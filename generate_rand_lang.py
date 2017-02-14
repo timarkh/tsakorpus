@@ -5,7 +5,7 @@ a script for generating a random language with changable characteristics
 
 import string
 
-ALPHABET = 'qwertyuiopasdfghjklzxcvbnm'
+ALPHABET = 'qwertyuiopasdfghjklzxcvbnmąóяŋ'
 PUNKT = string.punctuation
 MEAN_WORD_LENGTH = 5
 MEAN_SENT_LENGTH = 10

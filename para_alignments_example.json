@@ -1,0 +1,17 @@
+﻿# There will be a 'para_alignments' collection that will contain alignments between sentences in a parallel corpus (or in a monolingual corpus where sentences have translations into a metalanguage).
+# An aligned segment contains several tiers. Each tier corresponds to one language (or variant of the text). Each tier contains links to the sentences it includes.
+# The elements of the collection would look like this:
+
+{
+  "_id": ...,
+  "prev_id": ...,        # ID of the previous aligned segment
+  "next_id": ...,        # ID of the next aligned segment
+  "tiers": [
+    {
+      "name": "...",     # name of the tier (e. g. name of the language)
+      "sent_ids": [...], # IDs of the sentences included in this tier
+      "data": {...}      # any additional information about the segment as key-value pairs
+    },
+    ...
+  ]
+}

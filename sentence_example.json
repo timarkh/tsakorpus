@@ -1,0 +1,75 @@
+﻿# There will be a 'sentences' collection where elements would look like this:
+
+{
+  "_id": ...,
+  "prev_id": ...,  # ID of the previous sentence
+  "next_id": ...,  # ID of the next sentence
+  "text": "Colorlessgreenideas.",   # full text of the sentence (we may leave it blank if there is going to be only one variant of tokenization, but we need this field if there are multiple variants). An example here demonstrates the case of a spaceless writing system
+  "words": [       # list of words
+    {
+      "wf": "color",
+      "type": "word",
+      "off_start": "0",    # offset of the first character of the word in the sentence
+      "off_end": "5",      # offset of the last+1 character of the word in the sentence
+      "part_no": "0",      # number of the token partitioning variant
+      "ana": [     # list of analyses (if any)
+        {
+          "lex": "color"
+          "gr": [
+            {
+               "POS": "N"  # an arbitrary list of keys and values
+            }
+        }
+      ]
+    },
+    {
+      "wf": "less",
+      "type": "word",
+      "off_start": "5",
+      "off_end": "9",
+      "part_no": "0",
+      "ana": [
+        {
+          "lex": "less"
+          "gr": [
+            {
+               "POS": "ADV",
+               "degree": "comp"
+            }
+        }
+      ]
+    },
+    {
+      "wf": "colorless",
+      "type": "word",
+      "off_start": "0",
+      "off_end": "9",
+      "part_no": "1",
+      "ana": [
+        {
+          "lex": "colorless"
+          "gr": [
+            {
+               "POS": "ADJ",
+               "degree": "comp"
+            }
+        }
+      ]
+    },
+    ...
+  ],
+  "src_alignment": [
+    # a list of alignments between arbitrary segments of the sentence and one or more source files (audio/video)
+    {
+      "type": "...",            # audio/video/image
+      "src": "...",             # filename
+      "off_src": [..., ...],    # start and end offsets in milliseconds (for audio/video); if the key is absent, the whole audio/video file is taken
+      "off_sent": [..., ...],   # start and end offsets of the segment in the sentence, in characters; if the key is absent, the whole sentence is taken
+      "rect_src": [x_top, y_top, length, height]    # relevant rectangle coordinates (for images); if the key is absent, the whole image file is taken
+    },
+    ...
+  ],
+  "para_alignment_id": ...,     # ID of the parallel alignment segment (for parallel corpora)
+  "segment_ids": [...]          # IDs of annotated segments within this sentence
+}
+  
