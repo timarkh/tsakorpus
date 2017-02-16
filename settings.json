@@ -6,6 +6,8 @@
 		"MEAN_SENT_LENGTH" : 10,
 		"MAX_SENT_LENGTH" : 40,
 		"LENGTH_OF_CORPUS" : 15000000,
+        "WF_LEX_RATIO" : 10,
+        "MEAN_AMBIGUITY": 2.5,
 		"N_0" : 20000
 	},
 "grammar" : 
@@ -19,7 +21,7 @@
 			"num": [
 				"pl", 
 				"sg"
-				],
+				]
 			},
 		 "V" : {
 		 	"pers": [
@@ -27,7 +29,23 @@
 		 		"2",
 		 		"3"
 		 		],
+		 	"tense": [
+		 		"t1",
+		 		"t2",
+		 		"t3",
+		 		"t4",
+		 		"t5",
+		 		"t6",
+		 		"t7",
+		 		"t8",
+		 		"t9",
+		 		"t10",
+		 		"t11",
+		 		"t12",
+		 		"t13",
+		 		"t14"
+		 		]
+            },
 		 "ADV" : {}
-		}
 	}
 }
