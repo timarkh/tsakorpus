@@ -1,6 +1,7 @@
 import random
 import math
 import json
+import copy
 
 
 class MockMorphParser:
@@ -32,9 +33,21 @@ class MockMorphParser:
         return max(i for i, c in cdf if (c <= r))
 
     def generate_probabilities(self):
+        self.prob = {}
         l = self.settings['constants']['MEAN_AMBIGUITY']
-        self.prob = [(k, l ** k * math.exp(-l) / math.factorial(k))
-                     for k in range(math.floor(l) * 4)]
+        self.prob['n_ana'] = [(k, l ** k * math.exp(-l) / math.factorial(k))
+                              for k in range(math.floor(l) * 5)]
+        for pos in self.settings['grammar']:
+            for cat in self.settings['grammar'][pos]:
+                values = self.settings['grammar'][pos][cat]
+                if len(values) < 8:
+                    self.prob[cat] = [(v, 1 / len(values)) for v in values]
+                else:
+                    norm_coef = sum(1 / i for i in range(1, len(values) + 1))
+                    self.prob[cat] = []
+                    for i in range(len(values)):
+                        self.prob[cat].append((values[i], 1 / (norm_coef * (i + 1))))
+                print(cat, self.prob[cat])
 
     def one_lexeme(self):
         """
@@ -44,7 +57,7 @@ class MockMorphParser:
         lLen = random.choice(self.lengths)
         l['lex'] = ''.join(random.choice(self.settings['constants']['ALPHABET'])
                            for i in range(lLen))
-        l['pos'] = random.choice(self.pos)
+        l['gr'] = {'pos': random.choice(self.pos)}
         return l
 
     def generate_lexemes(self):
@@ -54,11 +67,22 @@ class MockMorphParser:
         self.lexemes = [self.one_lexeme()
                         for _ in range(self.n_lexemes)]
 
+    def get_random_cat_value(self, cat):
+        return MockMorphParser.ddistr(self.prob[cat])
+
+    def generate_analysis(self):
+        lex = copy.deepcopy(random.choice(self.lexemes))
+        for cat in self.settings['grammar'][lex['gr']['pos']]:
+            lex['gr'][cat] = self.get_random_cat_value(cat)
+        return lex
+
     def add_analysis(self, wf):
         """
         Add a random analysis (or analyses) to a Wordform object.
         """
-        n = MockMorphParser.ddistr(self.prob)
+        n = MockMorphParser.ddistr(self.prob['n_ana'])
+        wf.ana = [self.generate_analysis()
+                  for _ in range(n)]
         # print(n)
         return n
 
@@ -67,8 +91,11 @@ if __name__ == '__main__':
     settings = json.loads(f.read())
     f.close()
     mp = MockMorphParser(settings, 30000)
-    wf = {}
+    from gen_wfms_with_repr import WordForm
     n = 0
     for i in range(20):
+        wf = WordForm(1)
         n += mp.add_analysis(wf)
+        print(wf.ana)
     print(n / 20)
+    print(mp.lexemes[:30])
