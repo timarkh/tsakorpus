@@ -1,36 +1,12 @@
 
-'''
-a script for generating a random language with changable characteristics
-
-'''
-
 import json
 import math
 import string
-
-
-ALPHABET = 'qwertyuiopasdfghjklzxcvbnmąóяŋ'
-PUNKT = string.punctuation
-MEAN_WORD_LENGTH = 5
-MEAN_SENT_LENGTH = 10
-MAX_SENT_LENGTH = 40
-LENGTH_OF_CORPUS =  15*10**5
-N_0 = 20000 # a constant for zipf's low
-with open('grammar_features.json') as f:
-    GRAMMAR = json.load(f)
-
 
 class WordForm():
     """docstring for WordForm"""
     def __init__(self, freq):
         self.freq = freq
-
-
-class Lexeme():
-    """docstring for Lexeme"""
-    def __init__(self, pos):
-        self.pos = pos
-        
 
 def generate_wordforms():
     '''returns a list of wordforms (instances) with freqs'''
@@ -68,13 +44,5 @@ def calc_num_of_words():
     return round(n)
 
 
-def generate_sents():
-    current_length = 0
-    while current_length < LENGTH_OF_CORPUS:
-        pass
-
-
-# if __name__ == '__main__':
-#     generate_corp()
-    
-generate_wordforms()
+def give_text_repr():
+	pass
