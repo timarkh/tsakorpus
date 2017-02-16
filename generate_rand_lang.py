@@ -41,7 +41,7 @@ PUNKT = string.punctuation
 MEAN_WORD_LENGTH = 5
 MEAN_SENT_LENGTH = 10
 MAX_SENT_LENGTH = 40
-LENGTH_OF_CORPUS =  15*10**7
+LENGTH_OF_CORPUS =  15*10**6
 N_0 = 20000 # a constant for zipf's low
 # with open('grammar_features.json') as f:
 #     GRAMMAR = json.load(f)
