@@ -1,0 +1,33 @@
+{ "constants" :
+	{
+		"ALPHABET": "qwertyuiopasdfghjklzxcvbnmąóяŋ",
+		"PUNKT" : "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
+		"MEAN_WORD_LENGTH" : 5,
+		"MEAN_SENT_LENGTH" : 10,
+		"MAX_SENT_LENGTH" : 40,
+		"LENGTH_OF_CORPUS" : 15000000,
+		"N_0" : 20000
+	},
+"grammar" : 
+	{
+		"N": {
+			"case": [
+				"nom",
+				"gen",
+				"acc"
+				],
+			"num": [
+				"pl", 
+				"sg"
+				],
+			},
+		 "V" : {
+		 	"pers": [
+		 		"1",
+		 		"2",
+		 		"3"
+		 		],
+		 "ADV" : {}
+		}
+	}
+}
