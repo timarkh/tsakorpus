@@ -8,6 +8,7 @@ class WordForm():
     """docstring for WordForm"""
     def __init__(self, freq):
         self.freq = freq
+        self.type = 'word'
 
 
 class WordformGenerator():
@@ -29,10 +30,12 @@ class WordformGenerator():
         first = self.calc_f_0(n)
         for i in range(n//2):
             freq = first//(i + 1)
+            if freq == 0:
+                freq = 1
             #print('current_freq: ' + str(freq))
             wfms_with_freq.append(WordForm(freq))
         wfms_with_freq += [WordForm(1) for i in range(n - n//2)]
-        print(sum([wf.freq for wf in wfms_with_freq]))
+        print('number of tokens:',sum([wf.freq for wf in wfms_with_freq]))
         print('number of wordforms:',n)
         return wfms_with_freq
 
@@ -79,7 +82,9 @@ class WordformGenerator():
             while text in reprs:
                 le = random.choice(lengthvars)
                 text = ''.join(random.choice(self.settings['constants']['ALPHABET']) for i in range(le))
-            wordlist[i].text = text
+#            if i % 10000 == 0:
+#                print(i,le,text)
+            wordlist[i].wf = text
             reprs.add(text)
         print('mean word length:',sum([len(x) for x in reprs]) / len(reprs))
         return wordlist
@@ -95,4 +100,4 @@ if __name__ == '__main__':
     settings = json.loads(f.read())
     f.close()
     generator = WordformGenerator(settings)
-    print(generator.wordforms[-1].freq,generator.wordforms[-1].text)
+    print(generator.wordforms[-1].freq,generator.wordforms[-1].wf)
