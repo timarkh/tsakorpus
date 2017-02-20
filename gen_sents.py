@@ -6,7 +6,7 @@ import json
 import time
 
 
-class Sentence():
+class Sentence:
     def __init__(self):
         self.text = ''
         self.words = []
@@ -15,26 +15,25 @@ class Sentence():
         return len(self.words)
 
 
-class Punctuation():
-    def __init__(self,text):
+class Punctuation:
+    def __init__(self, text):
         self.wf = text
         self.type = 'punct'
 
     
-class CorpusGenerator():
-    ''' 
+class CorpusGenerator:
+    """
     object of this class, when created, generates corpus
     out of WordForm class objects and some random puctuation
-    '''
-    def __init__(self,settings):
+    """
+    def __init__(self, settings):
         self.settings = settings
         self.generate_sents()
 
-
     def create_full_wordforms(self):
-        '''
+        """
         returns wordforms with analyses
-        '''
+        """
         f = open('settings.json', 'r', encoding='utf-8')
         settings = json.loads(f.read())
         f.close()
@@ -46,14 +45,13 @@ class CorpusGenerator():
         print(n / len(generator.wordforms))
         return generator.wordforms
 
-
-    def final_sent(self,sent_arr):
-        '''
+    def final_sent(self, sent_arr):
+        """
         returns an object of Sentence class
-        '''
+        """
         sent = Sentence()
         text = ''
-        punct = np.random.choice([0,1],len(sent_arr),p=[0.9,0.1])
+        punct = np.random.choice([0, 1], len(sent_arr), p=[0.9, 0.1])
         offset = 0
         for i,item in enumerate(sent_arr):
             item.off_start = offset
@@ -66,7 +64,7 @@ class CorpusGenerator():
             sent.words.append(item.__dict__)
             text += item.wf
             if punct[i] and i != len(sent_arr) - 1:
-                punc_item = Punctuation(np.random.choice([';',',',':']))
+                punc_item = Punctuation(np.random.choice([';', ',', ':']))
                 punc_item.off_start = offset
                 offset += 1
                 punc_item.off_end = offset
@@ -75,18 +73,18 @@ class CorpusGenerator():
             if i != len(sent_arr) - 1:
                 text += ' '
             else:
-                finalpunct = Punctuation(np.random.choice(['.','!','?'],p=[0.7,0.15,0.15]))
+                finalpunct = Punctuation(np.random.choice(['.', '!', '?'],
+                                                          p=[0.7, 0.15, 0.15]))
                 text += finalpunct.wf
                 sent.words.append(finalpunct.__dict__)
         text = text[0].upper() + text[1:]
         sent.text = text
         return sent
-
     
     def generate_sents(self):
-        '''
+        """
         returns full corpus (array of objects of Sentence class)
-        '''
+        """
         self.sentences = []
         wfms = self.create_full_wordforms()
         full_list = [[x]*x.freq for x in wfms]
@@ -106,20 +104,21 @@ class CorpusGenerator():
                 sentence = full_list[prevlength:]
                 full_list = []
             self.sentences.append(self.final_sent(sentence))
-        print('mean sentence length:',np.sum([len(x) for x in self.sentences]) / len(self.sentences))
-        
+        print('mean sentence length:', np.sum([len(x) for x in self.sentences]) / len(self.sentences))
 
     def write_json(self):
-        '''
+        """
         writes corpus to .json file
-        '''
-        f = open('sentences.json','w',encoding='utf-8-sig')
+        """
+        f = open('test_output/sentences.json', 'w', encoding='utf-8-sig')
         sentences = [x.__dict__ for x in self.sentences]
-        f.write(json.dumps(sentences,indent=2,ensure_ascii=False))
+        f.write(json.dumps(sentences, indent=1, ensure_ascii=False))
         f.close()
 
-f = open('settings.json', 'r', encoding='utf-8')
-settings = json.loads(f.read())
-f.close()
-gen = CorpusGenerator(settings)
-#gen.write_json()
+
+if __name__ == '__main__':
+    f = open('settings.json', 'r', encoding='utf-8')
+    settings = json.loads(f.read())
+    f.close()
+    gen = CorpusGenerator(settings)
+    gen.write_json()

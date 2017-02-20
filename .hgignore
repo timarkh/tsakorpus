@@ -1,2 +1,3 @@
 syntax: regexp
 .*\.pyc
+.*\.idea/.*
