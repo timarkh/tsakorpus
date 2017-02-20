@@ -31,7 +31,7 @@ class WordSearchTree:
             return
         elif pmin >= self.pmax or pmax <= self.pmin:
             return
-        elif self.pmin - self.pmax < self.MIN_INTERVAL:
+        elif self.pmax - self.pmin < self.MIN_INTERVAL:
             if self.wfs is None:
                 self.wfs = [wf]
             else:
