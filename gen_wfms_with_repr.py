@@ -9,6 +9,7 @@ class WordForm:
     def __init__(self, freq):
         self.freq = freq
         self.type = 'word'
+        self.wf = ''
 
 
 class WordformGenerator:
@@ -34,8 +35,8 @@ class WordformGenerator:
             # print('current_freq: ' + str(freq))
             wfms_with_freq.append(WordForm(freq))
         wfms_with_freq += [WordForm(1) for i in range(n - n//2)]
-        print('number of tokens:',sum([wf.freq for wf in wfms_with_freq]))
-        print('number of wordforms:',n)
+        print('number of tokens:', sum([wf.freq for wf in wfms_with_freq]))
+        print('number of wordforms:', n)
         return wfms_with_freq
 
     def calc_f_0(self, n):
