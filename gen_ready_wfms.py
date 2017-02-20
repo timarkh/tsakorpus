@@ -99,3 +99,4 @@ if __name__ == '__main__':
         print(wf.ana)
     print(n / 20)
     print(mp.lexemes[:30])
+    print(len(set((l['lex'], l['gr']['pos']) for l in mp.lexemes)))
