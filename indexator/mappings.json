@@ -2,54 +2,59 @@
   "mappings": {
     "word": {
       "properties": {
-        "ana.gr.lang": {
-          "type": "keyword"
+        "ana": {
+          "properties": {
+            "gr.case": {
+              "type": "keyword"
+            },
+            "gr.v_form": {
+              "type": "keyword"
+            },
+            "lexref": {
+              "type": "text"
+            },
+            "lex": {
+              "type": "text"
+            },
+            "gr.pos": {
+              "type": "keyword"
+            },
+            "gr.lang": {
+              "type": "keyword"
+            },
+            "gr.adj_form": {
+              "type": "keyword"
+            },
+            "transl_en": {
+              "type": "text"
+            },
+            "gr.number": {
+              "type": "keyword"
+            },
+            "gr.tense": {
+              "type": "keyword"
+            },
+            "transl_ru": {
+              "type": "text"
+            },
+            "gr.gender": {
+              "type": "keyword"
+            },
+            "gr.person": {
+              "type": "keyword"
+            }
+          },
+          "type": "nested"
         },
-        "ana.gr.pos": {
-          "type": "keyword"
-        },
-        "ana.gr.tense": {
-          "type": "keyword"
-        },
-        "ana.gr.v_form": {
-          "type": "keyword"
+        "wf": {
+          "type": "text"
         },
         "wtype": {
           "type": "keyword"
         },
-        "ana.transl_ru": {
-          "type": "text"
-        },
-        "ana.lex": {
-          "type": "text"
-        },
-        "ana.gr.gender": {
-          "type": "keyword"
-        },
-        "ana.gr.number": {
-          "type": "keyword"
-        },
-        "ana.transl_en": {
-          "type": "text"
-        },
-        "ana.gr.case": {
-          "type": "keyword"
-        },
-        "ana.gr.adj_form": {
-          "type": "keyword"
-        },
         "sent_ids": {
-          "type": "integer",
-          "index": false
-        },
-        "ana.lexref": {
-          "type": "text"
-        },
-        "ana.gr.person": {
-          "type": "keyword"
-        },
-        "wf": {
-          "type": "text"
+          "index": false,
+          "type": "integer"
         }
       }
     }

@@ -9,7 +9,7 @@ class PrepareData:
     for indexing in the database.
     """
     SETTINGS_DIR = '../conf'
-    rxBadField = re.compile('[^a-z0-9_]|^(?:lex|gr)$')
+    rxBadField = re.compile('[^a-z0-9_]|^(?:lex|gr|wf|[wm]type|ana|sent_ids|id)$')
 
     def __init__(self):
         f = open(os.path.join(self.SETTINGS_DIR, 'word_fields.json'),
@@ -30,13 +30,15 @@ class PrepareData:
         m = {'wf': {'type': 'text'},
              'wtype': {'type': 'keyword'},
              'sent_ids': {'type': 'integer', 'index': False},
-             'ana.lex': {'type': 'text'}}
+             'ana': {'type': 'nested',
+                     'properties': {'lex': {'type': 'text'}}}
+             }
         for field in self.wordFields:
             if self.rxBadField.search(field) is None:
-                m['ana.' + field] = {'type': 'text'}
+                m['ana']['properties'][field] = {'type': 'text'}
         for field in set(self.categories.values()):
             if self.rxBadField.search(field) is None:
-                m['ana.gr.' + field] = {'type': 'keyword'}
+                m['ana']['properties']['gr.' + field] = {'type': 'keyword'}
         return m
 
     def generate_mappings(self):

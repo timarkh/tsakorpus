@@ -8,18 +8,17 @@
   "words": [       # list of words
     {
       "wf": "color",
-      "type": "word",
+      "wtype": "word",
       "off_start": "0",    # offset of the first character of the word in the sentence
       "off_end": "5",      # offset of the last+1 character of the word in the sentence
       "part_no": "0",      # number of the token partitioning variant
       "ana": [     # list of analyses (if any)
         {
-          "lex": "color"
-          "gr": [
-            {
-               "POS": "N"  # an arbitrary list of keys and values
-            }
-        }
+          "lex": "color",
+          "gr.pos": "N",
+          ...   # an arbitrary list of keys and values
+        },
+        ...
       ]
     },
     {
@@ -30,12 +29,9 @@
       "part_no": "0",
       "ana": [
         {
-          "lex": "less"
-          "gr": [
-            {
-               "POS": "ADV",
-               "degree": "comp"
-            }
+          "lex": "less",
+          "gr.pos": "ADV",
+          "gr.degree": "comp"
         }
       ]
     },
@@ -47,12 +43,9 @@
       "part_no": "1",
       "ana": [
         {
-          "lex": "colorless"
-          "gr": [
-            {
-               "POS": "ADJ",
-               "degree": "comp"
-            }
+          "lex": "colorless",
+          "gr.pos": "ADJ",
+          "gr.degree": "comp"
         }
       ]
     },
@@ -61,7 +54,7 @@
   "src_alignment": [
     # a list of alignments between arbitrary segments of the sentence and one or more source files (audio/video)
     {
-      "type": "...",            # audio/video/image
+      "mtype": "...",           # media type: audio/video/image
       "src": "...",             # filename
       "off_src": [..., ...],    # start and end offsets in milliseconds (for audio/video); if the key is absent, the whole audio/video file is taken
       "off_sent": [..., ...],   # start and end offsets of the segment in the sentence, in characters; if the key is absent, the whole sentence is taken
