@@ -21,6 +21,16 @@ class Indexator:
         f.close()
         self.name = self.settings['corpus_name']
         self.corpus_dir = os.path.join('../corpus', self.name)
+        f = open(os.path.join(self.SETTINGS_DIR, 'word_fields.json'),
+                 'r', encoding='utf-8')
+        self.goodWordFields = ['lex', 'wf'] + json.loads(f.read())
+        f.close()
+        f = open(os.path.join(self.SETTINGS_DIR, 'categories.json'),
+                 'r', encoding='utf-8')
+        categories = json.loads(f.read())
+        self.goodWordFields += ['gr.' + v for v in categories.values()]
+        self.goodWordFields = set(self.goodWordFields)
+        f.close()
         self.pd = PrepareData()
         self.es = Elasticsearch()
         self.es_ic = IndicesClient(self.es)
@@ -39,12 +49,38 @@ class Indexator:
         self.es_ic.create(index=self.name + '.sentences',
                           body=self.pd.generate_sentences_mapping())
 
+    def process_words(self, words):
+        """
+        Take words list from a sentence, remove all non-searchable
+        fields from them and add them to self.words dictionary.
+        """
+        for w in words:
+            wClean = {}
+            for field in w:
+                if field in self.goodWordFields:
+                    wClean[field] = w[field]
+            if 'ana' in w:
+                wClean['ana'] = []
+                for ana in w['ana']:
+                    cleanAna = {}
+                    for anaField in ana:
+                        if anaField in self.goodWordFields:
+                            cleanAna[anaField] = ana[anaField]
+                    wClean['ana'].append(cleanAna)
+            wCleanTxt = json.dumps(wClean, ensure_ascii=False, sort_keys=True)
+            try:
+                self.words[wCleanTxt] += 1
+            except KeyError:
+                self.words[wCleanTxt] = 1
+
     def iterate_sentences(self, fname):
         fIn = open(fname, 'r', encoding='utf-8-sig')
         curSentences = json.load(fIn)
         fIn.close()
         for iSent in range(len(curSentences)):
             s = curSentences[iSent]
+            if 'words' in s:
+                self.process_words(s['words'])
             if iSent > 0:
                 s['prev_id'] = self.sId - 1
             if iSent < len(curSentences) - 1:
@@ -58,15 +94,14 @@ class Indexator:
                          '_id': self.sId,
                          '_source': s}
             yield curAction
-            self.sId += 1
-            if self.sId % 100 == 1:
+            if self.sId % 500 == 0:
                 print('sentence', self.sId)
+            self.sId += 1
 
     def index_dir(self):
         """
         Index all files from the corpus directory.
         """
-        sId = 0
         for root, dirs, files in os.walk(self.corpus_dir):
             for fname in files:
                 if not fname.lower().endswith('.json'):
@@ -82,7 +117,8 @@ class Indexator:
         self.create_indices()
         self.index_dir()
         t2 = time.time()
-        print('Corpus indexed in', t2-t1, 'seconds.')
+        print('Corpus indexed in', t2-t1, 'seconds,',
+              len(self.words), 'different words.')
 
 
 if __name__ == '__main__':
