@@ -1,0 +1,57 @@
+{
+  "mappings": {
+    "word": {
+      "properties": {
+        "ana.gr.lang": {
+          "type": "keyword"
+        },
+        "ana.gr.pos": {
+          "type": "keyword"
+        },
+        "ana.gr.tense": {
+          "type": "keyword"
+        },
+        "ana.gr.v_form": {
+          "type": "keyword"
+        },
+        "wtype": {
+          "type": "keyword"
+        },
+        "ana.transl_ru": {
+          "type": "text"
+        },
+        "ana.lex": {
+          "type": "text"
+        },
+        "ana.gr.gender": {
+          "type": "keyword"
+        },
+        "ana.gr.number": {
+          "type": "keyword"
+        },
+        "ana.transl_en": {
+          "type": "text"
+        },
+        "ana.gr.case": {
+          "type": "keyword"
+        },
+        "ana.gr.adj_form": {
+          "type": "keyword"
+        },
+        "sent_ids": {
+          "type": "integer",
+          "index": false
+        },
+        "ana.lexref": {
+          "type": "text"
+        },
+        "ana.gr.person": {
+          "type": "keyword"
+        },
+        "wf": {
+          "type": "text"
+        }
+      }
+    }
+  }
+}
