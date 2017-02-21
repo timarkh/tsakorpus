@@ -1,5 +1,6 @@
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
+from elasticsearch.helpers import bulk
 import json
 import os
 import time
@@ -24,6 +25,7 @@ class Indexator:
         self.es = Elasticsearch()
         self.es_ic = IndicesClient(self.es)
         self.words = {}   # word as JSON -> its frequency
+        self.sId = 0
 
     def delete_indices(self):
         if self.es_ic.exists(index=self.name + '.words'):
@@ -37,6 +39,29 @@ class Indexator:
         self.es_ic.create(index=self.name + '.sentences',
                           body=self.pd.generate_sentences_mapping())
 
+    def iterate_sentences(self, fname):
+        fIn = open(fname, 'r', encoding='utf-8-sig')
+        curSentences = json.load(fIn)
+        fIn.close()
+        for iSent in range(len(curSentences)):
+            s = curSentences[iSent]
+            if iSent > 0:
+                s['prev_id'] = self.sId - 1
+            if iSent < len(curSentences) - 1:
+                s['next_id'] = self.sId + 1
+            # self.es.index(index=self.name + '.sentences',
+            #               doc_type='sentence',
+            #               id=self.sId,
+            #               body=s)
+            curAction = {'_index': self.name + '.sentences',
+                         '_type': 'sentence',
+                         '_id': self.sId,
+                         '_source': s}
+            yield curAction
+            self.sId += 1
+            if self.sId % 100 == 1:
+                print('sentence', self.sId)
+
     def index_dir(self):
         """
         Index all files from the corpus directory.
@@ -46,31 +71,17 @@ class Indexator:
             for fname in files:
                 if not fname.lower().endswith('.json'):
                     continue
-                fIn = open(os.path.join(root, fname), 'r', encoding='utf-8-sig')
-                curSentences = json.load(fIn)
-                fIn.close()
-                for s in curSentences:
-                    if sId > 0:
-                        s['prev_id'] = sId - 1
-                    if sId < len(curSentences) - 1:
-                        s['next_id'] = sId + 1
-                    self.es.index(index=self.name + '.sentences',
-                                  doc_type='sentence',
-                                  id=sId,
-                                  body=s)
-                    sId += 1
-                    if sId % 100 == 1:
-                        print('sentence', sId)
+                bulk(self.es, self.iterate_sentences(os.path.join(root, fname)))
 
     def load_corpus(self):
         """
         Drop the current database, if any, and load the entire corpus.
         """
-        t1 = time.clock()
+        t1 = time.time()
         self.delete_indices()
         self.create_indices()
         self.index_dir()
-        t2 = time.clock()
+        t2 = time.time()
         print('Corpus indexed in', t2-t1, 'seconds.')
 
 
