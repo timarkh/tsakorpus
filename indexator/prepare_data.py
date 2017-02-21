@@ -41,13 +41,44 @@ class PrepareData:
                 m['ana']['properties']['gr.' + field] = {'type': 'keyword'}
         return m
 
+    def generate_sentences_mapping(self):
+        """
+        Return Elasticsearch mapping for the type "sentence", based
+        on searchable features described in word_fields.json and
+        categories.json.
+        """
+        m = {'prev_id': {'type': 'integer'},
+             'next_id': {'type': 'integer'},
+             'text': {'type': 'text'},
+             'src_alignment': {'type': 'nested',
+                               'properties': {
+                                   'mtype': {'type': 'keyword'},
+                                   'src': {'type': 'keyword',
+                                           'index': False},
+                                   'off_src': {'type': 'integer',
+                                               'index': False},
+                                   'off_sent': {'type': 'short',
+                                                'index': False},
+                                   'rect_src': {'type': 'integer',
+                                                'index': False}
+                               }},
+             'para_alignment_id': {'type': 'integer',
+                                   'index': False},
+             'segment_ids': {'type': 'integer',
+                             'index': False},
+             'words': {'type': 'nested',
+                       'index': False}}
+        return m
+
     def generate_mappings(self):
         """
         Return Elasticsearch mappings for all types to be used
         in the corpus database.
         """
         mWord = {'properties': self.generate_words_mapping()}
-        mappings = {'mappings': {'word': mWord}}
+        mSent = {'properties': self.generate_sentences_mapping()}
+        mappings = {'sentences': {'mappings': {'sentence': mSent}},
+                    'words': {'mappings': {'word': mWord}}}
         return mappings
 
     def write_mappings(self, fnameOut):
