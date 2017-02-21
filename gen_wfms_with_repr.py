@@ -8,7 +8,7 @@ class WordForm:
     """docstring for WordForm"""
     def __init__(self, freq):
         self.freq = freq
-        self.type = 'word'
+        self.wtype = 'word'
         self.wf = ''
 
 

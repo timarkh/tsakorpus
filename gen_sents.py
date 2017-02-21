@@ -76,7 +76,7 @@ class Sentence:
 class Punctuation:
     def __init__(self, text):
         self.wf = text
-        self.type = 'punct'
+        self.wtype = 'punct'
 
     
 class CorpusGenerator:

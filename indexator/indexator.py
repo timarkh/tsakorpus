@@ -2,6 +2,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
 import json
 import os
+import time
 from prepare_data import PrepareData
 
 
@@ -65,9 +66,12 @@ class Indexator:
         """
         Drop the current database, if any, and load the entire corpus.
         """
+        t1 = time.clock()
         self.delete_indices()
         self.create_indices()
         self.index_dir()
+        t2 = time.clock()
+        print('Corpus indexed in', t2-t1, 'seconds.')
 
 
 if __name__ == '__main__':

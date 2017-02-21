@@ -56,8 +56,8 @@ class MockMorphParser:
         l = {}
         lLen = random.choice(self.lengths)
         l['lex'] = ''.join(random.choice(self.settings['constants']['ALPHABET'])
-                           for i in range(lLen))
-        l['gr'] = {'pos': random.choice(self.pos)}
+                           for _ in range(lLen))
+        l['gr.pos'] = random.choice(self.pos)
         return l
 
     def generate_lexemes(self):
@@ -72,8 +72,8 @@ class MockMorphParser:
 
     def generate_analysis(self):
         lex = copy.deepcopy(random.choice(self.lexemes))
-        for cat in self.settings['grammar'][lex['gr']['pos']]:
-            lex['gr'][cat] = self.get_random_cat_value(cat)
+        for cat in self.settings['grammar'][lex['gr.pos']]:
+            lex['gr.' + cat] = self.get_random_cat_value(cat)
         return lex
 
     def add_analysis(self, wf):
@@ -98,5 +98,4 @@ if __name__ == '__main__':
         n += mp.add_analysis(wf)
         print(wf.ana)
     print(n / 20)
-    print(mp.lexemes[:30])
-    print(len(set((l['lex'], l['gr']['pos']) for l in mp.lexemes)))
+    print(len(set((l['lex'], l['gr.pos']) for l in mp.lexemes)), 'lexemes total.')
