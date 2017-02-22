@@ -5,6 +5,7 @@ import json
 import os
 import time
 from prepare_data import PrepareData
+from json_doc_reader import JSONDocReader
 
 
 class Indexator:
@@ -20,7 +21,11 @@ class Indexator:
         self.settings = json.loads(f.read())
         f.close()
         self.name = self.settings['corpus_name']
+        self.input_format = self.settings['input_format']
         self.corpus_dir = os.path.join('../corpus', self.name)
+        self.iterSent = None
+        if self.input_format == 'json':
+            self.iterSent = JSONDocReader()
         f = open(os.path.join(self.SETTINGS_DIR, 'word_fields.json'),
                  'r', encoding='utf-8')
         self.goodWordFields = ['lex', 'wf'] + json.loads(f.read())
@@ -74,16 +79,13 @@ class Indexator:
                 self.words[wCleanTxt] = 1
 
     def iterate_sentences(self, fname):
-        fIn = open(fname, 'r', encoding='utf-8-sig')
-        curSentences = json.load(fIn)
-        fIn.close()
-        for iSent in range(len(curSentences)):
-            s = curSentences[iSent]
+        iSent = 0
+        for s, bLast in self.iterSent.get_sentences(fname):
             if 'words' in s:
                 self.process_words(s['words'])
             if iSent > 0:
                 s['prev_id'] = self.sId - 1
-            if iSent < len(curSentences) - 1:
+            if not bLast:
                 s['next_id'] = self.sId + 1
             # self.es.index(index=self.name + '.sentences',
             #               doc_type='sentence',
@@ -95,7 +97,7 @@ class Indexator:
                          '_source': s}
             yield curAction
             if self.sId % 500 == 0:
-                print('sentence', self.sId)
+                print('indexing sentence', self.sId)
             self.sId += 1
 
     def index_dir(self):
