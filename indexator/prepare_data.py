@@ -31,7 +31,8 @@ class PrepareData:
              'wtype': {'type': 'keyword'},
              'sent_ids': {'type': 'integer', 'index': False},
              'ana': {'type': 'nested',
-                     'properties': {'lex': {'type': 'text'}}}
+                     'properties': {'lex': {'type': 'text'}}},
+             'freq': {'type': 'integer'}
              }
         for field in self.wordFields:
             if self.rxBadField.search(field) is None:

@@ -54,7 +54,7 @@ class Indexator:
         self.es_ic.create(index=self.name + '.sentences',
                           body=self.pd.generate_sentences_mapping())
 
-    def process_words(self, words):
+    def process_sentence_words(self, words):
         """
         Take words list from a sentence, remove all non-searchable
         fields from them and add them to self.words dictionary.
@@ -78,11 +78,37 @@ class Indexator:
             except KeyError:
                 self.words[wCleanTxt] = 1
 
+    def iterate_words(self):
+        """
+        Iterate through all words collected at the previous
+        stage. Return JSON objects with actions for bulk indexing
+        in Elasticsearch.
+        """
+        iWord = 0
+        for w in self.words:
+            if iWord % 500 == 0:
+                print('indexing word', iWord)
+            wJson = json.loads(w)
+            wJson['freq'] = self.words[w]
+            curAction = {'_index': self.name + '.words',
+                         '_type': 'word',
+                         '_id': iWord,
+                         '_source': wJson}
+            iWord += 1
+            yield curAction
+
+    def index_words(self):
+        """
+        Index all words that have been collected at the previous stage
+        in self.words (while the sentences were being indexed).
+        """
+        bulk(self.es, self.iterate_words())
+
     def iterate_sentences(self, fname):
         iSent = 0
         for s, bLast in self.iterSent.get_sentences(fname):
             if 'words' in s:
-                self.process_words(s['words'])
+                self.process_sentence_words(s['words'])
             if iSent > 0:
                 s['prev_id'] = self.sId - 1
             if not bLast:
@@ -98,6 +124,7 @@ class Indexator:
             yield curAction
             if self.sId % 500 == 0:
                 print('indexing sentence', self.sId)
+            iSent += 1
             self.sId += 1
 
     def index_dir(self):
@@ -109,6 +136,7 @@ class Indexator:
                 if not fname.lower().endswith('.json'):
                     continue
                 bulk(self.es, self.iterate_sentences(os.path.join(root, fname)))
+        self.index_words()
 
     def load_corpus(self):
         """
