@@ -1,6 +1,7 @@
 from gen_wfms_with_repr import WordformGenerator
 from gen_ready_wfms import MockMorphParser
 import random
+import copy
 import numpy as np
 import json
 
@@ -78,7 +79,30 @@ class Punctuation:
         self.wf = text
         self.wtype = 'punct'
 
-    
+
+class Text:
+    def __init__(self, sentences, length, author, title, numwords, i):
+        self.sentences = sentences
+        self.create_meta(length, author, title, numwords, i)
+
+    def create_meta(self, length, author, title, numwords, i):
+        self.meta = {}
+        self.meta['author'] = author
+        self.meta['title'] = title
+        self.meta['year'] = random.randint(1960,2017)
+        self.meta['id'] = i
+        self.meta['sentences'] = length
+        self.meta['words'] = numwords
+
+    def write_json(self):
+        """
+        writes corpus to .json file
+        """
+        f = open('test_output/'+str(self.meta['id'])+'.json', 'w', encoding='utf-8-sig')
+        self.sentences = [x.__dict__ for x in self.sentences]
+        f.write(json.dumps(self.__dict__, indent=1, ensure_ascii=False))
+        f.close()
+  
 class CorpusGenerator:
     """
     object of this class, when created, generates corpus
@@ -113,15 +137,16 @@ class CorpusGenerator:
         punct = np.random.choice([0, 1], len(sent_arr), p=[0.9, 0.1])
         offset = 0
         for i, item in enumerate(sent_arr):
-            item.off_start = offset
-            offset += len(item.wf)
-            item.off_end = offset
+            dup_item = copy.deepcopy(item)
+            dup_item.off_start = offset
+            offset += len(dup_item.wf)
+            dup_item.off_end = offset
             try: #delete frequency attribute
                 delattr(item,'freq')
             except:
                 pass
-            sent.words.append(item.__dict__)
-            text += item.wf
+            sent.words.append(dup_item.__dict__)
+            text += dup_item.wf
             if punct[i] and i != len(sent_arr) - 1:
                 punc_item = Punctuation(np.random.choice([';', ',', ':']))
                 punc_item.off_start = offset
@@ -134,6 +159,9 @@ class CorpusGenerator:
             else:
                 finalpunct = Punctuation(np.random.choice(['.', '!', '?'],
                                                           p=[0.7, 0.15, 0.15]))
+                finalpunct.off_start = offset
+                offset += 1
+                finalpunct.off_end = offset
                 text += finalpunct.wf
                 sent.words.append(finalpunct.__dict__)
         text = text[0].upper() + text[1:]
@@ -169,11 +197,13 @@ class CorpusGenerator:
         self.sentences = []
         wfms = self.create_full_wordforms()
         self.build_wf_cdf(wfms)
-        prevlength = 0
         # full_corp = len(full_list)
         nCorpusSize = self.settings['constants']['LENGTH_OF_CORPUS']
         mean = np.mean(np.log(self.settings['constants']['MEAN_SENT_LENGTH']))
         nGenerated = 0
+        prevGenerated = 0
+        textlength = random.randint(100,3000)
+        textnum = 1
         while nGenerated < nCorpusSize:
             # print(nGenerated)
             length = int(np.round(np.random.lognormal(mean=mean)))
@@ -183,16 +213,26 @@ class CorpusGenerator:
                         for _ in range(min([length, nCorpusSize - nGenerated]))]
             nGenerated += len(sentence)
             self.sentences.append(self.final_sent(sentence))
-        print('mean sentence length:', np.sum([len(x) for x in self.sentences]) / len(self.sentences))
+            if nGenerated >= nCorpusSize:
+                textlength = len(self.sentences)
+            if len(self.sentences) == textlength:
+                author = [self.pick_random_word() for _ in range(2)]
+                author = ' '.join([x.wf[0].upper()+x.wf[1:] for x in author])
+                title = ' '.join([self.pick_random_word().wf 
+                                  for _ in range(random.randint(1,5))])
+                title = title[0].upper() + title[1:]
+                wordsInText = nGenerated - prevGenerated
+                text = Text(self.sentences, textlength, author, title, wordsInText, textnum)
+                text.write_json()
+                textlength = random.randint(100,3000)
+                textnum += 1
+                prevGenerated = nGenerated
+                self.sentences = []
+            
+        #print('mean sentence length:', np.sum([len(x) for x in self.sentences]) / len(self.sentences))
 
-    def write_json(self):
-        """
-        writes corpus to .json file
-        """
-        f = open('test_output/sentences.json', 'w', encoding='utf-8-sig')
-        sentences = [x.__dict__ for x in self.sentences]
-        f.write(json.dumps(sentences, indent=1, ensure_ascii=False))
-        f.close()
+        
+        
 
 
 if __name__ == '__main__':
@@ -200,4 +240,3 @@ if __name__ == '__main__':
     settings = json.loads(f.read())
     f.close()
     gen = CorpusGenerator(settings)
-    gen.write_json()
