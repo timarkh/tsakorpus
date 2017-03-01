@@ -1,4 +1,4 @@
-﻿# There will be a 'sentences' collection where elements would look like this:
+# There will be a 'sentences' collection where elements would look like this:
 
 {
   "_id": ...,
@@ -65,4 +65,3 @@
   "para_alignment_id": ...,     # ID of the parallel alignment segment (for parallel corpora)
   "segment_ids": [...]          # IDs of annotated segments within this sentence
 }
-  
