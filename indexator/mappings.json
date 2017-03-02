@@ -1,85 +1,79 @@
 {
-  "words": {
-    "mappings": {
-      "word": {
-        "properties": {
-          "sids": {
-            "type": "integer",
-            "index": false
-          },
-          "wtype": {
-            "type": "keyword"
-          },
-          "wf": {
-            "type": "text"
-          },
-          "ana": {
-            "properties": {
-              "gr.adj_form": {
-                "type": "keyword"
-              },
-              "gr.number": {
-                "type": "keyword"
-              },
-              "transl_en": {
-                "type": "text"
-              },
-              "gr.v_form": {
-                "type": "keyword"
-              },
-              "gr.gender": {
-                "type": "keyword"
-              },
-              "gr.person": {
-                "type": "keyword"
-              },
-              "gr.lang": {
-                "type": "keyword"
-              },
-              "gr.case": {
-                "type": "keyword"
-              },
-              "transl_ru": {
-                "type": "text"
-              },
-              "lexref": {
-                "type": "text"
-              },
-              "lex": {
-                "type": "text"
-              },
-              "gr.pos": {
-                "type": "keyword"
-              },
-              "gr.tense": {
-                "type": "keyword"
-              }
-            },
-            "type": "nested"
-          }
-        }
-      }
-    }
-  },
   "sentences": {
     "mappings": {
       "sentence": {
         "properties": {
-          "para_alignment_id": {
-            "type": "integer",
-            "index": false
-          },
-          "segment_ids": {
-            "type": "integer",
-            "index": false
+          "words": {
+            "type": "nested",
+            "properties": {
+              "wf": {
+                "type": "text"
+              },
+              "wtype": {
+                "type": "keyword"
+              },
+              "sids": {
+                "type": "integer",
+                "index": false
+              },
+              "freq": {
+                "type": "integer"
+              },
+              "ana": {
+                "type": "nested",
+                "properties": {
+                  "transl_ru": {
+                    "type": "text"
+                  },
+                  "gr.v_form": {
+                    "type": "keyword"
+                  },
+                  "gr.pers": {
+                    "type": "keyword"
+                  },
+                  "gr.case": {
+                    "type": "keyword"
+                  },
+                  "lex": {
+                    "type": "text"
+                  },
+                  "gr.tense": {
+                    "type": "keyword"
+                  },
+                  "gr.adj_form": {
+                    "type": "keyword"
+                  },
+                  "gr.gender": {
+                    "type": "keyword"
+                  },
+                  "gr.pos": {
+                    "type": "keyword"
+                  },
+                  "gr.number": {
+                    "type": "keyword"
+                  },
+                  "transl_en": {
+                    "type": "text"
+                  },
+                  "gr.lang": {
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
           },
           "src_alignment": {
+            "type": "nested",
             "properties": {
+              "src": {
+                "type": "keyword",
+                "index": false
+              },
               "mtype": {
                 "type": "keyword"
               },
-              "src": {
-                "type": "keyword",
+              "rect_src": {
+                "type": "integer",
                 "index": false
               },
               "off_sent": {
@@ -89,26 +83,87 @@
               "off_src": {
                 "type": "integer",
                 "index": false
-              },
-              "rect_src": {
-                "type": "integer",
-                "index": false
               }
-            },
-            "type": "nested"
-          },
-          "prev_id": {
-            "type": "integer"
-          },
-          "words": {
-            "type": "nested",
-            "index": false
+            }
           },
           "text": {
             "type": "text"
           },
+          "prev_id": {
+            "type": "integer"
+          },
           "next_id": {
             "type": "integer"
+          },
+          "segment_ids": {
+            "type": "integer",
+            "index": false
+          },
+          "para_alignment_id": {
+            "type": "integer",
+            "index": false
+          }
+        }
+      }
+    }
+  },
+  "words": {
+    "mappings": {
+      "word": {
+        "properties": {
+          "wf": {
+            "type": "text"
+          },
+          "wtype": {
+            "type": "keyword"
+          },
+          "sids": {
+            "type": "integer",
+            "index": false
+          },
+          "freq": {
+            "type": "integer"
+          },
+          "ana": {
+            "type": "nested",
+            "properties": {
+              "transl_ru": {
+                "type": "text"
+              },
+              "gr.v_form": {
+                "type": "keyword"
+              },
+              "gr.pers": {
+                "type": "keyword"
+              },
+              "gr.case": {
+                "type": "keyword"
+              },
+              "lex": {
+                "type": "text"
+              },
+              "gr.tense": {
+                "type": "keyword"
+              },
+              "gr.adj_form": {
+                "type": "keyword"
+              },
+              "gr.gender": {
+                "type": "keyword"
+              },
+              "gr.pos": {
+                "type": "keyword"
+              },
+              "gr.number": {
+                "type": "keyword"
+              },
+              "transl_en": {
+                "type": "text"
+              },
+              "gr.lang": {
+                "type": "keyword"
+              }
+            }
           }
         }
       }

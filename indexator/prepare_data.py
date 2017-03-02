@@ -29,7 +29,7 @@ class PrepareData:
         """
         m = {'wf': {'type': 'text'},
              'wtype': {'type': 'keyword'},
-             'sent_ids': {'type': 'integer', 'index': False},
+             'sids': {'type': 'integer', 'index': False},
              'ana': {'type': 'nested',
                      'properties': {'lex': {'type': 'text'}}},
              'freq': {'type': 'integer'}
@@ -42,7 +42,7 @@ class PrepareData:
                 m['ana']['properties']['gr.' + field] = {'type': 'keyword'}
         return {'mappings': {'word': {'properties': m}}}
 
-    def generate_sentences_mapping(self):
+    def generate_sentences_mapping(self, word_mapping):
         """
         Return Elasticsearch mapping for the type "sentence", based
         on searchable features described in word_fields.json and
@@ -67,7 +67,8 @@ class PrepareData:
                                    'index': False},
              'segment_ids': {'type': 'integer',
                              'index': False},
-             'words': {'type': 'nested'}}
+             'words': {'type': 'nested',
+                       'properties': word_mapping['mappings']['word']['properties']}}
         return {'mappings': {'sentence': {'properties': m}}}
 
     def generate_mappings(self):
@@ -76,7 +77,7 @@ class PrepareData:
         in the corpus database.
         """
         mWord = self.generate_words_mapping()
-        mSent = self.generate_sentences_mapping()
+        mSent = self.generate_sentences_mapping(mWord)
         mappings = {'sentences': mSent,
                     'words': mWord}
         return mappings
