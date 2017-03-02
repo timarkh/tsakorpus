@@ -52,11 +52,13 @@ class Indexator:
             self.es_ic.delete(index=self.name + '.sentences')
 
     def create_indices(self):
+        self.wordMapping = self.pd.generate_words_mapping()
+        self.sentMapping = self.pd.generate_sentences_mapping(self.wordMapping)
         self.es_ic.create(index=self.name + '.docs')
         self.es_ic.create(index=self.name + '.words',
-                          body=self.pd.generate_words_mapping())
+                          body=self.wordMapping)
         self.es_ic.create(index=self.name + '.sentences',
-                          body=self.pd.generate_sentences_mapping())
+                          body=self.sentMapping)
 
     def process_sentence_words(self, words):
         """
