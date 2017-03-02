@@ -3,7 +3,7 @@
     "mappings": {
       "word": {
         "properties": {
-          "sent_ids": {
+          "sids": {
             "type": "integer",
             "index": false
           },
