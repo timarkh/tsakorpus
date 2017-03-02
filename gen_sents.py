@@ -81,6 +81,10 @@ class Punctuation:
 
 
 class Text:
+    """
+    an object of this class generates meta and
+    writes .json files for given sentence sequences
+    """
     def __init__(self, sentences, length, author, title, numwords, i):
         self.sentences = sentences
         self.create_meta(length, author, title, numwords, i)
@@ -137,14 +141,14 @@ class CorpusGenerator:
         punct = np.random.choice([0, 1], len(sent_arr), p=[0.9, 0.1])
         offset = 0
         for i, item in enumerate(sent_arr):
-            dup_item = copy.deepcopy(item)
-            dup_item.off_start = offset
-            offset += len(dup_item.wf)
-            dup_item.off_end = offset
             try: #delete frequency attribute
                 delattr(item,'freq')
             except:
                 pass
+            dup_item = copy.deepcopy(item)
+            dup_item.off_start = offset
+            offset += len(dup_item.wf)
+            dup_item.off_end = offset
             sent.words.append(dup_item.__dict__)
             text += dup_item.wf
             if punct[i] and i != len(sent_arr) - 1:
@@ -156,6 +160,7 @@ class CorpusGenerator:
                 text += punc_item.wf
             if i != len(sent_arr) - 1:
                 text += ' '
+                offset += 1
             else:
                 finalpunct = Punctuation(np.random.choice(['.', '!', '?'],
                                                           p=[0.7, 0.15, 0.15]))
@@ -170,7 +175,7 @@ class CorpusGenerator:
 
     def build_wf_cdf(self, wfms):
         """
-        Build a searchh tree with the cumulative distribution
+        Build a search tree with the cumulative distribution
         function for the choice of wordforms, taking into account
         their frequencies.
         """
