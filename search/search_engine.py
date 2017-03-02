@@ -51,7 +51,7 @@ if __name__ == '__main__':
     sc = SearchClient()
 
     # 1. Lexical query.
-    query1 = {'ana.lex': 'iwkmx'}
+    query1 = {'ana.lex': 'vbcvqr'}
     query1 = sc.make_word_ana_query(query1)
     print('query1 (words):', json.dumps(query1, ensure_ascii=False))
     hits = sc.get_words(query1)
