@@ -18,6 +18,8 @@ class WordSearchTree:
     MIN_INTERVAL = 1e-4
 
     def __init__(self, mid=0.5, pmin=0.0, pmax=1.0):
+        self.hapax_cutoff = 0.5  # words right to this are considered to have equal probability
+        self.hapaxes = []        # hapax legomena in the rightmost branch
         self.left = None
         self.right = None
         self.wfs = None
@@ -26,6 +28,11 @@ class WordSearchTree:
         self.mid = mid
 
     def add_word(self, wf, pmin, pmax):
+        if pmax > self.hapax_cutoff:
+            self.hapaxes.append(wf)
+            if pmin < self.hapax_cutoff:
+                self.add_word(wf, pmin, self.hapax_cutoff)
+            return
         if pmin <= self.pmin and pmax >= self.pmax:
             self.wfs = [wf]
             # print(wf.wf, self.pmin, self.pmax)
@@ -55,6 +62,12 @@ class WordSearchTree:
         # print('find_word', self.pmin, self.mid, self.pmax, p)
         if self.wfs is not None:
             return random.choice(self.wfs)
+        elif p >= self.hapax_cutoff:
+            if len(self.hapaxes) <= 1:
+                p /= 2
+                return self.find_word(p)
+            iWf = random.randint(0, len(self.hapaxes) - 1)
+            return self.hapaxes.pop(iWf)
         elif self.pmin <= p < self.mid:
             if self.left is None:
                 return None
@@ -93,7 +106,7 @@ class Text:
         self.meta = {}
         self.meta['author'] = author
         self.meta['title'] = title
-        self.meta['year'] = random.randint(1960,2017)
+        self.meta['year'] = random.randint(1960, 2017)
         self.meta['id'] = i
         self.meta['sentences'] = length
         self.meta['words'] = numwords
@@ -197,7 +210,8 @@ class CorpusGenerator:
     
     def generate_sents(self):
         """
-        returns full corpus (array of objects of Sentence class)
+        Generates full corpus (list of objects of Sentence class),
+        writing it to json files.
         """
         self.sentences = []
         wfms = self.create_full_wordforms()
@@ -229,15 +243,12 @@ class CorpusGenerator:
                 wordsInText = nGenerated - prevGenerated
                 text = Text(self.sentences, textlength, author, title, wordsInText, textnum)
                 text.write_json()
-                textlength = random.randint(100,3000)
+                textlength = random.randint(100, 3000)
                 textnum += 1
                 prevGenerated = nGenerated
                 self.sentences = []
             
         #print('mean sentence length:', np.sum([len(x) for x in self.sentences]) / len(self.sentences))
-
-        
-        
 
 
 if __name__ == '__main__':
@@ -245,3 +256,4 @@ if __name__ == '__main__':
     settings = json.loads(f.read())
     f.close()
     gen = CorpusGenerator(settings)
+    gen.generate_sents()

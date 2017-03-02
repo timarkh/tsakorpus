@@ -51,7 +51,7 @@ if __name__ == '__main__':
     sc = SearchClient()
 
     # 1. Lexical query.
-    query1 = {'ana.lex': 'jvtkc'}
+    query1 = {'ana.lex': 'iwkmx'}
     query1 = sc.make_word_ana_query(query1)
     print('query1 (words):', json.dumps(query1, ensure_ascii=False))
     hits = sc.get_words(query1)
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     print(json.dumps(hits, ensure_ascii=False, indent=1))
 
     # 3. Grammar query in sentences:
-    query2 = {'ana.gr.tense': 't5', 'ana.gr.pers': '2'}
+    query2 = {'ana.gr.tense': 't7', 'ana.gr.pers': '2'}
     query2 = sc.make_sent_ana_query(query2)
     print('query2 (sentences):', json.dumps(query2, ensure_ascii=False))
     hits = sc.get_sentences(query2)
