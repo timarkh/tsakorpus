@@ -19,7 +19,8 @@ class JSONDocReader:
         if os.stat(fname).st_size > self.filesize_limit > 0:
             return
         fIn = open(fname, 'r', encoding='utf-8-sig')
-        sentences = json.load(fIn)
+        doc = json.load(fIn)
+        sentences = doc['sentences']
         fIn.close()
         for i in range(len(sentences)):
             if i == len(sentences) - 1:

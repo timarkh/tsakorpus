@@ -39,20 +39,26 @@ class Indexator:
         self.pd = PrepareData()
         self.es = Elasticsearch()
         self.es_ic = IndicesClient(self.es)
-        self.words = {}   # word as JSON -> its frequency
+        self.wordFreqs = {}   # word as JSON -> its frequency
+        self.wordSIDs = {}    # word as JSON -> set of sentence IDs
         self.sId = 0
 
     def delete_indices(self):
+        if self.es_ic.exists(index=self.name + '.docs'):
+            self.es_ic.delete(index=self.name + '.docs')
         if self.es_ic.exists(index=self.name + '.words'):
             self.es_ic.delete(index=self.name + '.words')
         if self.es_ic.exists(index=self.name + '.sentences'):
             self.es_ic.delete(index=self.name + '.sentences')
 
     def create_indices(self):
+        self.wordMapping = self.pd.generate_words_mapping()
+        self.sentMapping = self.pd.generate_sentences_mapping(self.wordMapping)
+        self.es_ic.create(index=self.name + '.docs')
         self.es_ic.create(index=self.name + '.words',
-                          body=self.pd.generate_words_mapping())
+                          body=self.wordMapping)
         self.es_ic.create(index=self.name + '.sentences',
-                          body=self.pd.generate_sentences_mapping())
+                          body=self.sentMapping)
 
     def process_sentence_words(self, words):
         """
@@ -74,9 +80,11 @@ class Indexator:
                     wClean['ana'].append(cleanAna)
             wCleanTxt = json.dumps(wClean, ensure_ascii=False, sort_keys=True)
             try:
-                self.words[wCleanTxt] += 1
+                self.wordFreqs[wCleanTxt] += 1
+                self.wordSIDs[wCleanTxt].add(self.sId)
             except KeyError:
-                self.words[wCleanTxt] = 1
+                self.wordFreqs[wCleanTxt] = 1
+                self.wordSIDs[wCleanTxt] = {self.sId}
 
     def iterate_words(self):
         """
@@ -85,11 +93,12 @@ class Indexator:
         in Elasticsearch.
         """
         iWord = 0
-        for w in self.words:
+        for w in self.wordFreqs:
             if iWord % 500 == 0:
                 print('indexing word', iWord)
             wJson = json.loads(w)
-            wJson['freq'] = self.words[w]
+            wJson['freq'] = self.wordFreqs[w]
+            wJson['sids'] = [sid for sid in sorted(self.wordSIDs[w])]
             curAction = {'_index': self.name + '.words',
                          '_type': 'word',
                          '_id': iWord,
@@ -148,7 +157,7 @@ class Indexator:
         self.index_dir()
         t2 = time.time()
         print('Corpus indexed in', t2-t1, 'seconds,',
-              len(self.words), 'different words.')
+              len(self.wordFreqs), 'different words.')
 
 
 if __name__ == '__main__':
