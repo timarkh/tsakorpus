@@ -2,8 +2,10 @@ import json
 import os
 
 FNAME = '/home/maryszmary/Downloads/adygvoice-2012-05-21.prs'
+# FNAME = '/home/maryszmary/Downloads/20040123.prs'
 
 ## TODO: do something about the punctuation
+## проблема: невозможно сохранить исходную индексацию, если считать знаки пунктуации токенами.
 
 class EANCDocReader():
     """the class for converting texts from EANC format"""
@@ -14,8 +16,10 @@ class EANCDocReader():
 
     def process_text(self):
         with open(self.fname, 'r', encoding='utf-8-sig') as f:
-            text = f.read().split('\n')
-        self.head = text[1].split('\t')[2:]
+            text = f.read().split('\n') 
+
+        # first 2 elements are cut off, bc they are about id, the last bc the information is redundant 
+        self.head = text[0].replace('#', '').split('\t')[2:-1] 
         sentences = [li for li in text if not li.startswith('#') and li != '']
         self.extract_sentences(sentences)
 
@@ -26,6 +30,7 @@ class EANCDocReader():
                 self.sentences[int(num)] += [content]
             else:
                 self.sentences.append([content])
+        print('head: ' + str(self.head))
         for i in range(len(self.sentences)):
             sent = Sentence(i, self.sentences[i], self.head)
             self.sentences[i] = sent.content
@@ -62,8 +67,8 @@ class WordForm():
     """
     extract analyses for one worform
     """
-    def __init__(self, ID, data, head):
-        self.ID = ID
+    def __init__(self, data, head):
+        self.wtype = 'word'
         self.head = head
         self.data = [data]
         self.wf = data[2]
@@ -71,10 +76,26 @@ class WordForm():
     def form_content(self):
         self.anas = []
         for line in self.data:
-            pass
+            if len(line) < len(self.head):
+                self.head = self.head[:-1]
+            ana = {pair[0] : pair[1] for pair in zip(self.head, line)}
+            self.anas.append(ana)
         self.content = {'ana' : self.anas, 'wf': self.wf, 'off_end' : None, 
-                        'off_start' : None , 'wtype' : None}
+                        'off_start' : None}
 
+
+    def start_and_end(self):
+        return prev_end + 1, prev_end + 1 + len(self.wf)
+
+
+class Punct():
+    def __init__(self, wf):
+        self.wf = wf
+        self.wtype = 'punct'
+
+    def start_and_end(self, prev_end):
+        return prev_end, prev_end + len(self.wf)
+        
 
 class Sentence():
     """docstring for Sentence"""
@@ -89,18 +110,32 @@ class Sentence():
         for line in content:
             num, word_data = tuple(line.split('\t', 1))
             num = int(num)
-            word_data = word_data.split('\t')
+            # print(word_data)
+            word_data = word_data.split('\t')[:-1]
+            # print('HEAD: ' + str(self.head))
             if num == len(self.words) + 1:
-                self.words.append(WordForm(num, word_data, self.head))
+                self.words.append(WordForm(word_data, self.head))
             elif num == len(self.words):
                 self.words[-1].data.append(word_data)
             else:
                 print('SOMETHING GONE WRONG WITH LINE ' + str(line))
 
+    def reach_punctuation(self):
+        i = 0
+        while i < len(self.words):
+            if self.words[i].wtype == 'word':
+                if self.words[i].content['punctl']\
+                   and (i == 0 or self.words[i].content['punctl'] != self.words[i - 1].wf):
+                   self.words.insert(i, Punct(self.words[i].content['punctl']))
+                elif self.words[i].content['punctr']:
+                    self.words.insert(i + 1, Punct(self.words[i].content['punctr']))
+                i += 1
+
     def form_content(self):
-        for word in self.words:
-            word.form_content()
+        for i in range(len(self.words)):
+            self.words[i].form_content()
         self.text = ' '.join([word.wf for word in self.words])
+        # self.reach_punctuation()
         self.content = {'text' : self.text, 'words': 
                         [w.content for w in self.words]}
 
@@ -108,9 +143,11 @@ class Sentence():
 if __name__ == '__main__':
     reader = EANCDocReader()
     # print(reader.get_meta(FNAME))
-    i = 0
-    for sent in reader.get_sentences(FNAME):
-        print(sent[0]['text'])
-        i += 1
-        if i > 100:
-            break
+    # i = 0
+    for pair in reader.get_sentences(FNAME):
+        print(pair[0]['text'])
+    #     for word in pair[0]['words']:
+    #         print(word['ana'])
+    #     i += 1
+    #     if i > 10:
+    #         break
