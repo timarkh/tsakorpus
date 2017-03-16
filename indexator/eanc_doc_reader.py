@@ -7,7 +7,7 @@ FNAME = '/home/maryszmary/Downloads/adygvoice-2012-05-21.prs'
 ## TODO: do something about the punctuation
 ## проблема: невозможно сохранить исходную индексацию, если считать знаки пунктуации токенами.
 
-class EANCDocReader():
+class EANCDocReader:
     """the class for converting texts from EANC format"""
     def __init__(self):
         self.filesize_limit = -1
@@ -31,9 +31,11 @@ class EANCDocReader():
             else:
                 self.sentences.append([content])
         print('head: ' + str(self.head))
+
         for i in range(len(self.sentences)):
             sent = Sentence(i, self.sentences[i], self.head)
             self.sentences[i] = sent.content
+
 
     def get_sentences(self, fname):
         """
@@ -63,7 +65,7 @@ class EANCDocReader():
         return meta
 
 
-class WordForm():
+class WordForm:
     """
     extract analyses for one worform
     """
@@ -81,23 +83,24 @@ class WordForm():
             ana = {pair[0] : pair[1] for pair in zip(self.head, line)}
             self.anas.append(ana)
         self.content = {'ana' : self.anas, 'wf': self.wf, 'off_end' : None, 
-                        'off_start' : None}
-
+                        'off_start' : None, 'wtype': self.wtype}
 
     def start_and_end(self):
         return prev_end + 1, prev_end + 1 + len(self.wf)
 
 
-class Punct():
+class Punct:
     def __init__(self, wf):
         self.wf = wf
         self.wtype = 'punct'
+        self.content = {'wf': self.wf, 'off_end': None,
+                        'off_start': None, 'wtype': self.wtype}
 
     def start_and_end(self, prev_end):
         return prev_end, prev_end + len(self.wf)
         
 
-class Sentence():
+class Sentence:
     """docstring for Sentence"""
     def __init__(self, ID, content, head):
         self.ID = ID
@@ -121,21 +124,33 @@ class Sentence():
                 print('SOMETHING GONE WRONG WITH LINE ' + str(line))
 
     def reach_punctuation(self):
+        """
+        extracts punctuation: iterates all the wordforms 
+        and if it seessome punctuation in them, 
+        craetes an object of class Punct and adds it to the list 
+        """
         i = 0
         while i < len(self.words):
             if self.words[i].wtype == 'word':
-                if self.words[i].content['punctl']\
-                   and (i == 0 or self.words[i].content['punctl'] != self.words[i - 1].wf):
-                   self.words.insert(i, Punct(self.words[i].content['punctl']))
-                elif self.words[i].content['punctr']:
-                    self.words.insert(i + 1, Punct(self.words[i].content['punctr']))
-                i += 1
+                punctl = self.words[i].content['ana'][0]['punctl']
+                punctr = self.words[i].content['ana'][0]['punctr']
+                if punctl and (i == 0 or punctl != self.words[i - 1].wf):
+                    self.words.insert(i, Punct(punctl))
+                    i += 1
+                elif punctr:
+                    self.words.insert(i + 1, Punct(punctr))
+                    i += 1
+            i += 1
+
+    def make_start_and_end(self):
+        pass
 
     def form_content(self):
         for i in range(len(self.words)):
             self.words[i].form_content()
+        self.reach_punctuation()
+        self.make_start_and_end()
         self.text = ' '.join([word.wf for word in self.words])
-        # self.reach_punctuation()
         self.content = {'text' : self.text, 'words': 
                         [w.content for w in self.words]}
 
@@ -143,11 +158,11 @@ class Sentence():
 if __name__ == '__main__':
     reader = EANCDocReader()
     # print(reader.get_meta(FNAME))
-    # i = 0
+    i = 0
     for pair in reader.get_sentences(FNAME):
         print(pair[0]['text'])
     #     for word in pair[0]['words']:
     #         print(word['ana'])
-    #     i += 1
-    #     if i > 10:
-    #         break
+        i += 1
+        if i > 10:
+            break
