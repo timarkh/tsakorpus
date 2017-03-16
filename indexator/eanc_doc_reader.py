@@ -145,12 +145,19 @@ class Sentence:
     def make_start_and_end(self):
         pass
 
+    def make_text(self):
+        self.text = self.words[0].wf
+        for token in self.words[1:]:
+            if token.wtype == 'word':
+                self.text += ' '
+            self.text += token.wf
+
     def form_content(self):
         for i in range(len(self.words)):
             self.words[i].form_content()
         self.reach_punctuation()
         self.make_start_and_end()
-        self.text = ' '.join([word.wf for word in self.words])
+        self.make_text()
         self.content = {'text' : self.text, 'words': 
                         [w.content for w in self.words]}
 
