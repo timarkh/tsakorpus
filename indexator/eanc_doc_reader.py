@@ -1,8 +1,6 @@
 import json
 import os
 
-FNAME = '/home/maryszmary/Downloads/adygvoice-2012-05-21.prs'
-# FNAME = '/home/maryszmary/Downloads/20040123.prs'
 
 class EANCDocReader:
     """the class for converting texts from EANC format"""
@@ -189,6 +187,8 @@ class Sentence:
 
 
 if __name__ == '__main__':
+    FNAME = '/home/maryszmary/Downloads/adygvoice-2012-05-21.prs'
+    # FNAME = '/home/maryszmary/Downloads/20040123.prs'
     sentences = []
     reader = EANCDocReader()
     # print(reader.get_meta(FNAME))
