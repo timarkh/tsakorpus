@@ -4,9 +4,6 @@ import os
 FNAME = '/home/maryszmary/Downloads/adygvoice-2012-05-21.prs'
 # FNAME = '/home/maryszmary/Downloads/20040123.prs'
 
-## TODO: do something about the punctuation
-## проблема: невозможно сохранить исходную индексацию, если считать знаки пунктуации токенами.
-
 class EANCDocReader:
     """the class for converting texts from EANC format"""
     def __init__(self):
@@ -93,10 +90,10 @@ class WordForm:
     def unify_analyses(self):
 
         # removing redundant attributes
-        redundant = ['punctl', 'punctl']
+        redundant = ['punctl', 'punctr']
         for i in range(len(self.content['ana'])):
             for attr in redundant:
-                if attr in self.content['ana']: 
+                if attr in self.content['ana'][i]:
                     self.content['ana'][i].pop(attr)
 
         # removing empty analyses
@@ -105,16 +102,15 @@ class WordForm:
                 self.content['ana'] = []
 
 
-
 class Punct:
     def __init__(self, wf):
-        self.wf = wf
+        self.wf = wf if wf != '\\n' else '\n'
         self.wtype = 'punct'
         self.content = {'wf': self.wf, 'off_end': None,
                         'off_start': None, 'wtype': self.wtype}
 
     def start_and_end(self, prev_end):
-        length = len(self.wf) if self.wf not in ['\\t', '\\n'] else 1
+        length = len(self.wf)
         self.content['off_start'] = prev_end
         self.content['off_end'] = prev_end + length
         return prev_end + len(self.wf)
@@ -191,15 +187,22 @@ class Sentence:
                         [w.content for w in self.words]}
 
 
+
 if __name__ == '__main__':
+    sentences = []
     reader = EANCDocReader()
     # print(reader.get_meta(FNAME))
     i = 0
     for pair in reader.get_sentences(FNAME):
+        sentences.append(pair[0])
         # print(pair[0]['text'])
-        for word in pair[0]['words']:
-            # if word['wtype'] == 'word':
-            print(word)
+        # print(pair[0])
+        # # for word in pair[0]['words']:
+        # #     print(word)
         i += 1
         if i > 10:
             break
+    f = open(FNAME.rsplit('.', 1)[0] + '.json', 'w', encoding='utf-8')
+    sentences = json.dumps(sentences, ensure_ascii=False, indent=4  )
+    f.write(sentences)
+    f.close()
