@@ -78,15 +78,32 @@ class WordForm:
     def form_content(self):
         self.anas = []
         for line in self.data:
-            if len(line) < len(self.head):
-                self.head = self.head[:-1]
+            # if len(line) < len(self.head):
+            #     self.head = self.head[:-1]
             ana = {pair[0] : pair[1] for pair in zip(self.head, line)}
             self.anas.append(ana)
         self.content = {'ana' : self.anas, 'wf': self.wf, 'off_end' : None, 
                         'off_start' : None, 'wtype': self.wtype}
 
-    def start_and_end(self):
-        return prev_end + 1, prev_end + 1 + len(self.wf)
+    def start_and_end(self, prev_end):
+        self.content['off_start'] = prev_end + 1
+        self.content['off_end'] = prev_end + 1 + len(self.wf)
+        return prev_end + 1 + len(self.wf)
+
+    def unify_analyses(self):
+
+        # removing redundant attributes
+        redundant = ['punctl', 'punctl']
+        for i in range(len(self.content['ana'])):
+            for attr in redundant:
+                if attr in self.content['ana']: 
+                    self.content['ana'][i].pop(attr)
+
+        # removing empty analyses
+        if len(self.content['ana']) == 1:
+            if self.content['ana'][0]['nlems'] == '0':
+                self.content['ana'] = []
+
 
 
 class Punct:
@@ -97,7 +114,10 @@ class Punct:
                         'off_start': None, 'wtype': self.wtype}
 
     def start_and_end(self, prev_end):
-        return prev_end, prev_end + len(self.wf)
+        length = len(self.wf) if self.wf not in ['\\t', '\\n'] else 1
+        self.content['off_start'] = prev_end
+        self.content['off_end'] = prev_end + length
+        return prev_end + len(self.wf)
         
 
 class Sentence:
@@ -143,7 +163,9 @@ class Sentence:
             i += 1
 
     def make_start_and_end(self):
-        pass
+        prev_end = self.words[0].start_and_end(0)
+        for i in range(1, len(self.words)):
+            prev_end = self.words[i].start_and_end(prev_end)
 
     def make_text(self):
         self.text = self.words[0].wf
@@ -152,12 +174,19 @@ class Sentence:
                 self.text += ' '
             self.text += token.wf
 
+    def clean_analyses(self):
+        for i in range(len(self.words)):
+            if self.words[i].wtype == 'word':
+                self.words[i].unify_analyses()
+
     def form_content(self):
         for i in range(len(self.words)):
             self.words[i].form_content()
         self.reach_punctuation()
         self.make_start_and_end()
         self.make_text()
+        self.make_start_and_end()
+        self.clean_analyses()
         self.content = {'text' : self.text, 'words': 
                         [w.content for w in self.words]}
 
@@ -167,9 +196,10 @@ if __name__ == '__main__':
     # print(reader.get_meta(FNAME))
     i = 0
     for pair in reader.get_sentences(FNAME):
-        print(pair[0]['text'])
-    #     for word in pair[0]['words']:
-    #         print(word['ana'])
+        # print(pair[0]['text'])
+        for word in pair[0]['words']:
+            # if word['wtype'] == 'word':
+            print(word)
         i += 1
         if i > 10:
             break
