@@ -3,22 +3,32 @@ import os
 
 
 class EANCDocReader:
-    """the class for converting texts from EANC format"""
+    """
+    the class for converting texts from EANC format
+    """
     def __init__(self):
         self.filesize_limit = -1
         self.meta = {}
         self.sentences = []
 
     def process_text(self):
+        """
+        Reads the file with the corpus, reads header separates sentences
+        from metadata. Calls extract_sentences.
+        """
         with open(self.fname, 'r', encoding='utf-8-sig') as f:
             text = f.read().split('\n') 
 
-        # first 2 elements are cut off, bc they are about id, the last bc the information is redundant 
+        # first 2 elements are cut off, bc they are about id,
+        # the last bc the information is redundant 
         self.head = text[0].replace('#', '').split('\t')[2:-1] 
         sentences = [li for li in text if not li.startswith('#') and li != '']
         self.extract_sentences(sentences)
 
     def extract_sentences(self, sentences):
+        """
+        Takes a list of unprocessed tokens from prs corpus
+        """
         for word in sentences:
             num, content = tuple(word.split('\t', 1))
             if int(num) == len(self.sentences) - 1:
@@ -30,7 +40,6 @@ class EANCDocReader:
         for i in range(len(self.sentences)):
             sent = Sentence(i, self.sentences[i], self.head)
             self.sentences[i] = sent.content
-
 
     def get_sentences(self, fname):
         """
@@ -86,6 +95,9 @@ class WordForm:
         return prev_end + 1 + len(self.wf)
 
     def unify_analyses(self):
+        """
+        making analysis attributes valid. currently is in TODO state. Tim!
+        """
 
         # removing redundant attributes
         redundant = ['punctl', 'punctr']
@@ -101,6 +113,10 @@ class WordForm:
 
 
 class Punct:
+    """
+    class for punctuation. a Punct object is like a WordForm object,
+    but has no analyses 
+    """
     def __init__(self, wf):
         self.wf = wf if wf != '\\n' else '\n'
         self.wtype = 'punct'
@@ -115,7 +131,11 @@ class Punct:
         
 
 class Sentence:
-    """docstring for Sentence"""
+    """
+    a Sentence object is a representation of a corpus sentence.
+    takes ID, a list of lines (each line for one token) and the header.
+    the json structure required for the corpus is stored in self.content. 
+    """
     def __init__(self, ID, content, head):
         self.ID = ID
         self.head = head
@@ -124,6 +144,10 @@ class Sentence:
         self.form_content()
 
     def form_words(self, content):
+        """
+        fills the sentence with tokens. iterates thruogh lines
+        and separates and builds the wordforms. 
+        """
         for line in content:
             num, word_data = tuple(line.split('\t', 1))
             num = int(num)
@@ -187,8 +211,8 @@ class Sentence:
 
 
 if __name__ == '__main__':
-    FNAME = '/home/maryszmary/Downloads/adygvoice-2012-05-21.prs'
-    # FNAME = '/home/maryszmary/Downloads/20040123.prs'
+    # FNAME = '/home/maryszmary/Downloads/adygvoice-2012-05-21.prs'
+    FNAME = '/home/maryszmary/Downloads/20040123-test.prs'
     sentences = []
     reader = EANCDocReader()
     # print(reader.get_meta(FNAME))
@@ -203,6 +227,6 @@ if __name__ == '__main__':
         if i > 10:
             break
     f = open(FNAME.rsplit('.', 1)[0] + '.json', 'w', encoding='utf-8')
-    sentences = json.dumps(sentences, ensure_ascii=False, indent=4  )
+    sentences = json.dumps(sentences, ensure_ascii=False, indent=4)
     f.write(sentences)
     f.close()
