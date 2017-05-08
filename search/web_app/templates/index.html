@@ -1,0 +1,18 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<title>Corpus search page</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type='text/javascript' src='static/js/json_loaders.js'></script>
+</head>
+<body>
+<p id="header">Corpus name: {{ corpus_name }}.</p>
+<form id="search_main">
+Wordform: <input type="text" id="wf"><br>
+Lemma: <input type="text" id="l"><br>
+Grammar: <input type="text" id="gr"><br>
+</form>
+<button value="Search sentences" id="search_sent">Search sentences</button>
+<button value="Search words" id="search_word">Search words</button>
+</body>
+</html>
