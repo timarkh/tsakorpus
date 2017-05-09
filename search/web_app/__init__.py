@@ -141,10 +141,22 @@ def search_page():
 def search_sent():
     query = copy.deepcopy(request.args)
     change_display_options(query)
-    result = sc.find_sentences(query,
-                               sortOrder=get_session_data('sort'),
-                               query_size=get_session_data('page_size'))
-    return jsonify(result)
+    sc.mode = 'production'
+    hits, query = sc.find_sentences(query,
+                                    sortOrder=get_session_data('sort'),
+                                    query_size=get_session_data('page_size'))
+    return jsonify(hits)
+
+
+@app.route('/search_sent_test')
+def search_sent_test():
+    query = copy.deepcopy(request.args)
+    change_display_options(query)
+    sc.mode = 'test'
+    query = sc.find_sentences(query,
+                              sortOrder=get_session_data('sort'),
+                              query_size=get_session_data('page_size'))
+    return jsonify(query)
 
 
 @app.route('/search_word')

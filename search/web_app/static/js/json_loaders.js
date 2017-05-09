@@ -8,7 +8,21 @@ $(function() {
 			dataType : "json",
 			success: parse,
 			error: function(errorThrown) {
-				alert( "111" );
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	});
+	
+	$("#search_sent_test").click(function() {
+		//$("#header").html( $("#search_main").serialize() );
+		$.ajax({
+			url: "search_sent_test",
+			data: $("#search_main").serialize(),
+			type: "GET",
+			dataType : "json",
+			success: parse,
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
 			}
 		});
 	});

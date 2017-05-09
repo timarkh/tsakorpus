@@ -24,11 +24,15 @@ class SearchClient:
         self.qp = InterfaceQueryParser(self.settings_dir)
 
     def make_sent_ana_query(self, filterQuery, sortOrder='random'):
-        esQuery = {'nested': {'path': 'words.ana', 'filter': filterQuery}}
+        esQuery = {'nested': {'path': 'words.ana', 'query': filterQuery}}
+        return esQuery
+
+    def make_sent_word_query(self, filterQuery, sortOrder='random'):
+        esQuery = {'nested': {'path': 'words', 'query': filterQuery}}
         return esQuery
 
     def make_word_ana_query(self, filterQuery, sortOrder='random'):
-        esQuery = {'nested': {'path': 'ana', 'filter': filterQuery}}
+        esQuery = {'nested': {'path': 'ana', 'query': filterQuery}}
         return esQuery
 
     def get_words(self, query, sortOrder='random'):
@@ -37,16 +41,23 @@ class SearchClient:
             return esQuery
         hits = self.es.search(index=self.name + '.words', doc_type='word',
                               body=esQuery)
-        return hits
+        return hits, esQuery
 
     def get_sentences(self, queryDict, query_from=0, query_size=10, sortOrder='random'):
-        wordAnaFields = ['words.ana.lex', 'words.ana.wf', 'words.ana.gr']
+        wordAnaFields = {'words.ana.lex', 'words.ana.gr'}
+        wordFields = {'words.wf'}
         queryDict = {k: queryDict[k] for k in queryDict
                      if queryDict[k] is not None and queryDict[k] != {}}
         if len(queryDict) == 0:
             query = {'match_none': {}}
         else:
-            query = self.make_sent_ana_query(list(queryDict.values()))
+            query = []
+            for k in queryDict:
+                if k in wordAnaFields:
+                    query.append(self.make_sent_ana_query(queryDict[k]))
+                elif k in wordFields:
+                    query.append(self.make_sent_word_query(queryDict[k]))
+            query = {'bool': {'filter': query}}
         if sortOrder == 'random':
             query = {'function_score': {'query': query, 'random_score': {}}}
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
@@ -54,15 +65,15 @@ class SearchClient:
             return esQuery
         hits = self.es.search(index=self.name + '.sentences', doc_type='sentence',
                               body=esQuery)
-        return hits
+        return hits, esQuery
 
     def find_sentences(self, htmlQuery, query_from=0, query_size=10, sortOrder='random'):
         prelimQuery = {}
         if 'wf' in htmlQuery and len(htmlQuery['wf']) > 0:
-            prelimQuery['words.ana.wf'] = self.qp.make_bool_query(htmlQuery['wf'], 'words.ana.wf')
+            prelimQuery['words.wf'] = self.qp.make_bool_query(htmlQuery['wf'], 'words.wf')
         if 'l' in htmlQuery and len(htmlQuery['l']) > 0:
             prelimQuery['words.ana.lex'] = self.qp.make_bool_query(htmlQuery['l'], 'words.ana.lex')
         if 'gr' in htmlQuery and len(htmlQuery['gr']) > 0:
-            prelimQuery['words.ana.wf'] = self.qp.make_bool_query(htmlQuery['gr'], 'words.ana.gr')
+            prelimQuery['words.ana.gr'] = self.qp.make_bool_query(htmlQuery['gr'], 'words.ana.gr')
         esQuery = self.get_sentences(prelimQuery, query_from, query_size, sortOrder)
         return esQuery
