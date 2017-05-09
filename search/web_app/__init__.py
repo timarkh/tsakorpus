@@ -4,6 +4,8 @@ import gzip
 import functools
 from functools import wraps
 import os
+import copy
+from search_engine.client import SearchClient
 
 
 SETTINGS_DIR = '../conf'
@@ -13,6 +15,7 @@ f.close()
 corpus_name = settings['corpus_name']
 localizations = {}
 supportedLocales = ['ru', 'en']
+sc = SearchClient()
 
 
 def jsonp(func):
@@ -65,3 +68,17 @@ sessionData = {}    # session key -> dictionary with the data for current sessio
 @app.route('/search')
 def search_page():
     return render_template('index.html', corpus_name=corpus_name)
+
+
+@app.route('/search_sent')
+def search_sent():
+    query = copy.deepcopy(request.args)
+    result = query
+    return jsonify(result)
+
+
+@app.route('/search_word')
+def search_word():
+    query = copy.deepcopy(request.args)
+    result = query
+    return jsonify(result)

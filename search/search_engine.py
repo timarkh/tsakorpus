@@ -7,7 +7,7 @@ import time
 
 class SearchClient:
     """
-    Contains methods for queriyng the corpus database.
+    Contains methods for querying the corpus database.
     """
     SETTINGS_DIR = '../conf'
 
