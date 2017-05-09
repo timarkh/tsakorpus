@@ -2,7 +2,7 @@ if __name__ == '__main__':
     import json
     import time
     from client import SearchClient
-    sc = SearchClient()
+    sc = SearchClient('../conf')
 
     # 1. Lexical query.
     query1 = {'ana.lex': 'vbcvqr'}

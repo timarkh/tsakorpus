@@ -17,35 +17,35 @@ class InterfaceQueryParser:
                  'r', encoding='utf-8-sig')
         self.gramDict = json.loads(f.read())
         f.close()
-        for g in self.gramDict:
-            self.gramDict[g] = u'gr.' + self.gramDict[g]
+        # for g in self.gramDict:
+        #     self.gramDict[g] = 'ana.gr.' + self.gramDict[g]
 
     @staticmethod
     def find_operator(strQuery, start=0, end=-1):
         if end == -1:
             end = len(strQuery) - 1
-        if strQuery[start] == u'~':
-            return start, u'~'
+        if strQuery[start] == '~':
+            return start, '~'
         parenthBalance = 0
         for i in range(start, end):
-            if strQuery[i] == u'(':
+            if strQuery[i] == '(':
                 parenthBalance += 1
-            elif strQuery[i] == u')':
+            elif strQuery[i] == ')':
                 parenthBalance -= 1
-            elif parenthBalance == 0 and strQuery[i] in u',&|':
+            elif parenthBalance == 0 and strQuery[i] in ',&|':
                 return i, strQuery[i]
-        return -1, u''
+        return -1, ''
 
     def make_simple_term_query(self, text, field):
         """
         Make a term query that will become one of the inner parts
-        of the compound bool query. If the field is "ana.gr", find
-        categories for every gramtag. If no category is available
-        for some tag, return {}.
+        of the compound bool query. Recognize simple wildcards and regexps.
+        If the field is "ana.gr", find categories for every gramtag. If no
+        category is available for some tag, return empty query.
         """
         if len(text) <= 0:
             return {}
-        if field != 'ana.gr':
+        if not field.endswith('.ana.gr'):
             if InterfaceQueryParser.rxSimpleText.search(text) is not None:
                 return {'term': {field: text}}
             elif InterfaceQueryParser.rxBooleanText.search(text) is not None:
@@ -53,7 +53,7 @@ class InterfaceQueryParser:
             else:
                 return {'regexp': {field: text}}
         try:
-            field += '.' + self.gramDict['text']
+            field += '.' + self.gramDict[text]
             return {'term': {field: text}}
         except KeyError:
             return {}
@@ -107,3 +107,4 @@ class InterfaceQueryParser:
 if __name__ == '__main__':
     iqp = InterfaceQueryParser('../../conf')
     print(json.dumps(iqp.make_bool_query('(A|B|C*D),~Z', 'asd')))
+    print(json.dumps(iqp.make_bool_query('~(A|(B.*[abc]|C*D))', 'asd')))

@@ -5,17 +5,19 @@ import functools
 from functools import wraps
 import os
 import copy
+import uuid
 from search_engine.client import SearchClient
 
 
 SETTINGS_DIR = '../conf'
+MAX_PAGE_SIZE = 100
 f = open(os.path.join(SETTINGS_DIR, 'corpus.json'), 'r', encoding='utf-8')
 settings = json.loads(f.read())
 f.close()
 corpus_name = settings['corpus_name']
 localizations = {}
 supportedLocales = ['ru', 'en']
-sc = SearchClient()
+sc = SearchClient(SETTINGS_DIR, mode='test')
 
 
 def jsonp(func):
@@ -65,6 +67,71 @@ app.secret_key = 'kkj6hd)^js7#dFQ'
 sessionData = {}    # session key -> dictionary with the data for current session
 
 
+def initialize_session():
+    global sessionData
+    session['session_id'] = str(uuid.uuid4())
+    sessionData[session['session_id']] = {'page_size': 10,
+                                          'login': False,
+                                          'locale': 'en',
+                                          'sort': ''}
+
+
+def get_session_data(fieldName):
+    global sessionData
+    if 'session_id' not in session:
+        initialize_session()
+    if session['session_id'] not in sessionData:
+        sessionData[session['session_id']] = {}
+    if fieldName == 'login' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['login'] = False
+    elif fieldName == 'locale' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['locale'] = 'en'
+    elif fieldName == 'page_size' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['page_size'] = 10
+    elif fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']][fieldName] = ''
+    try:
+        dictCurData = sessionData[session['session_id']]
+        requestedValue = dictCurData[fieldName]
+        return requestedValue
+    except KeyError:
+        return None
+
+
+def set_session_data(fieldName, value):
+    global sessionData
+    if 'session_id' not in session:
+        initialize_session()
+    if session['session_id'] not in sessionData:
+        sessionData[session['session_id']] = {}
+    sessionData[session['session_id']][fieldName] = value
+
+
+def in_session(fieldName):
+    global sessionData
+    if u'session_id' not in session:
+        return False
+    return fieldName in sessionData[session[u'session_id']]
+
+
+def change_display_options(query):
+    """
+    Remember the new display options provided in the query.
+    """
+    if 'page_size' in query:
+        try:
+            ps = int(query['page_size'])
+            if ps > MAX_PAGE_SIZE:
+                ps = MAX_PAGE_SIZE
+            elif ps < 1:
+                ps = 1
+            set_session_data('page_size', ps)
+        except:
+            pass
+    if 'sort' in query:
+        set_session_data('sort', query['sort'])
+
+
 @app.route('/search')
 def search_page():
     return render_template('index.html', corpus_name=corpus_name)
@@ -73,12 +140,16 @@ def search_page():
 @app.route('/search_sent')
 def search_sent():
     query = copy.deepcopy(request.args)
-    result = query
+    change_display_options(query)
+    result = sc.find_sentences(query,
+                               sortOrder=get_session_data('sort'),
+                               query_size=get_session_data('page_size'))
     return jsonify(result)
 
 
 @app.route('/search_word')
 def search_word():
     query = copy.deepcopy(request.args)
+    change_display_options(query)
     result = query
     return jsonify(result)
