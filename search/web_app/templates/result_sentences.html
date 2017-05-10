@@ -1,0 +1,11 @@
+﻿<p>Search result: {{ data.n_sentences }} sentence(s) found.</p>
+<div class="sent_results">
+{% for c in data.contexts %}
+<hr>
+{{ c | safe }}
+{% endfor %}
+{% if data.message %}
+</div>
+<p class="message">Message: {{ data.message }}</p>
+{% endif %}
+<script type='text/javascript'>assign_word_events();</script>

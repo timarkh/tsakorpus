@@ -7,6 +7,7 @@ import os
 import copy
 import uuid
 from search_engine.client import SearchClient
+from .response_processors import SentenceViewer
 
 
 SETTINGS_DIR = '../conf'
@@ -18,6 +19,7 @@ corpus_name = settings['corpus_name']
 localizations = {}
 supportedLocales = ['ru', 'en']
 sc = SearchClient(SETTINGS_DIR, mode='test')
+sentView = SentenceViewer(SETTINGS_DIR)
 
 
 def jsonp(func):
@@ -137,8 +139,19 @@ def search_page():
     return render_template('index.html', corpus_name=corpus_name)
 
 
-@app.route('/search_sent')
-def search_sent():
+@app.route('/search_sent_query')
+def search_sent_query():
+    query = copy.deepcopy(request.args)
+    change_display_options(query)
+    query = sc.qp.html2es(query,
+                          searchIndex='sentences',
+                          sortOrder=get_session_data('sort'),
+                          query_size=get_session_data('page_size'))
+    return jsonify(query)
+
+
+@app.route('/search_sent_json')
+def search_sent_json():
     query = copy.deepcopy(request.args)
     change_display_options(query)
     query = sc.qp.html2es(query,
@@ -149,19 +162,40 @@ def search_sent():
     return jsonify(hits)
 
 
-@app.route('/search_sent_test')
-def search_sent_test():
+@app.route('/search_sent')
+def search_sent():
     query = copy.deepcopy(request.args)
     change_display_options(query)
     query = sc.qp.html2es(query,
                           searchIndex='sentences',
                           sortOrder=get_session_data('sort'),
                           query_size=get_session_data('page_size'))
+    hits = sc.get_sentences(query)
+
+    # --- TEST ---
+    # fTest = open('test_response.json', 'r', encoding='utf-8-sig')
+    # testResponse = fTest.read()
+    # fTest.close()
+    # hits = json.loads(testResponse)
+    # --- END OF TEST ---
+
+    hitsProcessed = sentView.process_sent_json(hits)
+    return render_template('result_sentences.html', data=hitsProcessed)
+
+
+@app.route('/search_word_query')
+def search_word_query():
+    query = copy.deepcopy(request.args)
+    change_display_options(query)
+    query = sc.qp.html2es(query,
+                          searchIndex='words',
+                          sortOrder=get_session_data('sort'),
+                          query_size=get_session_data('page_size'))
     return jsonify(query)
 
 
-@app.route('/search_word')
-def search_word():
+@app.route('/search_word_json')
+def search_word_json():
     query = copy.deepcopy(request.args)
     change_display_options(query)
     query = sc.qp.html2es(query,
@@ -172,12 +206,3 @@ def search_word():
     return jsonify(hits)
 
 
-@app.route('/search_word_test')
-def search_word_test():
-    query = copy.deepcopy(request.args)
-    change_display_options(query)
-    query = sc.qp.html2es(query,
-                          searchIndex='words',
-                          sortOrder=get_session_data('sort'),
-                          query_size=get_session_data('page_size'))
-    return jsonify(query)

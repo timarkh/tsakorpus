@@ -1,0 +1,533 @@
+﻿{
+  "_shards": {
+    "failed": 0,
+    "successful": 5,
+    "total": 5
+  },
+  "hits": {
+    "hits": [
+      {
+        "_id": "3672070",
+        "_index": "test_corpus_50m.sentences",
+        "_score": 0.88286775,
+        "_source": {
+          "next_id": 3672071,
+          "prev_id": 3672069,
+          "text": "Zslw afas l jmcypząknя im l, en f eogmяjt wxfpccgxh l jwoóvcxя óuózz rwuя xяxxinóą cbrrpą: xoy zgewą f mjzcfxki.",
+          "words": [
+            {
+              "ana": [
+                {
+                  "gr.case": "gen",
+                  "gr.num": "sg",
+                  "gr.pos": "N",
+                  "lex": "dbóuocó"
+                },
+                {
+                  "gr.pers": "1",
+                  "gr.pos": "V",
+                  "gr.tense": "t10",
+                  "lex": "itmcяя"
+                },
+                {
+                  "gr.case": "gen",
+                  "gr.num": "pl",
+                  "gr.pos": "N",
+                  "lex": "moasfoiit"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "jpяiyvfes"
+                },
+                {
+                  "gr.pers": "1",
+                  "gr.pos": "V",
+                  "gr.tense": "t9",
+                  "lex": "dяzumaodó"
+                }
+              ],
+              "off_end": 4,
+              "off_start": 0,
+              "wf": "zslw",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.pers": "1",
+                  "gr.pos": "V",
+                  "gr.tense": "t1",
+                  "lex": "dxwgbti"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "nŋgmfjeia"
+                },
+                {
+                  "gr.pers": "1",
+                  "gr.pos": "V",
+                  "gr.tense": "t5",
+                  "lex": "tяgxtŋ"
+                },
+                {
+                  "gr.case": "acc",
+                  "gr.num": "sg",
+                  "gr.pos": "N",
+                  "lex": "guwjcmdw"
+                }
+              ],
+              "off_end": 9,
+              "off_start": 5,
+              "wf": "afas",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.pos": "ADV",
+                  "lex": "tŋoяdąn"
+                },
+                {
+                  "gr.pers": "3",
+                  "gr.pos": "V",
+                  "gr.tense": "t1",
+                  "lex": "fkąąrujn"
+                },
+                {
+                  "gr.pers": "3",
+                  "gr.pos": "V",
+                  "gr.tense": "t5",
+                  "lex": "qяnrwxąg"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "eughzwm"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "ohciŋm"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "tvwemcr"
+                }
+              ],
+              "off_end": 11,
+              "off_start": 10,
+              "wf": "l",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.case": "gen",
+                  "gr.num": "pl",
+                  "gr.pos": "N",
+                  "lex": "pfóqnsorkó"
+                }
+              ],
+              "off_end": 22,
+              "off_start": 12,
+              "wf": "jmcypząknя",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.case": "acc",
+                  "gr.num": "pl",
+                  "gr.pos": "N",
+                  "lex": "oitxeybw"
+                },
+                {
+                  "gr.case": "acc",
+                  "gr.num": "sg",
+                  "gr.pos": "N",
+                  "lex": "teqlahgdrl"
+                },
+                {
+                  "gr.case": "nom",
+                  "gr.num": "sg",
+                  "gr.pos": "N",
+                  "lex": "kzgsujxą"
+                },
+                {
+                  "gr.case": "acc",
+                  "gr.num": "sg",
+                  "gr.pos": "N",
+                  "lex": "iltrótsiŋ"
+                }
+              ],
+              "off_end": 25,
+              "off_start": 23,
+              "wf": "im",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.pos": "ADV",
+                  "lex": "tŋoяdąn"
+                },
+                {
+                  "gr.pers": "3",
+                  "gr.pos": "V",
+                  "gr.tense": "t1",
+                  "lex": "fkąąrujn"
+                },
+                {
+                  "gr.pers": "3",
+                  "gr.pos": "V",
+                  "gr.tense": "t5",
+                  "lex": "qяnrwxąg"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "eughzwm"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "ohciŋm"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "tvwemcr"
+                }
+              ],
+              "off_end": 27,
+              "off_start": 26,
+              "wf": "l",
+              "wtype": "word"
+            },
+            {
+              "off_end": 28,
+              "off_start": 27,
+              "wf": ",",
+              "wtype": "punct"
+            },
+            {
+              "ana": [
+                {
+                  "gr.pers": "1",
+                  "gr.pos": "V",
+                  "gr.tense": "t1",
+                  "lex": "bseąidbf"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "zjfdcmorv"
+                },
+                {
+                  "gr.pers": "1",
+                  "gr.pos": "V",
+                  "gr.tense": "t5",
+                  "lex": "hgbzófn"
+                }
+              ],
+              "off_end": 31,
+              "off_start": 29,
+              "wf": "en",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.pers": "3",
+                  "gr.pos": "V",
+                  "gr.tense": "t5",
+                  "lex": "pŋtяwde"
+                }
+              ],
+              "off_end": 33,
+              "off_start": 32,
+              "wf": "f",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.pers": "3",
+                  "gr.pos": "V",
+                  "gr.tense": "t2",
+                  "lex": "bkjkxhpó"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "yyąkxikŋdt"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "huuxhяjąww"
+                }
+              ],
+              "off_end": 41,
+              "off_start": 34,
+              "wf": "eogmяjt",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.case": "acc",
+                  "gr.num": "sg",
+                  "gr.pos": "N",
+                  "lex": "svjungŋwq"
+                }
+              ],
+              "off_end": 61,
+              "off_start": 42,
+              "wf": "wxfpccgxh",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.pos": "ADV",
+                  "lex": "tŋoяdąn"
+                },
+                {
+                  "gr.pers": "3",
+                  "gr.pos": "V",
+                  "gr.tense": "t1",
+                  "lex": "fkąąrujn"
+                },
+                {
+                  "gr.pers": "3",
+                  "gr.pos": "V",
+                  "gr.tense": "t5",
+                  "lex": "qяnrwxąg"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "eughzwm"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "ohciŋm"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "tvwemcr"
+                }
+              ],
+              "off_end": 53,
+              "off_start": 52,
+              "wf": "l",
+              "wtype": "word"
+            },
+            {
+              "ana": [],
+              "off_end": 62,
+              "off_start": 54,
+              "wf": "jwoóvcxя",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.case": "gen",
+                  "gr.num": "sg",
+                  "gr.pos": "N",
+                  "lex": "kepblnyn"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "mąfoąc"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "csxhąfqei"
+                }
+              ],
+              "off_end": 68,
+              "off_start": 63,
+              "wf": "óuózz",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.case": "nom",
+                  "gr.num": "pl",
+                  "gr.pos": "N",
+                  "lex": "cmfgsbwó"
+                },
+                {
+                  "gr.pers": "1",
+                  "gr.pos": "V",
+                  "gr.tense": "t1",
+                  "lex": "gqlmdяąu"
+                },
+                {
+                  "gr.case": "acc",
+                  "gr.num": "sg",
+                  "gr.pos": "N",
+                  "lex": "vuqąhykxq"
+                }
+              ],
+              "off_end": 73,
+              "off_start": 69,
+              "wf": "rwuя",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.pos": "ADV",
+                  "lex": "tkmtgjcte"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "adymяbbe"
+                },
+                {
+                  "gr.case": "nom",
+                  "gr.num": "pl",
+                  "gr.pos": "N",
+                  "lex": "hbbhdmqq"
+                }
+              ],
+              "off_end": 82,
+              "off_start": 74,
+              "wf": "xяxxinóą",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.pers": "1",
+                  "gr.pos": "V",
+                  "gr.tense": "t12",
+                  "lex": "óblkxmix"
+                },
+                {
+                  "gr.pos": "ADV",
+                  "lex": "opdtióiz"
+                }
+              ],
+              "off_end": 89,
+              "off_start": 83,
+              "wf": "cbrrpą",
+              "wtype": "word"
+            },
+            {
+              "off_end": 90,
+              "off_start": 89,
+              "wf": ":",
+              "wtype": "punct"
+            },
+            {
+              "ana": [
+                {
+                  "gr.pers": "2",
+                  "gr.pos": "V",
+                  "gr.tense": "t13",
+                  "lex": "ppfgbqy"
+                },
+                {
+                  "gr.case": "nom",
+                  "gr.num": "sg",
+                  "gr.pos": "N",
+                  "lex": "fkedóh"
+                },
+                {
+                  "gr.pers": "1",
+                  "gr.pos": "V",
+                  "gr.tense": "t2",
+                  "lex": "wqevtsy"
+                },
+                {
+                  "gr.pers": "3",
+                  "gr.pos": "V",
+                  "gr.tense": "t3",
+                  "lex": "ŋmcbcrяsw"
+                },
+                {
+                  "gr.case": "acc",
+                  "gr.num": "pl",
+                  "gr.pos": "N",
+                  "lex": "riotcijąuk"
+                }
+              ],
+              "off_end": 94,
+              "off_start": 91,
+              "wf": "xoy",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.pers": "1",
+                  "gr.pos": "V",
+                  "gr.tense": "t11",
+                  "lex": "xnnbipzo"
+                },
+                {
+                  "gr.pers": "3",
+                  "gr.pos": "V",
+                  "gr.tense": "t7",
+                  "lex": "miwdbia"
+                },
+                {
+                  "gr.case": "acc",
+                  "gr.num": "pl",
+                  "gr.pos": "N",
+                  "lex": "kzmffpfŋ"
+                }
+              ],
+              "off_end": 100,
+              "off_start": 95,
+              "wf": "zgewą",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.pers": "3",
+                  "gr.pos": "V",
+                  "gr.tense": "t5",
+                  "lex": "pŋtяwde"
+                }
+              ],
+              "off_end": 102,
+              "off_start": 101,
+              "wf": "f",
+              "wtype": "word"
+            },
+            {
+              "ana": [
+                {
+                  "gr.case": "nom",
+                  "gr.num": "sg",
+                  "gr.pos": "N",
+                  "lex": "kąznfdkxi"
+                },
+                {
+                  "gr.case": "nom",
+                  "gr.num": "sg",
+                  "gr.pos": "N",
+                  "lex": "jyjeuяmb"
+                }
+              ],
+              "off_end": 111,
+              "off_start": 103,
+              "wf": "mjzcfxki",
+              "wtype": "word"
+            },
+            {
+              "off_end": 112,
+              "off_start": 111,
+              "wf": ".",
+              "wtype": "punct"
+            }
+          ]
+        },
+        "_type": "sentence"
+      }
+    ],
+    "max_score": 0.88286775,
+    "total": 1
+  },
+  "timed_out": false,
+  "took": 3
+}
