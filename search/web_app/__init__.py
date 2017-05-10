@@ -141,10 +141,11 @@ def search_page():
 def search_sent():
     query = copy.deepcopy(request.args)
     change_display_options(query)
-    sc.mode = 'production'
-    hits, query = sc.find_sentences(query,
-                                    sortOrder=get_session_data('sort'),
-                                    query_size=get_session_data('page_size'))
+    query = sc.qp.html2es(query,
+                          searchIndex='sentences',
+                          sortOrder=get_session_data('sort'),
+                          query_size=get_session_data('page_size'))
+    hits = sc.get_sentences(query)
     return jsonify(hits)
 
 
@@ -152,10 +153,10 @@ def search_sent():
 def search_sent_test():
     query = copy.deepcopy(request.args)
     change_display_options(query)
-    sc.mode = 'test'
-    query = sc.find_sentences(query,
-                              sortOrder=get_session_data('sort'),
-                              query_size=get_session_data('page_size'))
+    query = sc.qp.html2es(query,
+                          searchIndex='sentences',
+                          sortOrder=get_session_data('sort'),
+                          query_size=get_session_data('page_size'))
     return jsonify(query)
 
 
@@ -163,5 +164,20 @@ def search_sent_test():
 def search_word():
     query = copy.deepcopy(request.args)
     change_display_options(query)
-    result = query
-    return jsonify(result)
+    query = sc.qp.html2es(query,
+                          searchIndex='words',
+                          sortOrder=get_session_data('sort'),
+                          query_size=get_session_data('page_size'))
+    hits = sc.get_words(query)
+    return jsonify(hits)
+
+
+@app.route('/search_word_test')
+def search_word_test():
+    query = copy.deepcopy(request.args)
+    change_display_options(query)
+    query = sc.qp.html2es(query,
+                          searchIndex='words',
+                          sortOrder=get_session_data('sort'),
+                          query_size=get_session_data('page_size'))
+    return jsonify(query)

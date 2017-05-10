@@ -8,9 +8,9 @@ class InterfaceQueryParser:
     rxBooleanText = re.compile('^[^\\[\\]\\\\{}^$.+]*$')
     rxParentheses = re.compile('[()]')
 
-    dictOperators = {u',': u'must',
-                     u'&': u'must',
-                     u'|': u'should'}
+    dictOperators = {',': 'must',
+                     '&': 'must',
+                     '|': 'should'}
 
     def __init__(self, settings_dir):
         f = open(os.path.join(settings_dir, 'categories.json'),
@@ -45,7 +45,7 @@ class InterfaceQueryParser:
         """
         if len(text) <= 0:
             return {}
-        if not field.endswith('.ana.gr'):
+        if not (field == 'ana.gr' or field.endswith('.ana.gr')):
             if InterfaceQueryParser.rxSimpleText.search(text) is not None:
                 return {'term': {field: text}}
             elif InterfaceQueryParser.rxBooleanText.search(text) is not None:
@@ -103,6 +103,122 @@ class InterfaceQueryParser:
             return self.make_bool_query(word, field)
         else:
             return {'regexp': {field: word}}
+
+    def make_nested_query(self, filterQuery, nestedPath):
+        esQuery = {'nested': {'path': nestedPath, 'query': filterQuery}}
+        return esQuery
+
+    def make_sent_ana_query(self, filterQuery, sortOrder='random'):
+        esQuery = {'nested': {'path': 'words.ana', 'query': filterQuery}}
+        return esQuery
+
+    def make_sent_word_query(self, filterQuery, sortOrder='random'):
+        esQuery = {'nested': {'path': 'words', 'query': filterQuery}}
+        return esQuery
+
+    def full_word_query(self, queryDict, query_from=0, query_size=10, sortOrder='random'):
+        """
+        Make a full ES query for the words index out of a dictionary
+        with bool queries.
+        """
+        wordAnaFields = {'ana.lex', 'ana.gr'}
+        queryDict = {k: queryDict[k] for k in queryDict
+                     if queryDict[k] is not None and queryDict[k] != {}}
+        queryDictWords, queryDictWordsAna = {}, {}
+        for k, v in queryDict.items():
+            if k in wordAnaFields:
+                queryDictWordsAna[k] = v
+            else:
+                queryDictWords[k] = v
+        if len(queryDict) <= 0:
+            query = {'match_none': {}}
+        else:
+            query = []
+            if len(queryDictWordsAna) > 0:
+                if len(queryDictWordsAna) == 1:
+                    queryWordsAna = list(queryDictWordsAna.values())[0]
+                else:
+                    queryWordsAna = {'bool': {'must': list(queryDictWordsAna.values())}}
+                query.append(self.make_nested_query(queryWordsAna, nestedPath='ana'))
+            if len(queryDictWords) > 0:
+                if len(queryDictWords) == 1:
+                    queryWords = list(queryDictWords.values())[0]
+                else:
+                    queryWords = {'bool': {'must': list(queryDictWords.values())}}
+                query.append(queryWords)
+            query = {'bool': {'filter': query}}
+        if sortOrder == 'random':
+            query = {'function_score': {'query': query,
+                                        'boost_mode': 'replace',
+                                        'random_score': {}}}
+        esQuery = {'query': query, 'size': query_size, 'from': query_from}
+        # if sortOrder in self.sortOrders:
+        return esQuery
+
+    def full_sentence_query(self, queryDict, query_from=0, query_size=10, sortOrder='random'):
+        """
+        Make a full ES query for the sentences index out of a dictionary
+        with bool queries.
+        """
+        wordAnaFields = {'words.ana.lex', 'words.ana.gr'}
+        wordFields = {'words.wf'}
+        queryDict = {k: queryDict[k] for k in queryDict
+                     if queryDict[k] is not None and queryDict[k] != {}}
+        queryDictWords, queryDictWordsAna = {}, {}
+        for k, v in queryDict.items():
+            if k in wordAnaFields:
+                queryDictWordsAna[k] = v
+            elif k in wordFields:
+                queryDictWords[k] = v
+        if len(queryDictWords) <= 0 and len(queryDictWordsAna) <= 0:
+            query = {'match_none': {}}
+        else:
+            query = []
+            if len(queryDictWordsAna) > 0:
+                if len(queryDictWordsAna) == 1:
+                    queryWordsAna = list(queryDictWordsAna.values())[0]
+                else:
+                    queryWordsAna = {'bool': {'must': list(queryDictWordsAna.values())}}
+                query.append(self.make_nested_query(queryWordsAna, nestedPath='words.ana'))
+            if len(queryDictWords) > 0:
+                if len(queryDictWords) == 1:
+                    queryWords = list(queryDictWords.values())[0]
+                else:
+                    queryWords = {'bool': {'must': list(queryDictWords.values())}}
+                query.append(self.make_nested_query(queryWords, nestedPath='words'))
+            query = {'bool': {'filter': query}}
+        if sortOrder == 'random':
+            query = {'function_score': {'query': query,
+                                        'boost_mode': 'replace',
+                                        'random_score': {}}}
+        esQuery = {'query': query, 'size': query_size, 'from': query_from}
+        # if sortOrder in self.sortOrders:
+        return esQuery
+
+    def html2es(self, htmlQuery, query_from=0, query_size=10, sortOrder='random',
+                searchIndex='sentences'):
+        """
+        Make and return a dict of bool queries out of the HTML form data.
+        """
+        prelimQuery = {}
+        if searchIndex == 'sentences':
+            pathPfx = 'words.'
+        else:
+            pathPfx = ''
+        if 'wf' in htmlQuery and len(htmlQuery['wf']) > 0:
+            prelimQuery[pathPfx + 'wf'] = self.make_bool_query(htmlQuery['wf'], pathPfx + 'wf')
+        if 'l' in htmlQuery and len(htmlQuery['l']) > 0:
+            prelimQuery[pathPfx + 'ana.lex'] = self.make_bool_query(htmlQuery['l'], pathPfx + 'ana.lex')
+        if 'gr' in htmlQuery and len(htmlQuery['gr']) > 0:
+            prelimQuery[pathPfx + 'ana.gr'] = self.make_bool_query(htmlQuery['gr'], pathPfx + 'ana.gr')
+        if searchIndex == 'sentences':
+            queryDict = self.full_sentence_query(prelimQuery, query_from, query_size, sortOrder)
+        elif searchIndex == 'words':
+            queryDict = self.full_word_query(prelimQuery, query_from, query_size, sortOrder)
+        else:
+            queryDict = {'query': {'match_none': ''}}
+        return queryDict
+
 
 if __name__ == '__main__':
     iqp = InterfaceQueryParser('../../conf')
