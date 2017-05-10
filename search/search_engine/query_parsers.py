@@ -179,7 +179,10 @@ class InterfaceQueryParser:
                     queryWordsAna = list(queryDictWordsAna.values())[0]
                 else:
                     queryWordsAna = {'bool': {'must': list(queryDictWordsAna.values())}}
-                query.append(self.make_nested_query(queryWordsAna, nestedPath='words.ana'))
+                if len(queryDictWords) > 0:
+                    queryDictWords['words.ana'] = self.make_nested_query(queryWordsAna, nestedPath='words.ana')
+                else:
+                    query.append(self.make_nested_query(queryWordsAna, nestedPath='words.ana'))
             if len(queryDictWords) > 0:
                 if len(queryDictWords) == 1:
                     queryWords = list(queryDictWords.values())[0]
