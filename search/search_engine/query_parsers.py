@@ -194,7 +194,8 @@ class InterfaceQueryParser:
             query = {'function_score': {'query': query,
                                         'boost_mode': 'replace',
                                         'random_score': {}}}
-        esQuery = {'query': query, 'size': query_size, 'from': query_from}
+        esQuery = {'query': query, 'size': query_size, 'from': query_from,
+                   'highlight': {'fields': {'_all': {'force_source': True}}}}
         # if sortOrder in self.sortOrders:
         return esQuery
 
