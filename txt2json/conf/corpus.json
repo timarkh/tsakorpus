@@ -17,5 +17,8 @@
   "meta_files_dir": false,
   "meta_files_case_sensitive": true,
   "parsed_wordlist_format": "xml_irl",
-  "json_indent": 2
+  "json_indent": 2,
+  "convert_quotes": true,
+  "left_quot_mark": "«",
+  "right_quot_mark": "»"
 }

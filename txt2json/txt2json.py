@@ -1,9 +1,10 @@
 import os
 import re
 import json
+from text_processor import TextProcessor
 
 
-class TxtProcessor:
+class Txt2JSON:
     """
     Contains methods to make JSONs ready for indexing from
     raw text files, a csv with metadata and a list with parsed
@@ -24,6 +25,8 @@ class TxtProcessor:
         self.corpusSettings = json.loads(fCorpus.read())
         fCorpus.close()
         self.meta = {}
+        self.tp = TextProcessor(settings=self.corpusSettings,
+                                categories=self.categories)
 
     def load_meta(self):
         """
@@ -70,7 +73,7 @@ class TxtProcessor:
         text = fSrc.read()
         fSrc.close()
 
-        # after some processing...
+        textJSON['sentences'] = self.tp.process_string(text)
 
         fTarget = open(fnameTarget, 'w', encoding='utf-8')
         fTarget.write(json.dumps(textJSON, ensure_ascii=False,
@@ -110,5 +113,5 @@ class TxtProcessor:
 
 
 if __name__ == '__main__':
-    tp = TxtProcessor()
-    tp.process_corpus()
+    t2j = Txt2JSON()
+    t2j.process_corpus()
