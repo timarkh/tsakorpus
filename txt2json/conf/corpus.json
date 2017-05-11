@@ -20,5 +20,9 @@
   "json_indent": 2,
   "convert_quotes": true,
   "left_quot_mark": "«",
-  "right_quot_mark": "»"
+  "right_quot_mark": "»",
+  "sent_end_punc": "(?:[.!?;;]+(?:[)\\]}>/»]|$)|\\\\n)",
+  "sent_start": "^[A-ZÄÖÜА-ЯЁӤӦӴӞӜ]",
+  "newline_ends_sent": true,
+  "abbreviations": []
 }
