@@ -5,6 +5,7 @@ import copy
 from text_cleaner import TextCleaner
 from tokenizer import Tokenizer
 from sentence_splitter import Splitter
+from analyzer import DumbMorphParser
 
 
 class TextProcessor:
@@ -18,6 +19,8 @@ class TextProcessor:
         self.cleaner = TextCleaner(settings=self.settings)
         self.tokenizer = Tokenizer(settings=self.settings)
         self.splitter = Splitter(settings=self.settings)
+        self.parser = DumbMorphParser(settings=self.settings,
+                                      categories=self.categories)
 
     def process_string(self, s):
         """
@@ -27,4 +30,5 @@ class TextProcessor:
         s = self.cleaner.clean_text(s)
         tokens = self.tokenizer.tokenize(s)
         sentences = self.splitter.split(tokens, s)
+        self.parser.analyze(sentences)
         return sentences
