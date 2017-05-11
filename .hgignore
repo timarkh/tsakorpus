@@ -4,3 +4,4 @@ syntax: regexp
 syntax: glob
 txt2json/corpus/json/*
 txt2json/corpus/txt/*
+corpus/*
