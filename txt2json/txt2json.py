@@ -23,6 +23,8 @@ class Txt2JSON:
         fCorpus = open(os.path.join(self.settingsDir, 'corpus.json'), 'r',
                        encoding='utf-8-sig')
         self.corpusSettings = json.loads(fCorpus.read())
+        if self.corpusSettings['json_indent'] < 0:
+            self.corpusSettings['json_indent'] = None
         fCorpus.close()
         self.meta = {}
         self.tp = TextProcessor(settings=self.corpusSettings,

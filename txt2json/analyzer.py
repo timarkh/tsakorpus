@@ -44,7 +44,7 @@ class DumbMorphParser:
             if tag not in self.categories:
                 print('No category for a gramtag:', tag)
                 continue
-            cat = self.categories[tag]
+            cat = 'gr.' + self.categories[tag]
             if self.categories[tag] not in grJSON:
                 grJSON[cat] = tag
             else:
@@ -68,7 +68,7 @@ class DumbMorphParser:
             anaJSON = {}
             for k, v in fields:
                 if k == 'gr':
-                    anaJSON[k] = self.transform_gramm_str(v)
+                    anaJSON.update(self.transform_gramm_str(v))
                 else:
                     anaJSON[k] = v
             analyses.append(anaJSON)

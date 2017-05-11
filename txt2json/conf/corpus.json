@@ -18,7 +18,7 @@
   "meta_files_case_sensitive": true,
   "parsed_wordlist_filename": "all_parsed.txt",
   "parsed_wordlist_format": "xml_rnc",
-  "json_indent": 2,
+  "json_indent": -1,
   "convert_quotes": true,
   "left_quot_mark": "«",
   "right_quot_mark": "»",
