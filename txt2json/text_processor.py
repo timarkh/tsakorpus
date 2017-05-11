@@ -3,6 +3,7 @@ import re
 import json
 import copy
 from text_cleaner import TextCleaner
+from tokenizer import Tokenizer
 
 
 class TextProcessor:
@@ -14,6 +15,7 @@ class TextProcessor:
         self.settings = copy.deepcopy(settings)
         self.categories = copy.deepcopy(categories)
         self.cleaner = TextCleaner(settings=self.settings)
+        self.tokenizer = Tokenizer(settings=self.settings)
 
     def process_string(self, s):
         """
@@ -21,4 +23,5 @@ class TextProcessor:
         Return the list and the statistics (number of words etc.).
         """
         s = self.cleaner.clean_text(s)
-        return []
+        tokens = self.tokenizer.tokenize(s)
+        return tokens
