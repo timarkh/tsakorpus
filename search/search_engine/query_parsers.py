@@ -47,14 +47,14 @@ class InterfaceQueryParser:
             return {}
         if not (field == 'ana.gr' or field.endswith('.ana.gr')):
             if InterfaceQueryParser.rxSimpleText.search(text) is not None:
-                return {'term': {field: text}}
+                return {'match': {field: text}}
             elif InterfaceQueryParser.rxBooleanText.search(text) is not None:
                 return {'wildcard': {field: text}}
             else:
                 return {'regexp': {field: text}}
         try:
             field += '.' + self.gramDict[text]
-            return {'term': {field: text}}
+            return {'match': {field: text}}
         except KeyError:
             return {}
 
@@ -104,16 +104,12 @@ class InterfaceQueryParser:
         else:
             return {'regexp': {field: word}}
 
-    def make_nested_query(self, filterQuery, nestedPath):
-        esQuery = {'nested': {'path': nestedPath, 'query': filterQuery}}
-        return esQuery
-
-    def make_sent_ana_query(self, filterQuery, sortOrder='random'):
-        esQuery = {'nested': {'path': 'words.ana', 'query': filterQuery}}
-        return esQuery
-
-    def make_sent_word_query(self, filterQuery, sortOrder='random'):
-        esQuery = {'nested': {'path': 'words', 'query': filterQuery}}
+    def make_nested_query(self, query, nestedPath, highlightFields=None):
+        esQuery = {'nested': {'path': nestedPath, 'query': query}}
+        if highlightFields is not None:
+            esQuery['nested']['inner_hits'] = {'highlight':
+                                                   {'fields':
+                                                        {f: {} for f in highlightFields}}}
         return esQuery
 
     def full_word_query(self, queryDict, query_from=0, query_size=10, sortOrder='random'):
@@ -146,7 +142,7 @@ class InterfaceQueryParser:
                 else:
                     queryWords = {'bool': {'must': list(queryDictWords.values())}}
                 query.append(queryWords)
-            query = {'bool': {'filter': query}}
+            query = {'bool': {'must': query}}
         if sortOrder == 'random':
             query = {'function_score': {'query': query,
                                         'boost_mode': 'replace',
@@ -180,22 +176,25 @@ class InterfaceQueryParser:
                 else:
                     queryWordsAna = {'bool': {'must': list(queryDictWordsAna.values())}}
                 if len(queryDictWords) > 0:
-                    queryDictWords['words.ana'] = self.make_nested_query(queryWordsAna, nestedPath='words.ana')
+                    queryDictWords['words.ana'] = self.make_nested_query(queryWordsAna,
+                                                                         nestedPath='words.ana',
+                                                                         highlightFields=['words.ana'])
                 else:
-                    query.append(self.make_nested_query(queryWordsAna, nestedPath='words.ana'))
+                    query.append(self.make_nested_query(queryWordsAna, nestedPath='words.ana',
+                                                        highlightFields=['words.ana']))
             if len(queryDictWords) > 0:
                 if len(queryDictWords) == 1:
                     queryWords = list(queryDictWords.values())[0]
                 else:
                     queryWords = {'bool': {'must': list(queryDictWords.values())}}
-                query.append(self.make_nested_query(queryWords, nestedPath='words'))
-            query = {'bool': {'filter': query}}
+                query.append(self.make_nested_query(queryWords, nestedPath='words',
+                                                    highlightFields=['words']))
+            query = {'bool': {'must': query}}
         if sortOrder == 'random':
             query = {'function_score': {'query': query,
                                         'boost_mode': 'replace',
                                         'random_score': {}}}
-        esQuery = {'query': query, 'size': query_size, 'from': query_from,
-                   'highlight': {'fields': {'_all': {'force_source': True}}}}
+        esQuery = {'query': query, 'size': query_size, 'from': query_from}
         # if sortOrder in self.sortOrders:
         return esQuery
 
