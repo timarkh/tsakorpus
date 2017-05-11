@@ -44,7 +44,7 @@ class SentenceViewer:
             if nWord in matchWordOffsets:
                 return ' match'
             return ''
-        
+
         spanStart = '<span class="word ' + \
                     ' '.join('w' + str(numSent) + '_' + str(n) + highlightClass(n)
                              for n in curWords) + '" data-ana="' + dataAna + '">'

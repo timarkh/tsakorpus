@@ -1,0 +1,21 @@
+{
+  "corpus_name": "udmurt",
+  "corpus_dir": "corpus",
+  "meta_filename": "meta.csv",
+  "meta_fields":
+  [
+    "filename",
+    "title",
+    "author",
+    "year1",
+    "year2",
+    "genre",
+    "issue",
+    "orth"
+  ],
+  "meta_files_ext": false,
+  "meta_files_dir": false,
+  "meta_files_case_sensitive": true,
+  "parsed_wordlist_format": "xml_irl",
+  "json_indent": 2
+}

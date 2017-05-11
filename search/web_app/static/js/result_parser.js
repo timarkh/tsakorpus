@@ -22,7 +22,7 @@ function highlight_cur_word(e) {
 }
 
 function highlight_word_spans(item, i) {
-	if (item == "word") return;
+	if (item == "word" || item == 'match') return;
 	$('.' + item).css({'border-color': '#FF9000', 'border-radius': '5px',
 					   'border-width': '2px', 'border-style': 'solid'});
 }
