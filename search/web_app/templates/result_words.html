@@ -1,0 +1,13 @@
+﻿<p>Search result: {{ data.n_occurrences }} different words found.</p>
+<div class="word_results">
+<table style='border: 1px solid blue'>
+<thead><td>word</td><td>frequency</td><td># sentences</td></thead>
+{% for w in data.words %}
+{{ w | safe }}
+{% endfor %}
+{% if data.message %}
+</table>
+</div>
+<p class="message">Message: {{ data.message }}</p>
+{% endif %}
+<script type='text/javascript'>assign_word_events();</script>

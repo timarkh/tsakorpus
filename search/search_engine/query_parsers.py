@@ -109,7 +109,8 @@ class InterfaceQueryParser:
         if highlightFields is not None:
             esQuery['nested']['inner_hits'] = {'highlight':
                                                {'fields':
-                                                {f: {'number_of_fragments': 100}
+                                                {f: {'number_of_fragments': 100,
+                                                     'fragment_size': 2048}
                                                  for f in highlightFields}}}
         return esQuery
 

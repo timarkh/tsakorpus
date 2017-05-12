@@ -184,6 +184,7 @@ def search_page():
 
 
 @app.route('/search_sent_query')
+@jsonp
 def search_sent_query():
     query = copy.deepcopy(request.args)
     change_display_options(query)
@@ -195,6 +196,7 @@ def search_sent_query():
 
 
 @app.route('/search_sent_json')
+@jsonp
 def search_sent_json():
     query = copy.deepcopy(request.args)
     change_display_options(query)
@@ -229,6 +231,7 @@ def search_sent():
 
 
 @app.route('/get_sent_context/<int:n>')
+@jsonp
 def get_sent_context(n):
     """
     Retrieve the neighboring sentences for the currently
@@ -266,6 +269,7 @@ def get_sent_context(n):
 
 
 @app.route('/search_word_query')
+@jsonp
 def search_word_query():
     query = copy.deepcopy(request.args)
     change_display_options(query)
@@ -277,6 +281,7 @@ def search_word_query():
 
 
 @app.route('/search_word_json')
+@jsonp
 def search_word_json():
     query = copy.deepcopy(request.args)
     change_display_options(query)
@@ -286,5 +291,18 @@ def search_word_json():
                           query_size=get_session_data('page_size'))
     hits = sc.get_words(query)
     return jsonify(hits)
+
+
+@app.route('/search_word')
+def search_word():
+    query = copy.deepcopy(request.args)
+    change_display_options(query)
+    query = sc.qp.html2es(query,
+                          searchIndex='words',
+                          sortOrder=get_session_data('sort'),
+                          query_size=get_session_data('page_size'))
+    hits = sc.get_words(query)
+    hitsProcessed = sentView.process_word_json(hits)
+    return render_template('result_words.html', data=hitsProcessed)
 
 

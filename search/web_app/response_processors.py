@@ -20,6 +20,20 @@ class SentenceViewer:
         self.name = self.settings['corpus_name']
         self.sentence_props = ['text']
 
+    def build_ana_popup(self, word):
+        """
+        Build a string for a popup with the word and its analyses. 
+        """
+        popup = ''
+        if 'wf' in word:
+            popup += word['wf'] + '\n'
+        if 'ana' in word:
+            for iAna in range(len(word['ana'])):
+                popup += 'Analysis #' + str(iAna + 1) + '.\n'
+                popup += json.dumps(word['ana'][iAna], ensure_ascii=False, indent=2)
+                popup += ' \n'
+        return popup
+
     def prepare_analyses(self, words, indexes):
         """
         Generate viewable analyses for the words with given indexes.
@@ -33,13 +47,7 @@ class SentenceViewer:
             if i < 0 or i >= len(words):
                 continue
             word = words[i]
-            if 'wf' in word:
-                result += word['wf'] + '\n'
-            if 'ana' in word:
-                for iAna in range(len(word['ana'])):
-                    result += 'Analysis #' + str(iAna + 1) + '.\n'
-                    result += json.dumps(word['ana'][iAna], ensure_ascii=False, indent=2)
-                    result += ' \n'
+            result += self.build_ana_popup(word)
         result = result.replace('\n', '\\n').replace('"', "'")
         return result
 
@@ -138,6 +146,20 @@ class SentenceViewer:
             chars[-1] += '</span>'
         return ''.join(chars)
 
+    def process_word(self, w):
+        """
+        Process one word taken from response['hits']['hits'].
+        """
+        if '_source' not in w:
+            return ''
+        wSource = w['_source']
+        word = '<tr><td><span class="word" data-ana="' +\
+               self.build_ana_popup(wSource).replace('\n', '\\n').replace('"', "'") +\
+               '">' + wSource['wf'] +\
+               '</span></td><td>' + str(wSource['freq']) +\
+               '</td><td>' + str(len(wSource['sids'])) + '</td></tr>'
+        return word
+
     def retrieve_highlighted_words(self, sentence, numSent):
         """
         Explore the inner_hits part of the response to find the
@@ -172,4 +194,15 @@ class SentenceViewer:
         result['contexts'] = []
         for iHit in range(len(response['hits']['hits'])):
             result['contexts'].append(self.process_sentence(response['hits']['hits'][iHit], iHit))
+        return result
+
+    def process_word_json(self, response):
+        result = {'n_occurrences': 0, 'n_sentences': 0, 'message': 'Nothing found.'}
+        if 'hits' not in response or 'total' not in response['hits']:
+            return result
+        result['message'] = ''
+        result['n_occurrences'] = response['hits']['total']
+        result['words'] = []
+        for iHit in range(len(response['hits']['hits'])):
+            result['words'].append(self.process_word(response['hits']['hits'][iHit]))
         return result

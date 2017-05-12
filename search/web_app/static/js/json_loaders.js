@@ -46,7 +46,6 @@ $(function() {
 			url: "search_word",
 			data: $("#search_main").serialize(),
 			type: "GET",
-			dataType : "text/html",
 			success: print_html,
 			error: function(errorThrown) {
 				alert( JSON.stringify(errorThrown) );
