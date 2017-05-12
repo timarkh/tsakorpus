@@ -150,6 +150,10 @@ class InterfaceQueryParser:
                                         'boost_mode': 'replace',
                                         'random_score': {}}}
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
+        if sortOrder == 'wf':
+            esQuery['sort'] = {'wf': {'order': 'asc'}}
+        elif sortOrder == 'freq':
+            esQuery['sort'] = {'freq': {'order': 'desc'}}
         # if sortOrder in self.sortOrders:
         return esQuery
 

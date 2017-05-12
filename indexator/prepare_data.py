@@ -27,7 +27,7 @@ class PrepareData:
         on searchable features described in word_fields.json and
         categories.json.
         """
-        m = {'wf': {'type': 'text'},
+        m = {'wf': {'type': 'text', 'fielddata': True},
              'wtype': {'type': 'keyword'},
              'sids': {'type': 'integer', 'index': False},
              'ana': {'type': 'nested',
