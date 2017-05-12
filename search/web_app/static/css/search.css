@@ -1,6 +1,10 @@
-﻿.match {
+﻿.wmatch {
 	font-weight: bold;
 	padding-left: 2px;
 	padding-right: 2px;
-	color: #411;
+	color: #901010;
+}
+
+.smatch {
+	font-style: italic;
 }

@@ -108,8 +108,9 @@ class InterfaceQueryParser:
         esQuery = {'nested': {'path': nestedPath, 'query': query}}
         if highlightFields is not None:
             esQuery['nested']['inner_hits'] = {'highlight':
-                                                   {'fields':
-                                                        {f: {} for f in highlightFields}}}
+                                               {'fields':
+                                                {f: {'number_of_fragments': 100}
+                                                 for f in highlightFields}}}
         return esQuery
 
     def full_word_query(self, queryDict, query_from=0, query_size=10, sortOrder='random'):
@@ -158,15 +159,20 @@ class InterfaceQueryParser:
         """
         wordAnaFields = {'words.ana.lex', 'words.ana.gr'}
         wordFields = {'words.wf'}
+        topLevelFields = {'text'}
         queryDict = {k: queryDict[k] for k in queryDict
                      if queryDict[k] is not None and queryDict[k] != {}}
-        queryDictWords, queryDictWordsAna = {}, {}
+        queryDictWords, queryDictWordsAna, queryDictTop = {}, {}, {}
         for k, v in queryDict.items():
             if k in wordAnaFields:
                 queryDictWordsAna[k] = v
             elif k in wordFields:
                 queryDictWords[k] = v
-        if len(queryDictWords) <= 0 and len(queryDictWordsAna) <= 0:
+            elif k in topLevelFields:
+                queryDictTop[k] = v
+        if (len(queryDictWords) <= 0
+                and len(queryDictWordsAna) <= 0
+                and len(topLevelFields) <= 0):
             query = {'match_none': {}}
         else:
             query = []
@@ -189,12 +195,17 @@ class InterfaceQueryParser:
                     queryWords = {'bool': {'must': list(queryDictWords.values())}}
                 query.append(self.make_nested_query(queryWords, nestedPath='words',
                                                     highlightFields=['words']))
+            query += list(queryDictTop.values())
             query = {'bool': {'must': query}}
         if sortOrder == 'random':
             query = {'function_score': {'query': query,
                                         'boost_mode': 'replace',
                                         'random_score': {}}}
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
+        if len(queryDictTop) >= 0:
+            esQuery['highlight'] = {'fields': {f: {'number_of_fragments': 100,
+                                                   'fragment_size': 2048}
+                                               for f in queryDictTop}}
         # if sortOrder in self.sortOrders:
         return esQuery
 
@@ -214,6 +225,11 @@ class InterfaceQueryParser:
             prelimQuery[pathPfx + 'ana.lex'] = self.make_bool_query(htmlQuery['l'], pathPfx + 'ana.lex')
         if 'gr' in htmlQuery and len(htmlQuery['gr']) > 0:
             prelimQuery[pathPfx + 'ana.gr'] = self.make_bool_query(htmlQuery['gr'], pathPfx + 'ana.gr')
+        if searchIndex == 'sentences' and 'txt' in htmlQuery and len(htmlQuery['txt']) > 0:
+            if 'precise' in htmlQuery and htmlQuery['precise'] == 'on':
+                prelimQuery['text'] = {'match_phrase': {'text': htmlQuery['txt']}}
+            else:
+                prelimQuery['text'] = {'match': {'text': htmlQuery['txt']}}
         if searchIndex == 'sentences':
             queryDict = self.full_sentence_query(prelimQuery, query_from, query_size, sortOrder)
         elif searchIndex == 'words':

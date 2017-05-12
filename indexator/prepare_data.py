@@ -50,6 +50,7 @@ class PrepareData:
         """
         m = {'prev_id': {'type': 'integer'},
              'next_id': {'type': 'integer'},
+             'doc_id': {'type': 'integer'},
              'text': {'type': 'text'},
              'src_alignment': {'type': 'nested',
                                'properties': {
