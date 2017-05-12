@@ -157,7 +157,9 @@ class SentenceViewer:
                self.build_ana_popup(wSource).replace('\n', '\\n').replace('"', "'") +\
                '">' + wSource['wf'] +\
                '</span></td><td>' + str(wSource['freq']) +\
-               '</td><td>' + str(len(wSource['sids'])) + '</td></tr>'
+               '</td><td>' + str(len(wSource['sids'])) +\
+               '</td><td><span class="search_w" data-wf="' +\
+               wSource['wf'] + '">&gt;&gt; GO!</td></tr>'
         return word
 
     def retrieve_highlighted_words(self, sentence, numSent):
