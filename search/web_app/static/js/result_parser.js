@@ -9,7 +9,10 @@ function print_html(results) {
 }
 
 function assign_word_events() {
+	$("span.word").unbind('click');
+	$("span.expand").unbind('click');
 	$('span.word').click(highlight_cur_word);
+	$('span.expand').click(expand_context);
 }
 
 function highlight_cur_word(e) {
@@ -21,8 +24,19 @@ function highlight_cur_word(e) {
 	alert($(e.target).attr('data-ana').replace(/\\n/g, "\n"));
 }
 
+function expand_context(e) {
+	n_sent = $(e.target).attr('data-nsent');
+	load_expanded_context(n_sent);
+}
+
 function highlight_word_spans(item, i) {
 	if (item == "word" || item.endsWith('match')) return;
 	$('.' + item).css({'border-color': '#FF9000', 'border-radius': '5px',
 					   'border-width': '2px', 'border-style': 'solid'});
+}
+
+function show_expanded_context(results) {
+	var n = results.n;
+	$('#res' + n).html(results.prev + ' ' + $('#res' + n).html() + ' ' + results.next);
+	assign_word_events();
 }

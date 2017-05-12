@@ -33,3 +33,9 @@ class SearchClient:
                               body=esQuery)
         return hits
 
+    def get_sentence_by_id(self, sentId):
+        esQuery = {'query': {'term': {'_id': sentId}}}
+        hits = self.es.search(index=self.name + '.sentences', doc_type='sentence',
+                              body=esQuery)
+        return hits
+

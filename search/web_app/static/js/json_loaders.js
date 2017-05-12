@@ -82,3 +82,16 @@ $(function() {
 		});
 	});
 });
+
+function load_expanded_context(n_sent) {
+	$.ajax({
+		url: "get_sent_context/" + n_sent,
+		type: "GET",
+		dataType : "json",
+		success: show_expanded_context,
+//		success: print_json,
+		error: function(errorThrown) {
+			alert( JSON.stringify(errorThrown) );
+		}
+	});
+}

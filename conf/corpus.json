@@ -1,4 +1,5 @@
 {
   "corpus_name": "test_udmurt",
-  "input_format": "json"
+  "input_format": "json",
+  "max_context_expand": 3
 }

@@ -75,7 +75,8 @@ def initialize_session():
     sessionData[session['session_id']] = {'page_size': 10,
                                           'login': False,
                                           'locale': 'en',
-                                          'sort': ''}
+                                          'sort': '',
+                                          'lastSentNum': -1}
 
 
 def get_session_data(fieldName):
@@ -90,6 +91,8 @@ def get_session_data(fieldName):
         sessionData[session['session_id']]['locale'] = 'en'
     elif fieldName == 'page_size' and fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']]['page_size'] = 10
+    elif fieldName == 'lastSentNum' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['lastSentNum'] = -1
     elif fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']][fieldName] = ''
     try:
@@ -133,6 +136,47 @@ def change_display_options(query):
     if 'sort' in query:
         set_session_data('sort', query['sort'])
 
+
+def add_sent_to_session(hits):
+    """
+    Store the ids of the currently viewed sentences in the
+    session data dictionary, so that the user can later ask
+    for expanded context.
+    """
+    if 'hits' not in hits or 'hits' not in hits['hits']:
+        return
+    curSentIDs = []
+    set_session_data('lastSentNum', len(hits['hits']['hits']) - 1)
+    for sent in hits['hits']['hits']:
+        nextID = prevID = -1
+        if '_source' in sent:
+            if 'next_id' in sent['_source']:
+                nextID = sent['_source']['next_id']
+            if 'prev_id' in sent['_source']:
+                prevID = sent['_source']['prev_id']
+        curSentIDs.append({'id': sent['_id'],
+                           'next_id': nextID,
+                           'prev_id': prevID,
+                           'times_expanded': 0})
+    set_session_data('sentence_data', curSentIDs)
+
+
+def update_expanded_contexts(context, neighboringIDs):
+    """
+    Update the session data dictionary with the expanded
+    context data.
+    """
+    curSentIDs = get_session_data('sentence_data')
+    if (curSentIDs is None
+            or 'n' not in context
+            or context['n'] < 0
+            or context['n'] >= len(curSentIDs)):
+        return
+    curSent = curSentIDs[context['n']]
+    curSent['times_expanded'] += 1
+    for side in ['next', 'prev']:
+        if side in context and len(context[side]) > 0:
+            curSent[side + '_id'] = neighboringIDs[side]
 
 @app.route('/search')
 def search_page():
@@ -180,7 +224,45 @@ def search_sent():
     # --- END OF TEST ---
 
     hitsProcessed = sentView.process_sent_json(hits)
+    add_sent_to_session(hits)
     return render_template('result_sentences.html', data=hitsProcessed)
+
+
+@app.route('/get_sent_context/<int:n>')
+def get_sent_context(n):
+    """
+    Retrieve the neighboring sentences for the currently
+    viewed sentence number n. Take into account how many
+    times this particular context has been expanded and
+    whether expanding it further is allowed.
+    """
+    if n < 0:
+        return jsonify({})
+    sentData = get_session_data('sentence_data')
+    if sentData is None or n >= len(sentData):
+        return jsonify({})
+    curSentData = sentData[n]
+    if curSentData['times_expanded'] >= settings['max_context_expand']:
+        return jsonify({})
+    context = {'n': n}
+    neighboringIDs = {'next': -1, 'prev': -1}
+    for side in ['next', 'prev']:
+        if side + '_id' in curSentData:
+            context[side] = sc.get_sentence_by_id(curSentData[side + '_id'])
+        if (len(context[side]) > 0
+                and 'hits' in context[side]
+                and 'hits' in context[side]['hits']
+                and len(context[side]['hits']['hits']) > 0):
+            lastSentNum = get_session_data('lastSentNum') + 1
+            curSent = context[side]['hits']['hits'][0]
+            if '_source' in curSent and side + '_id' in curSent['_source']:
+                neighboringIDs[side] = curSent['_source'][side + '_id']
+            context[side] = sentView.process_sentence(curSent, lastSentNum)
+            set_session_data('lastSentNum', lastSentNum)
+        else:
+            context[side] = ''
+    update_expanded_contexts(context, neighboringIDs)
+    return jsonify(context)
 
 
 @app.route('/search_word_query')
