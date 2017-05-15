@@ -239,7 +239,8 @@ class SentenceViewer:
 
     def process_sent_json(self, response):
         result = {'n_occurrences': 0, 'n_sentences': 0,
-                  'n_docs': 0, 'message': 'Nothing found.'}
+                  'n_docs': 0, 'page': 1,
+                  'message': 'Nothing found.'}
         if 'hits' not in response or 'total' not in response['hits']:
             return result
         result['message'] = ''

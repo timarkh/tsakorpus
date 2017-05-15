@@ -25,3 +25,15 @@
 	padding-right: 40px;
 }
 
+.page_link {
+}
+
+.cur_page {
+	padding: 20px;
+	font-size: 18px;
+}
+
+.pages {
+	margin-top: 30px;
+	margin-bottom: 20px;
+}

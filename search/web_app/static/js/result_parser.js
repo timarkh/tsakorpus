@@ -13,10 +13,12 @@ function assign_word_events() {
 	$("span.expand").unbind('click');
 	$("span.context_header").unbind('click');
 	$("span.search_w").unbind('click');
+	$("span.page_link").unbind('click');
 	$('span.word').click(highlight_cur_word);
 	$('span.expand').click(expand_context);
 	$('span.context_header').click(show_doc_meta);
 	$('span.search_w').click(search_word_from_list);
+	$("span.page_link").click(page_click);
 }
 
 function highlight_cur_word(e) {
@@ -48,6 +50,11 @@ function search_word_from_list(e) {
 	$('.search_input').val("");
 	$('#wf').val(wf);
 	$("#search_sent").click();
+}
+
+function page_click(e) {
+	var page = $(e.target).attr("data-page");
+	get_sentences_page(page);
 }
 
 function highlight_word_spans(item, i) {

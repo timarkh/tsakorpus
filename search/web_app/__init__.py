@@ -5,6 +5,7 @@ import functools
 from functools import wraps
 import os
 import copy
+import random
 import uuid
 from search_engine.client import SearchClient
 from .response_processors import SentenceViewer
@@ -73,10 +74,13 @@ def initialize_session():
     global sessionData
     session['session_id'] = str(uuid.uuid4())
     sessionData[session['session_id']] = {'page_size': 10,
+                                          'page': 1,
                                           'login': False,
                                           'locale': 'en',
                                           'sort': '',
-                                          'lastSentNum': -1}
+                                          'last_sent_num': -1,
+                                          'last_query': {},
+                                          'seed': random.randint(1, 1e6)}
 
 
 def get_session_data(fieldName):
@@ -91,8 +95,8 @@ def get_session_data(fieldName):
         sessionData[session['session_id']]['locale'] = 'en'
     elif fieldName == 'page_size' and fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']]['page_size'] = 10
-    elif fieldName == 'lastSentNum' and fieldName not in sessionData[session['session_id']]:
-        sessionData[session['session_id']]['lastSentNum'] = -1
+    elif fieldName == 'last_sent_num' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['last_sent_num'] = -1
     elif fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']][fieldName] = ''
     try:
@@ -114,9 +118,9 @@ def set_session_data(fieldName, value):
 
 def in_session(fieldName):
     global sessionData
-    if u'session_id' not in session:
+    if 'session_id' not in session:
         return False
-    return fieldName in sessionData[session[u'session_id']]
+    return fieldName in sessionData[session['session_id']]
 
 
 def change_display_options(query):
@@ -146,7 +150,7 @@ def add_sent_to_session(hits):
     if 'hits' not in hits or 'hits' not in hits['hits']:
         return
     curSentIDs = []
-    set_session_data('lastSentNum', len(hits['hits']['hits']) - 1)
+    set_session_data('last_sent_num', len(hits['hits']['hits']) - 1)
     for sent in hits['hits']['hits']:
         nextID = prevID = docID = -1
         if '_source' in sent:
@@ -186,49 +190,70 @@ def search_page():
     return render_template('index.html', corpus_name=corpus_name)
 
 
+@app.route('/search_sent_query/<int:page>')
 @app.route('/search_sent_query')
 @jsonp
-def search_sent_query():
-    query = copy.deepcopy(request.args)
-    change_display_options(query)
+def search_sent_query(page=1):
+    if request.args and page <= 0:
+        query = copy.deepcopy(request.args)
+        page = 1
+        change_display_options(query)
+        set_session_data('last_query', query)
+    else:
+        query = get_session_data('last_query')
+    set_session_data('page', page)
     query = sc.qp.html2es(query,
                           searchIndex='sentences',
                           sortOrder=get_session_data('sort'),
-                          query_size=get_session_data('page_size'))
+                          randomSeed=get_session_data('seed'),
+                          query_size=get_session_data('page_size'),
+                          page=get_session_data('page'))
     return jsonify(query)
 
 
+@app.route('/search_sent_json/<int:page>')
 @app.route('/search_sent_json')
 @jsonp
-def search_sent_json():
-    query = copy.deepcopy(request.args)
-    change_display_options(query)
+def search_sent_json(page=1):
+    if request.args and page <= 0:
+        query = copy.deepcopy(request.args)
+        page = 1
+        change_display_options(query)
+        set_session_data('last_query', query)
+    else:
+        query = get_session_data('last_query')
+    set_session_data('page', page)
     query = sc.qp.html2es(query,
                           searchIndex='sentences',
                           sortOrder=get_session_data('sort'),
-                          query_size=get_session_data('page_size'))
+                          randomSeed=get_session_data('seed'),
+                          query_size=get_session_data('page_size'),
+                          page=get_session_data('page'))
     hits = sc.get_sentences(query)
     return jsonify(hits)
 
 
+@app.route('/search_sent/<int:page>')
 @app.route('/search_sent')
-def search_sent():
-    query = copy.deepcopy(request.args)
-    change_display_options(query)
+def search_sent(page=0):
+    if request.args and page <= 0:
+        query = copy.deepcopy(request.args)
+        page = 1
+        change_display_options(query)
+        set_session_data('last_query', query)
+    else:
+        query = get_session_data('last_query')
+    set_session_data('page', page)
     query = sc.qp.html2es(query,
                           searchIndex='sentences',
                           sortOrder=get_session_data('sort'),
-                          query_size=get_session_data('page_size'))
+                          randomSeed=get_session_data('seed'),
+                          query_size=get_session_data('page_size'),
+                          page=get_session_data('page'))
     hits = sc.get_sentences(query)
-
-    # --- TEST ---
-    # fTest = open('test_response.json', 'r', encoding='utf-8-sig')
-    # testResponse = fTest.read()
-    # fTest.close()
-    # hits = json.loads(testResponse)
-    # --- END OF TEST ---
-
     hitsProcessed = sentView.process_sent_json(hits)
+    hitsProcessed['page'] = get_session_data('page')
+    hitsProcessed['page_size'] = get_session_data('page_size')
     add_sent_to_session(hits)
     return render_template('result_sentences.html', data=hitsProcessed)
 
@@ -259,7 +284,7 @@ def get_sent_context(n):
                 and 'hits' in context[side]
                 and 'hits' in context[side]['hits']
                 and len(context[side]['hits']['hits']) > 0):
-            lastSentNum = get_session_data('lastSentNum') + 1
+            lastSentNum = get_session_data('last_sent_num') + 1
             curSent = context[side]['hits']['hits'][0]
             if '_source' in curSent and side + '_id' in curSent['_source']:
                 neighboringIDs[side] = curSent['_source'][side + '_id']
@@ -267,7 +292,7 @@ def get_sent_context(n):
                                                         numSent=lastSentNum,
                                                         getHeader=False)
             context[side] = expandedContext['text']
-            set_session_data('lastSentNum', lastSentNum)
+            set_session_data('last_sent_num', lastSentNum)
         else:
             context[side] = ''
     update_expanded_contexts(context, neighboringIDs)

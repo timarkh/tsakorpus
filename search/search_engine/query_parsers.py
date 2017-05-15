@@ -157,7 +157,8 @@ class InterfaceQueryParser:
         # if sortOrder in self.sortOrders:
         return esQuery
 
-    def full_sentence_query(self, queryDict, query_from=0, query_size=10, sortOrder='random'):
+    def full_sentence_query(self, queryDict, query_from=0, query_size=10,
+                            sortOrder='random', randomSeed=None):
         """
         Make a full ES query for the sentences index out of a dictionary
         with bool queries.
@@ -206,6 +207,8 @@ class InterfaceQueryParser:
             query = {'function_score': {'query': query,
                                         'boost_mode': 'replace',
                                         'random_score': {}}}
+            if randomSeed is not None:
+                query['function_score']['random_score']['seed'] = randomSeed
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
         esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'doc_id'}}}
         if len(queryDictTop) >= 0:
@@ -215,11 +218,12 @@ class InterfaceQueryParser:
         # if sortOrder in self.sortOrders:
         return esQuery
 
-    def html2es(self, htmlQuery, query_from=0, query_size=10, sortOrder='random',
-                searchIndex='sentences'):
+    def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
+                randomSeed=None, searchIndex='sentences'):
         """
         Make and return a dict of bool queries out of the HTML form data.
         """
+        query_from = (page - 1) * query_size
         prelimQuery = {}
         if searchIndex == 'sentences':
             pathPfx = 'words.'
@@ -237,7 +241,9 @@ class InterfaceQueryParser:
             else:
                 prelimQuery['text'] = {'match': {'text': htmlQuery['txt']}}
         if searchIndex == 'sentences':
-            queryDict = self.full_sentence_query(prelimQuery, query_from, query_size, sortOrder)
+            queryDict = self.full_sentence_query(prelimQuery, query_from,
+                                                 query_size, sortOrder,
+                                                 randomSeed)
         elif searchIndex == 'words':
             queryDict = self.full_word_query(prelimQuery, query_from, query_size, sortOrder)
         else:

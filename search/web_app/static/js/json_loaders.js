@@ -1,16 +1,5 @@
 $(function() {
-	$("#search_sent").click(function() {
-		//$("#header").html( $("#search_main").serialize() );
-		$.ajax({
-			url: "search_sent",
-			data: $("#search_main").serialize(),
-			type: "GET",
-			success: print_html,
-			error: function(errorThrown) {
-				alert( JSON.stringify(errorThrown) );
-			}
-		});
-	});
+	$("#search_sent").click(get_sentences);
 	
 	$("#search_sent_json").click(function() {
 		//$("#header").html( $("#search_main").serialize() );
@@ -93,4 +82,32 @@ function load_expanded_context(n_sent) {
 			alert( JSON.stringify(errorThrown) );
 		}
 	});
+}
+
+function get_sentences() {
+	get_sentences_page(-1);
+}
+
+function get_sentences_page(page) {
+	if (page < 0) {
+		$.ajax({
+			url: "search_sent",
+			data: $("#search_main").serialize(),
+			type: "GET",
+			success: print_html,
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	}
+	else {
+		$.ajax({
+			url: "search_sent/" + page,
+			type: "GET",
+			success: print_html,
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	}
 }

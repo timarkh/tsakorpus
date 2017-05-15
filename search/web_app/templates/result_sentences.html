@@ -14,4 +14,20 @@
 </div>
 <p class="message">Message: {{ data.message }}</p>
 {% endif %}
+{% if data.contexts|length > 0 %}
+<div class="pages">
+{% for i_page in range(-5, 6) %}
+{% if (data.page + i_page > 0) and (data.page + i_page < data.n_sentences / data.page_size + 1) %}
+{% if i_page == 0 %}
+<span class="cur_page">{{ data.page + i_page }}</span>&nbsp;
+{% else %}
+<span class="page_link" data-page="{{ data.page + i_page }}">{{ data.page + i_page }}</span>&nbsp;
+{% endif %}
+{% endif %}
+{% endfor %}
+{% if data.page + 7 < data.n_sentences / data.page_size + 1 %}
+<span class="page_link">...</span>&nbsp;
+{% endif %}
+</div>
+{% endif %}
 <script type='text/javascript'>assign_word_events();</script>
