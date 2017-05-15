@@ -1,5 +1,12 @@
 {
   "corpus_name": "test_udmurt",
   "input_format": "json",
-  "max_context_expand": 3
+  "max_context_expand": 3,
+  "viewable_meta": [
+    "genre",
+    "issue",
+    "orth",
+    "year1",
+    "year2"
+  ]
 }

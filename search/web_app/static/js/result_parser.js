@@ -11,9 +11,11 @@ function print_html(results) {
 function assign_word_events() {
 	$("span.word").unbind('click');
 	$("span.expand").unbind('click');
+	$("span.context_header").unbind('click');
 	$("span.search_w").unbind('click');
 	$('span.word').click(highlight_cur_word);
 	$('span.expand').click(expand_context);
+	$('span.context_header').click(show_doc_meta);
 	$('span.search_w').click(search_word_from_list);
 }
 
@@ -27,8 +29,17 @@ function highlight_cur_word(e) {
 }
 
 function expand_context(e) {
-	n_sent = $(e.target).attr('data-nsent');
+	var n_sent = $(e.target).attr('data-nsent');
 	load_expanded_context(n_sent);
+}
+
+function show_doc_meta(e) {
+	var e_obj = $(e.target);
+	while (e_obj.attr('class') != 'context_header') {
+		e_obj = e_obj.parent();
+	}
+	var doc_meta = e_obj.attr('data-meta');
+	alert(doc_meta.replace(/\\n/g, "\n"));
 }
 
 function search_word_from_list(e) {

@@ -41,7 +41,8 @@ class Indexator:
         self.es_ic = IndicesClient(self.es)
         self.wordFreqs = {}   # word as JSON -> its frequency
         self.wordSIDs = {}    # word as JSON -> set of sentence IDs
-        self.sId = 0
+        self.sID = 0          # current sentence ID
+        self.dID = 0          # current document ID
 
     def delete_indices(self):
         if self.es_ic.exists(index=self.name + '.docs'):
@@ -81,10 +82,10 @@ class Indexator:
             wCleanTxt = json.dumps(wClean, ensure_ascii=False, sort_keys=True)
             try:
                 self.wordFreqs[wCleanTxt] += 1
-                self.wordSIDs[wCleanTxt].add(self.sId)
+                self.wordSIDs[wCleanTxt].add(self.sID)
             except KeyError:
                 self.wordFreqs[wCleanTxt] = 1
-                self.wordSIDs[wCleanTxt] = {self.sId}
+                self.wordSIDs[wCleanTxt] = {self.sID}
 
     def iterate_words(self):
         """
@@ -119,22 +120,36 @@ class Indexator:
             if 'words' in s:
                 self.process_sentence_words(s['words'])
             if iSent > 0:
-                s['prev_id'] = self.sId - 1
+                s['prev_id'] = self.sID - 1
             if not bLast:
-                s['next_id'] = self.sId + 1
+                s['next_id'] = self.sID + 1
+            s['doc_id'] = self.dID
             # self.es.index(index=self.name + '.sentences',
             #               doc_type='sentence',
-            #               id=self.sId,
+            #               id=self.sID,
             #               body=s)
             curAction = {'_index': self.name + '.sentences',
                          '_type': 'sentence',
-                         '_id': self.sId,
+                         '_id': self.sID,
                          '_source': s}
             yield curAction
-            if self.sId % 500 == 0:
-                print('indexing sentence', self.sId)
+            if self.sID % 500 == 0:
+                print('indexing sentence', self.sID)
             iSent += 1
-            self.sId += 1
+            self.sID += 1
+
+    def index_doc(self, fname):
+        """
+        Store the metadata of the source file.
+        """
+        self.dID += 1
+        if self.dID % 100 == 0:
+            print('indexing document', self.dID)
+        meta = self.iterSent.get_metadata(fname)
+        self.es.index(index=self.name + '.docs',
+                      doc_type='doc',
+                      id=self.dID,
+                      body=meta)
 
     def index_dir(self):
         """
@@ -144,7 +159,9 @@ class Indexator:
             for fname in files:
                 if not fname.lower().endswith('.json'):
                     continue
-                bulk(self.es, self.iterate_sentences(os.path.join(root, fname)))
+                fnameFull = os.path.join(root, fname)
+                self.index_doc(fnameFull)
+                bulk(self.es, self.iterate_sentences(fnameFull))
         self.index_words()
 
     def load_corpus(self):

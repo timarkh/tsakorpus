@@ -11,7 +11,7 @@ class SentenceViewer:
 
     rxWordNo = re.compile('^w[0-9]+_([0-9]+)$')
 
-    def __init__(self, settings_dir):
+    def __init__(self, settings_dir, search_client):
         self.settings_dir = settings_dir
         f = open(os.path.join(self.settings_dir, 'corpus.json'),
                  'r', encoding='utf-8')
@@ -19,6 +19,7 @@ class SentenceViewer:
         f.close()
         self.name = self.settings['corpus_name']
         self.sentence_props = ['text']
+        self.sc = search_client
 
     def build_ana_popup(self, word):
         """
@@ -86,9 +87,55 @@ class SentenceViewer:
                     offEnds[i - indexSubtr] = {'smatch'}
                 indexSubtr += 5
 
-    def process_sentence(self, s, numSent=1):
+    def process_sentence_header(self, sentSource):
+        """
+        Retrieve the metadata of the document the sentence
+        belongs to. Return an HTML string with this data that
+        can serve as a header for the context on the output page.
+        """
+        result = '<span class="context_header" data-meta="">'
+        docID = sentSource['doc_id']
+        meta = self.sc.get_doc_by_id(docID)
+        if (meta is None
+                or 'hits' not in meta
+                or 'hits' not in meta['hits']
+                or len(meta['hits']['hits']) <= 0):
+            return result + '</span>'
+        meta = meta['hits']['hits'][0]
+        if '_source' not in meta:
+            return result + '</span>'
+        meta = meta['_source']
+        if 'title' in meta:
+            result += '<span class="ch_title">' + meta['title'] + '</span>'
+        else:
+            result += '<span class="ch_title">-</span>'
+        if 'author' in meta:
+            result += '<span class="ch_author">' + meta['author'] + '</span>'
+        if 'issue' in meta and len(meta['issue']) > 0:
+            result += '<span class="ch_date">' + meta['issue'] + '</span>'
+        if 'year1' in meta and 'year2' in meta:
+            dateDisplayed = str(meta['year1'])
+            if meta['year2'] != meta['year1']:
+                dateDisplayed += '&ndash;' + str(meta['year2'])
+            result += '<span class="ch_date">' + dateDisplayed + '</span>'
+        dataMeta = ''
+        for metaField in self.settings['viewable_meta']:
+            try:
+                metaValue = meta[metaField]
+                dataMeta += metaField + ': ' + metaValue + '\\n'
+            except KeyError:
+                pass
+        dataMeta = dataMeta.replace('"', '&quot;')
+        if len(dataMeta) > 0:
+            result = result.replace('data-meta=""', 'data-meta="' + dataMeta + '"')
+        return result + '</span>'
+
+    def process_sentence(self, s, numSent=1, getHeader=False):
         """
         Process one sentence taken from response['hits']['hits'].
+        If getHeader is True, retrieve the metadata from the database.
+        Return dictionary {'header': document header HTML,
+                           'text': sentence HTML}.
         """
         if '_source' not in s:
             return ''
@@ -96,6 +143,10 @@ class SentenceViewer:
         sSource = s['_source']
         if 'text' not in sSource or len(sSource['text']) <= 0:
             return ''
+
+        header = {}
+        if getHeader:
+            header = self.process_sentence_header(sSource)
         if 'highlight' in s and 'text' in s['highlight']:
             highlightedText = s['highlight']['text']
             if type(highlightedText) == list:
@@ -144,7 +195,7 @@ class SentenceViewer:
             chars[i] = addition + chars[i]
         if len(curWords) > 0:
             chars[-1] += '</span>'
-        return ''.join(chars)
+        return {'header': header, 'text': ''.join(chars)}
 
     def process_word(self, w):
         """
@@ -195,7 +246,9 @@ class SentenceViewer:
         result['n_sentences'] = response['hits']['total']
         result['contexts'] = []
         for iHit in range(len(response['hits']['hits'])):
-            result['contexts'].append(self.process_sentence(response['hits']['hits'][iHit], iHit))
+            result['contexts'].append(self.process_sentence(response['hits']['hits'][iHit],
+                                                            numSent=iHit,
+                                                            getHeader=True))
         return result
 
     def process_word_json(self, response):

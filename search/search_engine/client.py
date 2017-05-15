@@ -39,3 +39,8 @@ class SearchClient:
                               body=esQuery)
         return hits
 
+    def get_doc_by_id(self, docId):
+        esQuery = {'query': {'term': {'_id': docId}}}
+        hits = self.es.search(index=self.name + '.docs', doc_type='doc',
+                              body=esQuery)
+        return hits

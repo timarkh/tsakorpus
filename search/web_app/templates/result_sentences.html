@@ -2,9 +2,13 @@
 <div class="sent_results">
 {% for c in data.contexts %}
 <hr>
+<div class="context" id='div_res{{ loop.index - 1 }}'>
+{{ c.header | safe }}
+<br>
 <span id='res{{ loop.index - 1 }}'>
-{{ c | safe }}
+{{ c.text | safe }}
 </span><span class='expand' data-nsent="{{ loop.index - 1 }}"><=...=></span>
+</div>
 {% endfor %}
 {% if data.message %}
 </div>

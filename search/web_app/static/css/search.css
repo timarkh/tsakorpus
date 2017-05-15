@@ -13,3 +13,15 @@
 	font-size: 22px;
 	color: #20A030;
 }
+
+.ch_title {
+	font-size: 18px;
+	padding-right: 20px;
+	font-weight: bold;
+}
+
+.ch_author {
+	font-size: 18px;
+	padding-right: 40px;
+}
+

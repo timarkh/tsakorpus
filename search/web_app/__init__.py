@@ -19,7 +19,7 @@ corpus_name = settings['corpus_name']
 localizations = {}
 supportedLocales = ['ru', 'en']
 sc = SearchClient(SETTINGS_DIR, mode='test')
-sentView = SentenceViewer(SETTINGS_DIR)
+sentView = SentenceViewer(SETTINGS_DIR, sc)
 
 
 def jsonp(func):
@@ -148,13 +148,15 @@ def add_sent_to_session(hits):
     curSentIDs = []
     set_session_data('lastSentNum', len(hits['hits']['hits']) - 1)
     for sent in hits['hits']['hits']:
-        nextID = prevID = -1
+        nextID = prevID = docID = -1
         if '_source' in sent:
             if 'next_id' in sent['_source']:
                 nextID = sent['_source']['next_id']
             if 'prev_id' in sent['_source']:
                 prevID = sent['_source']['prev_id']
+            docID = sent['_source']['doc_id']
         curSentIDs.append({'id': sent['_id'],
+                           'doc_id': docID,
                            'next_id': nextID,
                            'prev_id': prevID,
                            'times_expanded': 0})
@@ -177,6 +179,7 @@ def update_expanded_contexts(context, neighboringIDs):
     for side in ['next', 'prev']:
         if side in context and len(context[side]) > 0:
             curSent[side + '_id'] = neighboringIDs[side]
+
 
 @app.route('/search')
 def search_page():
@@ -260,7 +263,10 @@ def get_sent_context(n):
             curSent = context[side]['hits']['hits'][0]
             if '_source' in curSent and side + '_id' in curSent['_source']:
                 neighboringIDs[side] = curSent['_source'][side + '_id']
-            context[side] = sentView.process_sentence(curSent, lastSentNum)
+            expandedContext = sentView.process_sentence(curSent,
+                                                        numSent=lastSentNum,
+                                                        getHeader=False)
+            context[side] = expandedContext['text']
             set_session_data('lastSentNum', lastSentNum)
         else:
             context[side] = ''
