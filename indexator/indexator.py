@@ -71,6 +71,8 @@ class Indexator:
             for field in w:
                 if field in self.goodWordFields:
                     wClean[field] = w[field]
+                    if field == 'wf':
+                        wClean[field] = wClean[field].lower()
             if 'ana' in w:
                 wClean['ana'] = []
                 for ana in w['ana']:
@@ -100,6 +102,7 @@ class Indexator:
             wJson = json.loads(w)
             wJson['freq'] = self.wordFreqs[w]
             wJson['sids'] = [sid for sid in sorted(self.wordSIDs[w])]
+            wJson['n_sents'] = len(wJson['sids'])
             curAction = {'_index': self.name + '.words',
                          '_type': 'word',
                          '_id': iWord,
@@ -173,7 +176,9 @@ class Indexator:
         self.create_indices()
         self.index_dir()
         t2 = time.time()
-        print('Corpus indexed in', t2-t1, 'seconds,',
+        print('Corpus indexed in', t2-t1, 'seconds:',
+              self.dID, 'documents,',
+              self.sID, 'sentences,',
               len(self.wordFreqs), 'different words.')
 
 

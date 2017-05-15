@@ -95,6 +95,27 @@ class DumbMorphParser:
         """
         return word.strip().lower()
 
+    def analyze_word(self, wf):
+        if wf not in self.analyses and (wf.startswith('-') or wf.endswith('-')):
+            wf = wf.strip('-')
+        if wf in self.analyses:
+            analyses = copy.deepcopy(self.analyses[wf])
+        elif '-' in wf:
+            analyses = []
+            hyphenParts = wf.split('-')
+            for i in range(len(hyphenParts)):
+                wfPart = hyphenParts[i]
+                if len(wfPart) <= 0:
+                    continue
+                if i > 0:
+                    wfPart = '-' + wfPart
+                if i < len(hyphenParts) - 1:
+                    wfPart += '-'
+                analyses += self.analyze_word(wfPart)
+        else:
+            analyses = []
+        return analyses
+
     def analyze(self, sentences):
         """
         Analyze each word in each sentence using preloaded analyses.
@@ -106,8 +127,4 @@ class DumbMorphParser:
                 if word['wtype'] != 'word':
                     continue
                 wf = self.normalize(word['wf'])
-                if wf in self.analyses:
-                    word['ana'] = copy.deepcopy(self.analyses[wf])
-                else:
-                    word['ana'] = []
-
+                word['ana'] = self.analyze_word(wf)
