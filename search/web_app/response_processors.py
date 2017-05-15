@@ -245,6 +245,8 @@ class SentenceViewer:
         result['message'] = ''
         result['n_sentences'] = response['hits']['total']
         result['contexts'] = []
+        if 'aggregations' in response and 'agg_ndocs' in response['aggregations']:
+            result['n_docs'] = response['aggregations']['agg_ndocs']['value']
         for iHit in range(len(response['hits']['hits'])):
             result['contexts'].append(self.process_sentence(response['hits']['hits'][iHit],
                                                             numSent=iHit,

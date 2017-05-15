@@ -207,6 +207,7 @@ class InterfaceQueryParser:
                                         'boost_mode': 'replace',
                                         'random_score': {}}}
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
+        esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'doc_id'}}}
         if len(queryDictTop) >= 0:
             esQuery['highlight'] = {'fields': {f: {'number_of_fragments': 100,
                                                    'fragment_size': 2048}
