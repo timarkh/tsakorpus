@@ -48,7 +48,7 @@ function search_word_from_list(e) {
 	wf = $(e.target).attr('data-wf');
 	if (wf == "") return;
 	$('.search_input').val("");
-	$('#wf').val(wf);
+	$('#wf1').val(wf);
 	$("#search_sent").click();
 }
 

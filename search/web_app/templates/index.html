@@ -10,9 +10,17 @@
 <body>
 <p id="header">Corpus name: {{ corpus_name }}.</p>
 <form id="search_main">
-Wordform: <input type="text" class="search_input" name="wf" id="wf"><br>
-Lemma: <input type="text" class="search_input" name="l" id="l"><br>
-Grammar: <input type="text" class="search_input" name="gr" id="gr"><br>
+<input type="hidden" name="n_words" id="n_words" value="1">
+<div class="words_search">
+<div class="word_search" id="first_word">
+<p>Word #1</p>
+Wordform: <input type="text" class="search_input" name="wf1" id="wf1"><br>
+Lemma: <input type="text" class="search_input" name="l1" id="l1"><br>
+Grammar: <input type="text" class="search_input" name="gr1" id="gr1"><br>
+<span class="word_plus">add word</span>
+</div>
+</div>
+<br>
 Text search: <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise"> Precise match (not like in google)<br>
 Sorting:<br>
 <input type="radio" name="sort" value="random">random<br>

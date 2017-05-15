@@ -69,6 +69,8 @@ $(function() {
 			}
 		});
 	});
+	
+	assign_input_events();
 });
 
 function load_expanded_context(n_sent) {
@@ -110,4 +112,23 @@ function get_sentences_page(page) {
 			}
 		});
 	}
+}
+
+function assign_input_events() {
+	$("span.word_plus").unbind('click');
+	$("span.word_minus").unbind('click');
+	$("span.word_plus").click(add_word_inputs);
+}
+
+function add_word_inputs(e) {
+	var new_word_num = parseInt($("#n_words").attr('value'));
+	if (new_word_num <= 0) { return; }
+	new_word_num += 1;
+	word_div_html = '<div class="word_search">\n' + $('#first_word').html() + '</div>';
+	// word_div_html = word_div_html.replace(' id="first_word"', '');
+	word_div_html = word_div_html.replace(/1/g, new_word_num)
+	word_div = $.parseHTML(word_div_html);
+	$("div.words_search").append(word_div);
+	$("#n_words").attr('value', new_word_num);
+	assign_input_events();
 }

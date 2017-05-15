@@ -193,7 +193,7 @@ def search_page():
 @app.route('/search_sent_query/<int:page>')
 @app.route('/search_sent_query')
 @jsonp
-def search_sent_query(page=1):
+def search_sent_query(page=0):
     if request.args and page <= 0:
         query = copy.deepcopy(request.args)
         page = 1
@@ -214,7 +214,7 @@ def search_sent_query(page=1):
 @app.route('/search_sent_json/<int:page>')
 @app.route('/search_sent_json')
 @jsonp
-def search_sent_json(page=1):
+def search_sent_json(page=0):
     if request.args and page <= 0:
         query = copy.deepcopy(request.args)
         page = 1

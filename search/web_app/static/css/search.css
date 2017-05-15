@@ -37,3 +37,13 @@
 	margin-top: 30px;
 	margin-bottom: 20px;
 }
+
+.words_search {
+	display: flex;
+}
+
+.word_search {
+	float: left;
+	display: inline-block;
+	margin: 15px;
+}
