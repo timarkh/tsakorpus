@@ -75,6 +75,15 @@ class Splitter:
                 w['off_start'] -= startOffset
                 w['off_end'] -= startOffset
 
+    def add_next_word_id(self, sentences):
+        """
+        Insert the ID of the next word. (This is important for
+        the sentences that can have multiple tokenization variants.)
+        """
+        for s in sentences:
+            for i in range(len(s['words'])):
+                s['words'][i]['next_word'] = i + 1
+
     def split(self, tokens, text):
         """
         Split the text into sentences by packing tokens into
@@ -97,4 +106,5 @@ class Splitter:
                     curSentence = {'words': []}
                     continue
         self.recalculate_offsets(sentences)
+        self.add_next_word_id(sentences)
         return sentences

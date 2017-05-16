@@ -21,8 +21,8 @@ corpus_name = settings['corpus_name']
 localizations = {}
 supportedLocales = ['ru', 'en']
 sc = SearchClient(SETTINGS_DIR, mode='test')
-wr = WordRelations(SETTINGS_DIR)
 sentView = SentenceViewer(SETTINGS_DIR, sc)
+wr = WordRelations(SETTINGS_DIR, sentView)
 
 
 def jsonp(func):
@@ -204,7 +204,8 @@ def search_sent_query(page=0):
     else:
         query = get_session_data('last_query')
     set_session_data('page', page)
-    wordConstraints = {str(k): v for k, v in wr.get_constraints(query).items()}
+    wordConstraints = wr.get_constraints(query)
+    wordConstraints = {str(k): v for k, v in wordConstraints.items()}
     query = sc.qp.html2es(query,
                           searchIndex='sentences',
                           sortOrder=get_session_data('sort'),
@@ -223,9 +224,13 @@ def search_sent_json(page=0):
         page = 1
         change_display_options(query)
         set_session_data('last_query', query)
+        wordConstraints = wr.get_constraints(query)
     else:
         query = get_session_data('last_query')
+        wordConstraints = get_session_data('word_constraints')
     set_session_data('page', page)
+    if len(wordConstraints) > 0:
+        set_session_data('word_constraints', wordConstraints)
     query = sc.qp.html2es(query,
                           searchIndex='sentences',
                           sortOrder=get_session_data('sort'),
@@ -233,6 +238,13 @@ def search_sent_json(page=0):
                           query_size=get_session_data('page_size'),
                           page=get_session_data('page'))
     hits = sc.get_sentences(query)
+    if len(wordConstraints) > 0 and 'hits' in hits and 'hits' in hits['hits']:
+        for hit in hits['hits']['hits']:
+            hit['relations_satisfied'] = wr.check_sentence(hit, wordConstraints)
+            # if wr.check_sentence(hit, wordConstraints):
+            #     hit['relations_satisfied'] = True
+            # else:
+            #     hit['relations_satisfied'] = False
     return jsonify(hits)
 
 
@@ -244,9 +256,13 @@ def search_sent(page=0):
         page = 1
         change_display_options(query)
         set_session_data('last_query', query)
+        wordConstraints = wr.get_constraints(query).items()
     else:
         query = get_session_data('last_query')
+        wordConstraints = get_session_data('word_constraints')
     set_session_data('page', page)
+    if len(wordConstraints) > 0:
+        set_session_data('word_constraints', wordConstraints)
     query = sc.qp.html2es(query,
                           searchIndex='sentences',
                           sortOrder=get_session_data('sort'),
@@ -254,6 +270,12 @@ def search_sent(page=0):
                           query_size=get_session_data('page_size'),
                           page=get_session_data('page'))
     hits = sc.get_sentences(query)
+    if len(wordConstraints) > 0 and 'hits' in hits and 'hits' in hits['hits']:
+        for hit in hits['hits']['hits']:
+            if wr.check_sentence(hit, wordConstraints):
+                hit['relations_satisfied'] = True
+            else:
+                hit['relations_satisfied'] = False
     hitsProcessed = sentView.process_sent_json(hits)
     hitsProcessed['page'] = get_session_data('page')
     hitsProcessed['page_size'] = get_session_data('page_size')

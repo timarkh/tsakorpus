@@ -12,13 +12,14 @@ class WordRelations:
 
     rxWordRelFields = re.compile('^word_(?:dist_)?(rel|from|to)_([0-9]+)_([0-9]+)')
 
-    def __init__(self, settings_dir):
+    def __init__(self, settings_dir, sentence_viewer):
         self.settings_dir = settings_dir
         f = open(os.path.join(self.settings_dir, 'corpus.json'),
                  'r', encoding='utf-8')
         self.settings = json.loads(f.read())
         f.close()
         self.name = self.settings['corpus_name']
+        self.sentView = sentence_viewer
 
     def get_constraints(self, htmlQuery):
         """
@@ -84,3 +85,48 @@ class WordRelations:
                 if 'to' in relIDs[relID]:
                     constraints[wordPair]['to'] = relIDs[relID]['to']
         return constraints
+
+    def get_one_highlight_pos(self, highlight):
+        """
+        Find all offset information in one particular highlight.
+        Search recursively.
+        """
+        pos = set()
+        if type(highlight) == list:
+            for i in range(len(highlight)):
+                pos |= self.get_one_highlight_pos(highlight[i])
+        elif type(highlight) == dict:
+            if 'offset' in highlight:
+                pos.add(highlight['offset'])
+            else:
+                for v in highlight.values():
+                    if type(v) in [list, dict]:
+                        pos |= self.get_one_highlight_pos(v)
+        return pos
+
+    def get_all_highlight_pos(self, innerHits, constraints):
+        """
+        Find the positions of highlighted words in the list of words.
+        """
+        relevantHighlights = set()
+        for c in constraints:
+            relevantHighlights.add('w' + str(c[0]))
+            relevantHighlights.add('w' + str(c[1]))
+        if len(relevantHighlights) <= 0:
+            return {}
+        positions = {}
+        for hl in relevantHighlights:
+            if hl not in innerHits:
+                positions[hl] = []
+            else:
+                positions[hl] = [p for p in sorted(self.get_one_highlight_pos(innerHits[hl]))]
+        return positions
+
+    def check_sentence(self, sentence, constraints):
+        """
+        Check if the sentence satisfies tre word relation constraints.
+        """
+        if 'inner_hits' not in sentence:
+            return False
+        wordOffsets = self.get_all_highlight_pos(sentence['inner_hits'], constraints)
+        return wordOffsets
