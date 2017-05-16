@@ -1,6 +1,7 @@
 import re
 import os
 import json
+import random
 
 
 class InterfaceQueryParser:
@@ -104,7 +105,7 @@ class InterfaceQueryParser:
         else:
             return {'regexp': {field: word}}
 
-    def make_nested_query(self, query, nestedPath, highlightFields=None):
+    def make_nested_query(self, query, nestedPath, queryName='', highlightFields=None):
         esQuery = {'nested': {'path': nestedPath, 'query': query}}
         if highlightFields is not None:
             esQuery['nested']['inner_hits'] = {'highlight':
@@ -112,6 +113,8 @@ class InterfaceQueryParser:
                                                 {f: {'number_of_fragments': 100,
                                                      'fragment_size': 2048}
                                                  for f in highlightFields}}}
+            if len(queryName) > 0:
+                esQuery['nested']['inner_hits']['name'] = queryName
         return esQuery
 
     def full_word_query(self, queryDict, query_from=0, query_size=10, sortOrder='random'):
@@ -163,7 +166,7 @@ class InterfaceQueryParser:
         # if sortOrder in self.sortOrders:
         return esQuery
 
-    def single_word_sentence_query(self, queryDict):
+    def single_word_sentence_query(self, queryDict, queryWordNum):
         """
         Make a part of the full sentence query that contains
         a query for a single word, taking a dictionary with
@@ -184,6 +187,7 @@ class InterfaceQueryParser:
             return []
 
         query = []
+        queryName = 'w' + str(queryWordNum)
         if len(queryDictWordsAna) > 0:
             if len(queryDictWordsAna) == 1:
                 queryWordsAna = list(queryDictWordsAna.values())[0]
@@ -192,16 +196,21 @@ class InterfaceQueryParser:
             if len(queryDictWords) > 0:
                 queryDictWords['words.ana'] = self.make_nested_query(queryWordsAna,
                                                                      nestedPath='words.ana',
+                                                                     queryName=queryName,
                                                                      highlightFields=['words.ana'])
             else:
-                query.append(self.make_nested_query(queryWordsAna, nestedPath='words.ana',
+                query.append(self.make_nested_query(queryWordsAna,
+                                                    nestedPath='words.ana',
+                                                    queryName=queryName,
                                                     highlightFields=['words.ana']))
         if len(queryDictWords) > 0:
             if len(queryDictWords) == 1:
                 queryWords = list(queryDictWords.values())[0]
             else:
                 queryWords = {'bool': {'must': list(queryDictWords.values())}}
-            query.append(self.make_nested_query(queryWords, nestedPath='words',
+            query.append(self.make_nested_query(queryWords,
+                                                nestedPath='words',
+                                                queryName=queryName,
                                                 highlightFields=['words']))
         return query
 
@@ -223,8 +232,9 @@ class InterfaceQueryParser:
             query = {'match_none': {}}
         else:
             query = []
-            for wordDesc in queryDict['words']:
-                query += self.single_word_sentence_query(wordDesc)
+            for iQueryWord in range(len(queryDict['words'])):
+                wordDesc = queryDict['words'][iQueryWord]
+                query += self.single_word_sentence_query(wordDesc, iQueryWord + 1)
             query += list(queryDictTop.values())
             query = {'bool': {'must': query}}
 
@@ -246,7 +256,7 @@ class InterfaceQueryParser:
     def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
                 randomSeed=None, searchIndex='sentences'):
         """
-        Make and return a dict of bool queries out of the HTML form data.
+        Make and return a ES query out of the HTML form data.
         """
         query_from = (page - 1) * query_size
         prelimQuery = {'words': []}

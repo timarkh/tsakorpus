@@ -57,7 +57,8 @@ class SentenceViewer:
 
         def highlightClass(nWord):
             if nWord in matchWordOffsets:
-                return ' wmatch'
+                return ' wmatch' + ''.join(' wmatch_' + str(n)
+                                           for n in matchWordOffsets[nWord])
             return ''
 
         spanStart = '<span class="word ' + \
@@ -213,28 +214,47 @@ class SentenceViewer:
                wSource['wf'] + '">&gt;&gt; GO!</td></tr>'
         return word
 
-    def retrieve_highlighted_words(self, sentence, numSent):
+    def retrieve_highlighted_words(self, sentence, numSent, queryWordID=''):
         """
         Explore the inner_hits part of the response to find the
         offsets of the words that matched the word-level query.
         Search for word offsets recursively, so that the procedure
         does not depend excatly on the response structure.
+        Return a dictionary where keys are offsets of highlighted words
+        and values are sets of the IDs of the words in the search query .
         """
         if 'inner_hits' in sentence:
-            return self.retrieve_highlighted_words(sentence['inner_hits'], numSent)
-        offsets = set()
+            return self.retrieve_highlighted_words(sentence['inner_hits'],
+                                                   numSent,
+                                                   queryWordID)
+
+        offsets = {}    # query term ID -> highlights for this query term
         if type(sentence) == list:
             for el in sentence:
-                offsets |= self.retrieve_highlighted_words(el, numSent)
+                offsets.update(self.retrieve_highlighted_words(el, numSent, queryWordID))
             return offsets
         elif type(sentence) == dict:
             if 'field' in sentence and sentence['field'] == 'words':
                 if 'offset' in sentence:
-                    offsets.add('w' + str(numSent) + '_' + str(sentence['offset']))
+                    wordOffset = 'w' + str(numSent) + '_' + str(sentence['offset'])
+                    if wordOffset not in offsets:
+                        offsets[wordOffset] = set()
+                    if queryWordID == '':
+                        queryWordID = 'w0'
+                    offsets[wordOffset].add(queryWordID)
                 return offsets
             for k, v in sentence.items():
-                if type(v) in [dict, list]:
-                    offsets |= self.retrieve_highlighted_words(v, numSent)
+                if re.search('^w[0-9]+$', k) is not None:
+                    if len(queryWordID) <= 0 or queryWordID == k:
+                        newOffsets = self.retrieve_highlighted_words(v, numSent, k)
+                        for newK, newV in newOffsets.items():
+                            if newK not in offsets:
+                                offsets[newK] = newV
+                            else:
+                                offsets[newK] |= newV
+                else:
+                    if type(v) in [dict, list]:
+                        offsets.update(self.retrieve_highlighted_words(v, numSent, queryWordID))
         return offsets
 
     def process_sent_json(self, response):
