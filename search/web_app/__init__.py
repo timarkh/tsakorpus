@@ -80,6 +80,7 @@ def initialize_session():
                                           'login': False,
                                           'locale': 'en',
                                           'sort': '',
+                                          'distance_strict': False,
                                           'last_sent_num': -1,
                                           'last_query': {},
                                           'seed': random.randint(1, 1e6)}
@@ -141,6 +142,10 @@ def change_display_options(query):
             pass
     if 'sort' in query:
         set_session_data('sort', query['sort'])
+    if 'distance_strict' in query:
+        set_session_data('distance_strict', True)
+    else:
+        set_session_data('distance_strict', False)
 
 
 def add_sent_to_session(hits):
@@ -257,12 +262,11 @@ def search_sent(page=0):
         change_display_options(query)
         set_session_data('last_query', query)
         wordConstraints = wr.get_constraints(query)
+        set_session_data('word_constraints', wordConstraints)
     else:
         query = get_session_data('last_query')
         wordConstraints = get_session_data('word_constraints')
     set_session_data('page', page)
-    if len(wordConstraints) > 0:
-        set_session_data('word_constraints', wordConstraints)
     query = sc.qp.html2es(query,
                           searchIndex='sentences',
                           sortOrder=get_session_data('sort'),
@@ -270,7 +274,10 @@ def search_sent(page=0):
                           query_size=get_session_data('page_size'),
                           page=get_session_data('page'))
     hits = sc.get_sentences(query)
-    if len(wordConstraints) > 0 and 'hits' in hits and 'hits' in hits['hits']:
+
+    if len(wordConstraints) > 0 and get_session_data('distance_strict'):
+        sc.qp.filter_sentences(hits, wordConstraints)
+    elif len(wordConstraints) > 0 and 'hits' in hits and 'hits' in hits['hits']:
         for hit in hits['hits']['hits']:
             hit['relations_satisfied'] = wr.check_sentence(hit, wordConstraints)
     hitsProcessed = sentView.process_sent_json(hits)

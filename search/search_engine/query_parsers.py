@@ -295,6 +295,11 @@ class InterfaceQueryParser:
             queryDict = {'query': {'match_none': ''}}
         return queryDict
 
+    def filter_sentences(self, hits, constraint):
+        """
+        Remove sentences that do not satisfy the word relation constraints.
+        """
+        return hits  # TODO: write the code
 
 if __name__ == '__main__':
     iqp = InterfaceQueryParser('../../conf')

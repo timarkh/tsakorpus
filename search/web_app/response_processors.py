@@ -196,7 +196,11 @@ class SentenceViewer:
             chars[i] = addition + chars[i]
         if len(curWords) > 0:
             chars[-1] += '</span>'
-        return {'header': header, 'text': ''.join(chars)}
+        relationsSatisfied = True
+        if 'relations_satisfied' in s and not s['relations_satisfied']:
+            relationsSatisfied = False
+        return {'header': header, 'text': ''.join(chars),
+                'relations_satisfied': relationsSatisfied}
 
     def process_word(self, w):
         """

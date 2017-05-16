@@ -112,3 +112,7 @@
 .word_rel {
 	margin-top: 12px;
 }
+
+.bad_distances {
+	opacity: 0.5;
+}
