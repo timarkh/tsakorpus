@@ -4,8 +4,7 @@
 <hr>
 <div class="context {% if not c.relations_satisfied %} bad_distances{% endif %}" id='div_res{{ loop.index - 1 }}'>
 {{ c.header | safe }}
-<br>
-<span id='res{{ loop.index - 1 }}'>
+<span class="sentence" id='res{{ loop.index - 1 }}'>
 {{ c.text | safe }}
 </span><span class='expand' data-nsent="{{ loop.index - 1 }}"><=...=></span>
 </div>

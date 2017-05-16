@@ -73,20 +73,37 @@
 .expand {
 	font-size: 22px;
 	color: #20A030;
+	cursor: pointer;
+}
+
+.sentence {
+}
+
+.context_header {
+	cursor: pointer;
+	margin-bottom: 5px;
+	display: inline-block;
+}
+
+.context_header:hover {
+	border-bottom: 1px #6a7d96 dotted;
 }
 
 .ch_title {
 	font-size: 18px;
 	padding-right: 20px;
 	font-weight: bold;
+	color: #3a537a;
 }
 
 .ch_author {
 	font-size: 18px;
 	padding-right: 40px;
+	color: #0470a5;
 }
 
 .page_link {
+	cursor: pointer;
 }
 
 .cur_page {
@@ -115,4 +132,18 @@
 
 .bad_distances {
 	opacity: 0.5;
+}
+
+#res_p {
+	font-size: 16px;
+	font-family: "Segoe UI", "Lucida Grande", sans-serif;
+	line-height: 22px;
+}
+
+.word_plus {
+	cursor: pointer;
+}
+
+.add_rel {
+	cursor: pointer;
 }
