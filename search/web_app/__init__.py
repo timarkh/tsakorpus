@@ -8,6 +8,7 @@ import copy
 import random
 import uuid
 from search_engine.client import SearchClient
+from search_engine.word_relations import WordRelations
 from .response_processors import SentenceViewer
 
 
@@ -20,6 +21,7 @@ corpus_name = settings['corpus_name']
 localizations = {}
 supportedLocales = ['ru', 'en']
 sc = SearchClient(SETTINGS_DIR, mode='test')
+wr = WordRelations(SETTINGS_DIR)
 sentView = SentenceViewer(SETTINGS_DIR, sc)
 
 
@@ -202,13 +204,14 @@ def search_sent_query(page=0):
     else:
         query = get_session_data('last_query')
     set_session_data('page', page)
+    wordConstraints = {str(k): v for k, v in wr.get_constraints(query).items()}
     query = sc.qp.html2es(query,
                           searchIndex='sentences',
                           sortOrder=get_session_data('sort'),
                           randomSeed=get_session_data('seed'),
                           query_size=get_session_data('page_size'),
                           page=get_session_data('page'))
-    return jsonify(query)
+    return jsonify([query, wordConstraints])
 
 
 @app.route('/search_sent_json/<int:page>')

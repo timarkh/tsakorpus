@@ -117,18 +117,34 @@ function get_sentences_page(page) {
 function assign_input_events() {
 	$("span.word_plus").unbind('click');
 	$("span.word_minus").unbind('click');
+	$("span.add_rel").unbind('click');
 	$("span.word_plus").click(add_word_inputs);
+	$("span.add_rel").click(add_word_relations);
 }
 
 function add_word_inputs(e) {
 	var new_word_num = parseInt($("#n_words").attr('value'));
 	if (new_word_num <= 0) { return; }
 	new_word_num += 1;
-	word_div_html = '<div class="word_search">\n' + $('#first_word').html() + '</div>';
-	// word_div_html = word_div_html.replace(' id="first_word"', '');
+	word_div_html = '<div class="word_search" id="wsearch_' + new_word_num + '">\n' + $('#first_word').html();
 	word_div_html = word_div_html.replace(/1/g, new_word_num)
+	word_div_html += '<br><span class="add_rel" data-nword="' + new_word_num + '" data-nrels="0">add relation</span>';
+	word_div_html += '</div>';
 	word_div = $.parseHTML(word_div_html);
 	$("div.words_search").append(word_div);
 	$("#n_words").attr('value', new_word_num);
 	assign_input_events();
+}
+
+function add_word_relations(e) {
+	var word_num = parseInt($(e.target).attr('data-nword'));
+	if (word_num <= 0) { return; }
+	var nrels = parseInt($(e.target).attr('data-nrels'));
+	$(e.target).attr('data-nrels', nrels + 1);
+	word_rel_html = '<div class="word_rel"> Distance to word #<input type="number" name="word_rel_' + word_num + '_' + nrels + '"><br>';
+	word_rel_html += 'from <input type="number" name="word_dist_from_' + word_num + '_' + nrels + '"><br>';
+	word_rel_html += 'to <input type="number" name="word_dist_to_' + word_num + '_' + nrels + '"> ';
+	word_rel_html += '</div>';
+	word_rel_div = $.parseHTML(word_rel_html);
+	$("#wsearch_" + word_num).append(word_rel_div);
 }
