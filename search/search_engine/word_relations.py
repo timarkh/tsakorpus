@@ -122,11 +122,89 @@ class WordRelations:
                 positions[hl] = [p for p in sorted(self.get_one_highlight_pos(innerHits[hl]))]
         return positions
 
+    def find_word_path_lengths(self, words, posFrom, posTo, cumulatedLen=0, countPunc=False,
+                               left2right=True):
+        """
+        Return a set of path lengths between the words with positions
+        posFrom and posTo.
+        """
+        if posFrom == posTo:
+            if left2right:
+                return {-cumulatedLen}
+            else:
+                return {cumulatedLen}
+        if not (0 <= posFrom < len(words)) or 'next_word' not in words[posFrom]:
+            return set()
+        result = set()
+        lenAdd = 1
+        if words[posFrom]['wtype'] != 'word' and not countPunc:
+            lenAdd = 0
+        if type(words[posFrom]['next_word']) == int:
+            result |= self.find_word_path_lengths(words, words[posFrom]['next_word'], posTo,
+                                                  cumulatedLen=cumulatedLen + lenAdd,
+                                                  countPunc=countPunc,
+                                                  left2right=left2right)
+        else:
+            for iPos in words[posFrom]['next_word']:
+                result |= self.find_word_path_lengths(words, iPos, posTo,
+                                                      cumulatedLen=cumulatedLen+lenAdd,
+                                                      countPunc=countPunc,
+                                                      left2right=left2right)
+        return result
+
+    def word_path_exists(self, sentence, posFrom, posTo, minEdges, maxEdges, countPunc=False):
+        """
+        Check if a path with the length in the range [minEdges, maxEdges]
+        exists between the words whose positions in the sentence words list
+        are posFrom and posTo. If the "from" word is to the left of the
+        "to" word in the sentence, the distance is negative. If countPunc
+        is set to False, do not count non-word tokens when counting distance.
+        """
+        if '_source' not in sentence or 'words' not in sentence['_source']:
+            return False
+        if minEdges > maxEdges:
+            return False
+        words = sentence['_source']['words']
+        if not (0 <= posFrom < len(words)) or not (0 <= posTo < len(words)):
+            return False
+        if posFrom == posTo and minEdges <= 0 <= maxEdges:
+            return True
+        pathLengths = self.find_word_path_lengths(words, posFrom, posTo,
+                                                  countPunc=countPunc,
+                                                  left2right=True)
+        if any(minEdges <= pl <= maxEdges for pl in pathLengths):
+            return True
+        pathLengths = self.find_word_path_lengths(words, posTo, posFrom,
+                                                  countPunc=countPunc,
+                                                  left2right=False)
+        if any(minEdges <= pl <= maxEdges for pl in pathLengths):
+            return True
+        return False
+
     def check_sentence(self, sentence, constraints):
         """
-        Check if the sentence satisfies tre word relation constraints.
+        Check if the sentence satisfies the word relation constraints.
         """
         if 'inner_hits' not in sentence:
             return False
         wordOffsets = self.get_all_highlight_pos(sentence['inner_hits'], constraints)
-        return wordOffsets
+        for k, v in constraints.items():
+            wFrom, wTo = 'w' + str(k[0]), 'w' + str(k[1])
+            if wFrom not in wordOffsets or wTo not in wordOffsets:
+                return False
+            pathFound = False
+            for hlFrom in wordOffsets[wFrom]:
+                for hlTo in wordOffsets[wTo]:
+                    if self.word_path_exists(sentence, hlFrom, hlTo, v['from'], v['to'],
+                                             countPunc=False):
+                        pathFound = True
+                        # return {'to': hlTo, 'from': hlFrom,
+                        #         'minEdges': v['from'], 'maxEdges': v['to'],
+                        #         'pathLengths_l2r': list(self.find_word_path_lengths(sentence['_source']['words'], hlFrom, hlTo)),
+                        #         'pathLengths_r2l': list(self.find_word_path_lengths(sentence['_source']['words'], hlTo, hlFrom, left2right=False))}
+                        break
+                if pathFound:
+                    break
+            if not pathFound:
+                return False
+        return True

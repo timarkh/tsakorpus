@@ -256,7 +256,7 @@ def search_sent(page=0):
         page = 1
         change_display_options(query)
         set_session_data('last_query', query)
-        wordConstraints = wr.get_constraints(query).items()
+        wordConstraints = wr.get_constraints(query)
     else:
         query = get_session_data('last_query')
         wordConstraints = get_session_data('word_constraints')
@@ -272,10 +272,7 @@ def search_sent(page=0):
     hits = sc.get_sentences(query)
     if len(wordConstraints) > 0 and 'hits' in hits and 'hits' in hits['hits']:
         for hit in hits['hits']['hits']:
-            if wr.check_sentence(hit, wordConstraints):
-                hit['relations_satisfied'] = True
-            else:
-                hit['relations_satisfied'] = False
+            hit['relations_satisfied'] = wr.check_sentence(hit, wordConstraints)
     hitsProcessed = sentView.process_sent_json(hits)
     hitsProcessed['page'] = get_session_data('page')
     hitsProcessed['page_size'] = get_session_data('page_size')

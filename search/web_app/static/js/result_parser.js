@@ -58,7 +58,7 @@ function page_click(e) {
 }
 
 function highlight_word_spans(item, i) {
-	if (item == "word" || item.endsWith('match')) return;
+	if (item == "word" || item.includes('match')) return;
 	$('.' + item).css({'border-color': '#FF9000', 'border-radius': '5px',
 					   'border-width': '2px', 'border-style': 'solid'});
 }
