@@ -54,10 +54,11 @@ class Tokenizer:
         curToken = {}
         for i in range(len(text)):
             c = text[i]
-            if c == ' ' and curToken != {}:
-                curToken['off_end'] = i
-                tokens.append(curToken)
-                curToken = {}
+            if c == ' ':
+                if curToken != {}:
+                    curToken['off_end'] = i
+                    tokens.append(curToken)
+                    curToken = {}
                 continue
             if c == '\n':
                 if curToken != {}:

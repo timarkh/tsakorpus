@@ -133,13 +133,21 @@ class DumbMorphParser:
                 newWords[i]['off_start'] = offStart
                 offStart += len(newWords[i]['wf'])
                 newWords[i]['off_end'] = offStart
+                if i < len(newWords) - 1:
+                    newWords[i]['next_word'] = iWord + i + 1
+                else:
+                    newWords[i]['next_word'] += len(newWords) - 1
                 if newWords[i]['wf'].startswith('-'):
                     newWords[i]['wtype'] = 'punct'
                 else:
                     newWords[i]['ana'] = partAnalyses[i]
             words.pop(iWord)
+            for i in range(len(words)):
+                if words[i]['next_word'] > iWord:
+                    words[i]['next_word'] += len(newWords) - 1
             for i in range(len(newWords)):
                 words.insert(iWord + i, newWords[i])
+            # print(words)
             return len(newWords) - 1
         return 0
 
