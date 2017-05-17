@@ -17,6 +17,9 @@ MAX_PAGE_SIZE = 100
 f = open(os.path.join(SETTINGS_DIR, 'corpus.json'), 'r', encoding='utf-8')
 settings = json.loads(f.read())
 f.close()
+f = open(os.path.join(SETTINGS_DIR, 'word_fields.json'), 'r', encoding='utf-8')
+wordFields = json.loads(f.read())
+f.close()
 corpus_name = settings['corpus_name']
 localizations = {}
 supportedLocales = ['ru', 'en']
@@ -364,5 +367,13 @@ def search_word():
     hits = sc.get_words(query)
     hitsProcessed = sentView.process_word_json(hits)
     return render_template('result_words.html', data=hitsProcessed)
+
+
+@app.route('/get_word_fields')
+def get_word_fields():
+    result = '\n'.join(field + ': <input type="text" class="search_input" name="' + field +
+                       '1" id="' + field + '1"><br>'
+                       for field in wordFields)
+    return result
 
 

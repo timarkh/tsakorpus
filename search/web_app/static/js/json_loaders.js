@@ -70,6 +70,7 @@ $(function() {
 		});
 	});
 	
+	load_additional_word_fields();
 	assign_input_events();
 });
 
@@ -80,6 +81,19 @@ function load_expanded_context(n_sent) {
 		dataType : "json",
 		success: show_expanded_context,
 //		success: print_json,
+		error: function(errorThrown) {
+			alert( JSON.stringify(errorThrown) );
+		}
+	});
+}
+
+function load_additional_word_fields() {
+	$.ajax({
+		url: "get_word_fields",
+		type: "GET",
+		success: function(result) {
+			$("div.add_word_fields").html(result);
+		},
 		error: function(errorThrown) {
 			alert( JSON.stringify(errorThrown) );
 		}

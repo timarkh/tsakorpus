@@ -13,7 +13,7 @@ class DumbMorphParser:
 
     rxWordsRNC = re.compile('<w>(<ana.*?/(?:ana)>)([^<>]+)</w>', flags=re.DOTALL)
     rxAnalysesRNC = re.compile('<ana *([^<>]+)(?:></ana>|/>)\\s*')
-    rxAnaFieldRNC = re.compile('([^ <>"=]+) *= *"([^ <>"=]+)')
+    rxAnaFieldRNC = re.compile('([^ <>"=]+) *= *"([^<>"=]+)')
     rxSplitGramTags = re.compile('[, /]')
     rxHyphenParts = re.compile('[^\\-]+|-+')
 

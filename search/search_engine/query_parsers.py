@@ -18,6 +18,10 @@ class InterfaceQueryParser:
                  'r', encoding='utf-8-sig')
         self.gramDict = json.loads(f.read())
         f.close()
+        f = open(os.path.join(settings_dir, 'word_fields.json'),
+                 'r', encoding='utf-8-sig')
+        self.wordFields = json.loads(f.read())
+        f.close()
         # for g in self.gramDict:
         #     self.gramDict[g] = 'ana.gr.' + self.gramDict[g]
 
@@ -123,6 +127,8 @@ class InterfaceQueryParser:
         with bool queries.
         """
         wordAnaFields = {'ana.lex', 'ana.gr'}
+        for field in self.wordFields:
+            wordAnaFields.add('ana.' + field)
 
         # for the time being, use only the information from the first word box
         if 'words' not in queryDict or len(queryDict['words']) <= 0:
@@ -175,6 +181,8 @@ class InterfaceQueryParser:
         bool queries as input.
         """
         wordAnaFields = {'words.ana.lex', 'words.ana.gr'}
+        for field in self.wordFields:
+            wordAnaFields.add('words.ana.' + field)
         wordFields = {'words.wf'}
         queryDict = {k: queryDict[k] for k in queryDict
                      if queryDict[k] is not None and queryDict[k] != {}}
@@ -274,12 +282,15 @@ class InterfaceQueryParser:
             if 'wf' + strWordNum in htmlQuery and len(htmlQuery['wf' + strWordNum]) > 0:
                 curPrelimQuery[pathPfx + 'wf'] = self.make_bool_query(htmlQuery['wf' + strWordNum],
                                                                       pathPfx + 'wf')
-            if 'l' + strWordNum in htmlQuery and len(htmlQuery['l' + strWordNum]) > 0:
-                curPrelimQuery[pathPfx + 'ana.lex'] = self.make_bool_query(htmlQuery['l' + strWordNum],
-                                                                           pathPfx + 'ana.lex')
-            if 'gr' + strWordNum in htmlQuery and len(htmlQuery['gr' + strWordNum]) > 0:
-                curPrelimQuery[pathPfx + 'ana.gr'] = self.make_bool_query(htmlQuery['gr' + strWordNum],
-                                                                          pathPfx + 'ana.gr')
+            for anaField in ['lex', 'gr'] + self.wordFields:
+                if (anaField + strWordNum in htmlQuery
+                        and len(htmlQuery[anaField + strWordNum]) > 0):
+                    boolQuery = self.make_bool_query(htmlQuery[anaField + strWordNum],
+                                                     pathPfx + 'ana.' + anaField)
+                    curPrelimQuery[pathPfx + 'ana.' + anaField] = boolQuery
+            # if 'gr' + strWordNum in htmlQuery and len(htmlQuery['gr' + strWordNum]) > 0:
+            #     curPrelimQuery[pathPfx + 'ana.gr'] = self.make_bool_query(htmlQuery['gr' + strWordNum],
+            #                                                               pathPfx + 'ana.gr')
             if len(curPrelimQuery) > 0:
                 prelimQuery['words'].append(curPrelimQuery)
         if searchIndex == 'sentences' and 'txt' in htmlQuery and len(htmlQuery['txt']) > 0:
