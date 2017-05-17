@@ -8,7 +8,6 @@ import copy
 import random
 import uuid
 from search_engine.client import SearchClient
-from search_engine.word_relations import WordRelations
 from .response_processors import SentenceViewer
 
 
@@ -25,7 +24,6 @@ localizations = {}
 supportedLocales = ['ru', 'en']
 sc = SearchClient(SETTINGS_DIR, mode='test')
 sentView = SentenceViewer(SETTINGS_DIR, sc)
-wr = WordRelations(SETTINGS_DIR, sentView)
 
 
 def jsonp(func):
@@ -212,7 +210,7 @@ def search_sent_query(page=0):
     else:
         query = get_session_data('last_query')
     set_session_data('page', page)
-    wordConstraints = wr.get_constraints(query)
+    wordConstraints = sc.qp.wr.get_constraints(query)
     wordConstraints = {str(k): v for k, v in wordConstraints.items()}
     query = sc.qp.html2es(query,
                           searchIndex='sentences',
@@ -228,27 +226,52 @@ def search_sent_query(page=0):
 @jsonp
 def search_sent_json(page=0):
     if request.args and page <= 0:
-        query = copy.deepcopy(request.args)
+        query = {}
+        for field, value in request.args.items():
+            if type(value) != list or len(value) > 1:
+                query[field] = copy.deepcopy(value)
+            else:
+                query[field] = copy.deepcopy(value[0])
+        if 'sent_ids' in query:
+            del query['sent_ids']   # safety
         page = 1
         change_display_options(query)
         set_session_data('last_query', query)
-        wordConstraints = wr.get_constraints(query)
+        wordConstraints = sc.qp.wr.get_constraints(query)
+        set_session_data('word_constraints', wordConstraints)
     else:
         query = get_session_data('last_query')
         wordConstraints = get_session_data('word_constraints')
     set_session_data('page', page)
-    if len(wordConstraints) > 0:
-        set_session_data('word_constraints', wordConstraints)
-    query = sc.qp.html2es(query,
-                          searchIndex='sentences',
-                          sortOrder=get_session_data('sort'),
-                          randomSeed=get_session_data('seed'),
-                          query_size=get_session_data('page_size'),
-                          page=get_session_data('page'))
-    hits = sc.get_sentences(query)
-    if len(wordConstraints) > 0 and 'hits' in hits and 'hits' in hits['hits']:
+    if (len(wordConstraints) > 0
+            and get_session_data('distance_strict')
+            and 'sent_ids' not in query):
+        esQuery = sc.qp.html2es(query,
+                                searchIndex='sentences',
+                                query_size=1)
+        hits = sc.get_sentences(esQuery)
+        if ('hits' not in hits
+                or 'total' not in hits['hits']
+                or hits['hits']['total'] > settings['max_distance_filter']):
+            query = {}
+        else:
+            esQuery = sc.qp.html2es(query,
+                                    searchIndex='sentences')
+            iterator = sc.get_all_sentences(esQuery)
+            query['sent_ids'] = sc.qp.filter_sentences(iterator, wordConstraints)
+            set_session_data('last_query', query)
+    esQuery = sc.qp.html2es(query,
+                            searchIndex='sentences',
+                            sortOrder=get_session_data('sort'),
+                            randomSeed=get_session_data('seed'),
+                            query_size=get_session_data('page_size'),
+                            page=get_session_data('page'))
+    hits = sc.get_sentences(esQuery)
+    if (len(wordConstraints) > 0
+            and not get_session_data('distance_strict')
+            and 'hits' in hits and 'hits' in hits['hits']):
         for hit in hits['hits']['hits']:
-            hit['relations_satisfied'] = wr.check_sentence(hit, wordConstraints)
+            hit['relations_satisfied'] = sc.qp.wr.check_sentence(hit, wordConstraints)
             # if wr.check_sentence(hit, wordConstraints):
             #     hit['relations_satisfied'] = True
             # else:
@@ -260,29 +283,50 @@ def search_sent_json(page=0):
 @app.route('/search_sent')
 def search_sent(page=0):
     if request.args and page <= 0:
-        query = copy.deepcopy(request.args)
+        query = {}
+        for field, value in request.args.items():
+            if type(value) != list or len(value) > 1:
+                query[field] = copy.deepcopy(value)
+            else:
+                query[field] = copy.deepcopy(value[0])
+        if 'sent_ids' in query:
+            del query['sent_ids']   # safety
         page = 1
         change_display_options(query)
         set_session_data('last_query', query)
-        wordConstraints = wr.get_constraints(query)
+        wordConstraints = sc.qp.wr.get_constraints(query)
         set_session_data('word_constraints', wordConstraints)
     else:
         query = get_session_data('last_query')
         wordConstraints = get_session_data('word_constraints')
     set_session_data('page', page)
-    query = sc.qp.html2es(query,
-                          searchIndex='sentences',
-                          sortOrder=get_session_data('sort'),
-                          randomSeed=get_session_data('seed'),
-                          query_size=get_session_data('page_size'),
-                          page=get_session_data('page'))
-    hits = sc.get_sentences(query)
-
-    if len(wordConstraints) > 0 and get_session_data('distance_strict'):
-        sc.qp.filter_sentences(hits, wordConstraints)
-    elif len(wordConstraints) > 0 and 'hits' in hits and 'hits' in hits['hits']:
+    if (len(wordConstraints) > 0
+            and get_session_data('distance_strict')
+            and 'sent_ids' not in query):
+        esQuery = sc.qp.html2es(query,
+                                searchIndex='sentences',
+                                query_size=1)
+        hits = sc.get_sentences(esQuery)
+        if ('hits' not in hits
+                or 'total' not in hits['hits']
+                or hits['hits']['total'] > settings['max_distance_filter']):
+            query = {}
+        else:
+            esQuery = sc.qp.html2es(query,
+                                    searchIndex='sentences')
+            iterator = sc.get_all_sentences(esQuery)
+            query['sent_ids'] = sc.qp.filter_sentences(iterator, wordConstraints)
+            set_session_data('last_query', query)
+    esQuery = sc.qp.html2es(query,
+                            searchIndex='sentences',
+                            sortOrder=get_session_data('sort'),
+                            randomSeed=get_session_data('seed'),
+                            query_size=get_session_data('page_size'),
+                            page=get_session_data('page'))
+    hits = sc.get_sentences(esQuery)
+    if len(wordConstraints) > 0 and 'hits' in hits and 'hits' in hits['hits']:
         for hit in hits['hits']['hits']:
-            hit['relations_satisfied'] = wr.check_sentence(hit, wordConstraints)
+            hit['relations_satisfied'] = sc.qp.wr.check_sentence(hit, wordConstraints)
     hitsProcessed = sentView.process_sent_json(hits)
     hitsProcessed['page'] = get_session_data('page')
     hitsProcessed['page_size'] = get_session_data('page_size')

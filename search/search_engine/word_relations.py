@@ -12,14 +12,14 @@ class WordRelations:
 
     rxWordRelFields = re.compile('^word_(?:dist_)?(rel|from|to)_([0-9]+)_([0-9]+)')
 
-    def __init__(self, settings_dir, sentence_viewer):
+    def __init__(self, settings_dir):
         self.settings_dir = settings_dir
         f = open(os.path.join(self.settings_dir, 'corpus.json'),
                  'r', encoding='utf-8')
         self.settings = json.loads(f.read())
         f.close()
         self.name = self.settings['corpus_name']
-        self.sentView = sentence_viewer
+        # self.sentView = sentence_viewer
 
     def get_constraints(self, htmlQuery):
         """
@@ -30,11 +30,11 @@ class WordRelations:
         relIDs = {}
         for field, value in htmlQuery.items():
             mRel = self.rxWordRelFields.search(field)
-            try:
-                value = int(value)
-            except ValueError:
-                continue
             if mRel is not None:
+                try:
+                    value = int(value)
+                except:
+                    continue
                 relType = mRel.group(1)
                 nSource = int(mRel.group(2))
                 nRel = int(mRel.group(3))

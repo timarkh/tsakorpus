@@ -1,4 +1,4 @@
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, helpers
 from elasticsearch.client import IndicesClient
 import json
 import os
@@ -32,6 +32,14 @@ class SearchClient:
         hits = self.es.search(index=self.name + '.sentences', doc_type='sentence',
                               body=esQuery)
         return hits
+
+    def get_all_sentences(self, esQuery):
+        """
+        Iterate over all sentences found with the query.
+        """
+        iterator = helpers.scan(self.es, index=self.name + '.sentences', doc_type='sentence',
+                                query=esQuery)
+        return iterator
 
     def get_sentence_by_id(self, sentId):
         esQuery = {'query': {'term': {'_id': sentId}}}

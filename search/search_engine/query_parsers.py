@@ -2,6 +2,7 @@ import re
 import os
 import json
 import random
+from .word_relations import WordRelations
 
 
 class InterfaceQueryParser:
@@ -22,6 +23,7 @@ class InterfaceQueryParser:
                  'r', encoding='utf-8-sig')
         self.wordFields = json.loads(f.read())
         f.close()
+        self.wr = WordRelations(settings_dir)
         # for g in self.gramDict:
         #     self.gramDict[g] = 'ana.gr.' + self.gramDict[g]
 
@@ -161,9 +163,7 @@ class InterfaceQueryParser:
                 query.append(queryWords)
             query = {'bool': {'must': query}}
         if sortOrder == 'random':
-            query = {'function_score': {'query': query,
-                                        'boost_mode': 'replace',
-                                        'random_score': {}}}
+            query = self.make_random(query)
         esQuery = {'query': query, 'size': query_size, 'from': query_from,
                    '_source': {'excludes': ['sids']}}
         esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'dids'}}}
@@ -246,14 +246,11 @@ class InterfaceQueryParser:
                 wordDesc = queryDict['words'][iQueryWord]
                 query += self.single_word_sentence_query(wordDesc, iQueryWord + 1)
             query += list(queryDictTop.values())
+            if 'sent_ids' in queryDict:
+                query.append({'ids': {'values': queryDict['sent_ids']}})
             query = {'bool': {'must': query}}
-
         if sortOrder == 'random':
-            query = {'function_score': {'query': query,
-                                        'boost_mode': 'replace',
-                                        'random_score': {}}}
-            if randomSeed is not None:
-                query['function_score']['random_score']['seed'] = randomSeed
+            query = self.make_random(query, randomSeed)
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
         esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'doc_id'}}}
         if len(queryDictTop) >= 0:
@@ -263,15 +260,29 @@ class InterfaceQueryParser:
         # if sortOrder in self.sortOrders:
         return esQuery
 
+    def make_random(self, query, randomSeed=None):
+        """
+        Add random ordering to the ES query.
+        """
+        query = {'function_score': {'query': query,
+                                    'boost_mode': 'replace',
+                                    'random_score': {}}}
+        if randomSeed is not None:
+            query['function_score']['random_score']['seed'] = randomSeed
+        return query
+
     def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
                 randomSeed=None, searchIndex='sentences'):
         """
         Make and return a ES query out of the HTML form data.
         """
         query_from = (page - 1) * query_size
+
         prelimQuery = {'words': []}
         if searchIndex == 'sentences':
             pathPfx = 'words.'
+            if 'sent_ids' in htmlQuery:
+                prelimQuery['sent_ids'] = htmlQuery['sent_ids']
         else:
             pathPfx = ''
         if 'n_words' not in htmlQuery:
@@ -308,11 +319,16 @@ class InterfaceQueryParser:
             queryDict = {'query': {'match_none': ''}}
         return queryDict
 
-    def filter_sentences(self, hits, constraint):
+    def filter_sentences(self, iterSent, constraints):
         """
         Remove sentences that do not satisfy the word relation constraints.
         """
-        return hits  # TODO: write the code
+        goodSentIDs = []
+        for sent in iterSent:
+            if self.wr.check_sentence(sent, constraints):
+                goodSentIDs.append(sent['_id'])
+        return goodSentIDs
+
 
 if __name__ == '__main__':
     iqp = InterfaceQueryParser('../../conf')
