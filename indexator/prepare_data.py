@@ -20,6 +20,17 @@ class PrepareData:
                  'r', encoding='utf-8')
         self.categories = json.loads(f.read())
         f.close()
+        self.wfAnalyzer = {
+            'analysis': {
+                'analyzer': {
+                    'wf_analyzer': {
+                        'type': 'pattern',
+                        'pattern': '[\\-\n()]',
+                        'lowercase': True
+                    }
+                }
+            }
+        }
 
     def generate_words_mapping(self):
         """
@@ -27,7 +38,9 @@ class PrepareData:
         on searchable features described in word_fields.json and
         categories.json.
         """
-        m = {'wf': {'type': 'text', 'fielddata': True},
+        m = {'wf': {'type': 'text',
+                    'fielddata': True,
+                    'analyzer': 'wf_analyzer'},
              'wtype': {'type': 'keyword'},
              'sids': {'type': 'integer', 'index': False},
              'ana': {'type': 'nested',
@@ -43,7 +56,7 @@ class PrepareData:
         for field in set(self.categories.values()):
             if self.rxBadField.search(field) is None:
                 m['ana']['properties']['gr.' + field] = {'type': 'keyword'}
-        return {'mappings': {'word': {'properties': m}}}
+        return {'mappings': {'word': {'properties': m}}, 'settings': self.wfAnalyzer}
 
     def generate_sentences_mapping(self, word_mapping):
         """
@@ -73,7 +86,7 @@ class PrepareData:
                              'index': False},
              'words': {'type': 'nested',
                        'properties': word_mapping['mappings']['word']['properties']}}
-        return {'mappings': {'sentence': {'properties': m}}}
+        return {'mappings': {'sentence': {'properties': m}}, 'settings': self.wfAnalyzer}
 
     def generate_mappings(self):
         """
