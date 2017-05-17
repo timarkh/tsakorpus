@@ -21,25 +21,46 @@ class SentenceViewer:
         self.sentence_props = ['text']
         self.sc = search_client
 
+    def build_ana_div(self, ana):
+        """
+        Build the contents of a div with one particular analysis.
+        """
+        result = ''
+        if 'lex' in ana:
+            result += '<span class="popup_lex">' + ana['lex'] + '</span> '
+        if 'gr.pos' in ana:
+            result += '<span class="popup_pos">' + ana['gr.pos'] + '</span> '
+        for field in sorted(ana):
+            if field not in ['lex', 'gr.pos']:
+                value = ana[field]
+                if type(value) == list:
+                    value = ', '.join(value)
+                result += '<span class="popup_field">' + field +\
+                          ': <span class="popup_value">' + value + '</span></span>'
+        return result
+
     def build_ana_popup(self, word):
         """
         Build a string for a popup with the word and its analyses. 
         """
-        popup = ''
+        popup = '<div class="popup_word">'
         if 'wf' in word:
-            popup += word['wf'] + '\n'
+            popup += '<span class="popup_wf">' + word['wf'] + '</span>'
         if 'ana' in word:
             for iAna in range(len(word['ana'])):
-                popup += 'Analysis #' + str(iAna + 1) + '.\n'
-                popup += json.dumps(word['ana'][iAna], ensure_ascii=False, indent=2)
-                popup += ' \n'
+                popup += '<div class="popup_ana">'
+                if len(word['ana']) > 1:
+                    popup += str(iAna + 1) + '. '
+                popup += self.build_ana_div(word['ana'][iAna])
+                popup += '</div>'
+        popup += '</div>'
         return popup
 
     def prepare_analyses(self, words, indexes):
         """
         Generate viewable analyses for the words with given indexes.
         """
-        result = '---------\n'
+        result = ''
         for i in indexes:
             mWordNo = self.rxWordNo.search(i)
             if mWordNo is None:
@@ -51,11 +72,11 @@ class SentenceViewer:
             if word['wtype'] != 'word':
                 continue
             result += self.build_ana_popup(word)
-        result = result.replace('\n', '\\n').replace('"', "'")
+        result = result.replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
         return result
 
     def build_span(self, sentSrc, curWords, matchWordOffsets):
-        dataAna = self.prepare_analyses(sentSrc['words'], curWords)
+        dataAna = self.prepare_analyses(sentSrc['words'], curWords).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
 
         def highlightClass(nWord):
             if nWord in matchWordOffsets:
@@ -219,7 +240,7 @@ class SentenceViewer:
             return ''
         wSource = w['_source']
         word = '<tr><td><span class="word" data-ana="' +\
-               self.build_ana_popup(wSource).replace('\n', '\\n').replace('"', "'") +\
+               self.build_ana_popup(wSource).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;') +\
                '">' + wSource['wf'] +\
                '</span></td><td>' + str(wSource['freq']) +\
                '</span></td><td>' + str(wSource['rank']) +\

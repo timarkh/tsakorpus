@@ -1,4 +1,8 @@
-﻿.wmatch {
+﻿.word:hover {
+	border-bottom: 1px gray dotted;
+}
+
+.wmatch {
 	font-weight: bold;
 	padding-left: 2px;
 	padding-right: 2px;
@@ -144,10 +148,44 @@
 	line-height: 22px;
 }
 
-.word_plus {
+.word_plus, .add_rel {
 	cursor: pointer;
 }
 
-.add_rel {
-	cursor: pointer;
+.popup_wf {
+	font-weight: bold;
+}
+
+.popup_lex {
+	font-weight: bold;
+	color: #564b84;
+}
+
+.popup_pos {
+	margin-left: 5px;
+	color: #564b84;
+	display: inline-block;
+}
+
+.popup_field {
+	display: block;
+}
+
+.popup_value {
+}
+
+#analysis {
+    display: none;
+    padding: 10px;
+    line-height: 1.2;
+    position: absolute;
+    background: ghostwhite;
+    color: #000000;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 5px silver;
+    font-size: 90%;
+	font-family: "Segoe UI", "Lucida Grande", sans-serif;
+    z-index: 100;
 }
