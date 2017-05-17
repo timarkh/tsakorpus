@@ -1,7 +1,7 @@
-﻿<p>Search result: {{ data.n_occurrences }} different words found.</p>
+﻿<p>Search result: {{ data.n_occurrences }} different words in approximately {{ data.n_docs }} document(s) found.</p>
 <div class="word_results">
 <table style='border: 1px solid blue'>
-<thead><td>word</td><td>frequency</td><td># sentences</td><td>search in corpus</td></thead>
+<thead><td>word</td><td>frequency</td><td>freq. rank / quantile</td><td># sentences</td><td># documents</td><td>search in corpus</td></thead>
 {% for w in data.words %}
 {{ w | safe }}
 {% endfor %}

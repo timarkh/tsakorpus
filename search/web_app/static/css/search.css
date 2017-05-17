@@ -79,9 +79,13 @@
 .sentence {
 }
 
+.ch_container {
+	margin-bottom: 5px;
+	display: block;
+}
+
 .context_header {
 	cursor: pointer;
-	margin-bottom: 5px;
 	display: inline-block;
 }
 

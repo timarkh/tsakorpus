@@ -4,6 +4,7 @@ from elasticsearch.helpers import bulk
 import json
 import os
 import time
+import math
 from prepare_data import PrepareData
 from json_doc_reader import JSONDocReader
 
@@ -41,6 +42,7 @@ class Indexator:
         self.es_ic = IndicesClient(self.es)
         self.wordFreqs = {}   # word as JSON -> its frequency
         self.wordSIDs = {}    # word as JSON -> set of sentence IDs
+        self.wordDIDs = {}    # word as JSON -> set of document IDs
         self.sID = 0          # current sentence ID
         self.dID = 0          # current document ID
 
@@ -67,6 +69,8 @@ class Indexator:
         fields from them and add them to self.words dictionary.
         """
         for w in words:
+            if w['wtype'] != 'word':
+                continue
             wClean = {}
             for field in w:
                 if field in self.goodWordFields:
@@ -88,6 +92,10 @@ class Indexator:
             except KeyError:
                 self.wordFreqs[wCleanTxt] = 1
                 self.wordSIDs[wCleanTxt] = {self.sID}
+            try:
+                self.wordDIDs[wCleanTxt].add(self.dID)
+            except KeyError:
+                self.wordDIDs[wCleanTxt] = {self.dID}
 
     def iterate_words(self):
         """
@@ -96,13 +104,29 @@ class Indexator:
         in Elasticsearch.
         """
         iWord = 0
+        freqsSorted = [v for v in sorted(self.wordFreqs.values(), reverse=True)]
+        quantiles = {}
+        for q in [0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.25, 0.5]:
+            qIndex = math.ceil(q * len(freqsSorted))
+            if qIndex >= len(freqsSorted):
+                qIndex = len(freqsSorted) - 1
+            quantiles[q] = freqsSorted[qIndex]
         for w in self.wordFreqs:
             if iWord % 500 == 0:
                 print('indexing word', iWord)
             wJson = json.loads(w)
             wJson['freq'] = self.wordFreqs[w]
             wJson['sids'] = [sid for sid in sorted(self.wordSIDs[w])]
+            wJson['dids'] = [did for did in sorted(self.wordDIDs[w])]
             wJson['n_sents'] = len(wJson['sids'])
+            wJson['n_docs'] = len(wJson['dids'])
+            wJson['rank'] = ''
+            if wJson['freq'] > 1:
+                if wJson['freq'] > quantiles[0.03]:
+                    wJson['rank'] = '#' + str(freqsSorted.index(wJson['freq']) + 1)
+                else:
+                    wJson['rank'] = '&gt; ' + str(min(math.ceil(q * 100) for q in quantiles
+                                                  if wJson['freq'] >= quantiles[q])) + '%'
             curAction = {'_index': self.name + '.words',
                          '_type': 'word',
                          '_id': iWord,

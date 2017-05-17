@@ -33,6 +33,7 @@ function highlight_cur_word(e) {
 function expand_context(e) {
 	var n_sent = $(e.target).attr('data-nsent');
 	load_expanded_context(n_sent);
+	$('#res' + n_sent).html($('#res' + n_sent).html().replace(/<span class="newline"><\/span>/g, "<br>"));
 }
 
 function show_doc_meta(e) {

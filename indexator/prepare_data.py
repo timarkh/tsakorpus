@@ -32,7 +32,10 @@ class PrepareData:
              'sids': {'type': 'integer', 'index': False},
              'ana': {'type': 'nested',
                      'properties': {'lex': {'type': 'text'}}},
-             'freq': {'type': 'integer'}
+             'freq': {'type': 'integer'},
+             'rank': {'type': 'keyword'},
+             'n_sents': {'type': 'integer'},
+             'n_docs': {'type': 'integer'}
              }
         for field in self.wordFields:
             if self.rxBadField.search(field) is None:

@@ -12,7 +12,7 @@ class TextCleaner:
     rxTags = re.compile('</?(?:a|img|span|div|p|body|html|head)(?: [^<>]+)?>|[\0⌐-♯]+',
                         flags=re.DOTALL)
     rxSpaces1 = re.compile(' {2,}| +|\t+|&nbsp;| ', flags=re.DOTALL)
-    rxSpaces2 = re.compile('(?: *\r\n)+ *', flags=re.DOTALL)
+    rxSpaces2 = re.compile('(?: *\n)+ *', flags=re.DOTALL)
     rxPuncWords = re.compile('([,!?:;·;·)\\]>])([\\w(\\[<])')
     rxQuotesL = re.compile('([\\s(\\[{<\\-])"([\\w\\-\'`´‘’‛@.,-‒–—―•])',
                            flags=re.DOTALL)

@@ -48,6 +48,8 @@ class SentenceViewer:
             if i < 0 or i >= len(words):
                 continue
             word = words[i]
+            if word['wtype'] != 'word':
+                continue
             result += self.build_ana_popup(word)
         result = result.replace('\n', '\\n').replace('"', "'")
         return result
@@ -180,6 +182,13 @@ class SentenceViewer:
                 offEnds[offEnd] = {wn}
         curWords = set()
         for i in range(len(chars)):
+            if chars[i] == '\n':
+                if (i == 0 or i == len(chars) - 1
+                        or all(chars[j] == '\n'
+                               for j in range(i+1, len(chars)))):
+                    chars[i] = '<span class="newline"></span>'
+                else:
+                    chars[i] = '<br>'
             if i not in offStarts and i not in offEnds:
                 continue
             addition = ''
@@ -213,7 +222,9 @@ class SentenceViewer:
                self.build_ana_popup(wSource).replace('\n', '\\n').replace('"', "'") +\
                '">' + wSource['wf'] +\
                '</span></td><td>' + str(wSource['freq']) +\
-               '</td><td>' + str(len(wSource['sids'])) +\
+               '</span></td><td>' + str(wSource['rank']) +\
+               '</td><td>' + str(wSource['n_sents']) +\
+               '</td><td>' + str(wSource['n_docs']) +\
                '</td><td><span class="search_w" data-wf="' +\
                wSource['wf'] + '">&gt;&gt; GO!</td></tr>'
         return word
@@ -279,11 +290,14 @@ class SentenceViewer:
         return result
 
     def process_word_json(self, response):
-        result = {'n_occurrences': 0, 'n_sentences': 0, 'message': 'Nothing found.'}
-        if 'hits' not in response or 'total' not in response['hits']:
+        result = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'message': 'Nothing found.'}
+        if ('hits' not in response
+                or 'total' not in response['hits']
+                or response['hits']['total'] <= 0):
             return result
         result['message'] = ''
         result['n_occurrences'] = response['hits']['total']
+        result['n_docs'] = response['aggregations']['agg_ndocs']['value']
         result['words'] = []
         for iHit in range(len(response['hits']['hits'])):
             result['words'].append(self.process_word(response['hits']['hits'][iHit]))

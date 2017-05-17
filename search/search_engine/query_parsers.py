@@ -126,7 +126,7 @@ class InterfaceQueryParser:
 
         # for the time being, use only the information from the first word box
         if 'words' not in queryDict or len(queryDict['words']) <= 0:
-            return {'match_none': {}}
+            return {'query': {'match_none': {}}}
         queryDict = queryDict['words'][0]
 
         queryDict = {k: queryDict[k] for k in queryDict
@@ -158,7 +158,9 @@ class InterfaceQueryParser:
             query = {'function_score': {'query': query,
                                         'boost_mode': 'replace',
                                         'random_score': {}}}
-        esQuery = {'query': query, 'size': query_size, 'from': query_from}
+        esQuery = {'query': query, 'size': query_size, 'from': query_from,
+                   '_source': {'excludes': ['sids']}}
+        esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'dids'}}}
         if sortOrder == 'wf':
             esQuery['sort'] = {'wf': {'order': 'asc'}}
         elif sortOrder == 'freq':

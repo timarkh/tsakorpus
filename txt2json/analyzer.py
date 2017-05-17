@@ -15,6 +15,7 @@ class DumbMorphParser:
     rxAnalysesRNC = re.compile('<ana *([^<>]+)(?:></ana>|/>)\\s*')
     rxAnaFieldRNC = re.compile('([^ <>"=]+) *= *"([^ <>"=]+)')
     rxSplitGramTags = re.compile('[, /]')
+    rxHyphenParts = re.compile('[^\\-]+|-+')
 
     def __init__(self, settings, categories):
         self.settings = copy.deepcopy(settings)
@@ -100,21 +101,47 @@ class DumbMorphParser:
             wf = wf.strip('-')
         if wf in self.analyses:
             analyses = copy.deepcopy(self.analyses[wf])
-        elif '-' in wf:
-            analyses = []
-            hyphenParts = wf.split('-')
-            for i in range(len(hyphenParts)):
-                wfPart = hyphenParts[i]
-                if len(wfPart) <= 0:
-                    continue
-                if i > 0:
-                    wfPart = '-' + wfPart
-                if i < len(hyphenParts) - 1:
-                    wfPart += '-'
-                analyses += self.analyze_word(wfPart)
         else:
             analyses = []
         return analyses
+
+    def analyze_hyphened_word(self, words, iWord):
+        """
+        Try to analyze a word that contains a hyphen but could
+        not be analyzed as a whole. Split the word in several,
+        if needed.
+        """
+        word = words[iWord]
+        parts = self.rxHyphenParts.findall(word['wf'])
+        partAnalyses = []
+        for iPart in range(len(parts)):
+            if parts[iPart].startswith('-'):
+                partAnalyses.append(None)
+                continue
+            wfPart = parts[iPart]
+            if iPart > 0:
+                wfPart = '-' + wfPart
+            if iPart < len(parts) - 1:
+                wfPart += '-'
+            partAna = self.analyze_word(wfPart)
+            partAnalyses.append(partAna)
+        if any(pa is not None and len(pa) > 0 for pa in partAnalyses):
+            offStart = word['off_start']
+            newWords = [copy.deepcopy(word) for i in range(len(partAnalyses))]
+            for i in range(len(newWords)):
+                newWords[i]['wf'] = parts[i]
+                newWords[i]['off_start'] = offStart
+                offStart += len(newWords[i]['wf'])
+                newWords[i]['off_end'] = offStart
+                if newWords[i]['wf'].startswith('-'):
+                    newWords[i]['wtype'] = 'punct'
+                else:
+                    newWords[i]['ana'] = partAnalyses[i]
+            words.pop(iWord)
+            for i in range(len(newWords)):
+                words.insert(iWord + i, newWords[i])
+            return len(newWords) - 1
+        return 0
 
     def analyze(self, sentences):
         """
@@ -123,8 +150,15 @@ class DumbMorphParser:
         for s in sentences:
             if 'words' not in s:
                 continue
-            for word in s['words']:
+            iWord = -1
+            while iWord < len(s['words']) - 1:
+                iWord += 1
+                word = s['words'][iWord]
                 if word['wtype'] != 'word':
                     continue
                 wf = self.normalize(word['wf'])
-                word['ana'] = self.analyze_word(wf)
+                analyses = self.analyze_word(wf)
+                if len(analyses) > 0:
+                    word['ana'] = analyses
+                elif '-' in word['wf']:
+                    iWord += self.analyze_hyphened_word(s['words'], iWord)
