@@ -1,13 +1,15 @@
 ﻿<p>Search result: {{ data.n_occurrences }} different words in approximately {{ data.n_docs }} document(s) found.</p>
 <div class="word_results">
 <table style='border: 1px solid blue'>
-<thead><td>word</td><td>frequency</td><td>freq. rank / quantile</td><td># sentences</td><td># documents</td><td>search in corpus</td></thead>
+<thead><th>word</th><th>frequency</th><th>freq. rank / quantile</th><th># sentences</th><th># documents</th><th>search in corpus</th></thead>
+<tbody>
 {% for w in data.words %}
 {{ w | safe }}
 {% endfor %}
 {% if data.message %}
+</tbody>
 </table>
 </div>
 <p class="message">Message: {{ data.message }}</p>
 {% endif %}
-<script type='text/javascript'>assign_word_events();</script>
+<script type='text/javascript'>assign_word_events(); make_sortable();</script>

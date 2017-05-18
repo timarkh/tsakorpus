@@ -110,6 +110,10 @@
 	color: #0470a5;
 }
 
+.ch_date {
+	padding-left: 10px;
+}
+
 .page_link {
 	cursor: pointer;
 }
@@ -195,4 +199,24 @@
     font-size: 90%;
 	font-family: "Segoe UI", "Lucida Grande", sans-serif;
     z-index: 100;
+}
+
+tr:nth-child(odd) {
+	background-color: #d9f0fc; 
+}
+
+tr:nth-child(even) {
+	background-color: #fff;
+}
+
+th {
+	padding: 3px 5px;
+	color: #004b72;
+	min-width: 35px;
+	background-color: #eee;
+	cursor: pointer;
+}
+
+td {
+	padding: 3px 4px;
 }
