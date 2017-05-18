@@ -111,7 +111,8 @@ class InterfaceQueryParser:
         else:
             return {'regexp': {field: word}}
 
-    def make_nested_query(self, query, nestedPath, queryName='', highlightFields=None):
+    def make_nested_query(self, query, nestedPath, queryName='', highlightFields=None,
+                          sortOrder=''):
         esQuery = {'nested': {'path': nestedPath, 'query': query}}
         if highlightFields is not None:
             esQuery['nested']['inner_hits'] = {'highlight':
@@ -174,7 +175,7 @@ class InterfaceQueryParser:
         # if sortOrder in self.sortOrders:
         return esQuery
 
-    def single_word_sentence_query(self, queryDict, queryWordNum):
+    def single_word_sentence_query(self, queryDict, queryWordNum, sortOrder):
         """
         Make a part of the full sentence query that contains
         a query for a single word, taking a dictionary with
@@ -212,7 +213,8 @@ class InterfaceQueryParser:
                 query.append(self.make_nested_query(queryWordsAna,
                                                     nestedPath='words.ana',
                                                     queryName=queryName,
-                                                    highlightFields=['words.ana']))
+                                                    highlightFields=['words.ana'],
+                                                    sortOrder=sortOrder))
         if len(queryDictWords) > 0:
             if len(queryDictWords) == 1:
                 queryWords = list(queryDictWords.values())[0]
@@ -221,7 +223,8 @@ class InterfaceQueryParser:
             query.append(self.make_nested_query(queryWords,
                                                 nestedPath='words',
                                                 queryName=queryName,
-                                                highlightFields=['words']))
+                                                highlightFields=['words'],
+                                                sortOrder=sortOrder))
         return query
 
     def full_sentence_query(self, queryDict, query_from=0, query_size=10,
@@ -244,7 +247,7 @@ class InterfaceQueryParser:
             query = []
             for iQueryWord in range(len(queryDict['words'])):
                 wordDesc = queryDict['words'][iQueryWord]
-                query += self.single_word_sentence_query(wordDesc, iQueryWord + 1)
+                query += self.single_word_sentence_query(wordDesc, iQueryWord + 1, sortOrder)
             query += list(queryDictTop.values())
             if 'sent_ids' in queryDict:
                 query.append({'ids': {'values': queryDict['sent_ids']}})

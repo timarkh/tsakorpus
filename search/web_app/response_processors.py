@@ -39,16 +39,21 @@ class SentenceViewer:
                           ': <span class="popup_value">' + value + '</span></span>'
         return result
 
-    def build_ana_popup(self, word):
+    def build_ana_popup(self, word, matchingAnalyses=None):
         """
         Build a string for a popup with the word and its analyses. 
         """
+        if matchingAnalyses is None:
+            matchingAnalyses = []
         popup = '<div class="popup_word">'
         if 'wf' in word:
             popup += '<span class="popup_wf">' + word['wf'] + '</span>'
         if 'ana' in word:
             for iAna in range(len(word['ana'])):
-                popup += '<div class="popup_ana">'
+                popup += '<div class="popup_ana'
+                if iAna in matchingAnalyses:
+                    popup += ' popup_match'
+                popup += '">'
                 if len(word['ana']) > 1:
                     popup += str(iAna + 1) + '. '
                 popup += self.build_ana_div(word['ana'][iAna])
@@ -56,13 +61,13 @@ class SentenceViewer:
         popup += '</div>'
         return popup
 
-    def prepare_analyses(self, words, indexes):
+    def prepare_analyses(self, words, indexes, matchWordOffsets=None):
         """
         Generate viewable analyses for the words with given indexes.
         """
         result = ''
-        for i in indexes:
-            mWordNo = self.rxWordNo.search(i)
+        for iStr in indexes:
+            mWordNo = self.rxWordNo.search(iStr)
             if mWordNo is None:
                 continue
             i = int(mWordNo.group(1))
@@ -71,17 +76,21 @@ class SentenceViewer:
             word = words[i]
             if word['wtype'] != 'word':
                 continue
-            result += self.build_ana_popup(word)
+            matchingAnalyses = []
+            if matchWordOffsets is not None and iStr in matchWordOffsets:
+                matchingAnalyses = [offAna[1] for offAna in matchWordOffsets[iStr]]
+            result += self.build_ana_popup(word, matchingAnalyses)
         result = result.replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
         return result
 
     def build_span(self, sentSrc, curWords, matchWordOffsets):
-        dataAna = self.prepare_analyses(sentSrc['words'], curWords).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
+        dataAna = self.prepare_analyses(sentSrc['words'], curWords, matchWordOffsets).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
 
         def highlightClass(nWord):
             if nWord in matchWordOffsets:
                 return ' wmatch' + ''.join(' wmatch_' + str(n)
-                                           for n in matchWordOffsets[nWord])
+                                           for n in set(anaOff[0]
+                                                        for anaOff in matchWordOffsets[nWord]))
             return ''
 
         spanStart = '<span class="word ' + \
@@ -253,11 +262,13 @@ class SentenceViewer:
     def retrieve_highlighted_words(self, sentence, numSent, queryWordID=''):
         """
         Explore the inner_hits part of the response to find the
-        offsets of the words that matched the word-level query.
+        offsets of the words that matched the word-level query
+        and offsets of the respective analyses, if any.
         Search for word offsets recursively, so that the procedure
         does not depend excatly on the response structure.
         Return a dictionary where keys are offsets of highlighted words
-        and values are sets of the IDs of the words in the search query .
+        and values are sets of the pairs (ID of the words, ID of its ana)
+        that were found by the search query .
         """
         if 'inner_hits' in sentence:
             return self.retrieve_highlighted_words(sentence['inner_hits'],
@@ -267,7 +278,12 @@ class SentenceViewer:
         offsets = {}    # query term ID -> highlights for this query term
         if type(sentence) == list:
             for el in sentence:
-                offsets.update(self.retrieve_highlighted_words(el, numSent, queryWordID))
+                newOffsets = self.retrieve_highlighted_words(el, numSent, queryWordID)
+                for newK, newV in newOffsets.items():
+                    if newK not in offsets:
+                        offsets[newK] = newV
+                    else:
+                        offsets[newK] |= newV
             return offsets
         elif type(sentence) == dict:
             if 'field' in sentence and sentence['field'] == 'words':
@@ -277,20 +293,27 @@ class SentenceViewer:
                         offsets[wordOffset] = set()
                     if queryWordID == '':
                         queryWordID = 'w0'
-                    offsets[wordOffset].add(queryWordID)
+                    anaOffset = -1
+                    if ('_nested' in sentence
+                            and 'field' in sentence['_nested']
+                            and sentence['_nested']['field'] == 'ana'):
+                        anaOffset = sentence['_nested']['offset']
+                    offsets[wordOffset].add((queryWordID, anaOffset))
                 return offsets
             for k, v in sentence.items():
+                curQueryWordID = queryWordID
                 if re.search('^w[0-9]+$', k) is not None:
-                    if len(queryWordID) <= 0 or queryWordID == k:
-                        newOffsets = self.retrieve_highlighted_words(v, numSent, k)
-                        for newK, newV in newOffsets.items():
-                            if newK not in offsets:
-                                offsets[newK] = newV
-                            else:
-                                offsets[newK] |= newV
-                else:
-                    if type(v) in [dict, list]:
-                        offsets.update(self.retrieve_highlighted_words(v, numSent, queryWordID))
+                    if len(queryWordID) > 0 and queryWordID != k:
+                        continue
+                    elif len(queryWordID) <= 0:
+                        curQueryWordID = k
+                if type(v) in [dict, list]:
+                    newOffsets = self.retrieve_highlighted_words(v, numSent, curQueryWordID)
+                    for newK, newV in newOffsets.items():
+                        if newK not in offsets:
+                            offsets[newK] = newV
+                        else:
+                            offsets[newK] |= newV
         return offsets
 
     def process_sent_json(self, response):

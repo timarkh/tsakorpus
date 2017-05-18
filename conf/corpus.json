@@ -1,5 +1,5 @@
 {
-  "corpus_name": "test_udmurt",
+  "corpus_name": "udmurt",
   "input_format": "json",
   "max_context_expand": 3,
   "max_distance_filter": 10000,
