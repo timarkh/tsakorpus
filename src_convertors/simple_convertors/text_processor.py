@@ -2,10 +2,10 @@ import os
 import re
 import json
 import copy
-from text_cleaner import TextCleaner
-from tokenizer import Tokenizer
-from sentence_splitter import Splitter
-from analyzer import DumbMorphParser
+from .text_cleaner import TextCleaner
+from .tokenizer import Tokenizer
+from .sentence_splitter import Splitter
+from .analyzer import DumbMorphParser
 
 
 class TextProcessor:

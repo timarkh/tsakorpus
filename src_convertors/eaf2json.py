@@ -1,60 +1,15 @@
 import os
 import re
 import json
-from text_processor import TextProcessor
+from txt2json import Txt2JSON
 
 
-class Txt2JSON:
+class Eaf2JSON(Txt2JSON):
     """
     Contains methods to make JSONs ready for indexing from
-    raw text files, a csv with metadata and a list with parsed
+    ELAN aligned files, a csv with metadata and a list with parsed
     word forms.
     """
-
-    rxStripDir = re.compile('^.*[/\\\\]')
-    rxStripExt = re.compile('\\.[^.]*$')
-
-    def __init__(self, settingsDir='conf'):
-        self.settingsDir = settingsDir
-        fCategories = open(os.path.join(self.settingsDir, 'categories.json'), 'r',
-                           encoding='utf-8-sig')
-        self.categories = json.loads(fCategories.read())
-        fCategories.close()
-        fCorpus = open(os.path.join(self.settingsDir, 'corpus.json'), 'r',
-                       encoding='utf-8-sig')
-        self.corpusSettings = json.loads(fCorpus.read())
-        if self.corpusSettings['json_indent'] < 0:
-            self.corpusSettings['json_indent'] = None
-        fCorpus.close()
-        self.meta = {}
-        self.tp = TextProcessor(settings=self.corpusSettings,
-                                categories=self.categories)
-
-    def load_meta(self):
-        """
-        Load the metainformation about the files of the corpus
-        from the tab-delimited meta file.
-        """
-        self.meta = {}
-        fMeta = open(os.path.join(self.corpusSettings['corpus_dir'],
-                                  self.corpusSettings['meta_filename']),
-                     'r', encoding='utf-8')
-        for line in fMeta:
-            if len(line) <= 3:
-                continue
-            metaValues = line.split('\t')
-            curMetaDict = {}
-            for i in range(len(self.corpusSettings['meta_fields'])):
-                fieldName = self.corpusSettings['meta_fields'][i]
-                if i >= len(metaValues):
-                    break
-                if fieldName == 'filename':
-                    if not self.corpusSettings['meta_files_case_sensitive']:
-                        metaValues[i] = metaValues[i].lower()
-                    self.meta[metaValues[i]] = curMetaDict
-                else:
-                    curMetaDict[fieldName] = metaValues[i].strip()
-        fMeta.close()
 
     def convert_file(self, fnameSrc, fnameTarget):
         fname2check = fnameSrc
@@ -72,9 +27,11 @@ class Txt2JSON:
         textJSON = {'meta': curMeta, 'sentences': []}
         words, parsedWords, sentences = 0, 0, 0
         fSrc = open(fnameSrc, 'r', encoding='utf-8')
-        text = fSrc.read()
+        eafText = fSrc.read()
         fSrc.close()
 
+        text = eafText
+        # TODO: actual EAF processing
         textJSON['sentences'] = self.tp.process_string(text)
 
         fTarget = open(fnameTarget, 'w', encoding='utf-8')
@@ -85,18 +42,18 @@ class Txt2JSON:
 
     def process_corpus(self):
         """
-        Take every text file from the source directory subtree, turn it
+        Take every eaf file from the source directory subtree, turn it
         into a parsed json and store it in the target directory.
         """
         if self.corpusSettings is None or len(self.corpusSettings) <= 0:
             return
         self.load_meta()
         wordsTotal, parsedTotal = 0, 0
-        srcDir = os.path.join(self.corpusSettings['corpus_dir'], 'txt')
+        srcDir = os.path.join(self.corpusSettings['corpus_dir'], 'eaf')
         targetDir = os.path.join(self.corpusSettings['corpus_dir'], 'json')
         for path, dirs, files in os.walk(srcDir):
             for filename in files:
-                if not filename.lower().endswith('.txt'):
+                if not filename.lower().endswith('.eaf'):
                     continue
                 targetPath = path.replace(srcDir, targetDir)
                 if targetPath == path:
@@ -115,5 +72,5 @@ class Txt2JSON:
 
 
 if __name__ == '__main__':
-    t2j = Txt2JSON()
-    t2j.process_corpus()
+    t2j = Eaf2JSON()
+    # t2j.process_corpus()

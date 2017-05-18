@@ -279,6 +279,8 @@ class InterfaceQueryParser:
         """
         Make and return a ES query out of the HTML form data.
         """
+        if len(htmlQuery) <= 0:
+            return {'query': {'match_none': ''}}
         query_from = (page - 1) * query_size
 
         prelimQuery = {'words': []}
