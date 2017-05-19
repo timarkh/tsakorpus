@@ -132,8 +132,20 @@ function assign_input_events() {
 	$("span.word_plus").unbind('click');
 	$("span.word_minus").unbind('click');
 	$("span.add_rel").unbind('click');
+	$("input.neg_query").unbind('change');
 	$("span.word_plus").click(add_word_inputs);
 	$("span.add_rel").click(add_word_relations);
+	$("input.neg_query").change(negative_query);
+}
+
+function negative_query(e) {
+	var word_div = $(this).parent();
+	if (word_div.css("background-color") != "rgb(20, 20, 20)") {
+		word_div.css({"background-color": "rgb(20, 20, 20)", "color": "#fff"});
+	}
+	else {
+		word_div.css({"background-color": "#fff", "color": "black"});
+	}
 }
 
 function add_word_inputs(e) {

@@ -64,6 +64,7 @@
     height: 15px;
 	margin-right: 8px;
     border-radius: 50%;
+	border: 1px white solid;
 }
 
 .query_word_header {
@@ -135,7 +136,8 @@
 .word_search {
 	float: left;
 	display: inline-block;
-	margin: 15px;
+	padding: 15px;
+	border-radius: 5px;
 }
 
 .word_rel {
@@ -154,6 +156,10 @@
 
 .word_plus, .add_rel, .search_w {
 	cursor: pointer;
+}
+
+.word_plus {
+	margin-top: 5px;
 }
 
 .popup_wf {

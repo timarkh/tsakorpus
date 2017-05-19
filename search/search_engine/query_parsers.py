@@ -172,7 +172,12 @@ class InterfaceQueryParser:
         # for the time being, use only the information from the first word box
         if 'words' not in queryDict or len(queryDict['words']) <= 0:
             return {'query': {'match_none': {}}}
-        queryDict = queryDict['words'][0]
+        queryDict, negQuery = queryDict['words'][0]
+
+        if negQuery:
+            mustWord = 'must_not'
+        else:
+            mustWord = 'must'
 
         queryDict = {k: queryDict[k] for k in queryDict
                      if queryDict[k] is not None and queryDict[k] != {}}
@@ -198,7 +203,7 @@ class InterfaceQueryParser:
                 else:
                     queryWords = {'bool': {'must': list(queryDictWords.values())}}
                 query.append(queryWords)
-            query = {'bool': {'must': query}}
+            query = {'bool': {mustWord: query}}
         if sortOrder == 'random':
             query = self.make_random(query)
         esQuery = {'query': query, 'size': query_size, 'from': query_from,
@@ -211,12 +216,13 @@ class InterfaceQueryParser:
         # if sortOrder in self.sortOrders:
         return esQuery
 
-    def single_word_sentence_query(self, queryDict, queryWordNum, sortOrder):
+    def single_word_sentence_query(self, queryDict, queryWordNum, sortOrder, negative=False):
         """
         Make a part of the full sentence query that contains
         a query for a single word, taking a dictionary with
         bool queries as input.
         """
+
         wordAnaFields = {'words.ana.lex', 'words.ana.gr', 'words.ana.gloss_index'}
         for field in self.wordFields:
             wordAnaFields.add('words.ana.' + field)
@@ -261,6 +267,8 @@ class InterfaceQueryParser:
                                                 queryName=queryName,
                                                 highlightFields=['words'],
                                                 sortOrder=sortOrder))
+        if negative:
+            return [{'bool': {'must_not': query}}]
         return query
 
     def full_sentence_query(self, queryDict, query_from=0, query_size=10,
@@ -282,8 +290,9 @@ class InterfaceQueryParser:
         else:
             query = []
             for iQueryWord in range(len(queryDict['words'])):
-                wordDesc = queryDict['words'][iQueryWord]
-                query += self.single_word_sentence_query(wordDesc, iQueryWord + 1, sortOrder)
+                wordDesc, negQuery = queryDict['words'][iQueryWord]
+                query += self.single_word_sentence_query(wordDesc, iQueryWord + 1, sortOrder,
+                                                         negative=negQuery)
             query += list(queryDictTop.values())
             if 'sent_ids' in queryDict:
                 query.append({'ids': {'values': queryDict['sent_ids']}})
@@ -331,6 +340,7 @@ class InterfaceQueryParser:
         for iWord in range(int(htmlQuery['n_words'])):
             curPrelimQuery = {}
             strWordNum = str(iWord + 1)
+            negQuery = ('negq' + strWordNum in htmlQuery)
             if 'wf' + strWordNum in htmlQuery and len(htmlQuery['wf' + strWordNum]) > 0:
                 curPrelimQuery[pathPfx + 'wf'] = self.make_bool_query(htmlQuery['wf' + strWordNum],
                                                                       pathPfx + 'wf')
@@ -344,7 +354,7 @@ class InterfaceQueryParser:
             #     curPrelimQuery[pathPfx + 'ana.gr'] = self.make_bool_query(htmlQuery['gr' + strWordNum],
             #                                                               pathPfx + 'ana.gr')
             if len(curPrelimQuery) > 0:
-                prelimQuery['words'].append(curPrelimQuery)
+                prelimQuery['words'].append((curPrelimQuery, negQuery))
         if searchIndex == 'sentences' and 'txt' in htmlQuery and len(htmlQuery['txt']) > 0:
             if 'precise' in htmlQuery and htmlQuery['precise'] == 'on':
                 prelimQuery['text'] = {'match_phrase': {'text': htmlQuery['txt']}}
