@@ -1,13 +1,15 @@
 {
-  "corpus_name": "udmurt",
-  "input_format": "json",
+  "corpus_name": "adyge",
+  "input_format": "json-gzip",
   "max_context_expand": 3,
-  "max_distance_filter": 10000,
+  "max_distance_filter": 20000,
   "viewable_meta": [
     "genre",
     "issue",
-    "orth",
     "year1",
     "year2"
-  ]
+  ],
+  "gloss_shortcuts": {
+    "case": "(obl(\\.pl)?|abs|erg|ins)"
+  }
 }

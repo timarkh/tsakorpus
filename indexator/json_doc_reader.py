@@ -1,5 +1,6 @@
 import json
 import os
+import gzip
 
 
 class JSONDocReader:
@@ -8,9 +9,10 @@ class JSONDocReader:
     through sentences read from corpus files in tsakorpus native
     JSON format.
     """
-    def __init__(self):
+    def __init__(self, format=format):
         self.filesize_limit = -1
         self.lastFileName = ''
+        self.format = format
         self.lastDoc = None         # for lazy calculations
 
     def get_metadata(self, fname):
@@ -22,7 +24,12 @@ class JSONDocReader:
         if fname == self.lastFileName and self.lastDoc is not None:
             return self.lastDoc['meta']
         self.lastFileName = fname
-        fIn = open(fname, 'r', encoding='utf-8-sig')
+        if self.format == 'json':
+            fIn = open(fname, 'r', encoding='utf-8-sig')
+        elif self.format == 'json-gzip':
+            fIn = gzip.open(fname, 'rt', encoding='utf-8-sig')
+        else:
+            return {}
         doc = json.load(fIn)
         self.lastDoc = doc
         metadata = doc['meta']
@@ -40,7 +47,12 @@ class JSONDocReader:
             sentences = self.lastDoc['sentences']
         else:
             self.lastFileName = fname
-            fIn = open(fname, 'r', encoding='utf-8-sig')
+            if self.format == 'json':
+                fIn = open(fname, 'r', encoding='utf-8-sig')
+            elif self.format == 'json-gzip':
+                fIn = gzip.open(fname, 'rt', encoding='utf-8-sig')
+            else:
+                return {}, True
             doc = json.load(fIn)
             self.lastDoc = doc
             sentences = doc['sentences']

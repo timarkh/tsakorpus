@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import gzip
 from simple_convertors.text_processor import TextProcessor
 
 
@@ -24,11 +25,12 @@ class Txt2JSON:
         self.settingsDir = settingsDir
         self.corpusSettings = {}
         self.load_settings()
+        self.corpusSettings['corpus_dir'] = os.path.join(self.corpusSettings['corpus_dir'],
+                                                         self.corpusSettings['corpus_name'])
         self.settingsDir = os.path.join(self.corpusSettings['corpus_dir'],
-                                        self.corpusSettings['corpus_name'],
                                         'conf')
         self.load_settings()
-        
+
         fCategories = open(os.path.join(self.settingsDir, 'categories.json'), 'r',
                            encoding='utf-8-sig')
         self.categories = json.loads(fCategories.read())
@@ -53,7 +55,7 @@ class Txt2JSON:
         self.meta = {}
         fMeta = open(os.path.join(self.corpusSettings['corpus_dir'],
                                   self.corpusSettings['meta_filename']),
-                     'r', encoding='utf-8')
+                     'r', encoding='utf-8-sig')
         for line in fMeta:
             if len(line) <= 3:
                 continue
@@ -72,6 +74,9 @@ class Txt2JSON:
         fMeta.close()
 
     def convert_file(self, fnameSrc, fnameTarget):
+        if fnameSrc == fnameTarget:
+            return 0, 0, 0
+
         fname2check = fnameSrc
         curMeta = {'filename': fnameSrc}
         if not self.corpusSettings['meta_files_dir']:
@@ -85,18 +90,20 @@ class Txt2JSON:
         else:
             curMeta.update(self.meta[fname2check])
         textJSON = {'meta': curMeta, 'sentences': []}
-        words, parsedWords, sentences = 0, 0, 0
         fSrc = open(fnameSrc, 'r', encoding='utf-8')
         text = fSrc.read()
         fSrc.close()
 
-        textJSON['sentences'] = self.tp.process_string(text)
+        textJSON['sentences'], nTokens, nWords, nAnalyze = self.tp.process_string(text)
 
-        fTarget = open(fnameTarget, 'w', encoding='utf-8')
-        fTarget.write(json.dumps(textJSON, ensure_ascii=False,
-                                 indent=self.corpusSettings['json_indent']))
+        if self.corpusSettings['gzip']:
+            fTarget = gzip.open(fnameTarget, 'wt', encoding='utf-8')
+        else:
+            fTarget = open(fnameTarget, 'w', encoding='utf-8')
+        json.dump(textJSON, fp=fTarget, ensure_ascii=False,
+                  indent=self.corpusSettings['json_indent'])
         fTarget.close()
-        return words, parsedWords
+        return nTokens, nWords, nAnalyze
 
     def process_corpus(self):
         """
@@ -106,7 +113,7 @@ class Txt2JSON:
         if self.corpusSettings is None or len(self.corpusSettings) <= 0:
             return
         self.load_meta()
-        wordsTotal, parsedTotal = 0, 0
+        nTokens, nWords, nAnalyzed = 0, 0, 0
         srcDir = os.path.join(self.corpusSettings['corpus_dir'], 'txt')
         targetDir = os.path.join(self.corpusSettings['corpus_dir'], 'json')
         for path, dirs, files in os.walk(srcDir):
@@ -120,15 +127,19 @@ class Txt2JSON:
                     os.makedirs(targetPath)
                 fnameSrc = os.path.join(path, filename)
                 fnameTarget = os.path.join(targetPath, filename)
-                fnameTarget = self.rxStripExt.sub('.json', fnameTarget)
-                curWords, curWordsPared = self.convert_file(fnameSrc, fnameTarget)
-                wordsTotal += curWords
-                parsedTotal += curWordsPared
-        print('Conversion finished.', wordsTotal, 'words total.')
-        if wordsTotal > 0:
-            print(parsedTotal, 'words parsed (' + str(parsedTotal / wordsTotal) + '%).')
+                fextTarget = '.json'
+                if self.corpusSettings['gzip']:
+                    fextTarget = '.json.gz'
+                fnameTarget = self.rxStripExt.sub(fextTarget, fnameTarget)
+                curTokens, curWords, curAnalyzed = self.convert_file(fnameSrc, fnameTarget)
+                nTokens += curTokens
+                nWords += curWords
+                nAnalyzed += curAnalyzed
+        print('Conversion finished.', nTokens, 'tokens total,', nWords, 'words total.')
+        if nWords > 0:
+            print(nAnalyzed, 'words parsed (' + str(nAnalyzed / nWords * 100) + '%).')
 
 
 if __name__ == '__main__':
     t2j = Txt2JSON()
-    # t2j.process_corpus()
+    t2j.process_corpus()

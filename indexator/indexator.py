@@ -25,11 +25,11 @@ class Indexator:
         self.input_format = self.settings['input_format']
         self.corpus_dir = os.path.join('../corpus', self.name)
         self.iterSent = None
-        if self.input_format == 'json':
-            self.iterSent = JSONDocReader()
+        if self.input_format in ['json', 'json-gzip']:
+            self.iterSent = JSONDocReader(format=self.input_format)
         f = open(os.path.join(self.SETTINGS_DIR, 'word_fields.json'),
                  'r', encoding='utf-8')
-        self.goodWordFields = ['lex', 'wf'] + json.loads(f.read())
+        self.goodWordFields = ['lex', 'wf', 'parts', 'gloss', 'gloss_index'] + json.loads(f.read())
         f.close()
         f = open(os.path.join(self.SETTINGS_DIR, 'categories.json'),
                  'r', encoding='utf-8')
@@ -184,7 +184,10 @@ class Indexator:
         """
         for root, dirs, files in os.walk(self.corpus_dir):
             for fname in files:
-                if not fname.lower().endswith('.json'):
+                if (not ((self.settings['input_format'] == 'json'
+                          and fname.lower().endswith('.json'))
+                         or (self.settings['input_format'] == 'json-gzip'
+                             and fname.lower().endswith('.json.gz')))):
                     continue
                 fnameFull = os.path.join(root, fname)
                 self.index_doc(fnameFull)

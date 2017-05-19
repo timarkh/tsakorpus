@@ -16,6 +16,7 @@ class DumbMorphParser:
     rxAnaFieldRNC = re.compile('([^ <>"=]+) *= *"([^<>"=]+)')
     rxSplitGramTags = re.compile('[, /]')
     rxHyphenParts = re.compile('[^\\-]+|-+')
+    rxGlossParts = re.compile('[^ \\-=<>]+')
 
     def __init__(self, settings, categories):
         self.settings = copy.deepcopy(settings)
@@ -46,7 +47,7 @@ class DumbMorphParser:
                 print('No category for a gramtag:', tag)
                 continue
             cat = 'gr.' + self.categories[tag]
-            if self.categories[tag] not in grJSON:
+            if cat not in grJSON:
                 grJSON[cat] = tag
             else:
                 if type(grJSON[cat]) != list:
@@ -54,6 +55,24 @@ class DumbMorphParser:
                 if tag not in grJSON[cat]:
                     grJSON[cat].append(tag)
         return grJSON
+
+    def process_gloss_in_ana(self, ana):
+        """
+        If there are fields 'gloss' and 'parts' in the JSON
+        analysis, add field 'gloss_index' that contains the
+        glossed word in such a form that it could be queried
+        with the gloss query language.
+        Modify the source analysis, do not return anything.
+        """
+        if 'gloss' not in ana or 'parts' not in ana:
+            return
+        wordParts = self.rxGlossParts.findall(ana['parts'].replace('{', '(').replace('{', ')'))
+        glosses = self.rxGlossParts.findall(ana['gloss'])
+        if len(wordParts) <= 0 or len(glosses) == 0 or len(wordParts) != len(glosses):
+            return
+        glossIndex = '-'.join(p[1] + '{' + p[0] + '}'
+                              for p in zip(wordParts, glosses))
+        ana['gloss_index'] = glossIndex
 
     def transform_ana_rnc(self, ana):
         """
@@ -72,6 +91,7 @@ class DumbMorphParser:
                     anaJSON.update(self.transform_gramm_str(v))
                 else:
                     anaJSON[k] = v
+            self.process_gloss_in_ana(anaJSON)
             analyses.append(anaJSON)
         return analyses
 
@@ -154,19 +174,25 @@ class DumbMorphParser:
     def analyze(self, sentences):
         """
         Analyze each word in each sentence using preloaded analyses.
+        Return statistics.
         """
+        nTokens, nWords, nAnalyzed = 0, 0, 0
         for s in sentences:
             if 'words' not in s:
                 continue
             iWord = -1
             while iWord < len(s['words']) - 1:
                 iWord += 1
+                nTokens += 1
                 word = s['words'][iWord]
                 if word['wtype'] != 'word':
                     continue
+                nWords += 1
                 wf = self.normalize(word['wf'])
                 analyses = self.analyze_word(wf)
                 if len(analyses) > 0:
                     word['ana'] = analyses
+                    nAnalyzed += 1
                 elif '-' in word['wf']:
                     iWord += self.analyze_hyphened_word(s['words'], iWord)
+        return nTokens, nWords, nAnalyzed

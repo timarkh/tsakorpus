@@ -1,5 +1,5 @@
 {
-  "corpus_name": "udmurt",
+  "corpus_name": "adyge",
   "corpus_dir": "corpus",
   "meta_filename": "meta.csv",
   "meta_fields":
@@ -19,11 +19,12 @@
   "parsed_wordlist_filename": "all_parsed.txt",
   "parsed_wordlist_format": "xml_rnc",
   "json_indent": -1,
+  "gzip": true,
   "convert_quotes": true,
   "left_quot_mark": "«",
   "right_quot_mark": "»",
   "sent_end_punc": "(?:[.!?;;]+(?:[)\\]}>/»]|$)|\\\\n)",
-  "sent_start": "^[A-ZÄÖÜА-ЯЁӤӦӴӞӜ]",
+  "sent_start": "^[A-ZÄÖÜА-ЯЁӤӦӴӞӜ0-9]",
   "newline_ends_sent": true,
   "abbreviations": []
 }

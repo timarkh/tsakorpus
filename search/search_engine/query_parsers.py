@@ -7,8 +7,9 @@ from .word_relations import WordRelations
 
 class InterfaceQueryParser:
     rxSimpleText = re.compile('^[^\\[\\]()*\\\\{}^$.?+~|]*$')
-    rxBooleanText = re.compile('^[^\\[\\]\\\\{}^$.+]*$')
+    rxBooleanText = re.compile('^[^\\[\\]()\\\\{}^$.+|]*$')
     rxParentheses = re.compile('[()]')
+    rxGlossQueryQuant = re.compile('^\\(([^()]+)\\)([*+?])$')
 
     dictOperators = {',': 'must',
                      '&': 'must',
@@ -43,6 +44,38 @@ class InterfaceQueryParser:
                 return i, strQuery[i]
         return -1, ''
 
+    def make_gloss_query_part(self, text):
+        """
+        Return a regexp for a single gloss part of a gloss query.
+        """
+        if text == '*':
+            return '(.+([\\-=<>]|$))?'
+        elif text == '+':
+            return '([^\\-=<>].*([\\-=<>]|$))'
+        elif text == '?':
+            return '([^\\-=<>{}]+\\{[^{}]+\\}([\\-=<>]|$))'
+        mQuant = self.rxGlossQueryQuant.search(text)
+        if mQuant is not None:
+            glossBody, quantifier = self.make_gloss_query_part(mQuant.group(1)), mQuant.group(2)
+            return '(' + glossBody + ')' + quantifier
+        return text.replace('.', '\\.') + '\\{[^{}]+\\}([\\-=<>]|$)'
+
+    def make_simple_gloss_query(self, text):
+        """
+        Return a regexp for an entire gloss query.
+        """
+        qStart, qEnd = '.*', '.*'
+        if text.startswith('#'):
+            qStart = '^'
+            text = text[1:]
+        if text.endswith('#'):
+            qEnd = '$'
+            text = text[:-1]
+        parts = text.split('-')
+        result = ''.join(self.make_gloss_query_part(part)
+                         for part in parts if len(part) > 0)
+        return qStart + result + qEnd
+
     def make_simple_term_query(self, text, field):
         """
         Make a term query that will become one of the inner parts
@@ -52,7 +85,10 @@ class InterfaceQueryParser:
         """
         if len(text) <= 0:
             return {}
-        if not (field == 'ana.gr' or field.endswith('.ana.gr')):
+        if field == 'ana.gloss_index' or field.endswith('.ana.gloss_index'):
+            # return {'regexp': {field: text}}
+            return {'regexp': {field: self.make_simple_gloss_query(text)}}
+        elif not (field == 'ana.gr' or field.endswith('.ana.gr')):
             if InterfaceQueryParser.rxSimpleText.search(text) is not None:
                 return {'match': {field: text}}
             elif InterfaceQueryParser.rxBooleanText.search(text) is not None:
@@ -129,7 +165,7 @@ class InterfaceQueryParser:
         Make a full ES query for the words index out of a dictionary
         with bool queries.
         """
-        wordAnaFields = {'ana.lex', 'ana.gr'}
+        wordAnaFields = {'ana.lex', 'ana.gr', 'ana.gloss_index'}
         for field in self.wordFields:
             wordAnaFields.add('ana.' + field)
 
@@ -181,7 +217,7 @@ class InterfaceQueryParser:
         a query for a single word, taking a dictionary with
         bool queries as input.
         """
-        wordAnaFields = {'words.ana.lex', 'words.ana.gr'}
+        wordAnaFields = {'words.ana.lex', 'words.ana.gr', 'words.ana.gloss_index'}
         for field in self.wordFields:
             wordAnaFields.add('words.ana.' + field)
         wordFields = {'words.wf'}
@@ -298,7 +334,7 @@ class InterfaceQueryParser:
             if 'wf' + strWordNum in htmlQuery and len(htmlQuery['wf' + strWordNum]) > 0:
                 curPrelimQuery[pathPfx + 'wf'] = self.make_bool_query(htmlQuery['wf' + strWordNum],
                                                                       pathPfx + 'wf')
-            for anaField in ['lex', 'gr'] + self.wordFields:
+            for anaField in ['lex', 'gr', 'gloss_index'] + self.wordFields:
                 if (anaField + strWordNum in htmlQuery
                         and len(htmlQuery[anaField + strWordNum]) > 0):
                     boolQuery = self.make_bool_query(htmlQuery[anaField + strWordNum],

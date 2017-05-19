@@ -9,7 +9,7 @@ class PrepareData:
     for indexing in the database.
     """
     SETTINGS_DIR = '../conf'
-    rxBadField = re.compile('[^a-z0-9_]|^(?:lex|gr|wf|[wm]type|ana|sent_ids|id)$')
+    rxBadField = re.compile('[^a-z0-9_]|^(?:lex|gr|gloss_index|wf|[wm]type|ana|sent_ids|id)$')
 
     def __init__(self):
         f = open(os.path.join(self.SETTINGS_DIR, 'word_fields.json'),
@@ -27,7 +27,12 @@ class PrepareData:
                         'type': 'pattern',
                         'pattern': '[\\-\n()]',
                         'lowercase': True
-                    }
+                    },
+                    'gloss_analyzer': {
+                        'type': 'pattern',
+                        'pattern': ' ',
+                        'lowercase': True
+                    },
                 }
             }
         }
@@ -44,7 +49,9 @@ class PrepareData:
              'wtype': {'type': 'keyword'},
              'sids': {'type': 'integer', 'index': False},
              'ana': {'type': 'nested',
-                     'properties': {'lex': {'type': 'text'}}},
+                     'properties': {'lex': {'type': 'text'},
+                                    'gloss_index': {'type': 'text',
+                                                    'analyzer': 'gloss_analyzer'}}},
              'freq': {'type': 'integer'},
              'rank': {'type': 'keyword'},
              'n_sents': {'type': 'integer'},
