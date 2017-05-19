@@ -15,20 +15,35 @@ class Txt2JSON:
     rxStripExt = re.compile('\\.[^.]*$')
 
     def __init__(self, settingsDir='conf'):
+        """
+        Load settings, including corpus name and directory, from the
+        corpus.json file in settings directory. Then load all other
+        settings from the corpus directory. These may override the
+        initially loaded settings.
+        """
         self.settingsDir = settingsDir
+        self.corpusSettings = {}
+        self.load_settings()
+        self.settingsDir = os.path.join(self.corpusSettings['corpus_dir'],
+                                        self.corpusSettings['corpus_name'],
+                                        'conf')
+        self.load_settings()
+        
         fCategories = open(os.path.join(self.settingsDir, 'categories.json'), 'r',
                            encoding='utf-8-sig')
         self.categories = json.loads(fCategories.read())
         fCategories.close()
-        fCorpus = open(os.path.join(self.settingsDir, 'corpus.json'), 'r',
-                       encoding='utf-8-sig')
-        self.corpusSettings = json.loads(fCorpus.read())
-        if self.corpusSettings['json_indent'] < 0:
-            self.corpusSettings['json_indent'] = None
-        fCorpus.close()
         self.meta = {}
         self.tp = TextProcessor(settings=self.corpusSettings,
                                 categories=self.categories)
+
+    def load_settings(self):
+        fCorpus = open(os.path.join(self.settingsDir, 'corpus.json'), 'r',
+                       encoding='utf-8-sig')
+        self.corpusSettings.update(json.loads(fCorpus.read()))
+        if self.corpusSettings['json_indent'] < 0:
+            self.corpusSettings['json_indent'] = None
+        fCorpus.close()
 
     def load_meta(self):
         """
