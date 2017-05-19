@@ -71,7 +71,7 @@ class DumbMorphParser:
         if len(wordParts) <= 0 or len(glosses) == 0 or len(wordParts) != len(glosses):
             return
         glossIndex = '-'.join(p[1] + '{' + p[0] + '}'
-                              for p in zip(wordParts, glosses))
+                              for p in zip(wordParts, glosses)) + '-'
         ana['gloss_index'] = glossIndex
 
     def transform_ana_rnc(self, ana):

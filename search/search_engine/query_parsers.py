@@ -10,6 +10,7 @@ class InterfaceQueryParser:
     rxBooleanText = re.compile('^[^\\[\\]()\\\\{}^$.+|]*$')
     rxParentheses = re.compile('[()]')
     rxGlossQueryQuant = re.compile('^\\(([^()]+)\\)([*+?])$')
+    rxGlossQuerySrc = re.compile('^([^{}]*)\\{([^{}]*)\\}$')
 
     dictOperators = {',': 'must',
                      '&': 'must',
@@ -48,17 +49,24 @@ class InterfaceQueryParser:
         """
         Return a regexp for a single gloss part of a gloss query.
         """
+        text = text.lower()
         if text == '*':
-            return '(.+([\\-=<>]|$))?'
+            return '(.+[\\-=<>])?'
         elif text == '+':
-            return '([^\\-=<>].*([\\-=<>]|$))'
+            return '([^\\-=<>].*[\\-=<>])'
         elif text == '?':
-            return '([^\\-=<>{}]+\\{[^{}]+\\}([\\-=<>]|$))'
+            return '([^\\-=<>{}]+\\{[^{}]+\\}[\\-=<>])'
         mQuant = self.rxGlossQueryQuant.search(text)
         if mQuant is not None:
             glossBody, quantifier = self.make_gloss_query_part(mQuant.group(1)), mQuant.group(2)
             return '(' + glossBody + ')' + quantifier
-        return text.replace('.', '\\.') + '\\{[^{}]+\\}([\\-=<>]|$)'
+        mSrc = self.rxGlossQuerySrc.search(text)
+        if mSrc is not None:
+            glossTag, glossSrc = mSrc.group(1), mSrc.group(2)
+            if len(glossTag) <= 0:
+                return '[^{}]*\\{(' + glossSrc + ')\\}[\\-=<>]'
+            return '(' + glossTag + ')\\{(' + glossSrc + ')\\}[\\-=<>]'
+        return '(' + text.replace('.', '\\.') + ')\\{[^{}]+\\}[\\-=<>]'
 
     def make_simple_gloss_query(self, text):
         """
@@ -66,10 +74,10 @@ class InterfaceQueryParser:
         """
         qStart, qEnd = '.*', '.*'
         if text.startswith('#'):
-            qStart = '^'
+            qStart = ''
             text = text[1:]
         if text.endswith('#'):
-            qEnd = '$'
+            qEnd = ''
             text = text[:-1]
         parts = text.split('-')
         result = ''.join(self.make_gloss_query_part(part)
@@ -153,9 +161,10 @@ class InterfaceQueryParser:
         if highlightFields is not None:
             esQuery['nested']['inner_hits'] = {'highlight':
                                                {'fields':
-                                                {f: {'number_of_fragments': 100,
+                                                {f: {'number_of_fragments': 50,
                                                      'fragment_size': 2048}
-                                                 for f in highlightFields}}}
+                                                 for f in highlightFields}},
+                                               'size': 50}
             if len(queryName) > 0:
                 esQuery['nested']['inner_hits']['name'] = queryName
         return esQuery
