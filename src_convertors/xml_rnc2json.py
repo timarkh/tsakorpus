@@ -21,6 +21,7 @@ class Xml_Rnc2JSON(Txt2JSON):
     def __init__(self, settingsDir='conf'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
         self.srcExt = 'xml'
+        self.pID = 0        # id of last aligned segment
 
     def process_se_tokens(self, tokens, lang):
         """
@@ -67,7 +68,8 @@ class Xml_Rnc2JSON(Txt2JSON):
                 tokenJSON['off_end'] = len(seText)
                 tokenJSON['wtype'] = 'word'
             words.append(tokenJSON)
-        sentence = {'words': words, 'text': seText}
+        paraAlignment = {'off_start': 0, 'off_end': len(seText), 'para_id': self.pID}
+        sentence = {'words': words, 'text': seText, 'para_alignment': [paraAlignment]}
         return sentence
 
     def process_se_node(self, se, lang):
@@ -76,16 +78,14 @@ class Xml_Rnc2JSON(Txt2JSON):
         one ore more sentences in one language. The input is an
         XML string, not an element.
         """
-        se = self.rxSeTags.sub('', se)
-        if len(se) <= 0:
-            return None
         bProcessXML = ('<w>' in se)
         seParts = self.rxSeParts.split(se)
         for part in seParts:
             if not bProcessXML:
                 part = self.tp.cleaner.clean_text(part)
                 words = self.tp.tokenizer.tokenize(part)
-                yield {'words': words, 'text': part}
+                paraAlignment = {'off_start': 0, 'off_end': len(part), 'para_id': self.pID}
+                yield {'words': words, 'text': part, 'para_alignment': [paraAlignment]}
             else:
                 yield self.process_se_tokens(self.rxSeWords.findall('>' + part.strip() + '<'), lang)
 
@@ -94,12 +94,17 @@ class Xml_Rnc2JSON(Txt2JSON):
         Extract data from a <para> node that contains a bunch of parallel
         fragments in several languages.
         """
+        self.pID += 1
         for se in paraNode.xpath('se'):
             if se.get('lang') in self.corpusSettings['language_codes']:
                 lang = self.corpusSettings['language_codes'][se.attrib['lang']]
                 langCode = self.corpusSettings['languages'].index(lang)
-                for seJSON in self.process_se_node(etree.tostring(se, encoding='unicode'), lang):
-                    if seJSON is None:
+                seStr = etree.tostring(se, encoding='unicode')
+                seStr = self.rxSeTags.sub('', seStr)
+                if self.rxSpaces.search(seStr) is not None:
+                    continue
+                for seJSON in self.process_se_node(seStr, lang):
+                    if seJSON is None or 'words' in seJSON and len(seJSON['words']) <= 0:
                         continue
                     seJSON['lang'] = langCode
                     yield seJSON
@@ -111,6 +116,10 @@ class Xml_Rnc2JSON(Txt2JSON):
         srcTree = etree.parse(fnameSrc)
         textJSON['sentences'] = [s for paraNode in srcTree.xpath('/html/body/para')
                                  for s in self.process_para_node(paraNode)]
+        textJSON['sentences'].sort(key=lambda s: s['lang'])
+        for i in range(len(textJSON['sentences']) - 1):
+            if textJSON['sentences'][i]['lang'] != textJSON['sentences'][i + 1]['lang']:
+                textJSON['sentences'][i]['last'] = True
         self.tp.splitter.recalculate_offsets(textJSON['sentences'])
         self.tp.splitter.add_next_word_id(textJSON['sentences'])
         self.write_output(fnameTarget, textJSON)

@@ -22,6 +22,9 @@ class Indexator:
         self.settings = json.loads(f.read())
         f.close()
         self.name = self.settings['corpus_name']
+        self.languages = self.settings['languages']
+        if len(self.languages) <= 0:
+            self.languages = [self.name]
         self.input_format = self.settings['input_format']
         self.corpus_dir = os.path.join('../corpus', self.name)
         self.iterSent = None
@@ -34,16 +37,17 @@ class Indexator:
         f = open(os.path.join(self.SETTINGS_DIR, 'categories.json'),
                  'r', encoding='utf-8')
         categories = json.loads(f.read())
-        self.goodWordFields += ['gr.' + v for v in categories.values()]
+        self.goodWordFields += ['gr.' + v for lang in categories
+                                for v in categories[lang].values()]
         self.goodWordFields = set(self.goodWordFields)
         f.close()
         self.pd = PrepareData()
         self.es = Elasticsearch()
         self.es_ic = IndicesClient(self.es)
-        self.wordFreqs = {}   # word as JSON -> its frequency
+        self.wordFreqs = [{} for i in range(len(self.languages))]   # word as JSON -> its frequency
         self.wordSIDs = {}    # word as JSON -> set of sentence IDs
         self.wordDIDs = {}    # word as JSON -> set of document IDs
-        self.sID = 0          # current sentence ID
+        self.sID = 0          # current sentence ID for each language
         self.dID = 0          # current document ID
 
     def delete_indices(self):
@@ -63,7 +67,7 @@ class Indexator:
         self.es_ic.create(index=self.name + '.sentences',
                           body=self.sentMapping)
 
-    def process_sentence_words(self, words):
+    def process_sentence_words(self, words, langID):
         """
         Take words list from a sentence, remove all non-searchable
         fields from them and add them to self.words dictionary.
@@ -71,7 +75,7 @@ class Indexator:
         for w in words:
             if w['wtype'] != 'word':
                 continue
-            wClean = {}
+            wClean = {'lang': langID}
             for field in w:
                 if field in self.goodWordFields:
                     wClean[field] = w[field]
@@ -87,10 +91,10 @@ class Indexator:
                     wClean['ana'].append(cleanAna)
             wCleanTxt = json.dumps(wClean, ensure_ascii=False, sort_keys=True)
             try:
-                self.wordFreqs[wCleanTxt] += 1
+                self.wordFreqs[langID][wCleanTxt] += 1
                 self.wordSIDs[wCleanTxt].add(self.sID)
             except KeyError:
-                self.wordFreqs[wCleanTxt] = 1
+                self.wordFreqs[langID][wCleanTxt] = 1
                 self.wordSIDs[wCleanTxt] = {self.sID}
             try:
                 self.wordDIDs[wCleanTxt].add(self.dID)
@@ -104,35 +108,37 @@ class Indexator:
         in Elasticsearch.
         """
         iWord = 0
-        freqsSorted = [v for v in sorted(self.wordFreqs.values(), reverse=True)]
-        quantiles = {}
-        for q in [0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.25, 0.5]:
-            qIndex = math.ceil(q * len(freqsSorted))
-            if qIndex >= len(freqsSorted):
-                qIndex = len(freqsSorted) - 1
-            quantiles[q] = freqsSorted[qIndex]
-        for w in self.wordFreqs:
-            if iWord % 500 == 0:
-                print('indexing word', iWord)
-            wJson = json.loads(w)
-            wJson['freq'] = self.wordFreqs[w]
-            wJson['sids'] = [sid for sid in sorted(self.wordSIDs[w])]
-            wJson['dids'] = [did for did in sorted(self.wordDIDs[w])]
-            wJson['n_sents'] = len(wJson['sids'])
-            wJson['n_docs'] = len(wJson['dids'])
-            wJson['rank'] = ''
-            if wJson['freq'] > 1:
-                if wJson['freq'] > quantiles[0.03]:
-                    wJson['rank'] = '#' + str(freqsSorted.index(wJson['freq']) + 1)
-                else:
-                    wJson['rank'] = '&gt; ' + str(min(math.ceil(q * 100) for q in quantiles
-                                                  if wJson['freq'] >= quantiles[q])) + '%'
-            curAction = {'_index': self.name + '.words',
-                         '_type': 'word',
-                         '_id': iWord,
-                         '_source': wJson}
-            iWord += 1
-            yield curAction
+        freqsSorted = [[v for v in sorted(self.wordFreqs[langID].values(), reverse=True)]
+                       for langID in range(len(self.languages))]
+        for langID in range(len(self.languages)):
+            quantiles = {}
+            for q in [0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.25, 0.5]:
+                qIndex = math.ceil(q * len(freqsSorted[langID]))
+                if qIndex >= len(freqsSorted[langID]):
+                    qIndex = len(freqsSorted[langID]) - 1
+                quantiles[q] = freqsSorted[langID][qIndex]
+            for w in self.wordFreqs[langID]:
+                if iWord % 500 == 0:
+                    print('indexing word', iWord)
+                wJson = json.loads(w)
+                wJson['freq'] = self.wordFreqs[langID][w]
+                wJson['sids'] = [sid for sid in sorted(self.wordSIDs[w])]
+                wJson['dids'] = [did for did in sorted(self.wordDIDs[w])]
+                wJson['n_sents'] = len(wJson['sids'])
+                wJson['n_docs'] = len(wJson['dids'])
+                wJson['rank'] = ''
+                if wJson['freq'] > 1:
+                    if wJson['freq'] > quantiles[0.03]:
+                        wJson['rank'] = '#' + str(freqsSorted[langID].index(wJson['freq']) + 1)
+                    else:
+                        wJson['rank'] = '&gt; ' + str(min(math.ceil(q * 100) for q in quantiles
+                                                      if wJson['freq'] >= quantiles[q])) + '%'
+                curAction = {'_index': self.name + '.words',
+                             '_type': 'word',
+                             '_id': iWord,
+                             '_source': wJson}
+                iWord += 1
+                yield curAction
 
     def index_words(self):
         """
@@ -141,14 +147,38 @@ class Indexator:
         """
         bulk(self.es, self.iterate_words())
 
+    def add_parallel_sids(self, sentences, paraIDs):
+        """
+        In the parallel corpus, add the IDs of aligned sentences in other languages
+        to each sentence that has a para_id.
+        """
+        for s in sentences:
+            if 'para_alignment' not in s['_source'] or 'lang' not in s['_source']:
+                continue
+            langID = s['_source']['lang']
+            for pa in s['_source']['para_alignment']:
+                paraID = pa['para_id']
+                pa['sent_ids'] = []
+                for i in range(len(self.languages)):
+                    if i == langID:
+                        continue
+                    if paraID in paraIDs[langID]:
+                        pa['sent_ids'] += paraIDs[langID][paraID]
+
     def iterate_sentences(self, fname):
         iSent = 0
+        sentences = []
+        paraIDs = [{} for i in range(len(self.languages))]
         for s, bLast in self.iterSent.get_sentences(fname):
+            if 'lang' in s:
+                langID = s['lang']
+            else:
+                langID = 0
             if 'words' in s:
-                self.process_sentence_words(s['words'])
+                self.process_sentence_words(s['words'], langID)
             if iSent > 0:
                 s['prev_id'] = self.sID - 1
-            if not bLast:
+            if not bLast and 'last' not in s:
                 s['next_id'] = self.sID + 1
             s['doc_id'] = self.dID
             # self.es.index(index=self.name + '.sentences',
@@ -159,11 +189,26 @@ class Indexator:
                          '_type': 'sentence',
                          '_id': self.sID,
                          '_source': s}
-            yield curAction
+            if len(self.languages) <= 1:
+                yield curAction
+            else:
+                sentences.append(curAction)
+                if 'para_alignment' in s:
+                    for pa in s['para_alignment']:
+                        paraID = str(self.dID) + '_' + str(pa['para_id'])
+                        pa['para_id'] = paraID
+                        try:
+                            paraIDs[langID][paraID].append(self.sID)
+                        except KeyError:
+                            paraIDs[langID][paraID] = [self.sID]
             if self.sID % 500 == 0:
                 print('indexing sentence', self.sID)
             iSent += 1
             self.sID += 1
+        if len(self.languages) > 1:
+            self.add_parallel_sids(sentences, paraIDs)
+            for s in sentences:
+                yield s
 
     def index_doc(self, fname):
         """
@@ -206,7 +251,7 @@ class Indexator:
         print('Corpus indexed in', t2-t1, 'seconds:',
               self.dID, 'documents,',
               self.sID, 'sentences,',
-              len(self.wordFreqs), 'different words.')
+              sum(len(self.wordFreqs[i]) for i in range(len(self.languages))), 'different words.')
 
 
 if __name__ == '__main__':

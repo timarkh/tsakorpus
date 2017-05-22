@@ -1,5 +1,5 @@
 {
-  "corpus_name": "adyge",
+  "corpus_name": "rus_para",
   "input_format": "json-gzip",
   "max_context_expand": 3,
   "max_distance_filter": 20000,
@@ -9,7 +9,8 @@
     "year1",
     "year2"
   ],
-  "languages":
+  "languages": ["buryat", "russian"],
+  "lang_props":
   {
     "adyge":
     {

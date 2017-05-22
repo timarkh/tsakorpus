@@ -47,6 +47,7 @@ class PrepareData:
                     'fielddata': True,
                     'analyzer': 'wf_analyzer'},
              'wtype': {'type': 'keyword'},
+             'lang': {'type': 'byte'},
              'sids': {'type': 'integer', 'index': False},
              'ana': {'type': 'nested',
                      'properties': {'lex': {'type': 'text'},
@@ -60,7 +61,8 @@ class PrepareData:
         for field in self.wordFields:
             if self.rxBadField.search(field) is None:
                 m['ana']['properties'][field] = {'type': 'text'}
-        for field in set(self.categories.values()):
+        for field in set(v for lang in self.categories.values()
+                         for v in lang.values()):
             if self.rxBadField.search(field) is None:
                 m['ana']['properties']['gr.' + field] = {'type': 'keyword'}
         return {'mappings': {'word': {'properties': m}}, 'settings': self.wfAnalyzer}
@@ -75,6 +77,7 @@ class PrepareData:
              'next_id': {'type': 'integer'},
              'doc_id': {'type': 'integer'},
              'text': {'type': 'text'},
+             'lang': {'type': 'byte'},
              'src_alignment': {'type': 'nested',
                                'properties': {
                                    'mtype': {'type': 'keyword'},
@@ -87,8 +90,17 @@ class PrepareData:
                                    'rect_src': {'type': 'integer',
                                                 'index': False}
                                }},
-             'para_alignment_id': {'type': 'integer',
-                                   'index': False},
+             'para_alignment': {'type': 'nested',
+                                'properties': {
+                                    'off_start': {'type': 'short',
+                                                  'index': False},
+                                    'off_end': {'type': 'short',
+                                                'index': False},
+                                    'para_id': {'type': 'keyword',
+                                                'index': False},
+                                    'sent_ids': {'type': 'integer',
+                                                 'index': False}
+                                }},
              'segment_ids': {'type': 'integer',
                              'index': False},
              'words': {'type': 'nested',

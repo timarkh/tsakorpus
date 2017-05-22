@@ -32,6 +32,11 @@ Sorting:<br>
 <input type="radio" name="sort" value="freq">by frequency (word queries)<br>
 <input type="checkbox" name="distance_strict">Word distance requirements are strict<br>
 Results per page: <input type="number" name="page_size" id="page_size" value="10"><br>
+<select name="lang" id="lang">
+{% for lang in languages %}
+<option value="{{ lang }}">{{ lang }}</option>
+{% endfor %}
+</select>
 </form>
 <button value="Search sentences" id="search_sent" style="width:200px;">Search sentences</button>
 <button value="Search words" id="search_word" style="width:200px;">Search words</button><br>

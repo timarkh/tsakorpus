@@ -195,7 +195,7 @@ def update_expanded_contexts(context, neighboringIDs):
 
 @app.route('/search')
 def search_page():
-    return render_template('index.html', corpus_name=corpus_name)
+    return render_template('index.html', corpus_name=corpus_name, languages=settings['languages'])
 
 
 @app.route('/search_sent_query/<int:page>')

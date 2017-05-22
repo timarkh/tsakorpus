@@ -3,76 +3,30 @@
     "mappings": {
       "sentence": {
         "properties": {
-          "words": {
-            "type": "nested",
-            "properties": {
-              "wf": {
-                "type": "text"
-              },
-              "wtype": {
-                "type": "keyword"
-              },
-              "sids": {
-                "type": "integer",
-                "index": false
-              },
-              "freq": {
-                "type": "integer"
-              },
-              "ana": {
-                "type": "nested",
-                "properties": {
-                  "transl_ru": {
-                    "type": "text"
-                  },
-                  "gr.v_form": {
-                    "type": "keyword"
-                  },
-                  "gr.pers": {
-                    "type": "keyword"
-                  },
-                  "gr.case": {
-                    "type": "keyword"
-                  },
-                  "lex": {
-                    "type": "text"
-                  },
-                  "gr.tense": {
-                    "type": "keyword"
-                  },
-                  "gr.adj_form": {
-                    "type": "keyword"
-                  },
-                  "gr.gender": {
-                    "type": "keyword"
-                  },
-                  "gr.pos": {
-                    "type": "keyword"
-                  },
-                  "gr.number": {
-                    "type": "keyword"
-                  },
-                  "transl_en": {
-                    "type": "text"
-                  },
-                  "gr.lang": {
-                    "type": "keyword"
-                  }
-                }
-              }
-            }
+          "prev_id": {
+            "type": "integer"
           },
+          "next_id": {
+            "type": "integer"
+          },
+          "doc_id": {
+            "type": "integer"
+          },
+          "text": {
+            "type": "text"
+          },
+          "lang": "byte",
           "src_alignment": {
             "type": "nested",
             "properties": {
+              "mtype": {
+                "type": "keyword"
+              },
               "src": {
                 "type": "keyword",
                 "index": false
               },
-              "mtype": {
-                "type": "keyword"
-              },
-              "rect_src": {
+              "off_src": {
                 "type": "integer",
                 "index": false
               },
@@ -80,28 +34,140 @@
                 "type": "short",
                 "index": false
               },
-              "off_src": {
+              "rect_src": {
                 "type": "integer",
                 "index": false
               }
             }
           },
-          "text": {
-            "type": "text"
-          },
-          "prev_id": {
-            "type": "integer"
-          },
-          "next_id": {
-            "type": "integer"
+          "para_alignment": {
+            "type": "nested",
+            "properties": {
+              "off_start": "short",
+              "off_end": "short",
+              "para_id": "keyword",
+              "sent_ids": "integer"
+            },
+            "index": false
           },
           "segment_ids": {
             "type": "integer",
             "index": false
           },
-          "para_alignment_id": {
-            "type": "integer",
-            "index": false
+          "words": {
+            "type": "nested",
+            "properties": {
+              "wf": {
+                "type": "text",
+                "fielddata": true,
+                "analyzer": "wf_analyzer"
+              },
+              "wtype": {
+                "type": "keyword"
+              },
+              "lang": "byte",
+              "sids": {
+                "type": "integer",
+                "index": false
+              },
+              "ana": {
+                "type": "nested",
+                "properties": {
+                  "lex": {
+                    "type": "text"
+                  },
+                  "gloss_index": {
+                    "type": "text",
+                    "analyzer": "gloss_analyzer"
+                  },
+                  "trans_ru": {
+                    "type": "text"
+                  },
+                  "lex2": {
+                    "type": "text"
+                  },
+                  "trans_ru2": {
+                    "type": "text"
+                  },
+                  "gr.appl": {
+                    "type": "keyword"
+                  },
+                  "gr.pos": {
+                    "type": "keyword"
+                  },
+                  "gr.case": {
+                    "type": "keyword"
+                  },
+                  "gr.tense": {
+                    "type": "keyword"
+                  },
+                  "gr.v_form": {
+                    "type": "keyword"
+                  },
+                  "gr.ptcp_form": {
+                    "type": "keyword"
+                  },
+                  "gr.pers": {
+                    "type": "keyword"
+                  },
+                  "gr.poss": {
+                    "type": "keyword"
+                  },
+                  "gr.v_deriv": {
+                    "type": "keyword"
+                  },
+                  "gr.tr": {
+                    "type": "keyword"
+                  },
+                  "gr.number": {
+                    "type": "keyword"
+                  },
+                  "gr.dyn": {
+                    "type": "keyword"
+                  },
+                  "gr.numeral": {
+                    "type": "keyword"
+                  },
+                  "gr.clitics": {
+                    "type": "keyword"
+                  },
+                  "gr.adj_form": {
+                    "type": "keyword"
+                  },
+                  "gr.dir": {
+                    "type": "keyword"
+                  }
+                }
+              },
+              "freq": {
+                "type": "integer"
+              },
+              "rank": {
+                "type": "keyword"
+              },
+              "n_sents": {
+                "type": "integer"
+              },
+              "n_docs": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "settings": {
+      "analysis": {
+        "analyzer": {
+          "wf_analyzer": {
+            "type": "pattern",
+            "pattern": "[\\-\n()]",
+            "lowercase": true
+          },
+          "gloss_analyzer": {
+            "type": "pattern",
+            "pattern": " ",
+            "lowercase": true
           }
         }
       }
@@ -112,58 +178,114 @@
       "word": {
         "properties": {
           "wf": {
-            "type": "text"
+            "type": "text",
+            "fielddata": true,
+            "analyzer": "wf_analyzer"
           },
           "wtype": {
             "type": "keyword"
           },
+          "lang": "byte",
           "sids": {
             "type": "integer",
             "index": false
           },
-          "freq": {
-            "type": "integer"
-          },
           "ana": {
             "type": "nested",
             "properties": {
-              "transl_ru": {
-                "type": "text"
-              },
-              "gr.v_form": {
-                "type": "keyword"
-              },
-              "gr.pers": {
-                "type": "keyword"
-              },
-              "gr.case": {
-                "type": "keyword"
-              },
               "lex": {
                 "type": "text"
               },
-              "gr.tense": {
-                "type": "keyword"
+              "gloss_index": {
+                "type": "text",
+                "analyzer": "gloss_analyzer"
               },
-              "gr.adj_form": {
-                "type": "keyword"
+              "trans_ru": {
+                "type": "text"
               },
-              "gr.gender": {
+              "lex2": {
+                "type": "text"
+              },
+              "trans_ru2": {
+                "type": "text"
+              },
+              "gr.appl": {
                 "type": "keyword"
               },
               "gr.pos": {
                 "type": "keyword"
               },
+              "gr.case": {
+                "type": "keyword"
+              },
+              "gr.tense": {
+                "type": "keyword"
+              },
+              "gr.v_form": {
+                "type": "keyword"
+              },
+              "gr.ptcp_form": {
+                "type": "keyword"
+              },
+              "gr.pers": {
+                "type": "keyword"
+              },
+              "gr.poss": {
+                "type": "keyword"
+              },
+              "gr.v_deriv": {
+                "type": "keyword"
+              },
+              "gr.tr": {
+                "type": "keyword"
+              },
               "gr.number": {
                 "type": "keyword"
               },
-              "transl_en": {
-                "type": "text"
+              "gr.dyn": {
+                "type": "keyword"
               },
-              "gr.lang": {
+              "gr.numeral": {
+                "type": "keyword"
+              },
+              "gr.clitics": {
+                "type": "keyword"
+              },
+              "gr.adj_form": {
+                "type": "keyword"
+              },
+              "gr.dir": {
                 "type": "keyword"
               }
             }
+          },
+          "freq": {
+            "type": "integer"
+          },
+          "rank": {
+            "type": "keyword"
+          },
+          "n_sents": {
+            "type": "integer"
+          },
+          "n_docs": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "settings": {
+      "analysis": {
+        "analyzer": {
+          "wf_analyzer": {
+            "type": "pattern",
+            "pattern": "[\\-\n()]",
+            "lowercase": true
+          },
+          "gloss_analyzer": {
+            "type": "pattern",
+            "pattern": " ",
+            "lowercase": true
           }
         }
       }

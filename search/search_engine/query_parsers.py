@@ -21,6 +21,10 @@ class InterfaceQueryParser:
                  'r', encoding='utf-8-sig')
         self.gramDict = json.loads(f.read())
         f.close()
+        f = open(os.path.join(settings_dir, 'corpus.json'),
+                 'r', encoding='utf-8-sig')
+        self.settings = json.loads(f.read())
+        f.close()
         f = open(os.path.join(settings_dir, 'word_fields.json'),
                  'r', encoding='utf-8-sig')
         self.wordFields = json.loads(f.read())
@@ -169,7 +173,8 @@ class InterfaceQueryParser:
                 esQuery['nested']['inner_hits']['name'] = queryName
         return esQuery
 
-    def full_word_query(self, queryDict, query_from=0, query_size=10, sortOrder='random'):
+    def full_word_query(self, queryDict, query_from=0, query_size=10, sortOrder='random',
+                        lang=0):
         """
         Make a full ES query for the words index out of a dictionary
         with bool queries.
@@ -213,6 +218,10 @@ class InterfaceQueryParser:
                     queryWords = {'bool': {'must': list(queryDictWords.values())}}
                 query.append(queryWords)
             query = {'bool': {mustWord: query}}
+            if 'must' not in query['bool']:
+                query['bool']['must'] = {'term': {'lang': lang}}
+            else:
+                query['bool']['must'].append({'term': {'lang': lang}})
         if sortOrder == 'random':
             query = self.make_random(query)
         esQuery = {'query': query, 'size': query_size, 'from': query_from,
@@ -281,7 +290,7 @@ class InterfaceQueryParser:
         return query
 
     def full_sentence_query(self, queryDict, query_from=0, query_size=10,
-                            sortOrder='random', randomSeed=None):
+                            sortOrder='random', randomSeed=None, lang=0):
         """
         Make a full ES query for the sentences index out of a dictionary
         with bool queries.
@@ -297,7 +306,7 @@ class InterfaceQueryParser:
                 and len(queryDict['words']) <= 0):
             query = {'match_none': {}}
         else:
-            query = []
+            query = [{'term': {'lang': lang}}]
             for iQueryWord in range(len(queryDict['words'])):
                 wordDesc, negQuery = queryDict['words'][iQueryWord]
                 query += self.single_word_sentence_query(wordDesc, iQueryWord + 1, sortOrder,
@@ -337,6 +346,11 @@ class InterfaceQueryParser:
             return {'query': {'match_none': ''}}
         query_from = (page - 1) * query_size
 
+        if 'lang' not in htmlQuery or htmlQuery['lang'] not in self.settings['languages']:
+            lang = 0
+        else:
+            lang = self.settings['languages'].index(htmlQuery['lang'])
+
         prelimQuery = {'words': []}
         if searchIndex == 'sentences':
             pathPfx = 'words.'
@@ -372,9 +386,11 @@ class InterfaceQueryParser:
         if searchIndex == 'sentences':
             queryDict = self.full_sentence_query(prelimQuery, query_from,
                                                  query_size, sortOrder,
-                                                 randomSeed)
+                                                 randomSeed,
+                                                 lang=lang)
         elif searchIndex == 'words':
-            queryDict = self.full_word_query(prelimQuery, query_from, query_size, sortOrder)
+            queryDict = self.full_word_query(prelimQuery, query_from, query_size, sortOrder,
+                                             lang=lang)
         else:
             queryDict = {'query': {'match_none': ''}}
         return queryDict

@@ -278,6 +278,8 @@ class SentenceViewer:
         offsets = {}    # query term ID -> highlights for this query term
         if type(sentence) == list:
             for el in sentence:
+                if type(el) not in [dict, list]:
+                    continue
                 newOffsets = self.retrieve_highlighted_words(el, numSent, queryWordID)
                 for newK, newV in newOffsets.items():
                     if newK not in offsets:
