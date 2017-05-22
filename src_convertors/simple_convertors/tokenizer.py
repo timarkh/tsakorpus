@@ -92,4 +92,7 @@ class Tokenizer:
                     curToken['wtype'] = 'word'
                 continue
             curToken['wf'] += c
+        if curToken != {}:
+            curToken['off_end'] = len(text) - 1
+            tokens.append(curToken)
         return self.join_hyphens(tokens)

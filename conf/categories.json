@@ -1,4 +1,6 @@
 {
+  "adyge":
+  {
     "1": "pers",
     "2": "pers",
     "3": "pers",
@@ -121,4 +123,5 @@
     "q": "clitics",
     "cs": "clitics",
     "ba": "clitics"
+  }
 }

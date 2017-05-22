@@ -11,7 +11,7 @@ class DumbMorphParser:
     place here.
     """
 
-    rxWordsRNC = re.compile('<w>(<ana.*?/(?:ana)>)([^<>]+)</w>', flags=re.DOTALL)
+    rxWordsRNC = re.compile('<w>(<ana.*?/(?:ana)?>)([^<>]+)</w>', flags=re.DOTALL)
     rxAnalysesRNC = re.compile('<ana *([^<>]+)(?:></ana>|/>)\\s*')
     rxAnaFieldRNC = re.compile('([^ <>"=]+) *= *"([^<>"=]+)')
     rxSplitGramTags = re.compile('[, /]')
@@ -22,8 +22,10 @@ class DumbMorphParser:
         self.settings = copy.deepcopy(settings)
         self.categories = copy.deepcopy(categories)
         self.analyses = {}
-        self.load_analyses(os.path.join(self.settings['corpus_dir'],
-                                        self.settings['parsed_wordlist_filename']))
+        if ('parsed_wordlist_filename' in self.settings
+                and len(self.settings['parsed_wordlist_filename']) > 0):
+            self.load_analyses(os.path.join(self.settings['corpus_dir'],
+                                            self.settings['parsed_wordlist_filename']))
 
     def load_analyses(self, fname):
         """
@@ -36,17 +38,17 @@ class DumbMorphParser:
         if self.settings['parsed_wordlist_format'] == 'xml_rnc':
             self.load_analyses_xml_rnc(text)
 
-    def transform_gramm_str(self, grStr):
+    def transform_gramm_str(self, grStr, lang=''):
         """
         Transform a string with gramtags into a JSON object.
         """
         grJSON = {}
         grTags = self.rxSplitGramTags.split(grStr)
         for tag in grTags:
-            if tag not in self.categories:
-                print('No category for a gramtag:', tag)
+            if tag not in self.categories[lang]:
+                print('No category for a gramtag:', tag, ', language:', lang)
                 continue
-            cat = 'gr.' + self.categories[tag]
+            cat = 'gr.' + self.categories[lang][tag]
             if cat not in grJSON:
                 grJSON[cat] = tag
             else:
@@ -74,7 +76,7 @@ class DumbMorphParser:
                               for p in zip(wordParts, glosses)) + '-'
         ana['gloss_index'] = glossIndex
 
-    def transform_ana_rnc(self, ana):
+    def transform_ana_rnc(self, ana, lang=''):
         """
         Transform analyses for a single word, written in the XML
         format used in Russian National Corpus, into a JSON object.
@@ -88,24 +90,27 @@ class DumbMorphParser:
             anaJSON = {}
             for k, v in fields:
                 if k == 'gr':
-                    anaJSON.update(self.transform_gramm_str(v))
+                    anaJSON.update(self.transform_gramm_str(v, lang=lang))
                 else:
                     anaJSON[k] = v
             self.process_gloss_in_ana(anaJSON)
             analyses.append(anaJSON)
         return analyses
 
-    def load_analyses_xml_rnc(self, text):
+    def load_analyses_xml_rnc(self, text, lang=''):
         """
         Load analyses from a string in the XML format used
         in Russian National Corpus.
         """
+        if lang == '':
+            lang = self.settings['corpus_name']
+            # there can be several languages if the corpus is parallel
         analyses = self.rxWordsRNC.findall(text)
         for ana in analyses:
             word = ana[1].strip('$&^#%*·;·‒–—―•…‘’‚“‛”„‟"\'')
             if len(word) <= 0:
                 continue
-            ana = self.transform_ana_rnc(ana[0])
+            ana = self.transform_ana_rnc(ana[0], lang=lang)
             if word not in self.analyses:
                 self.analyses[word] = ana
         print('Analyses for', len(self.analyses), 'different words loaded.')

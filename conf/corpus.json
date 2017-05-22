@@ -9,7 +9,13 @@
     "year1",
     "year2"
   ],
-  "gloss_shortcuts": {
-    "case": "(obl(\\.pl)?|abs|erg|ins)"
+  "languages":
+  {
+    "adyge":
+    {
+      "gloss_shortcuts": {
+        "case": "(obl(\\.pl)?|abs|erg|ins)"
+      }
+    }
   }
 }

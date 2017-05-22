@@ -11,9 +11,9 @@ class Eaf2JSON(Txt2JSON):
     word forms.
     """
 
-    def convert_file(self, fnameSrc, fnameTarget):
-        fname2check = fnameSrc
-        curMeta = {'filename': fnameSrc}
+    def get_meta(self, fname):
+        fname2check = fname
+        curMeta = {'filename': fname}
         if not self.corpusSettings['meta_files_dir']:
             fname2check = self.rxStripDir.sub('', fname2check)
         if not self.corpusSettings['meta_files_ext']:
@@ -21,9 +21,13 @@ class Eaf2JSON(Txt2JSON):
         if not self.corpusSettings['meta_files_case_sensitive']:
             fname2check = fname2check.lower()
         if fname2check not in self.meta:
-            print('File not in meta:', fnameSrc)
+            print('File not in meta:', fname)
         else:
             curMeta.update(self.meta[fname2check])
+        return curMeta
+
+    def convert_file(self, fnameSrc, fnameTarget):
+        curMeta = self.get_meta(fnameSrc)
         textJSON = {'meta': curMeta, 'sentences': []}
         words, parsedWords, sentences = 0, 0, 0
         fSrc = open(fnameSrc, 'r', encoding='utf-8')

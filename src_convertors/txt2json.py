@@ -38,6 +38,7 @@ class Txt2JSON:
         self.meta = {}
         self.tp = TextProcessor(settings=self.corpusSettings,
                                 categories=self.categories)
+        self.srcExt = 'txt'
 
     def load_settings(self):
         fCorpus = open(os.path.join(self.settingsDir, 'corpus.json'), 'r',
@@ -73,29 +74,7 @@ class Txt2JSON:
                     curMetaDict[fieldName] = metaValues[i].strip()
         fMeta.close()
 
-    def convert_file(self, fnameSrc, fnameTarget):
-        if fnameSrc == fnameTarget:
-            return 0, 0, 0
-
-        fname2check = fnameSrc
-        curMeta = {'filename': fnameSrc}
-        if not self.corpusSettings['meta_files_dir']:
-            fname2check = self.rxStripDir.sub('', fname2check)
-        if not self.corpusSettings['meta_files_ext']:
-            fname2check = self.rxStripExt.sub('', fname2check)
-        if not self.corpusSettings['meta_files_case_sensitive']:
-            fname2check = fname2check.lower()
-        if fname2check not in self.meta:
-            print('File not in meta:', fnameSrc)
-        else:
-            curMeta.update(self.meta[fname2check])
-        textJSON = {'meta': curMeta, 'sentences': []}
-        fSrc = open(fnameSrc, 'r', encoding='utf-8')
-        text = fSrc.read()
-        fSrc.close()
-
-        textJSON['sentences'], nTokens, nWords, nAnalyze = self.tp.process_string(text)
-
+    def write_output(self, fnameTarget, textJSON):
         if self.corpusSettings['gzip']:
             fTarget = gzip.open(fnameTarget, 'wt', encoding='utf-8')
         else:
@@ -103,6 +82,34 @@ class Txt2JSON:
         json.dump(textJSON, fp=fTarget, ensure_ascii=False,
                   indent=self.corpusSettings['json_indent'])
         fTarget.close()
+
+    def get_meta(self, fname):
+        fname2check = fname
+        curMeta = {'filename': fname}
+        if not self.corpusSettings['meta_files_dir']:
+            fname2check = self.rxStripDir.sub('', fname2check)
+        if not self.corpusSettings['meta_files_ext']:
+            fname2check = self.rxStripExt.sub('', fname2check)
+        if not self.corpusSettings['meta_files_case_sensitive']:
+            fname2check = fname2check.lower()
+        if fname2check not in self.meta:
+            print('File not in meta:', fname)
+        else:
+            curMeta.update(self.meta[fname2check])
+        return curMeta
+
+    def convert_file(self, fnameSrc, fnameTarget):
+        if fnameSrc == fnameTarget:
+            return 0, 0, 0
+
+        curMeta = self.get_meta(fnameSrc)
+        textJSON = {'meta': curMeta, 'sentences': []}
+        fSrc = open(fnameSrc, 'r', encoding='utf-8')
+        text = fSrc.read()
+        fSrc.close()
+
+        textJSON['sentences'], nTokens, nWords, nAnalyze = self.tp.process_string(text)
+        self.write_output(fnameTarget, textJSON)
         return nTokens, nWords, nAnalyze
 
     def process_corpus(self):
@@ -114,11 +121,11 @@ class Txt2JSON:
             return
         self.load_meta()
         nTokens, nWords, nAnalyzed = 0, 0, 0
-        srcDir = os.path.join(self.corpusSettings['corpus_dir'], 'txt')
+        srcDir = os.path.join(self.corpusSettings['corpus_dir'], self.srcExt)
         targetDir = os.path.join(self.corpusSettings['corpus_dir'], 'json')
         for path, dirs, files in os.walk(srcDir):
             for filename in files:
-                if not filename.lower().endswith('.txt'):
+                if not filename.lower().endswith('.' + self.srcExt):
                     continue
                 targetPath = path.replace(srcDir, targetDir)
                 if targetPath == path:
