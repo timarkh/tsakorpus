@@ -162,8 +162,8 @@ class Indexator:
                 for i in range(len(self.languages)):
                     if i == langID:
                         continue
-                    if paraID in paraIDs[langID]:
-                        pa['sent_ids'] += paraIDs[langID][paraID]
+                    if paraID in paraIDs[i]:
+                        pa['sent_ids'] += paraIDs[i][paraID]
 
     def iterate_sentences(self, fname):
         iSent = 0

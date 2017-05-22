@@ -163,19 +163,19 @@ class SentenceViewer:
             result = result.replace('data-meta=""', 'data-meta="' + dataMeta + '"')
         return result + '</span>'
 
-    def process_sentence(self, s, numSent=1, getHeader=False):
+    def process_sentence(self, s, numSent=1, getHeader=False, lang=''):
         """
         Process one sentence taken from response['hits']['hits'].
         If getHeader is True, retrieve the metadata from the database.
         Return dictionary {'header': document header HTML,
-                           'text': sentence HTML}.
+                           {'languages': {'<language_name>': {'text': sentence HTML}}}}.
         """
         if '_source' not in s:
-            return ''
+            return {'languages': {lang: {'text': ''}}}
         matchWordOffsets = self.retrieve_highlighted_words(s, numSent)
         sSource = s['_source']
         if 'text' not in sSource or len(sSource['text']) <= 0:
-            return ''
+            return {'languages': {lang: {'text': ''}}}
 
         header = {}
         if getHeader:
@@ -190,7 +190,7 @@ class SentenceViewer:
         else:
             highlightedText = sSource['text']
         if 'words' not in sSource:
-            return highlightedText
+            return {'languages': {lang: {'text': highlightedText}}}
         chars = list(sSource['text'])
         offStarts, offEnds = {}, {}
         self.add_highlighted_offsets(offStarts, offEnds, highlightedText)
@@ -238,7 +238,7 @@ class SentenceViewer:
         relationsSatisfied = True
         if 'relations_satisfied' in s and not s['relations_satisfied']:
             relationsSatisfied = False
-        return {'header': header, 'text': ''.join(chars),
+        return {'header': header, 'languages': {lang: {'text': ''.join(chars)}},
                 'relations_satisfied': relationsSatisfied}
 
     def process_word(self, w):
@@ -330,9 +330,13 @@ class SentenceViewer:
         if 'aggregations' in response and 'agg_ndocs' in response['aggregations']:
             result['n_docs'] = response['aggregations']['agg_ndocs']['value']
         for iHit in range(len(response['hits']['hits'])):
-            result['contexts'].append(self.process_sentence(response['hits']['hits'][iHit],
-                                                            numSent=iHit,
-                                                            getHeader=True))
+            langID = response['hits']['hits'][iHit]['_source']['lang']
+            lang = self.settings['languages'][langID]
+            curContext = self.process_sentence(response['hits']['hits'][iHit],
+                                               numSent=iHit,
+                                               getHeader=True,
+                                               lang=lang)
+            result['contexts'].append(curContext)
         return result
 
     def process_word_json(self, response):

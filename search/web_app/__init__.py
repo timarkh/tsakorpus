@@ -279,6 +279,32 @@ def search_sent_json(page=0):
     return jsonify(hits)
 
 
+def add_parallel(hits, htmlResponse):
+    """
+    Add HTML of fragments in other languages aligned with the sentence
+    to the response.
+    """
+    for iHit in range(len(hits)):
+        if ('para_alignment' not in hits[iHit]['_source']
+                or len(hits[iHit]['_source']['para_alignment']) <= 0):
+            continue
+        sids = set()
+        for pa in hits[iHit]['_source']['para_alignment']:
+            sids |= set(pa['sent_ids'])
+        sids = list(sid for sid in sorted(sids))
+        query = {'query': {'ids': {'values': sids}}}
+        paraSentHits = sc.get_sentences(query)
+        htmlResponse['contexts'][iHit]['header'] += str(len(paraSentHits))
+        for s in paraSentHits['hits']['hits']:
+            langID = s['_source']['lang']
+            lang = settings['languages'][langID]
+            sentHTML = sentView.process_sentence(s, numSent=555, getHeader=False, lang=lang)['languages'][lang]['text']
+            try:
+                htmlResponse['contexts'][iHit]['languages'][lang]['text'] += sentHTML
+            except KeyError:
+                htmlResponse['contexts'][iHit]['languages'][lang] = {'text': sentHTML}
+
+
 @app.route('/search_sent/<int:page>')
 @app.route('/search_sent')
 def search_sent(page=0):
@@ -328,6 +354,8 @@ def search_sent(page=0):
         for hit in hits['hits']['hits']:
             hit['relations_satisfied'] = sc.qp.wr.check_sentence(hit, wordConstraints)
     hitsProcessed = sentView.process_sent_json(hits)
+    if len(settings['languages']) > 1 and 'hits' in hits and 'hits' in hits['hits']:
+        add_parallel(hits['hits']['hits'], hitsProcessed)
     hitsProcessed['page'] = get_session_data('page')
     hitsProcessed['page_size'] = get_session_data('page_size')
     add_sent_to_session(hits)
