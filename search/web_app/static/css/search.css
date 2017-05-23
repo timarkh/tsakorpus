@@ -84,6 +84,15 @@
 .sentence {
 }
 
+.sent_lang:hover {
+	background-color: #ded;
+}
+
+.sent_lang {
+	padding-bottom: 5px;
+	display: block;
+}
+
 .ch_container {
 	margin-bottom: 5px;
 	display: block;

@@ -69,7 +69,10 @@ function highlight_word_spans(item, i) {
 
 function show_expanded_context(results) {
 	var n = results.n;
-	$('#res' + n).html(results.prev + ' ' + $('#res' + n).html() + ' ' + results.next);
+	for (lang in results.languages) {
+		var resID = '#res' + n + '_' + lang;
+		$(resID).html(results.languages[lang].prev + ' ' + $(resID).html() + ' ' + results.languages[lang].next);
+	}
 	assign_word_events();
 }
 

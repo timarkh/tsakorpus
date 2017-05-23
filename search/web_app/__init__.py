@@ -149,6 +149,35 @@ def change_display_options(query):
         set_session_data('distance_strict', False)
 
 
+def add_sent_data_for_session(sent, sentData):
+    """
+    Add information about one particluar sentence to the
+    sentData dictionary for storing in the session data
+    dictionary.
+    Modify sentData, do not return anything.
+    """
+    if len(sentData) <= 0:
+        docID = -1
+        if '_source' in sent:
+            docID = sent['_source']['doc_id']
+        sentData.update({'languages': {},
+                         'doc_id': docID,
+                         'times_expanded': 0})
+    langID = 0
+    nextID = prevID = -1
+    if '_source' in sent:
+        if 'next_id' in sent['_source']:
+            nextID = sent['_source']['next_id']
+        if 'prev_id' in sent['_source']:
+            prevID = sent['_source']['prev_id']
+        if 'lang' in sent['_source']:
+            langID = sent['_source']['lang']
+        lang = settings['languages'][langID]
+        sentData['languages'][lang] = {'id': sent['_id'],
+                                       'next_id': nextID,
+                                       'prev_id': prevID}
+
+
 def add_sent_to_session(hits):
     """
     Store the ids of the currently viewed sentences in the
@@ -160,18 +189,9 @@ def add_sent_to_session(hits):
     curSentIDs = []
     set_session_data('last_sent_num', len(hits['hits']['hits']) - 1)
     for sent in hits['hits']['hits']:
-        nextID = prevID = docID = -1
-        if '_source' in sent:
-            if 'next_id' in sent['_source']:
-                nextID = sent['_source']['next_id']
-            if 'prev_id' in sent['_source']:
-                prevID = sent['_source']['prev_id']
-            docID = sent['_source']['doc_id']
-        curSentIDs.append({'id': sent['_id'],
-                           'doc_id': docID,
-                           'next_id': nextID,
-                           'prev_id': prevID,
-                           'times_expanded': 0})
+        curSentID = {}
+        add_sent_data_for_session(sent, curSentID)
+        curSentIDs.append(curSentID)
     set_session_data('sentence_data', curSentIDs)
 
 
@@ -188,9 +208,10 @@ def update_expanded_contexts(context, neighboringIDs):
         return
     curSent = curSentIDs[context['n']]
     curSent['times_expanded'] += 1
-    for side in ['next', 'prev']:
-        if side in context and len(context[side]) > 0:
-            curSent[side + '_id'] = neighboringIDs[side]
+    for lang in curSent['languages']:
+        for side in ['next', 'prev']:
+            if side in context['languages'][lang] and len(context['languages'][lang][side]) > 0:
+                curSent['languages'][lang][side + '_id'] = neighboringIDs[lang][side]
 
 
 @app.route('/search')
@@ -288,6 +309,7 @@ def add_parallel(hits, htmlResponse):
         if ('para_alignment' not in hits[iHit]['_source']
                 or len(hits[iHit]['_source']['para_alignment']) <= 0):
             continue
+        curSentIDs = get_session_data('sentence_data')
         sids = set()
         for pa in hits[iHit]['_source']['para_alignment']:
             sids |= set(pa['sent_ids'])
@@ -296,11 +318,14 @@ def add_parallel(hits, htmlResponse):
         paraSentHits = sc.get_sentences(query)
         htmlResponse['contexts'][iHit]['header'] += str(len(paraSentHits))
         for s in paraSentHits['hits']['hits']:
+            numSent = get_session_data('last_sent_num') + 1
+            set_session_data('last_sent_num', numSent)
+            add_sent_data_for_session(s, curSentIDs[iHit])
             langID = s['_source']['lang']
             lang = settings['languages'][langID]
-            sentHTML = sentView.process_sentence(s, numSent=555, getHeader=False, lang=lang)['languages'][lang]['text']
+            sentHTML = sentView.process_sentence(s, numSent=numSent, getHeader=False, lang=lang)['languages'][lang]['text']
             try:
-                htmlResponse['contexts'][iHit]['languages'][lang]['text'] += sentHTML
+                htmlResponse['contexts'][iHit]['languages'][lang]['text'] += ' ' + sentHTML
             except KeyError:
                 htmlResponse['contexts'][iHit]['languages'][lang] = {'text': sentHTML}
 
@@ -353,12 +378,13 @@ def search_sent(page=0):
     if len(wordConstraints) > 0 and 'hits' in hits and 'hits' in hits['hits']:
         for hit in hits['hits']['hits']:
             hit['relations_satisfied'] = sc.qp.wr.check_sentence(hit, wordConstraints)
+    add_sent_to_session(hits)
     hitsProcessed = sentView.process_sent_json(hits)
     if len(settings['languages']) > 1 and 'hits' in hits and 'hits' in hits['hits']:
         add_parallel(hits['hits']['hits'], hitsProcessed)
     hitsProcessed['page'] = get_session_data('page')
     hitsProcessed['page_size'] = get_session_data('page_size')
-    add_sent_to_session(hits)
+
     return render_template('result_sentences.html', data=hitsProcessed)
 
 
@@ -371,34 +397,40 @@ def get_sent_context(n):
     times this particular context has been expanded and
     whether expanding it further is allowed.
     """
+
     if n < 0:
         return jsonify({})
     sentData = get_session_data('sentence_data')
-    if sentData is None or n >= len(sentData):
+    # return jsonify({"l": len(sentData), "i": sentData[n]})
+    if sentData is None or n >= len(sentData) or 'languages' not in sentData[n]:
         return jsonify({})
     curSentData = sentData[n]
     if curSentData['times_expanded'] >= settings['max_context_expand']:
         return jsonify({})
-    context = {'n': n}
-    neighboringIDs = {'next': -1, 'prev': -1}
-    for side in ['next', 'prev']:
-        if side + '_id' in curSentData:
-            context[side] = sc.get_sentence_by_id(curSentData[side + '_id'])
-        if (len(context[side]) > 0
-                and 'hits' in context[side]
-                and 'hits' in context[side]['hits']
-                and len(context[side]['hits']['hits']) > 0):
-            lastSentNum = get_session_data('last_sent_num') + 1
-            curSent = context[side]['hits']['hits'][0]
-            if '_source' in curSent and side + '_id' in curSent['_source']:
-                neighboringIDs[side] = curSent['_source'][side + '_id']
-            expandedContext = sentView.process_sentence(curSent,
-                                                        numSent=lastSentNum,
-                                                        getHeader=False)
-            context[side] = expandedContext['text']
-            set_session_data('last_sent_num', lastSentNum)
-        else:
-            context[side] = ''
+    context = {'n': n, 'languages': {lang: {} for lang in curSentData['languages']}}
+    neighboringIDs = {lang: {'next': -1, 'prev': -1} for lang in curSentData['languages']}
+    for lang in curSentData['languages']:
+        for side in ['next', 'prev']:
+            curCxLang = context['languages'][lang]
+            if side + '_id' in curSentData['languages'][lang]:
+                curCxLang[side] = sc.get_sentence_by_id(curSentData['languages'][lang][side + '_id'])
+            if (side in curCxLang
+                    and len(curCxLang[side]) > 0
+                    and 'hits' in curCxLang[side]
+                    and 'hits' in curCxLang[side]['hits']
+                    and len(curCxLang[side]['hits']['hits']) > 0):
+                lastSentNum = get_session_data('last_sent_num') + 1
+                curSent = curCxLang[side]['hits']['hits'][0]
+                if '_source' in curSent and side + '_id' in curSent['_source']:
+                    neighboringIDs[lang][side] = curSent['_source'][side + '_id']
+                expandedContext = sentView.process_sentence(curSent,
+                                                            numSent=lastSentNum,
+                                                            getHeader=False,
+                                                            lang=lang)
+                curCxLang[side] = expandedContext['languages'][lang]['text']
+                set_session_data('last_sent_num', lastSentNum)
+            else:
+                curCxLang[side] = ''
     update_expanded_contexts(context, neighboringIDs)
     return jsonify(context)
 
