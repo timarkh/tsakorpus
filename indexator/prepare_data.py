@@ -67,6 +67,17 @@ class PrepareData:
                 m['ana']['properties']['gr.' + field] = {'type': 'keyword'}
         return {'mappings': {'word': {'properties': m}}, 'settings': self.wfAnalyzer}
 
+    def generate_wordfreq_mapping(self):
+        """
+        Return Elasticsearch mapping for the type "word_freq".
+        Each element of word_freq index contains data about frequency
+        of a specific word in a specific document.
+        """
+        m = {'w_id': {'type': 'integer'},
+             'd_id': {'type': 'integer'},
+             'freq': {'type': 'integer'}}
+        return {'mappings': {'word_freq': {'properties': m}}}
+
     def generate_sentences_mapping(self, word_mapping):
         """
         Return Elasticsearch mapping for the type "sentence", based
@@ -114,8 +125,10 @@ class PrepareData:
         """
         mWord = self.generate_words_mapping()
         mSent = self.generate_sentences_mapping(mWord)
+        mWFreq = self.generate_wordfreq_mapping()
         mappings = {'sentences': mSent,
-                    'words': mWord}
+                    'words': mWord,
+                    'word_freqs': mWFreq}
         return mappings
 
     def write_mappings(self, fnameOut):

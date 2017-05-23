@@ -45,6 +45,7 @@ class Indexator:
         self.es = Elasticsearch()
         self.es_ic = IndicesClient(self.es)
         self.wordFreqs = [{} for i in range(len(self.languages))]   # word as JSON -> its frequency
+        self.wordDocFreqs = [{} for i in range(len(self.languages))]  # (word as JSON, dID) -> word frequency in the document
         self.wordSIDs = {}    # word as JSON -> set of sentence IDs
         self.wordDIDs = {}    # word as JSON -> set of document IDs
         self.sID = 0          # current sentence ID for each language
@@ -55,15 +56,20 @@ class Indexator:
             self.es_ic.delete(index=self.name + '.docs')
         if self.es_ic.exists(index=self.name + '.words'):
             self.es_ic.delete(index=self.name + '.words')
+        if self.es_ic.exists(index=self.name + '.word_freqs'):
+            self.es_ic.delete(index=self.name + '.word_freqs')
         if self.es_ic.exists(index=self.name + '.sentences'):
             self.es_ic.delete(index=self.name + '.sentences')
 
     def create_indices(self):
         self.wordMapping = self.pd.generate_words_mapping()
+        self.wordFreqMapping = self.pd.generate_wordfreq_mapping()
         self.sentMapping = self.pd.generate_sentences_mapping(self.wordMapping)
         self.es_ic.create(index=self.name + '.docs')
         self.es_ic.create(index=self.name + '.words',
                           body=self.wordMapping)
+        self.es_ic.create(index=self.name + '.word_freqs',
+                          body=self.wordFreqMapping)
         self.es_ic.create(index=self.name + '.sentences',
                           body=self.sentMapping)
 
@@ -100,6 +106,10 @@ class Indexator:
                 self.wordDIDs[wCleanTxt].add(self.dID)
             except KeyError:
                 self.wordDIDs[wCleanTxt] = {self.dID}
+            try:
+                self.wordDocFreqs[langID][(wCleanTxt, self.dID)] += 1
+            except KeyError:
+                self.wordDocFreqs[langID][(wCleanTxt, self.dID)] = 1
 
     def iterate_words(self):
         """
@@ -137,8 +147,16 @@ class Indexator:
                              '_type': 'word',
                              '_id': iWord,
                              '_source': wJson}
-                iWord += 1
                 yield curAction
+                for docID in wJson['dids']:
+                    wfreqJson = {'w_id': iWord,
+                                 'd_id': docID,
+                                 'freq': self.wordDocFreqs[langID][(w, docID)]}
+                    curAction = {'_index': self.name + '.word_freqs',
+                                 '_type': 'word_freq',
+                                 '_source': wfreqJson}
+                    yield curAction
+                iWord += 1
 
     def index_words(self):
         """
