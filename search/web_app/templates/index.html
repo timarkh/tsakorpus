@@ -37,6 +37,11 @@ Results per page: <input type="number" name="page_size" id="page_size" value="10
 <option value="{{ lang }}">{{ lang }}</option>
 {% endfor %}
 </select>
+<div class="subcorpus_select">
+Author: <input type="text" name="author" id="author"> Title: <input type="text" name="title" id="title"><br>
+Year: from <input type="number" name="year1" id="year1"> to <input type="number" name="year2" id="year2">.
+Genre: <input type="text" name="genre" id="genre">
+</div>
 </form>
 <button value="Search sentences" id="search_sent" style="width:200px;">Search sentences</button>
 <button value="Search words" id="search_word" style="width:200px;">Search words</button><br>

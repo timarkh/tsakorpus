@@ -30,6 +30,10 @@ class InterfaceQueryParser:
         self.wordFields = json.loads(f.read())
         f.close()
         self.wr = WordRelations(settings_dir)
+        self.docMetaFields = ['author', 'title', 'year1', 'year2', 'genre']
+        if 'viewable_meta' in self.settings:
+            self.docMetaFields += [f for f in self.settings['viewable_meta']
+                                   if f not in self.docMetaFields and f != 'filename']
         # for g in self.gramDict:
         #     self.gramDict[g] = 'ana.gr.' + self.gramDict[g]
 
@@ -337,6 +341,13 @@ class InterfaceQueryParser:
             query['function_score']['random_score']['seed'] = randomSeed
         return query
 
+    def subcorpus_ids(self, htmlQuery):
+        """
+        Return IDs of the documents specified by the subcorpus selection
+        fields in htmlQuery.
+        """
+        pass
+
     def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
                 randomSeed=None, searchIndex='sentences'):
         """
@@ -350,6 +361,10 @@ class InterfaceQueryParser:
             lang = 0
         else:
             lang = self.settings['languages'].index(htmlQuery['lang'])
+
+        docIDs = None
+        if any(f in htmlQuery for f in self.docMetaFields):
+            docIDs = self.subcorpus_ids(htmlQuery)
 
         prelimQuery = {'words': []}
         if searchIndex == 'sentences':
@@ -383,6 +398,7 @@ class InterfaceQueryParser:
                 prelimQuery['text'] = {'match_phrase': {'text': htmlQuery['txt']}}
             else:
                 prelimQuery['text'] = {'match': {'text': htmlQuery['txt']}}
+        prelimQuery['doc_ids'] = docIDs
         if searchIndex == 'sentences':
             queryDict = self.full_sentence_query(prelimQuery, query_from,
                                                  query_size, sortOrder,
