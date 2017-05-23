@@ -173,9 +173,18 @@ def add_sent_data_for_session(sent, sentData):
         if 'lang' in sent['_source']:
             langID = sent['_source']['lang']
         lang = settings['languages'][langID]
-        sentData['languages'][lang] = {'id': sent['_id'],
-                                       'next_id': nextID,
-                                       'prev_id': prevID}
+        if lang not in sentData['languages']:
+            sentData['languages'][lang] = {'id': sent['_id'],
+                                           'next_id': nextID,
+                                           'prev_id': prevID}
+        else:
+            if ('next_id' not in sentData['languages'][lang]
+                    or nextID == -1
+                    or nextID > sentData['languages'][lang]['next_id']):
+                sentData['languages'][lang]['next_id'] = nextID
+            if ('prev_id' not in sentData['languages'][lang]
+                    or prevID < sentData['languages'][lang]['prev_id']):
+                sentData['languages'][lang]['prev_id'] = prevID
 
 
 def add_sent_to_session(hits):
@@ -316,7 +325,6 @@ def add_parallel(hits, htmlResponse):
         sids = list(sid for sid in sorted(sids))
         query = {'query': {'ids': {'values': sids}}}
         paraSentHits = sc.get_sentences(query)
-        htmlResponse['contexts'][iHit]['header'] += str(len(paraSentHits))
         for s in paraSentHits['hits']['hits']:
             numSent = get_session_data('last_sent_num') + 1
             set_session_data('last_sent_num', numSent)

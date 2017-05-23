@@ -84,7 +84,17 @@ class SentenceViewer:
         return result
 
     def build_span(self, sentSrc, curWords, matchWordOffsets):
-        dataAna = self.prepare_analyses(sentSrc['words'], curWords, matchWordOffsets).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
+        curClass = ''
+        if any(wn.startswith('w') for wn in curWords):
+            curClass += ' word '
+        if any(wn.startswith('p') for wn in curWords):
+            curClass += ' para '
+        curClass = curClass.lstrip()
+
+        if 'word' in curClass:
+            dataAna = self.prepare_analyses(sentSrc['words'], curWords, matchWordOffsets).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
+        else:
+            dataAna = ''
 
         def highlightClass(nWord):
             if nWord in matchWordOffsets:
@@ -93,7 +103,7 @@ class SentenceViewer:
                                                         for anaOff in matchWordOffsets[nWord]))
             return ''
 
-        spanStart = '<span class="word ' + \
+        spanStart = '<span class="' + curClass + \
                     ' '.join(wn + highlightClass(wn)
                              for wn in curWords) + '" data-ana="' + dataAna + '">'
         return spanStart
@@ -163,6 +173,58 @@ class SentenceViewer:
             result = result.replace('data-meta=""', 'data-meta="' + dataMeta + '"')
         return result + '</span>'
 
+    def get_word_offsets(self, sSource, numSent):
+        """
+        Find at which offsets which word start and end.
+        Return two dicts, one with start offsets and the other with end offsets.
+        The keys are offsets and the values are the string IDs of the words.
+        """
+        offStarts, offEnds = {}, {}
+        for iWord in range(len(sSource['words'])):
+            try:
+                if sSource['words'][iWord]['wtype'] != 'word':
+                    continue
+                offStart, offEnd = sSource['words'][iWord]['off_start'], sSource['words'][iWord]['off_end']
+            except KeyError:
+                continue
+            wn = 'w' + str(numSent) + '_' + str(iWord)
+            try:
+                offStarts[offStart].add(wn)
+            except KeyError:
+                offStarts[offStart] = {wn}
+            try:
+                offEnds[offEnd].add(wn)
+            except KeyError:
+                offEnds[offEnd] = {wn}
+        return offStarts, offEnds
+
+    def get_para_offsets(self, sSource):
+        """
+        Find at which offsets which parallel fragments start and end.
+        Return two dicts, one with start offsets and the other with end offsets.
+        The keys are offsets and the values are the string IDs of the fragments.
+        """
+        offStarts, offEnds = {}, {}
+        if 'para_alignment' not in sSource or 'doc_id' not in sSource:
+            return offStarts, offEnds
+        docID = sSource['doc_id']
+        for iPA in range(len(sSource['para_alignment'])):
+            pa = sSource['para_alignment'][iPA]
+            try:
+                offStart, offEnd = pa['off_start'], pa['off_end']
+            except KeyError:
+                continue
+            pID = 'p' + pa['para_id'] + str(docID)
+            try:
+                offStarts[offStart].add(pID)
+            except KeyError:
+                offStarts[offStart] = {pID}
+            try:
+                offEnds[offEnd].add(pID)
+            except KeyError:
+                offEnds[offEnd] = {pID}
+        return offStarts, offEnds
+
     def process_sentence(self, s, numSent=1, getHeader=False, lang=''):
         """
         Process one sentence taken from response['hits']['hits'].
@@ -192,24 +254,10 @@ class SentenceViewer:
         if 'words' not in sSource:
             return {'languages': {lang: {'text': highlightedText}}}
         chars = list(sSource['text'])
-        offStarts, offEnds = {}, {}
+        offParaStarts, offParaEnds = self.get_para_offsets(sSource)
+        offStarts, offEnds = self.get_word_offsets(sSource, numSent)
         self.add_highlighted_offsets(offStarts, offEnds, highlightedText)
-        for iWord in range(len(sSource['words'])):
-            try:
-                if sSource['words'][iWord]['wtype'] != 'word':
-                    continue
-                offStart, offEnd = sSource['words'][iWord]['off_start'], sSource['words'][iWord]['off_end']
-            except KeyError:
-                continue
-            wn = 'w' + str(numSent) + '_' + str(iWord)
-            try:
-                offStarts[offStart].add(wn)
-            except KeyError:
-                offStarts[offStart] = {wn}
-            try:
-                offEnds[offEnd].add(wn)
-            except KeyError:
-                offEnds[offEnd] = {wn}
+
         curWords = set()
         for i in range(len(chars)):
             if chars[i] == '\n':
@@ -219,16 +267,22 @@ class SentenceViewer:
                     chars[i] = '<span class="newline"></span>'
                 else:
                     chars[i] = '<br>'
-            if i not in offStarts and i not in offEnds:
+            if (i not in offStarts and i not in offEnds
+                    and i not in offParaStarts and i not in offParaEnds):
                 continue
             addition = ''
             if len(curWords) > 0:
                 addition = '</span>'
                 if i in offEnds:
                     curWords -= offEnds[i]
+                if i in offParaEnds:
+                    curWords -= offParaEnds[i]
             newWord = False
             if i in offStarts:
                 curWords |= offStarts[i]
+                newWord = True
+            if i in offParaStarts:
+                curWords |= offParaStarts[i]
                 newWord = True
             if len(curWords) > 0 and (len(addition) > 0 or newWord):
                 addition += self.build_span(sSource, curWords, matchWordOffsets)

@@ -85,12 +85,19 @@
 }
 
 .sent_lang:hover {
-	background-color: #ded;
+	border-left: 2px #bbd dotted;
+	border-right: 2px #bbd dotted;
 }
 
 .sent_lang {
-	padding-bottom: 5px;
+	border-left: 2px #fff solid;
+	border-right: 2px #fff solid;
+	margin-bottom: 5px;
 	display: block;
+}
+
+.p_highlighted {
+	background-color: #f8ffc4;
 }
 
 .ch_container {
@@ -122,6 +129,12 @@
 
 .ch_date {
 	padding-left: 10px;
+}
+
+.context {
+	border-radius: 10px;
+	border-top: 1px gray dotted;
+	padding: 5px;
 }
 
 .page_link {

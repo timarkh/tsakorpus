@@ -19,6 +19,7 @@ function assign_word_events() {
 	$('span.context_header').click(show_doc_meta);
 	$('span.search_w').click(search_word_from_list);
 	$("span.page_link").click(page_click);
+	assign_para_highlight();
 	assign_gram_popup();
 }
 
@@ -61,10 +62,15 @@ function page_click(e) {
 }
 
 function highlight_word_spans(item, i) {
-	if (item == "word" || item.includes('match')) return;
+	if (item == "word" || item.includes('match') || !item.startsWith("w")) return;
 	$('.' + item).css({'border-color': '#FF9000', 'border-radius': '5px',
 					   'border-width': '2px', 'border-style': 'solid'});
 	$('.' + item).addClass('w_highlighted');
+}
+
+function highlight_para_spans(item, i) {
+	if (item == "para" || item.includes('match') || !item.startsWith("p")) return;
+	$('.' + item).addClass('p_highlighted');
 }
 
 function show_expanded_context(results) {
@@ -74,6 +80,18 @@ function show_expanded_context(results) {
 		$(resID).html(results.languages[lang].prev + ' ' + $(resID).html() + ' ' + results.languages[lang].next);
 	}
 	assign_word_events();
+}
+
+function assign_para_highlight() {
+	$("span.para").unbind('hover');
+	$("span.para").unbind('mousemove');
+	$('span.para').hover(function (e) {
+		$('.p_highlighted').removeClass('p_highlighted');
+		var targetClasses = $(e.target).attr('class').split(' ');
+		targetClasses.forEach(highlight_para_spans);
+	}, function () {
+		$('.p_highlighted').removeClass('p_highlighted');
+	});
 }
 
 function assign_gram_popup() {
