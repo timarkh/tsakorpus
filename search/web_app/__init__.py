@@ -251,10 +251,58 @@ def search_sent_query(page=0):
     return jsonify([query, wordConstraints])
 
 
-@app.route('/search_sent_json/<int:page>')
-@app.route('/search_sent_json')
-@jsonp
-def search_sent_json(page=0):
+def find_parallel_for_one_sent(sSource):
+    """
+    Retrieve all sentences in other languages which are aligned
+    with the given sentence. Return the search results in JSON.
+    """
+    sids = set()
+    for pa in sSource['para_alignment']:
+        sids |= set(pa['sent_ids'])
+    sids = list(sid for sid in sorted(sids))
+    query = {'query': {'ids': {'values': sids}}}
+    paraSentHits = sc.get_sentences(query)
+    if 'hits' in paraSentHits and 'hits' in paraSentHits['hits']:
+        return paraSentHits['hits']['hits']
+    return []
+
+
+def get_parallel_for_one_sent_html(sSource, numHit):
+    """
+    Iterate over HTML strings with sentences in other languages
+    aligned with the given sentence.
+    """
+    curSentIDs = get_session_data('sentence_data')
+    for s in find_parallel_for_one_sent(sSource):
+        numSent = get_session_data('last_sent_num') + 1
+        set_session_data('last_sent_num', numSent)
+        add_sent_data_for_session(s, curSentIDs[numHit])
+        langID = s['_source']['lang']
+        lang = settings['languages'][langID]
+        sentHTML = sentView.process_sentence(s, numSent=numSent, getHeader=False, lang=lang)['languages'][lang]['text']
+        yield sentHTML, lang
+
+
+def add_parallel(hits, htmlResponse):
+    """
+    Add HTML of fragments in other languages aligned with the current
+    search results to the response.
+    """
+    for iHit in range(len(hits)):
+        if ('para_alignment' not in hits[iHit]['_source']
+                or len(hits[iHit]['_source']['para_alignment']) <= 0):
+            continue
+        for sentHTML, lang in get_parallel_for_one_sent_html(hits[iHit]['_source'], iHit):
+            try:
+                htmlResponse['contexts'][iHit]['languages'][lang]['text'] += ' ' + sentHTML
+            except KeyError:
+                htmlResponse['contexts'][iHit]['languages'][lang] = {'text': sentHTML}
+
+
+def find_sentences_json(page=0):
+    """
+    Find sentences and change current options using the query in request.args.
+    """
     if request.args and page <= 0:
         query = {}
         for field, value in request.args.items():
@@ -302,90 +350,21 @@ def search_sent_json(page=0):
             and 'hits' in hits and 'hits' in hits['hits']):
         for hit in hits['hits']['hits']:
             hit['relations_satisfied'] = sc.qp.wr.check_sentence(hit, wordConstraints)
-            # if wr.check_sentence(hit, wordConstraints):
-            #     hit['relations_satisfied'] = True
-            # else:
-            #     hit['relations_satisfied'] = False
+    return hits
+
+
+@app.route('/search_sent_json/<int:page>')
+@app.route('/search_sent_json')
+@jsonp
+def search_sent_json(page=0):
+    hits = find_sentences_json(page=page)
     return jsonify(hits)
-
-
-def add_parallel(hits, htmlResponse):
-    """
-    Add HTML of fragments in other languages aligned with the sentence
-    to the response.
-    """
-    for iHit in range(len(hits)):
-        if ('para_alignment' not in hits[iHit]['_source']
-                or len(hits[iHit]['_source']['para_alignment']) <= 0):
-            continue
-        curSentIDs = get_session_data('sentence_data')
-        sids = set()
-        for pa in hits[iHit]['_source']['para_alignment']:
-            sids |= set(pa['sent_ids'])
-        sids = list(sid for sid in sorted(sids))
-        query = {'query': {'ids': {'values': sids}}}
-        paraSentHits = sc.get_sentences(query)
-        for s in paraSentHits['hits']['hits']:
-            numSent = get_session_data('last_sent_num') + 1
-            set_session_data('last_sent_num', numSent)
-            add_sent_data_for_session(s, curSentIDs[iHit])
-            langID = s['_source']['lang']
-            lang = settings['languages'][langID]
-            sentHTML = sentView.process_sentence(s, numSent=numSent, getHeader=False, lang=lang)['languages'][lang]['text']
-            try:
-                htmlResponse['contexts'][iHit]['languages'][lang]['text'] += ' ' + sentHTML
-            except KeyError:
-                htmlResponse['contexts'][iHit]['languages'][lang] = {'text': sentHTML}
 
 
 @app.route('/search_sent/<int:page>')
 @app.route('/search_sent')
 def search_sent(page=0):
-    if request.args and page <= 0:
-        query = {}
-        for field, value in request.args.items():
-            if type(value) != list or len(value) > 1:
-                query[field] = copy.deepcopy(value)
-            else:
-                query[field] = copy.deepcopy(value[0])
-        if 'sent_ids' in query:
-            del query['sent_ids']   # safety
-        page = 1
-        change_display_options(query)
-        set_session_data('last_query', query)
-        wordConstraints = sc.qp.wr.get_constraints(query)
-        set_session_data('word_constraints', wordConstraints)
-    else:
-        query = get_session_data('last_query')
-        wordConstraints = get_session_data('word_constraints')
-    set_session_data('page', page)
-    if (len(wordConstraints) > 0
-            and get_session_data('distance_strict')
-            and 'sent_ids' not in query):
-        esQuery = sc.qp.html2es(query,
-                                searchIndex='sentences',
-                                query_size=1)
-        hits = sc.get_sentences(esQuery)
-        if ('hits' not in hits
-                or 'total' not in hits['hits']
-                or hits['hits']['total'] > settings['max_distance_filter']):
-            query = {}
-        else:
-            esQuery = sc.qp.html2es(query,
-                                    searchIndex='sentences')
-            iterator = sc.get_all_sentences(esQuery)
-            query['sent_ids'] = sc.qp.filter_sentences(iterator, wordConstraints)
-            set_session_data('last_query', query)
-    esQuery = sc.qp.html2es(query,
-                            searchIndex='sentences',
-                            sortOrder=get_session_data('sort'),
-                            randomSeed=get_session_data('seed'),
-                            query_size=get_session_data('page_size'),
-                            page=get_session_data('page'))
-    hits = sc.get_sentences(esQuery)
-    if len(wordConstraints) > 0 and 'hits' in hits and 'hits' in hits['hits']:
-        for hit in hits['hits']['hits']:
-            hit['relations_satisfied'] = sc.qp.wr.check_sentence(hit, wordConstraints)
+    hits = find_sentences_json(page=page)
     add_sent_to_session(hits)
     hitsProcessed = sentView.process_sent_json(hits)
     if len(settings['languages']) > 1 and 'hits' in hits and 'hits' in hits['hits']:
