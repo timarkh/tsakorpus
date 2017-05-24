@@ -41,6 +41,19 @@ $(function() {
 			}
 		});
 	});
+
+	$("#search_doc").click(function() {
+		//$("#query").html( $("#search_main").serialize() );
+		$.ajax({
+			url: "search_doc",
+			data: $("#search_main").serialize(),
+			type: "GET",
+			success: print_html,
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	});
 	
 	$("#search_word_json").click(function() {
 		//$("#query").html( $("#search_main").serialize() );
@@ -56,10 +69,38 @@ $(function() {
 		});
 	});
 	
+	$("#search_doc_json").click(function() {
+		//$("#query").html( $("#search_main").serialize() );
+		$.ajax({
+			url: "search_doc_json",
+			data: $("#search_main").serialize(),
+			type: "GET",
+			dataType : "json",
+			success: print_json,
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	});
+	
 	$("#search_word_query").click(function() {
 		//$("#query").html( $("#search_main").serialize() );
 		$.ajax({
 			url: "search_word_query",
+			data: $("#search_main").serialize(),
+			type: "GET",
+			dataType : "json",
+			success: print_json,
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	});
+	
+	$("#search_doc_query").click(function() {
+		//$("#query").html( $("#search_main").serialize() );
+		$.ajax({
+			url: "search_doc_query",
 			data: $("#search_main").serialize(),
 			type: "GET",
 			dataType : "json",

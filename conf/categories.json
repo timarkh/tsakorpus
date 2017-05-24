@@ -368,5 +368,10 @@
     "q": "clitics",
     "cs": "clitics",
     "ba": "clitics"
+  },
+  "all":
+  {
+    "nom": "case",
+    "gen": "case"
   }
 }

@@ -313,6 +313,27 @@ class SentenceViewer:
                wSource['wf'] + '">&gt;&gt; GO!</td></tr>'
         return word
 
+    def process_doc(self, d):
+        """
+        Process one document taken from response['hits']['hits'].
+        """
+        if '_source' not in d:
+            return ''
+        dSource = d['_source']
+        doc = '<tr>'
+        dateDisplayed = '-'
+        if 'year1' in dSource:
+            dateDisplayed = str(dSource['year1'])
+            if 'year2' in dSource and dSource['year2'] != dSource['year1']:
+                dateDisplayed += '&ndash;' + str(dSource['year2'])
+        for field in self.sc.qp.docMetaFields:
+            if field in dSource:
+                doc += '<td>' + dSource[field] + '</td>'
+            else:
+                doc += '<td></td>'
+        doc += '</tr>\n'
+        return doc
+
     def retrieve_highlighted_words(self, sentence, numSent, queryWordID=''):
         """
         Explore the inner_hits part of the response to find the
@@ -405,4 +426,18 @@ class SentenceViewer:
         result['words'] = []
         for iHit in range(len(response['hits']['hits'])):
             result['words'].append(self.process_word(response['hits']['hits'][iHit]))
+        return result
+
+    def process_docs_json(self, response):
+        result = {'n_words': 0, 'n_sentences': 0, 'n_docs': 0, 'message': 'Nothing found.',
+                  'metafields': self.sc.qp.docMetaFields}
+        if ('hits' not in response
+                or 'total' not in response['hits']
+                or response['hits']['total'] <= 0):
+            return result
+        result['message'] = ''
+        result['n_docs'] = response['hits']['total']
+        result['docs'] = []
+        for iHit in range(len(response['hits']['hits'])):
+            result['docs'].append(self.process_doc(response['hits']['hits'][iHit]))
         return result

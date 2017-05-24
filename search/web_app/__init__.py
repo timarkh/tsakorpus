@@ -225,7 +225,11 @@ def update_expanded_contexts(context, neighboringIDs):
 
 @app.route('/search')
 def search_page():
-    return render_template('index.html', corpus_name=corpus_name, languages=settings['languages'])
+    allLangSearch = settings['all_language_search_enabled']
+    return render_template('index.html',
+                           corpus_name=corpus_name,
+                           languages=settings['languages'],
+                           all_lang_search=allLangSearch)
 
 
 @app.route('/search_sent_query/<int:page>')
@@ -371,6 +375,7 @@ def search_sent(page=0):
         add_parallel(hits['hits']['hits'], hitsProcessed)
     hitsProcessed['page'] = get_session_data('page')
     hitsProcessed['page_size'] = get_session_data('page_size')
+    hitsProcessed['languages'] = settings['languages']
 
     return render_template('result_sentences.html', data=hitsProcessed)
 
@@ -397,6 +402,7 @@ def get_sent_context(n):
     context = {'n': n, 'languages': {lang: {} for lang in curSentData['languages']}}
     neighboringIDs = {lang: {'next': -1, 'prev': -1} for lang in curSentData['languages']}
     for lang in curSentData['languages']:
+        langID = settings['languages'].index(lang)
         for side in ['next', 'prev']:
             curCxLang = context['languages'][lang]
             if side + '_id' in curSentData['languages'][lang]:
@@ -408,6 +414,10 @@ def get_sent_context(n):
                     and len(curCxLang[side]['hits']['hits']) > 0):
                 lastSentNum = get_session_data('last_sent_num') + 1
                 curSent = curCxLang[side]['hits']['hits'][0]
+                if '_source' in curSent and ('lang' not in curSent['_source']
+                                             or curSent['_source']['lang'] != langID):
+                    curCxLang[side] = ''
+                    continue
                 if '_source' in curSent and side + '_id' in curSent['_source']:
                     neighboringIDs[lang][side] = curSent['_source'][side + '_id']
                 expandedContext = sentView.process_sentence(curSent,
@@ -458,6 +468,42 @@ def search_word():
     hits = sc.get_words(query)
     hitsProcessed = sentView.process_word_json(hits)
     return render_template('result_words.html', data=hitsProcessed)
+
+
+@app.route('/search_doc_query')
+@jsonp
+def search_doc_query():
+    query = copy.deepcopy(request.args)
+    change_display_options(query)
+    query = sc.qp.subcorpus_query(query,
+                                  sortOrder=get_session_data('sort'),
+                                  query_size=get_session_data('page_size'))
+    return jsonify(query)
+
+
+@app.route('/search_doc_json')
+@jsonp
+def search_doc_json():
+    query = copy.deepcopy(request.args)
+    change_display_options(query)
+    query = sc.qp.subcorpus_query(query,
+                                  sortOrder=get_session_data('sort'),
+                                  query_size=get_session_data('page_size'))
+    hits = sc.get_docs(query)
+    return jsonify(hits)
+
+
+@app.route('/search_doc')
+@jsonp
+def search_doc():
+    query = copy.deepcopy(request.args)
+    change_display_options(query)
+    query = sc.qp.subcorpus_query(query,
+                                  sortOrder=get_session_data('sort'),
+                                  query_size=get_session_data('page_size'))
+    hits = sc.get_docs(query)
+    hitsProcessed = sentView.process_docs_json(hits)
+    return render_template('result_docs.html', data=hitsProcessed)
 
 
 @app.route('/get_word_fields')

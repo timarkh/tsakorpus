@@ -1,5 +1,5 @@
 {
-  "corpus_name": "rus_para",
+  "corpus_name": "udmurt",
   "input_format": "json-gzip",
   "max_context_expand": 3,
   "max_distance_filter": 20000,
@@ -7,9 +7,11 @@
     "genre",
     "issue",
     "year1",
-    "year2"
+    "year2",
+    "orth"
   ],
-  "languages": ["buryat", "russian"],
+  "languages": ["udmurt"],
+  "all_language_search_enabled": true,
   "lang_props":
   {
     "adyge":

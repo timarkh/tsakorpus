@@ -28,6 +28,11 @@ class SearchClient:
                               body=esQuery)
         return hits
 
+    def get_docs(self, esQuery):
+        hits = self.es.search(index=self.name + '.docs',
+                              body=esQuery)
+        return hits
+
     def get_sentences(self, esQuery):
         hits = self.es.search(index=self.name + '.sentences', doc_type='sentence',
                               body=esQuery)
