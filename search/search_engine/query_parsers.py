@@ -187,6 +187,11 @@ class InterfaceQueryParser:
         for field in self.wordFields:
             wordAnaFields.add('ana.' + field)
 
+        if 'doc_ids' in queryDict:
+            docIDs = queryDict['doc_ids']
+        else:
+            docIDs = None
+
         # for the time being, use only the information from the first word box
         if 'words' not in queryDict or len(queryDict['words']) <= 0:
             return {'query': {'match_none': {}}}
@@ -224,9 +229,14 @@ class InterfaceQueryParser:
             query = {'bool': {mustWord: query}}
             if lang >= 0:
                 if 'must' not in query['bool']:
-                    query['bool']['must'] = {'term': {'lang': lang}}
+                    query['bool']['must'] = [{'term': {'lang': lang}}]
                 else:
                     query['bool']['must'].append({'term': {'lang': lang}})
+            if docIDs is not None:
+                if 'must' not in query['bool']:
+                    query['bool']['must'] = [{'terms': {'dids': docIDs}}]
+                else:
+                    query['bool']['must'].append({'terms': {'dids': docIDs}})
         if sortOrder == 'random':
             query = self.make_random(query)
         esQuery = {'query': query, 'size': query_size, 'from': query_from,
@@ -322,6 +332,8 @@ class InterfaceQueryParser:
             query += list(queryDictTop.values())
             if 'sent_ids' in queryDict:
                 query.append({'ids': {'values': queryDict['sent_ids']}})
+            elif 'doc_ids' in queryDict:
+                query.append({'terms': {'doc_id': queryDict['doc_ids']}})
             query = {'bool': {'must': query}}
         if sortOrder == 'random':
             query = self.make_random(query, randomSeed)
@@ -356,22 +368,19 @@ class InterfaceQueryParser:
             if field in htmlQuery and len(htmlQuery[field]) > 0:
                 queryParts.append(self.make_bool_query(htmlQuery[field], field, 'all'))
         if len(queryParts) <= 0:
-            return {'query': {'match_none': ''}}
+            return None
         query = {'bool': {'must': queryParts}}
         if sortOrder == 'random':
             query = self.make_random(query, randomSeed)
+
+        addNWords = {'aggs': {'agg_nwords': {'stat': {'sum': 'n_words'}}}}
+        # TODO: add ndocs property in the indexator and then add this aggregation
+        
         esQuery = {'query': query, 'from': query_from, 'size': query_size,
                    '_source': {'excludes': ['filename']}}
         if sortOrder in self.docMetaFields:
             esQuery['sort'] = {sortOrder: {'order': 'asc'}}
         return esQuery
-
-    def subcorpus_ids(self, htmlQuery):
-        """
-        Return IDs of the documents specified by the subcorpus selection
-        fields in htmlQuery.
-        """
-        return None
 
     def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
                 randomSeed=None, searchIndex='sentences'):
@@ -392,10 +401,6 @@ class InterfaceQueryParser:
             lang = htmlQuery['lang']
             langID = self.settings['languages'].index(lang)
 
-        docIDs = None
-        if any(f in htmlQuery for f in self.docMetaFields):
-            docIDs = self.subcorpus_ids(htmlQuery)
-
         prelimQuery = {'words': []}
         if searchIndex == 'sentences':
             pathPfx = 'words.'
@@ -403,6 +408,10 @@ class InterfaceQueryParser:
                 prelimQuery['sent_ids'] = htmlQuery['sent_ids']
         else:
             pathPfx = ''
+
+        if 'doc_ids' in htmlQuery:
+            prelimQuery['doc_ids'] = htmlQuery['doc_ids']
+
         if 'n_words' not in htmlQuery:
             return {'query': {'match_none': ''}}
         for iWord in range(int(htmlQuery['n_words'])):
@@ -428,7 +437,6 @@ class InterfaceQueryParser:
                 prelimQuery['text'] = {'match_phrase': {'text': htmlQuery['txt']}}
             else:
                 prelimQuery['text'] = {'match': {'text': htmlQuery['txt']}}
-        prelimQuery['doc_ids'] = docIDs
         if searchIndex == 'sentences':
             queryDict = self.full_sentence_query(prelimQuery, query_from,
                                                  query_size, sortOrder,

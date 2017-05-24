@@ -200,6 +200,7 @@ class Indexator:
                 langID = s['lang']
             else:
                 langID = 0
+                s['lang'] = langID
             if 'words' in s:
                 self.process_sentence_words(s['words'], langID)
             if iSent > 0:

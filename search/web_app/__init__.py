@@ -303,19 +303,41 @@ def add_parallel(hits, htmlResponse):
                 htmlResponse['contexts'][iHit]['languages'][lang] = {'text': sentHTML}
 
 
+def subcorpus_ids(htmlQuery):
+    """
+    Return IDs of the documents specified by the subcorpus selection
+    fields in htmlQuery.
+    """
+    subcorpusQuery = sc.qp.subcorpus_query(htmlQuery, sortOrder='')
+    if subcorpusQuery is None:
+        return None
+    iterator = sc.get_all_docs(subcorpusQuery)
+    docIDs = []
+    for doc in iterator:
+        docIDs.append(doc['_id'])
+    return docIDs
+
+
+def copy_request_args():
+    query = {}
+    if request.args is None or len(request.args) <= 0:
+        return query
+    for field, value in request.args.items():
+        if type(value) != list or len(value) > 1:
+            query[field] = copy.deepcopy(value)
+        else:
+            query[field] = copy.deepcopy(value[0])
+    if 'sent_ids' in query:
+        del query['sent_ids']  # safety
+    return query
+
+
 def find_sentences_json(page=0):
     """
     Find sentences and change current options using the query in request.args.
     """
     if request.args and page <= 0:
-        query = {}
-        for field, value in request.args.items():
-            if type(value) != list or len(value) > 1:
-                query[field] = copy.deepcopy(value)
-            else:
-                query[field] = copy.deepcopy(value[0])
-        if 'sent_ids' in query:
-            del query['sent_ids']   # safety
+        query = copy_request_args()
         page = 1
         change_display_options(query)
         set_session_data('last_query', query)
@@ -325,6 +347,12 @@ def find_sentences_json(page=0):
         query = get_session_data('last_query')
         wordConstraints = get_session_data('word_constraints')
     set_session_data('page', page)
+
+    if 'doc_ids' not in query and 'sent_ids' not in query:
+        docIDs = subcorpus_ids(query)
+        if docIDs is not None:
+            query['doc_ids'] = docIDs
+
     if (len(wordConstraints) > 0
             and get_session_data('distance_strict')
             and 'sent_ids' not in query):
@@ -435,8 +463,14 @@ def get_sent_context(n):
 @app.route('/search_word_query')
 @jsonp
 def search_word_query():
-    query = copy.deepcopy(request.args)
+    query = copy_request_args()
     change_display_options(query)
+
+    if 'doc_ids' not in query:
+        docIDs = subcorpus_ids(query)
+        if docIDs is not None:
+            query['doc_ids'] = docIDs
+
     query = sc.qp.html2es(query,
                           searchIndex='words',
                           sortOrder=get_session_data('sort'),
@@ -447,8 +481,14 @@ def search_word_query():
 @app.route('/search_word_json')
 @jsonp
 def search_word_json():
-    query = copy.deepcopy(request.args)
+    query = copy_request_args()
     change_display_options(query)
+
+    if 'doc_ids' not in query:
+        docIDs = subcorpus_ids(query)
+        if docIDs is not None:
+            query['doc_ids'] = docIDs
+
     query = sc.qp.html2es(query,
                           searchIndex='words',
                           sortOrder=get_session_data('sort'),
@@ -459,21 +499,28 @@ def search_word_json():
 
 @app.route('/search_word')
 def search_word():
-    query = copy.deepcopy(request.args)
+    query = copy_request_args()
     change_display_options(query)
+    if 'doc_ids' not in query:
+        docIDs = subcorpus_ids(query)
+        if docIDs is not None:
+            query['doc_ids'] = docIDs
+    else:
+        docIDs = query['doc_ids']
+
     query = sc.qp.html2es(query,
                           searchIndex='words',
                           sortOrder=get_session_data('sort'),
                           query_size=get_session_data('page_size'))
     hits = sc.get_words(query)
-    hitsProcessed = sentView.process_word_json(hits)
+    hitsProcessed = sentView.process_word_json(hits, docIDs)
     return render_template('result_words.html', data=hitsProcessed)
 
 
 @app.route('/search_doc_query')
 @jsonp
 def search_doc_query():
-    query = copy.deepcopy(request.args)
+    query = copy_request_args()
     change_display_options(query)
     query = sc.qp.subcorpus_query(query,
                                   sortOrder=get_session_data('sort'),
@@ -484,7 +531,7 @@ def search_doc_query():
 @app.route('/search_doc_json')
 @jsonp
 def search_doc_json():
-    query = copy.deepcopy(request.args)
+    query = copy_request_args()
     change_display_options(query)
     query = sc.qp.subcorpus_query(query,
                                   sortOrder=get_session_data('sort'),
@@ -496,7 +543,7 @@ def search_doc_json():
 @app.route('/search_doc')
 @jsonp
 def search_doc():
-    query = copy.deepcopy(request.args)
+    query = copy_request_args()
     change_display_options(query)
     query = sc.qp.subcorpus_query(query,
                                   sortOrder=get_session_data('sort'),

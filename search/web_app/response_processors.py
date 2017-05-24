@@ -295,20 +295,55 @@ class SentenceViewer:
         return {'header': header, 'languages': {lang: {'text': ''.join(chars)}},
                 'relations_satisfied': relationsSatisfied}
 
-    def process_word(self, w):
+    def count_word_subcorpus_stats(self, w, docIDs):
+        """
+        Return statistics about the given word in the subcorpus
+        specified by the list of document IDs.
+        """
+        query = {'bool':
+                 {'must':
+                  [{'term': {'w_id': w['_id']}},
+                   {'terms': {'d_id': docIDs}}]
+                  }
+                 }
+        aggFreq = {'agg_freq': {'stats': {'field': 'freq'}}}
+        esQuery = {'query': query, 'aggs': aggFreq, 'size': 1}
+        response = self.sc.get_word_freqs(esQuery)
+        nSents, rank = '', ''   # for now
+        if 'hits' not in response or 'total' not in response['hits']:
+            return '?', '?', '?', '?'
+        nDocs = str(response['hits']['total'])
+        if 'aggregations' in response and 'agg_freq' in response['aggregations']:
+            freq = str(int(response['aggregations']['agg_freq']['sum']))
+        else:
+            freq = '0'
+        return freq, rank, nSents, nDocs
+
+    def process_word(self, w, docIDs):
         """
         Process one word taken from response['hits']['hits'].
         """
         if '_source' not in w:
             return ''
         wSource = w['_source']
+        freqAll = str(wSource['freq'])
+        rankAll = str(wSource['rank'])
+        nSentsAll = str(wSource['n_sents'])
+        nDocsAll = str(wSource['n_docs'])
+        if docIDs is None or len(docIDs) <= 0:
+            freq = freqAll
+            rank = rankAll
+            nSents = nSentsAll
+            nDocs = nDocsAll
+        else:
+            freq, rank, nSents, nDocs = self.count_word_subcorpus_stats(w, docIDs)
         word = '<tr><td><span class="word" data-ana="' +\
                self.build_ana_popup(wSource).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;') +\
                '">' + wSource['wf'] +\
-               '</span></td><td>' + str(wSource['freq']) +\
-               '</span></td><td>' + str(wSource['rank']) +\
-               '</td><td>' + str(wSource['n_sents']) +\
-               '</td><td>' + str(wSource['n_docs']) +\
+               '</span></td><td>' + freq +\
+               '</span></td><td>' + rank +\
+               '</td><td>' + nSents +\
+               '</td><td>' + nDocs +\
                '</td><td><span class="search_w" data-wf="' +\
                wSource['wf'] + '">&gt;&gt; GO!</td></tr>'
         return word
@@ -405,7 +440,10 @@ class SentenceViewer:
         if 'aggregations' in response and 'agg_ndocs' in response['aggregations']:
             result['n_docs'] = response['aggregations']['agg_ndocs']['value']
         for iHit in range(len(response['hits']['hits'])):
-            langID = response['hits']['hits'][iHit]['_source']['lang']
+            if 'lang' in response['hits']['hits'][iHit]['_source']:
+                langID = response['hits']['hits'][iHit]['_source']['lang']
+            else:
+                langID = 0
             lang = self.settings['languages'][langID]
             curContext = self.process_sentence(response['hits']['hits'][iHit],
                                                numSent=iHit,
@@ -414,7 +452,7 @@ class SentenceViewer:
             result['contexts'].append(curContext)
         return result
 
-    def process_word_json(self, response):
+    def process_word_json(self, response, docIDs):
         result = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'message': 'Nothing found.'}
         if ('hits' not in response
                 or 'total' not in response['hits']
@@ -425,7 +463,7 @@ class SentenceViewer:
         result['n_docs'] = response['aggregations']['agg_ndocs']['value']
         result['words'] = []
         for iHit in range(len(response['hits']['hits'])):
-            result['words'].append(self.process_word(response['hits']['hits'][iHit]))
+            result['words'].append(self.process_word(response['hits']['hits'][iHit], docIDs))
         return result
 
     def process_docs_json(self, response):

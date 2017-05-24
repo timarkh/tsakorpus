@@ -28,10 +28,23 @@ class SearchClient:
                               body=esQuery)
         return hits
 
+    def get_word_freqs(self, esQuery):
+        hits = self.es.search(index=self.name + '.word_freqs',
+                              body=esQuery)
+        return hits
+
     def get_docs(self, esQuery):
         hits = self.es.search(index=self.name + '.docs',
                               body=esQuery)
         return hits
+
+    def get_all_docs(self, esQuery):
+        """
+        Iterate over all documents found with the query.
+        """
+        iterator = helpers.scan(self.es, index=self.name + '.docs',
+                                query=esQuery)
+        return iterator
 
     def get_sentences(self, esQuery):
         hits = self.es.search(index=self.name + '.sentences', doc_type='sentence',
