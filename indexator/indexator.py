@@ -97,7 +97,7 @@ class Indexator:
                             cleanAna[anaField] = ana[anaField]
                     wClean['ana'].append(cleanAna)
             wCleanTxt = json.dumps(wClean, ensure_ascii=False, sort_keys=True)
-            if wCleanTxt in self.tmpWordIDs:
+            if wCleanTxt in self.tmpWordIDs[langID]:
                 wID = self.tmpWordIDs[langID][wCleanTxt]
             else:
                 wID = len(self.tmpWordIDs[langID])
