@@ -44,8 +44,9 @@ class Indexator:
         self.pd = PrepareData()
         self.es = Elasticsearch()
         self.es_ic = IndicesClient(self.es)
-        self.wordFreqs = [{} for i in range(len(self.languages))]   # word as JSON -> its frequency
-        self.wordDocFreqs = [{} for i in range(len(self.languages))]  # (word as JSON, dID) -> word frequency in the document
+        self.tmpWordIDs = [{} for i in range(len(self.languages))]    # word as JSON -> its integer ID
+        self.wordFreqs = [{} for i in range(len(self.languages))]     # word's ID -> its frequency
+        self.wordDocFreqs = [{} for i in range(len(self.languages))]  # (word's ID, dID) -> word frequency in the document
         self.wordSIDs = {}    # word as JSON -> set of sentence IDs
         self.wordDIDs = {}    # word as JSON -> set of document IDs
         self.sID = 0          # current sentence ID for each language
@@ -96,20 +97,26 @@ class Indexator:
                             cleanAna[anaField] = ana[anaField]
                     wClean['ana'].append(cleanAna)
             wCleanTxt = json.dumps(wClean, ensure_ascii=False, sort_keys=True)
+            if wCleanTxt in self.tmpWordIDs:
+                wID = self.tmpWordIDs[langID][wCleanTxt]
+            else:
+                wID = len(self.tmpWordIDs[langID])
+                self.tmpWordIDs[langID][wCleanTxt] = wID
+
             try:
-                self.wordFreqs[langID][wCleanTxt] += 1
-                self.wordSIDs[wCleanTxt].add(self.sID)
+                self.wordFreqs[langID][wID] += 1
+                self.wordSIDs[wID].add(self.sID)
             except KeyError:
-                self.wordFreqs[langID][wCleanTxt] = 1
-                self.wordSIDs[wCleanTxt] = {self.sID}
+                self.wordFreqs[langID][wID] = 1
+                self.wordSIDs[wID] = {self.sID}
             try:
-                self.wordDIDs[wCleanTxt].add(self.dID)
+                self.wordDIDs[wID].add(self.dID)
             except KeyError:
-                self.wordDIDs[wCleanTxt] = {self.dID}
+                self.wordDIDs[wID] = {self.dID}
             try:
-                self.wordDocFreqs[langID][(wCleanTxt, self.dID)] += 1
+                self.wordDocFreqs[langID][(wID, self.dID)] += 1
             except KeyError:
-                self.wordDocFreqs[langID][(wCleanTxt, self.dID)] = 1
+                self.wordDocFreqs[langID][(wID, self.dID)] = 1
 
     def iterate_words(self):
         """
@@ -127,13 +134,14 @@ class Indexator:
                 if qIndex >= len(freqsSorted[langID]):
                     qIndex = len(freqsSorted[langID]) - 1
                 quantiles[q] = freqsSorted[langID][qIndex]
-            for w in self.wordFreqs[langID]:
+            # for wID in self.wordFreqs[langID]:
+            for w, wID in self.tmpWordIDs[langID].items():
                 if iWord % 500 == 0:
                     print('indexing word', iWord)
                 wJson = json.loads(w)
-                wJson['freq'] = self.wordFreqs[langID][w]
-                wJson['sids'] = [sid for sid in sorted(self.wordSIDs[w])]
-                wJson['dids'] = [did for did in sorted(self.wordDIDs[w])]
+                wJson['freq'] = self.wordFreqs[langID][wID]
+                wJson['sids'] = [sid for sid in sorted(self.wordSIDs[wID])]
+                wJson['dids'] = [did for did in sorted(self.wordDIDs[wID])]
                 wJson['n_sents'] = len(wJson['sids'])
                 wJson['n_docs'] = len(wJson['dids'])
                 wJson['rank'] = ''
@@ -151,7 +159,7 @@ class Indexator:
                 for docID in wJson['dids']:
                     wfreqJson = {'w_id': iWord,
                                  'd_id': docID,
-                                 'freq': self.wordDocFreqs[langID][(w, docID)]}
+                                 'freq': self.wordDocFreqs[langID][(wID, docID)]}
                     curAction = {'_index': self.name + '.word_freqs',
                                  '_type': 'word_freq',
                                  '_source': wfreqJson}
