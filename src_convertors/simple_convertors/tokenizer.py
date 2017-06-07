@@ -9,6 +9,7 @@ class Tokenizer:
     """
 
     rxPunc = re.compile('[^\\w ]')
+    rxOnlyPunc = re.compile('^[^\\w ]*$')
 
     def __init__(self, settings):
         self.settings = copy.deepcopy(settings)

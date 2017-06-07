@@ -1,16 +1,14 @@
 {
-  "corpus_name": "udmurt",
-  "input_format": "json-gzip",
+  "corpus_name": "nganasan",
+  "input_format": "json",
   "max_context_expand": 3,
   "max_distance_filter": 200000,
   "viewable_meta": [
     "genre",
-    "issue",
     "year1",
-    "year2",
-    "orth"
+    "year2"
   ],
-  "languages": ["udmurt"],
+  "languages": ["nganasan"],
   "all_language_search_enabled": true,
   "lang_props":
   {

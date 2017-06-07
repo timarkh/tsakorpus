@@ -54,6 +54,8 @@ class Txt2JSON:
         from the tab-delimited meta file.
         """
         self.meta = {}
+        if len(self.corpusSettings['meta_filename']) <= 0:
+            return
         fMeta = open(os.path.join(self.corpusSettings['corpus_dir'],
                                   self.corpusSettings['meta_filename']),
                      'r', encoding='utf-8-sig')

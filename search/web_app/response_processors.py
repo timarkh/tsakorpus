@@ -165,6 +165,8 @@ class SentenceViewer:
         for metaField in self.settings['viewable_meta']:
             try:
                 metaValue = meta[metaField]
+                if type(metaValue) != str:
+                    metaValue = str(metaValue)
                 dataMeta += metaField + ': ' + metaValue + '\\n'
             except KeyError:
                 pass

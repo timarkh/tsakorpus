@@ -17,10 +17,12 @@ class DumbMorphParser:
     rxSplitGramTags = re.compile('[, /]')
     rxHyphenParts = re.compile('[^\\-]+|-+')
     rxGlossParts = re.compile('[^ \\-=<>]+')
+    rxGlossIndexPart = re.compile('^(.*)\\{(.*?)\\}')
 
     def __init__(self, settings, categories):
         self.settings = copy.deepcopy(settings)
         self.categories = copy.deepcopy(categories)
+        self.rxAllGlosses = self.prepare_gloss_regex()
         self.analyses = {}
         if ('parsed_wordlist_filename' in self.settings
                 and len(self.settings['parsed_wordlist_filename']) > 0):
@@ -57,6 +59,64 @@ class DumbMorphParser:
                 if tag not in grJSON[cat]:
                     grJSON[cat].append(tag)
         return grJSON
+
+    def prepare_gloss_regex(self):
+        """
+        Return a regex that finds all glosses.
+        """
+        regexes = {}
+        for lang in self.settings['languages']:
+            if 'glosses' in self.settings and lang in self.settings['glosses']:
+                sRegex = '|'.join(re.escape(g) for g in sorted(self.settings['glosses'][lang], key=len))
+                sRegex = '\\b(' + sRegex + ')\\b'
+                regexes[lang] = re.compile(sRegex)
+            else:
+                sRegex = '|'.join(re.escape(g) for g in sorted(self.categories[lang], key=len))
+                sRegex = '\\b(' + sRegex + ')\\b'
+                regexes[lang] = re.compile(sRegex, flags=re.I)
+        return regexes
+
+    def gloss2gr(self, ana, lang):
+        """
+        For an analysis that has glosses, but no tags for inflectional
+        categories, add these categories.
+        """
+        # TODO: Add rules for translating the glosses into tags.
+        if 'gloss_index' not in ana:
+            return
+        glosses = self.rxAllGlosses[lang].findall(ana['gloss_index'])
+        for gloss in glosses:
+            if gloss.lower() in self.categories[lang]:
+                field = 'gr.' + self.categories[lang][gloss.lower()]
+                if field not in ana:
+                    ana[field] = gloss.lower()
+                else:
+                    if type(ana[field]) == str:
+                        ana[field] = [ana[field]]
+                    if gloss.lower() not in ana[field]:
+                        ana[field].append(gloss.lower())
+
+    def find_stems(self, glossIndex, lang):
+        """
+        Return all glosses that are not in the categories list, and
+        therefore are the glosses for the stem.
+        """
+        stems = []
+        newIndexGloss = ''
+        for glossPart in glossIndex.split('-'):
+            if len(glossPart) <= 0:
+                continue
+            m = self.rxGlossIndexPart.search(glossPart)
+            if m is None:
+                newIndexGloss += glossPart + '-'
+                continue
+            gloss, part = m.group(1), m.group(2)
+            if self.rxAllGlosses[lang].match(gloss) is None:
+                stems.append((gloss, part))
+                newIndexGloss += 'STEM{' + part + '}-'
+            else:
+                newIndexGloss += glossPart + '-'
+        return stems, newIndexGloss
 
     def process_gloss_in_ana(self, ana):
         """
