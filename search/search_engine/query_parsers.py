@@ -374,8 +374,8 @@ class InterfaceQueryParser:
             query = self.make_random(query, randomSeed)
 
         addNWords = {'aggs': {'agg_nwords': {'stat': {'sum': 'n_words'}}}}
-        # TODO: add ndocs property in the indexator and then add this aggregation
-        
+        # TODO: add n_words property in the indexator and then add this aggregation
+
         esQuery = {'query': query, 'from': query_from, 'size': query_size,
                    '_source': {'excludes': ['filename']}}
         if sortOrder in self.docMetaFields:

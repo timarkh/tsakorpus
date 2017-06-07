@@ -417,7 +417,6 @@ def get_sent_context(n):
     times this particular context has been expanded and
     whether expanding it further is allowed.
     """
-
     if n < 0:
         return jsonify({})
     sentData = get_session_data('sentence_data')

@@ -51,6 +51,7 @@ class Indexator:
         self.wordDIDs = {}    # word as JSON -> set of document IDs
         self.sID = 0          # current sentence ID for each language
         self.dID = 0          # current document ID
+        self.numWords = 0     # number of words in current document
 
     def delete_indices(self):
         if self.es_ic.exists(index=self.name + '.docs'):
@@ -82,6 +83,7 @@ class Indexator:
         for w in words:
             if w['wtype'] != 'word':
                 continue
+            self.numWords += 1
             wClean = {'lang': langID}
             for field in w:
                 if field in self.goodWordFields:
@@ -241,14 +243,16 @@ class Indexator:
         """
         Store the metadata of the source file.
         """
-        self.dID += 1
         if self.dID % 100 == 0:
             print('indexing document', self.dID)
         meta = self.iterSent.get_metadata(fname)
+        meta['n_words'] = self.numWords
+        self.numWords = 0
         self.es.index(index=self.name + '.docs',
                       doc_type='doc',
                       id=self.dID,
                       body=meta)
+        self.dID += 1
 
     def index_dir(self):
         """
@@ -262,8 +266,8 @@ class Indexator:
                              and fname.lower().endswith('.json.gz')))):
                     continue
                 fnameFull = os.path.join(root, fname)
-                self.index_doc(fnameFull)
                 bulk(self.es, self.iterate_sentences(fnameFull))
+                self.index_doc(fnameFull)
         self.index_words()
 
     def load_corpus(self):
