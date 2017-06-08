@@ -137,6 +137,35 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
             curToken['ana'] = [ana]
             yield curToken
 
+    def get_parallel_sentences(self, srcTree, sentBoundaries):
+        """
+        Iterate over sentences in description tiers aligned with the
+        sentence in the main tx tier. The sentence to align with is
+        defined by the tuple sentBoundaries that contains the start
+        and the end time label for the sentence.
+        """
+        self.pID += 1
+        for iTier in range(len(self.corpusSettings['translation_tiers'])):
+            tierName = self.corpusSettings['translation_tiers'][iTier]
+            events = srcTree.xpath('/basic-transcription/basic-body/'
+                                   'tier[@id=\'' + tierName + '\']/'
+                                   'event[@start=\'' + sentBoundaries[0] +
+                                   '\' and @end=\'' + sentBoundaries[1] + '\']')
+            for event in events:
+                text = ''
+                for child in event:
+                    if child.tail is not None:
+                        text += child.tail
+                if len(text) <= 0:
+                    text = event.text
+                if text is None or len(text) <= 0:
+                    continue
+                text = self.tp.cleaner.clean_text(text)
+                words = self.tp.tokenizer.tokenize(text)
+                paraAlignment = {'off_start': 0, 'off_end': len(text), 'para_id': self.pID}
+                yield {'words': words, 'text': text, 'para_alignment': [paraAlignment],
+                       'lang': len(self.corpusSettings['languages']) + iTier}
+
     def get_sentences(self, srcTree):
         """
         Iterate over sentences in the XML tree.
@@ -152,8 +181,12 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         for word in self.get_words(srcTree):
             curSentIndex = self.find_sentence_index(sentBoundaries, word['tli_start'])
             if curSentIndex != prevSentIndex and len(curSent['text']) > 0:
+                paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
+                curSent['para_alignment'] = [paraAlignment]
                 yield curSent
                 curSent = {'text': '', 'words': [], 'lang': 0}
+                for paraSent in self.get_parallel_sentences(srcTree, sentBoundaries[curSentIndex]):
+                    yield paraSent
                 prevSentIndex = curSentIndex
             if word['wtype'] == 'punct':
                 word['off_start'] = len(curSent['text'])
@@ -184,6 +217,8 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                 curSent['words'].append(punc)
             curSent['text'] += spacesR
         if len(curSent['text']) > 0:
+            paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
+            curSent['para_alignment'] = [paraAlignment]
             yield curSent
 
     def convert_file(self, fnameSrc, fnameTarget):

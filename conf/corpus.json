@@ -8,7 +8,7 @@
     "year1",
     "year2"
   ],
-  "languages": ["nganasan"],
+  "languages": ["nganasan", "nganasan_cyrillic", "russian", "english"],
   "all_language_search_enabled": true,
   "lang_props":
   {

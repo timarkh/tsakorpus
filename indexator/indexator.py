@@ -47,8 +47,8 @@ class Indexator:
         self.tmpWordIDs = [{} for i in range(len(self.languages))]    # word as JSON -> its integer ID
         self.wordFreqs = [{} for i in range(len(self.languages))]     # word's ID -> its frequency
         self.wordDocFreqs = [{} for i in range(len(self.languages))]  # (word's ID, dID) -> word frequency in the document
-        self.wordSIDs = {}    # word as JSON -> set of sentence IDs
-        self.wordDIDs = {}    # word as JSON -> set of document IDs
+        self.wordSIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of sentence IDs
+        self.wordDIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of document IDs
         self.sID = 0          # current sentence ID for each language
         self.dID = 0          # current document ID
         self.numWords = 0     # number of words in current document
@@ -107,14 +107,14 @@ class Indexator:
 
             try:
                 self.wordFreqs[langID][wID] += 1
-                self.wordSIDs[wID].add(self.sID)
+                self.wordSIDs[langID][wID].add(self.sID)
             except KeyError:
                 self.wordFreqs[langID][wID] = 1
-                self.wordSIDs[wID] = {self.sID}
+                self.wordSIDs[langID][wID] = {self.sID}
             try:
-                self.wordDIDs[wID].add(self.dID)
+                self.wordDIDs[langID][wID].add(self.dID)
             except KeyError:
-                self.wordDIDs[wID] = {self.dID}
+                self.wordDIDs[langID][wID] = {self.dID}
             try:
                 self.wordDocFreqs[langID][(wID, self.dID)] += 1
             except KeyError:
@@ -142,8 +142,8 @@ class Indexator:
                     print('indexing word', iWord)
                 wJson = json.loads(w)
                 wJson['freq'] = self.wordFreqs[langID][wID]
-                wJson['sids'] = [sid for sid in sorted(self.wordSIDs[wID])]
-                wJson['dids'] = [did for did in sorted(self.wordDIDs[wID])]
+                wJson['sids'] = [sid for sid in sorted(self.wordSIDs[langID][wID])]
+                wJson['dids'] = [did for did in sorted(self.wordDIDs[langID][wID])]
                 wJson['n_sents'] = len(wJson['sids'])
                 wJson['n_docs'] = len(wJson['dids'])
                 wJson['rank'] = ''
