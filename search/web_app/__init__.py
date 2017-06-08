@@ -1,4 +1,4 @@
-from flask import Flask, request, after_this_request, render_template, session, jsonify, current_app
+from flask import Flask, request, after_this_request, render_template, session, jsonify, current_app, send_from_directory
 import json
 import gzip
 import functools
@@ -559,4 +559,8 @@ def get_word_fields():
                        for field in wordFields)
     return result
 
+
+@app.route('/media/<path:path>')
+def send_media(path):
+    return send_from_directory(os.path.join('../media', corpus_name), path)
 

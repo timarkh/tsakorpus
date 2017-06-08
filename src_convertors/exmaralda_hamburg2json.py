@@ -137,7 +137,55 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
             curToken['ana'] = [ana]
             yield curToken
 
-    def get_parallel_sentences(self, srcTree, sentBoundaries):
+    def add_src_alignment(self, sent, sentBoundaries, srcFile):
+        """
+        Add the alignment of the sentence with the sound/video. If
+        word-level time data is available, align words, otherwise
+        align the whole sentence.
+        """
+        wordAlignments = []
+        for word in sent['words']:
+            if 'tli_start' not in word or 'tli_end' not in word:
+                continue
+            if len(self.tlis[word['tli_start']]['time']) > 0:
+                for wa in wordAlignments:
+                    if len(wa['off_end_src']) <= 0:
+                        wa['off_end_src'] = self.tlis[word['tli_start']]['time']
+                        wa['src_id'] += word['tli_start']
+                wordAlignments.append({'off_start_src': self.tlis[word['tli_start']]['time'],
+                                       'off_end_src': '',
+                                       'off_start_sent': word['off_start'],
+                                       'off_end_sent': word['off_end'],
+                                       'mtype': 'audio',
+                                       'src': srcFile,
+                                       'src_id': word['tli_start'] + '_'})
+            if len(self.tlis[word['tli_end']]['time']) > 0:
+                for wa in wordAlignments:
+                    if len(wa['off_end_src']) <= 0:
+                        wa['off_end_src'] = self.tlis[word['tli_end']]['time']
+                        wa['off_end_sent'] = word['off_end']
+                        wa['src_id'] += word['tli_end']
+        for wa in wordAlignments:
+            if len(wa['off_end_src']) <= 0:
+                if len(self.tlis[sentBoundaries[1]]['time']) > 0:
+                    wa['off_end_src'] = self.tlis[sentBoundaries[1]]['time']
+                    wa['src_id'] += sentBoundaries[1]
+                else:
+                    wa['off_end_src'] = wa['off_start_src']
+                    wa['src_id'] += wa['src_id'][:-1]
+                    wa['off_end_sent'] = len(sent['text'])
+        if len(wordAlignments) <= 0 and len(self.tlis[sentBoundaries[0]]['time']) > 0:
+            wordAlignments.append({'off_start_src': self.tlis[sentBoundaries[0]]['time'],
+                                   'off_end_src': self.tlis[sentBoundaries[1]]['time'],
+                                   'off_start_sent': 0,
+                                   'off_end_sent': len(sent['text']),
+                                   'mtype': 'audio',
+                                   'src_id': sentBoundaries[0] + '_' + sentBoundaries[1],
+                                   'src': srcFile})
+        if len(wordAlignments) > 0:
+            sent['src_alignment'] = wordAlignments
+
+    def get_parallel_sentences(self, srcTree, sentBoundaries, srcFile):
         """
         Iterate over sentences in description tiers aligned with the
         sentence in the main tx tier. The sentence to align with is
@@ -163,10 +211,12 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                 text = self.tp.cleaner.clean_text(text)
                 words = self.tp.tokenizer.tokenize(text)
                 paraAlignment = {'off_start': 0, 'off_end': len(text), 'para_id': self.pID}
-                yield {'words': words, 'text': text, 'para_alignment': [paraAlignment],
-                       'lang': len(self.corpusSettings['languages']) + iTier}
+                paraSent = {'words': words, 'text': text, 'para_alignment': [paraAlignment],
+                            'lang': len(self.corpusSettings['languages']) + iTier}
+                self.add_src_alignment(paraSent, sentBoundaries, srcFile)
+                yield paraSent
 
-    def get_sentences(self, srcTree):
+    def get_sentences(self, srcTree, srcFile):
         """
         Iterate over sentences in the XML tree.
         """
@@ -183,9 +233,11 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
             if curSentIndex != prevSentIndex and len(curSent['text']) > 0:
                 paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
                 curSent['para_alignment'] = [paraAlignment]
+                self.add_src_alignment(curSent, sentBoundaries[curSentIndex], srcFile)
                 yield curSent
                 curSent = {'text': '', 'words': [], 'lang': 0}
-                for paraSent in self.get_parallel_sentences(srcTree, sentBoundaries[curSentIndex]):
+                for paraSent in self.get_parallel_sentences(srcTree, sentBoundaries[curSentIndex],
+                                                            srcFile):
                     yield paraSent
                 prevSentIndex = curSentIndex
             if word['wtype'] == 'punct':
@@ -219,6 +271,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         if len(curSent['text']) > 0:
             paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
             curSent['para_alignment'] = [paraAlignment]
+            self.add_src_alignment(curSent, sentBoundaries[curSentIndex], srcFile)
             yield curSent
 
     def convert_file(self, fnameSrc, fnameTarget):
@@ -228,7 +281,12 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         nTokens, nWords, nAnalyze = 0, 0, 0
         srcTree = etree.parse(fnameSrc)
         self.tlis = self.get_tlis(srcTree)
-        textJSON['sentences'] = [s for s in self.get_sentences(srcTree)]
+        srcFileNode = srcTree.xpath('/basic-transcription/head/meta-information/referenced-file')
+        if len(srcFileNode) > 0 and 'url' in srcFileNode[0].attrib:
+            srcFile = self.rxStripDir.sub('', srcFileNode[0].attrib['url'])
+        else:
+            srcFile = ''
+        textJSON['sentences'] = [s for s in self.get_sentences(srcTree, srcFile)]
         textJSON['sentences'].sort(key=lambda s: s['lang'])
         for i in range(len(textJSON['sentences']) - 1):
             if textJSON['sentences'][i]['lang'] != textJSON['sentences'][i + 1]['lang']:

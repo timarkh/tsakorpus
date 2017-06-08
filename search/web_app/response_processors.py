@@ -89,6 +89,8 @@ class SentenceViewer:
             curClass += ' word '
         if any(wn.startswith('p') for wn in curWords):
             curClass += ' para '
+        if any(wn.startswith('src') for wn in curWords):
+            curClass += ' src '
         curClass = curClass.lstrip()
 
         if 'word' in curClass:
@@ -227,6 +229,39 @@ class SentenceViewer:
                 offEnds[offEnd] = {pID}
         return offStarts, offEnds
 
+    def get_src_offsets(self, sSource):
+        """
+        Find at which offsets which sound/video-alignment fragments start and end.
+        Return three dicts, one with start offsets, the other with end offsets,
+        and the third with the descriptions of the fragments.
+        The keys in the first two are offsets and the values are the string IDs 
+        of the fragments.
+        """
+        offStarts, offEnds, fragmentInfo = {}, {}, {}
+        if 'src_alignment' not in sSource or 'doc_id' not in sSource:
+            return offStarts, offEnds
+        docID = sSource['doc_id']
+        for iSA in range(len(sSource['src_alignment'])):
+            sa = sSource['src_alignment'][iSA]
+            try:
+                offStart, offEnd = sa['off_start_sent'], sa['off_end_sent']
+            except KeyError:
+                continue
+            srcID = 'src' + sa['src_id'] + str(docID)
+            fragmentInfo[srcID] = {'start': sa['off_start_src'],
+                                   'end': sa['off_end_src'],
+                                   'src': sa['src'],
+                                   'mtype': sa['mtype']}
+            try:
+                offStarts[offStart].add(srcID)
+            except KeyError:
+                offStarts[offStart] = {srcID}
+            try:
+                offEnds[offEnd].add(srcID)
+            except KeyError:
+                offEnds[offEnd] = {srcID}
+        return offStarts, offEnds, fragmentInfo
+
     def process_sentence(self, s, numSent=1, getHeader=False, lang=''):
         """
         Process one sentence taken from response['hits']['hits'].
@@ -257,6 +292,7 @@ class SentenceViewer:
             return {'languages': {lang: {'text': highlightedText}}}
         chars = list(sSource['text'])
         offParaStarts, offParaEnds = self.get_para_offsets(sSource)
+        offSrcStarts, offSrcEnds, fragmentInfo = self.get_src_offsets(sSource)
         offStarts, offEnds = self.get_word_offsets(sSource, numSent)
         self.add_highlighted_offsets(offStarts, offEnds, highlightedText)
 
@@ -270,7 +306,8 @@ class SentenceViewer:
                 else:
                     chars[i] = '<br>'
             if (i not in offStarts and i not in offEnds
-                    and i not in offParaStarts and i not in offParaEnds):
+                    and i not in offParaStarts and i not in offParaEnds
+                    and i not in offSrcStarts and i not in offSrcEnds):
                 continue
             addition = ''
             if len(curWords) > 0:
@@ -279,12 +316,17 @@ class SentenceViewer:
                     curWords -= offEnds[i]
                 if i in offParaEnds:
                     curWords -= offParaEnds[i]
+                if i in offSrcEnds:
+                    curWords -= offSrcEnds[i]
             newWord = False
             if i in offStarts:
                 curWords |= offStarts[i]
                 newWord = True
             if i in offParaStarts:
                 curWords |= offParaStarts[i]
+                newWord = True
+            if i in offSrcStarts:
+                curWords |= offSrcStarts[i]
                 newWord = True
             if len(curWords) > 0 and (len(addition) > 0 or newWord):
                 addition += self.build_span(sSource, curWords, matchWordOffsets)
@@ -295,7 +337,8 @@ class SentenceViewer:
         if 'relations_satisfied' in s and not s['relations_satisfied']:
             relationsSatisfied = False
         return {'header': header, 'languages': {lang: {'text': ''.join(chars)}},
-                'relations_satisfied': relationsSatisfied}
+                'relations_satisfied': relationsSatisfied,
+                'src_alignment': fragmentInfo}
 
     def count_word_subcorpus_stats(self, w, docIDs):
         """
@@ -439,6 +482,7 @@ class SentenceViewer:
         result['message'] = ''
         result['n_sentences'] = response['hits']['total']
         result['contexts'] = []
+        srcAlignmentInfo = {}
         if 'aggregations' in response and 'agg_ndocs' in response['aggregations']:
             result['n_docs'] = response['aggregations']['agg_ndocs']['value']
         for iHit in range(len(response['hits']['hits'])):
@@ -451,7 +495,11 @@ class SentenceViewer:
                                                numSent=iHit,
                                                getHeader=True,
                                                lang=lang)
+            if 'src_alignment' in curContext:
+                srcAlignmentInfo.update(curContext['src_alignment'])
             result['contexts'].append(curContext)
+        if len(srcAlignmentInfo) > 0:
+            result['src_alignment'] = json.dumps(srcAlignmentInfo)
         return result
 
     def process_word_json(self, response, docIDs):
