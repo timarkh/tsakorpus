@@ -1,4 +1,6 @@
-﻿function print_json(results) {
+﻿var curClickedObj = null;
+
+function print_json(results) {
 	//alert("success" + JSON.stringify(results));
 	$("#res_p").html( "<p style=\"font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;\">Success!<hr>" + JSON.stringify(results, null, 2).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;") ) + "</p>";
 }
@@ -74,10 +76,60 @@ function highlight_para_spans(item, i) {
 	$('.' + item).addClass('p_highlighted');
 }
 
+function make_player_markers(objContext, curFragment) {
+	var markers = [];
+	children = objContext.children('.src');
+	usedIntervals = [];
+	children.each(function () {
+		var targetClasses = $(this).attr('class').split(' ');
+		for (var iClass = 0; iClass < targetClasses.length; iClass++) {
+			var item = targetClasses[iClass];
+			if (!item.startsWith("src") || item == "src" || item.includes('highlighted')) continue;
+			if (usedIntervals.indexOf(item) > -1) { continue; }
+			usedIntervals.push(item);
+			var alignmentInfo = srcAlignments[item];
+			if (item == curFragment) {
+				markers.push({'time': parseFloat(alignmentInfo.start) + 0.01,
+							  'text': $(this).text() + '...',
+							  'class': 'timespan_highlighted'});
+			}
+			else {
+				markers.push({'time': parseFloat(alignmentInfo.start) + 0.01, 'text': $(this).text() + '...'});
+			}
+			markers.push({'time': parseFloat(alignmentInfo.end) - 0.01, 'text': '[end]'});
+		}
+	});
+	// alert(JSON.stringify(markers));
+	return markers;
+}
+
 function src_align_span(item, i) {
 	if (!item.startsWith("src") || item == "src" || item.includes('highlighted')) return;
-	alignmentInfo = srcAlignments[item];
+	var alignmentInfo = srcAlignments[item];
+	// alert(item);
 	alert(JSON.stringify(alignmentInfo));
+	var srcPlayer = videojs('src_player');
+	if (srcPlayer.src() != "media/" + alignmentInfo.src) {
+		if (alignmentInfo.mtype == 'audio') {
+			srcPlayer.currentType('audio/wav');
+		}
+		srcPlayer.src("media/" + alignmentInfo.src);
+	}
+	objContext = curClickedObj.parent();
+	markers = make_player_markers(objContext, item);
+	if (srcPlayer.markers.destroy)
+	{
+		srcPlayer.markers.destroy();
+	}
+	srcPlayer.markers({'markers': markers, "markerStyle": {
+			'width': '4px',
+			'border-radius': '30%',
+			'background-color': 'green'
+		}});
+	srcPlayer.markers.reset(markers);
+	alert(parseFloat(alignmentInfo.start));
+	srcPlayer.currentTime(parseFloat(alignmentInfo.start));
+	srcPlayer.play();
 	$('.' + item).addClass('src_highlighted');
 }
 
@@ -105,6 +157,7 @@ function assign_para_highlight() {
 function assign_src_alignment() {
 	$("span.src").unbind('click');
 	$('span.src').click(function (e) {
+		curClickedObj = $(e.target);
 		var targetClasses = $(e.target).attr('class').split(' ');
 		targetClasses.forEach(src_align_span);
 	});

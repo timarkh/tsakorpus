@@ -1,6 +1,7 @@
 {
   "corpus_name": "nganasan",
   "input_format": "json",
+  "media": true,
   "max_context_expand": 3,
   "max_distance_filter": 200000,
   "viewable_meta": [

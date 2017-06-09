@@ -248,3 +248,8 @@ th {
 td {
 	padding: 3px 4px;
 }
+
+.timespan_highlighted {
+	color: red;
+	background-color: red;
+}

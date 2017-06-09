@@ -229,7 +229,8 @@ def search_page():
     return render_template('index.html',
                            corpus_name=corpus_name,
                            languages=settings['languages'],
-                           all_lang_search=allLangSearch)
+                           all_lang_search=allLangSearch,
+                           media=settings['media'])
 
 
 @app.route('/search_sent_query/<int:page>')
@@ -404,6 +405,7 @@ def search_sent(page=0):
     hitsProcessed['page'] = get_session_data('page')
     hitsProcessed['page_size'] = get_session_data('page_size')
     hitsProcessed['languages'] = settings['languages']
+    hitsProcessed['media'] = settings['media']
 
     return render_template('result_sentences.html', data=hitsProcessed)
 
