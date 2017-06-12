@@ -13,7 +13,7 @@
     markerTip: {
       display: true,
       text: function text(marker) {
-        return "Break: " + marker.text;
+        return marker.text;
       },
       time: function time(marker) {
         return marker.time;
@@ -60,7 +60,7 @@
         markersMap = {},
         markersList = [],
         // list of markers sorted by time
-    videoWrapper = $(this.el()),
+    videoWrapper = $(this.el),
         currentMarkerIndex = NULL_INDEX,
         player = this,
         markerTip = null,
@@ -84,6 +84,7 @@
         markersMap[marker.key] = marker;
         markersList.push(marker);
       });
+	  options.markers = newMarkers;
 
       sortMarkersList();
     }
@@ -166,7 +167,7 @@
       });
 
       // sort again
-      sortMarkersList();
+      sortMarkersList()
     }
 
     // attach hover event handler
@@ -295,18 +296,19 @@
         initializeMarkerTip();
       }
 
-      // remove existing markers if already initialized
-      player.markers.removeAll();
-      addMarkers(options.markers);
+	  player.markers.removeAll();
+	  addMarkers(options.markers);
 
       if (setting.breakOverlay.display) {
         initializeOverlay();
       }
+	  
       onTimeUpdate();
       player.on("timeupdate", onTimeUpdate);
     }
 
     // setup the plugin after we loaded video's meta data
+	
     player.on("loadedmetadata", function () {
       initialize();
     });
@@ -316,6 +318,7 @@
       getMarkers: function getMarkers() {
         return markersList;
       },
+	  initialize: initialize,
       next: function next() {
         // go to the next marker from current timestamp
         var currentTime = player.currentTime();

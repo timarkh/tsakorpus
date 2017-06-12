@@ -13,3 +13,7 @@
 <p class="message">Message: {{ data.message }}</p>
 {% endif %}
 <script type='text/javascript'>assign_word_events(); make_sortable();</script>
+{% if data.media %}
+<script type='text/javascript'>hide_player();</script>
+{% endif %}
+

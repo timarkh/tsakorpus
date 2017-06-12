@@ -235,13 +235,13 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
             if curSentIndex != prevSentIndex and len(curSent['text']) > 0:
                 paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
                 curSent['para_alignment'] = [paraAlignment]
-                self.add_src_alignment(curSent, sentBoundaries[curSentIndex], srcFile)
+                self.add_src_alignment(curSent, sentBoundaries[prevSentIndex], srcFile)
                 yield curSent
                 curSent = {'text': '', 'words': [], 'lang': 0}
                 for paraSent in self.get_parallel_sentences(srcTree, sentBoundaries[curSentIndex],
                                                             srcFile):
                     yield paraSent
-                prevSentIndex = curSentIndex
+            prevSentIndex = curSentIndex
             if word['wtype'] == 'punct':
                 word['off_start'] = len(curSent['text'])
                 curSent['text'] += word['wf']

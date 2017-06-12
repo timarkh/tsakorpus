@@ -1,12 +1,4 @@
 ﻿<p>Search result: {{ data.n_sentences }} sentence(s) found in approximately {{ data.n_docs }} document(s).</p>
-{% if data.media %}
-<audio id="src_player" class="video-js" type='audio/wav' controls preload="auto" width="640" height="264" data-setup="{}">
-<p class="vjs-no-js">
-To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
-</p>
-</audio>
-
-{% endif %}
 
 <div class="sent_results">
 {% for c in data.contexts %}
@@ -55,3 +47,6 @@ var srcAlignments = {{ data.src_alignment | safe }};
 </div>
 {% endif %}
 <script type='text/javascript'>assign_word_events();</script>
+{% if data.media %}
+<script type='text/javascript'>show_player();</script>
+{% endif %}

@@ -251,5 +251,9 @@ td {
 
 .timespan_highlighted {
 	color: red;
-	background-color: red;
+	background-color: red !important;
+}
+
+.src_highlighted {
+	font-weight: bold;
 }
