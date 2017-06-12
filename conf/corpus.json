@@ -18,6 +18,15 @@
       "gloss_shortcuts": {
         "case": "(obl(\\.pl)?|abs|erg|ins)"
       }
+    },
+    "nganasan":
+    {
+      "gloss_shortcuts": {
+        "case": "(nom|gen|acc|obl|voc)(\\.(sg|pl|du))?(\\.[123](sg|pl|du))?",
+        "num": "(sg|pl|du)(\\.[123](sg|pl|du))?",
+        "tense": "(pst|prs|fut|pf1?)(\\.excl)?",
+        "pers": "[123](sg|pl|du)\\.([sr]|op?)(\\.excl)?"
+      }
     }
   }
 }

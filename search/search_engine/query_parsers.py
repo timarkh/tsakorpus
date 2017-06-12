@@ -74,6 +74,11 @@ class InterfaceQueryParser:
             if len(glossTag) <= 0:
                 return '[^{}]*\\{(' + glossSrc + ')\\}[\\-=<>]'
             return '(' + glossTag + ')\\{(' + glossSrc + ')\\}[\\-=<>]'
+        if ('lang_props' in self.settings and lang in self.settings['lang_props']
+                and 'gloss_shortcuts' in self.settings['lang_props'][lang]
+                and text in self.settings['lang_props'][lang]['gloss_shortcuts']):
+            text = self.settings['lang_props'][lang]['gloss_shortcuts'][text]
+            return '(' + text + ')\\{[^{}]+\\}[\\-=<>]'
         return '(' + text.replace('.', '\\.') + ')\\{[^{}]+\\}[\\-=<>]'
 
     def make_simple_gloss_query(self, text, lang):

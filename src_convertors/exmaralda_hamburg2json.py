@@ -174,7 +174,9 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                     wa['off_end_src'] = wa['off_start_src']
                     wa['src_id'] += wa['src_id'][:-1]
                     wa['off_end_sent'] = len(sent['text'])
-        if len(wordAlignments) <= 0 and len(self.tlis[sentBoundaries[0]]['time']) > 0:
+        # if len(wordAlignments) <= 0 and len(self.tlis[sentBoundaries[0]]['time']) > 0:
+        if len(self.tlis[sentBoundaries[0]]['time']) > 0:
+            wordAlignments = []     # for the time being
             wordAlignments.append({'off_start_src': self.tlis[sentBoundaries[0]]['time'],
                                    'off_end_src': self.tlis[sentBoundaries[1]]['time'],
                                    'off_start_sent': 0,

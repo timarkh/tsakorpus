@@ -428,7 +428,8 @@ def get_sent_context(n):
     curSentData = sentData[n]
     if curSentData['times_expanded'] >= settings['max_context_expand']:
         return jsonify({})
-    context = {'n': n, 'languages': {lang: {} for lang in curSentData['languages']}}
+    context = {'n': n, 'languages': {lang: {} for lang in curSentData['languages']},
+               'src_alignment': {}}
     neighboringIDs = {lang: {'next': -1, 'prev': -1} for lang in curSentData['languages']}
     for lang in curSentData['languages']:
         langID = settings['languages'].index(lang)
@@ -454,6 +455,7 @@ def get_sent_context(n):
                                                             getHeader=False,
                                                             lang=lang)
                 curCxLang[side] = expandedContext['languages'][lang]['text']
+                context['src_alignment'].update(expandedContext['src_alignment'])
                 set_session_data('last_sent_num', lastSentNum)
             else:
                 curCxLang[side] = ''

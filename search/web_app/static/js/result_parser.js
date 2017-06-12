@@ -106,8 +106,9 @@ function make_player_markers(objContext, curFragment) {
 function src_align_span(item, i) {
 	if (!item.startsWith("src") || item == "src" || item.includes('highlighted')) return;
 	var alignmentInfo = srcAlignments[item];
+	// alert(JSON.stringify(srcAlignments));
 	// alert(item);
-	alert(JSON.stringify(alignmentInfo));
+	// alert(JSON.stringify(alignmentInfo));
 	var srcPlayer = videojs('src_player');
 	if (srcPlayer.src() != "media/" + alignmentInfo.src) {
 		if (alignmentInfo.mtype == 'audio') {
@@ -127,7 +128,7 @@ function src_align_span(item, i) {
 			'background-color': 'green'
 		}});
 	srcPlayer.markers.reset(markers);
-	alert(parseFloat(alignmentInfo.start));
+	// alert(parseFloat(alignmentInfo.start));
 	srcPlayer.currentTime(parseFloat(alignmentInfo.start));
 	srcPlayer.play();
 	$('.' + item).addClass('src_highlighted');
@@ -139,6 +140,11 @@ function show_expanded_context(results) {
 		var resID = '#res' + n + '_' + lang;
 		$(resID).html(results.languages[lang].prev + ' ' + $(resID).html() + ' ' + results.languages[lang].next);
 	}
+	// alert(JSON.stringify(srcAlignments));
+	for (var srcKey in results.src_alignment) {
+        srcAlignments[srcKey] = results.src_alignment[srcKey];
+    }
+	// alert(JSON.stringify(srcAlignments));
 	assign_word_events();
 }
 
