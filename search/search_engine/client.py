@@ -24,6 +24,8 @@ class SearchClient:
         self.qp = InterfaceQueryParser(self.settings_dir)
 
     def get_words(self, esQuery):
+        if self.settings['query_timeout'] > 0:
+            esQuery['timeout'] = str(self.settings['query_timeout']) + 's'
         hits = self.es.search(index=self.name + '.words', doc_type='word',
                               body=esQuery)
         return hits
@@ -47,6 +49,8 @@ class SearchClient:
         return iterator
 
     def get_sentences(self, esQuery):
+        if self.settings['query_timeout'] > 0:
+            esQuery['timeout'] = str(self.settings['query_timeout']) + 's'
         hits = self.es.search(index=self.name + '.sentences', doc_type='sentence',
                               body=esQuery)
         return hits

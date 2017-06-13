@@ -266,7 +266,7 @@ class SentenceViewer:
         """
         offStarts, offEnds, fragmentInfo = {}, {}, {}
         if 'src_alignment' not in sSource or 'doc_id' not in sSource:
-            return offStarts, offEnds
+            return offStarts, offEnds, fragmentInfo
         docID = sSource['doc_id']
         for iSA in range(len(sSource['src_alignment'])):
             sa = sSource['src_alignment'][iSA]
@@ -554,10 +554,9 @@ class SentenceViewer:
         srcAlignmentInfo = {}
         if 'aggregations' in response:
             if 'agg_ndocs' in response['aggregations']:
-                result['n_docs'] = response['aggregations']['agg_ndocs']['value']
-            if 'agg_nwords' in response['aggregations']:
-                result['n_occurrences'] = int(math.floor(response['aggregations']['agg_nwords']['sum']
-                                                         - response['aggregations']['agg_nwords']['count']))
+                result['n_docs'] = int(response['aggregations']['agg_ndocs']['value'])
+            if result['n_docs'] > 0 and 'agg_nwords' in response['aggregations']:
+                result['n_occurrences'] = int(math.floor(response['aggregations']['agg_nwords']['sum']))
         for iHit in range(len(response['hits']['hits'])):
             langID, lang = self.get_lang_from_hit(response['hits']['hits'][iHit])
             curContext = self.process_sentence(response['hits']['hits'][iHit],

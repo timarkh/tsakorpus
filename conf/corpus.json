@@ -5,6 +5,7 @@
   "media_length": 60,
   "max_context_expand": 3,
   "max_distance_filter": 200000,
+  "query_timeout": 20,
   "viewable_meta": [
     "genre",
     "year1",

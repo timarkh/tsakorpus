@@ -7,6 +7,7 @@ import os
 import copy
 import random
 import uuid
+import math
 from search_engine.client import SearchClient
 from .response_processors import SentenceViewer
 
@@ -24,6 +25,7 @@ localizations = {}
 supportedLocales = ['ru', 'en']
 sc = SearchClient(SETTINGS_DIR, mode='test')
 sentView = SentenceViewer(SETTINGS_DIR, sc)
+random.seed()
 
 
 def jsonp(func):
@@ -101,6 +103,8 @@ def get_session_data(fieldName):
         sessionData[session['session_id']]['page_size'] = 10
     elif fieldName == 'last_sent_num' and fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']]['last_sent_num'] = -1
+    elif fieldName == 'seed' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['seed'] = random.randint(1, 1e6)
     elif fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']][fieldName] = ''
     try:
@@ -338,6 +342,19 @@ def copy_request_args():
     return query
 
 
+def count_occurrences(query):
+    esQuery = sc.qp.html2es(query,
+                            searchIndex='sentences',
+                            sortOrder='no',
+                            query_size=1)
+    hits = sc.get_sentences(esQuery)
+    if ('aggregations' in hits
+            and 'agg_nwords' in hits['aggregations']
+            and hits['aggregations']['agg_nwords']['sum'] is not None):
+        return int(math.floor(hits['aggregations']['agg_nwords']['sum']))
+    return 0
+
+
 def find_sentences_json(page=0):
     """
     Find sentences and change current options using the query in request.args.
@@ -376,6 +393,9 @@ def find_sentences_json(page=0):
             iterator = sc.get_all_sentences(esQuery)
             query['sent_ids'] = sc.qp.filter_sentences(iterator, wordConstraints)
             set_session_data('last_query', query)
+    nOccurrences = 0
+    if get_session_data('sort') == 'random':
+        nOccurrences = count_occurrences(query)
     esQuery = sc.qp.html2es(query,
                             searchIndex='sentences',
                             sortOrder=get_session_data('sort'),
@@ -383,6 +403,9 @@ def find_sentences_json(page=0):
                             query_size=get_session_data('page_size'),
                             page=get_session_data('page'))
     hits = sc.get_sentences(esQuery)
+    if nOccurrences > 0 and 'aggregations' in hits and 'agg_nwords' in hits['aggregations']:
+        hits['aggregations']['agg_nwords']['sum'] = nOccurrences
+        hits['aggregations']['agg_nwords']['count'] = 0
     if (len(wordConstraints) > 0
             and not get_session_data('distance_strict')
             and 'hits' in hits and 'hits' in hits['hits']):

@@ -170,9 +170,13 @@ class InterfaceQueryParser:
 
     def make_nested_query(self, query, nestedPath, queryName='', highlightFields=None,
                           sortOrder=''):
-        esQuery = {'nested': {'path': nestedPath,
-                              'query': {'constant_score': {'query': query, 'boost': 1}},
-                              'score_mode': 'sum'}}
+        if sortOrder != 'random':
+            esQuery = {'nested': {'path': nestedPath,
+                                  'query': {'constant_score': {'query': query, 'boost': 1}},
+                                  'score_mode': 'sum'}}
+        else:
+            esQuery = {'nested': {'path': nestedPath,
+                                  'query': query}}
         if highlightFields is not None:
             esQuery['nested']['inner_hits'] = {'highlight':
                                                {'fields':
@@ -226,7 +230,8 @@ class InterfaceQueryParser:
                     queryWordsAna = list(queryDictWordsAna.values())[0]
                 else:
                     queryWordsAna = {'bool': {'must': list(queryDictWordsAna.values())}}
-                query.append(self.make_nested_query(queryWordsAna, nestedPath='ana'))
+                query.append(self.make_nested_query(queryWordsAna, nestedPath='ana',
+                                                    sortOrder=sortOrder))
             if len(queryDictWords) > 0:
                 if len(queryDictWords) == 1:
                     queryWords = list(queryDictWords.values())[0]
@@ -290,7 +295,8 @@ class InterfaceQueryParser:
                 queryDictWords['words.ana'] = self.make_nested_query(queryWordsAna,
                                                                      nestedPath='words.ana',
                                                                      queryName=queryName,
-                                                                     highlightFields=['words.ana'])
+                                                                     highlightFields=['words.ana'],
+                                                                     sortOrder=sortOrder)
             else:
                 query.append(self.make_nested_query(queryWordsAna,
                                                     nestedPath='words.ana',
@@ -329,7 +335,7 @@ class InterfaceQueryParser:
             query = {'match_none': {}}
         else:
             if lang >= 0:
-                query = [{'term': {'lang': lang}}]
+                query = [{'term': {'lang': {'value': lang, 'boost': 0}}}]
             else:
                 query = []
             for iQueryWord in range(len(queryDict['words'])):
@@ -362,7 +368,7 @@ class InterfaceQueryParser:
                                     'boost_mode': 'replace',
                                     'random_score': {}}}
         if randomSeed is not None:
-            query['function_score']['random_score']['seed'] = randomSeed
+            query['function_score']['random_score']['seed'] = str(randomSeed)
         return query
 
     def subcorpus_query(self, htmlQuery, query_from=0, query_size=10,
