@@ -18,7 +18,16 @@
     "adyge":
     {
       "gloss_shortcuts": {
-        "case": "(obl(\\.pl)?|abs|erg|ins)"
+        "case": "(obl(\\.pl)?|abs|erg|ins|adv)",
+        "app": "(dat|ben|(gen)?loc|com|instr|inadv|pv_digit)",
+        "pers": "(([123](sg|pl)|rel|rec|rfl)\\.(abs|erg|io))",
+        "pers.abs": "(([123](sg|pl)|rel|rec|rfl)\\.abs)",
+        "pers.erg": "(([123](sg|pl)|rel|rec|rfl)\\.erg)",
+        "pers.io": "(([123](sg|pl)|rel|rec|rfl)\\.io)",
+        "pers.p": "(([123](sg|pl)|rel)\\.p)",
+        "tense": "(pst|fut|aux)",
+        "adj": "(два|три|четыре|пять|сто|большой|старый|новый)",
+        "sfx": "(re|ill|el|cont)"
       }
     },
     "nganasan":

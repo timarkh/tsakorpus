@@ -174,7 +174,7 @@ class Indexator:
         Index all words that have been collected at the previous stage
         in self.words (while the sentences were being indexed).
         """
-        bulk(self.es, self.iterate_words())
+        bulk(self.es, self.iterate_words(), chunk_size=300)
 
     def add_parallel_sids(self, sentences, paraIDs):
         """
@@ -267,7 +267,7 @@ class Indexator:
                              and fname.lower().endswith('.json.gz')))):
                     continue
                 fnameFull = os.path.join(root, fname)
-                bulk(self.es, self.iterate_sentences(fnameFull))
+                bulk(self.es, self.iterate_sentences(fnameFull), chunk_size=300)
                 self.index_doc(fnameFull)
         self.index_words()
 

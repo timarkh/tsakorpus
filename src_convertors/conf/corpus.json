@@ -1,5 +1,5 @@
 {
-  "corpus_name": "nganasan",
+  "corpus_name": "adyge",
   "corpus_dir": "corpus",
   "meta_filename": "meta.csv",
   "meta_fields":
@@ -17,7 +17,7 @@
   "meta_files_dir": false,
   "meta_files_case_sensitive": true,
   "parsed_wordlist_filename": "all_parsed.txt",
-  "parsed_wordlist_format": "exmaralda_hamburg",
+  "parsed_wordlist_format": "txt",
   "json_indent": -1,
   "gzip": true,
   "convert_quotes": true,
