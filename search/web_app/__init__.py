@@ -162,7 +162,8 @@ def add_sent_data_for_session(sent, sentData):
             docID = sent['_source']['doc_id']
         sentData.update({'languages': {},
                          'doc_id': docID,
-                         'times_expanded': 0})
+                         'times_expanded': 0,
+                         'src_alignment_files': []})
     langID = 0
     nextID = prevID = -1
     if '_source' in sent:
@@ -185,6 +186,10 @@ def add_sent_data_for_session(sent, sentData):
             if ('prev_id' not in sentData['languages'][lang]
                     or prevID < sentData['languages'][lang]['prev_id']):
                 sentData['languages'][lang]['prev_id'] = prevID
+        if 'src_alignment' in sent['_source']:
+            for alignment in sent['_source']['src_alignment']:
+                if alignment['src'] not in sentData['src_alignment_files']:
+                    sentData['src_alignment_files'].append(alignment['src'])
 
 
 def add_sent_to_session(hits):
@@ -455,6 +460,7 @@ def get_sent_context(n):
                                                             getHeader=False,
                                                             lang=lang)
                 curCxLang[side] = expandedContext['languages'][lang]['text']
+                sentView.relativize_src_alignment(expandedContext, curSentData['src_alignment_files'])
                 context['src_alignment'].update(expandedContext['src_alignment'])
                 set_session_data('last_sent_num', lastSentNum)
             else:

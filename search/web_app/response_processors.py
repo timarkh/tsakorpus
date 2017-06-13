@@ -262,6 +262,36 @@ class SentenceViewer:
                 offEnds[offEnd] = {srcID}
         return offStarts, offEnds, fragmentInfo
 
+    def relativize_src_alignment(self, expandedContext, srcFiles):
+        """
+        If the sentences in the expanded context are aligned with the
+        neighboring media file fragments rather than with the same fragment,
+        re-align them with the same one and recalculate offsets.
+        """
+        srcFiles = set(srcFiles)
+        if len(srcFiles) > 1 or len(srcFiles) <= 0:
+            return
+        srcFile = list(srcFiles)[0]
+        rxSrcFragmentName = re.compile('^(.*?)-(\\d+)-(\\d+)\\.[^.]*$')
+        mSrc = rxSrcFragmentName.search(srcFile)
+        if mSrc is None:
+            return
+        for k in expandedContext['src_alignment']:
+            alignment = expandedContext['src_alignment'][k]
+            if srcFile == alignment['src']:
+                continue
+            mExp = rxSrcFragmentName.search(alignment['src'])
+            if mExp is None or mExp.group(1) != mSrc.group(1):
+                continue
+            offsetSrc = (int(mSrc.group(3)) * self.settings['media_length']
+                         + int(mSrc.group(2)) * self.settings['media_length'] / 3)
+            offsetExp = (int(mExp.group(3)) * self.settings['media_length']
+                         + int(mExp.group(2)) * self.settings['media_length'] / 3)
+            difference = offsetExp - offsetSrc
+            alignment['src'] = srcFile
+            alignment['start'] = str(float(alignment['start']) + difference)
+            alignment['end'] = str(float(alignment['end']) + difference)
+
     def process_sentence(self, s, numSent=1, getHeader=False, lang=''):
         """
         Process one sentence taken from response['hits']['hits'].

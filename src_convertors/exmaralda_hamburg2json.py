@@ -3,6 +3,7 @@ import re
 import json
 from lxml import etree
 from txt2json import Txt2JSON
+from media_operations import MediaCutter
 
 
 class Exmaralda_Hamburg2JSON(Txt2JSON):
@@ -14,9 +15,11 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
 
     rxBracketGloss = re.compile('\\.?\\[.*?\\]')
     rxWordPunc = re.compile('^( *)([^\\w]*)(.*?)([^\\w]*?)( *)$')
+    mediaExtensions = {'.wav', '.mp3', '.mp4', '.avi'}
 
     def __init__(self, settingsDir='conf'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
+        self.mc = MediaCutter(settings=self.corpusSettings)
         self.srcExt = 'exb'
         self.tlis = {}      # time labels
         self.pID = 0        # id of last aligned segment
@@ -137,6 +140,24 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
             curToken['ana'] = [ana]
             yield curToken
 
+    def fragmentize_src_alignment(self, alignment):
+        """
+        Find corresponding media file fragment and transform a JSON
+        dictionary with the information about the alignment.
+        """
+        fileName, fileExt = os.path.splitext(alignment['src'].lower())
+        if fileExt not in self.mediaExtensions:
+            return
+        ts1 = alignment['off_start_src']
+        ts2 = alignment['off_end_src']
+        if len(ts1) <= 0 or len(ts2) <= 0:
+            return
+        ts1frag, ts2frag, srcFileFrag = self.mc.get_media_name(alignment['src'],
+                                                               float(ts1), float(ts2))
+        alignment['src'] = srcFileFrag
+        alignment['off_start_src'] = str(ts1frag)
+        alignment['off_end_src'] = str(ts2frag)
+
     def add_src_alignment(self, sent, sentBoundaries, srcFile):
         """
         Add the alignment of the sentence with the sound/video. If
@@ -185,6 +206,8 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                                    'src_id': sentBoundaries[0] + '_' + sentBoundaries[1],
                                    'src': srcFile})
         if len(wordAlignments) > 0:
+            for alignment in wordAlignments:
+                self.fragmentize_src_alignment(alignment)
             sent['src_alignment'] = wordAlignments
 
     def get_parallel_sentences(self, srcTree, sentBoundaries, srcFile):
@@ -297,6 +320,18 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         self.tp.splitter.add_next_word_id(textJSON['sentences'])
         self.write_output(fnameTarget, textJSON)
         return nTokens, nWords, nAnalyze
+
+    def process_corpus(self):
+        Txt2JSON.process_corpus(self)
+        for path, dirs, files in os.walk(os.path.join(self.corpusSettings['corpus_dir'],
+                                                      self.srcExt)):
+            for fname in files:
+                fileExt = os.path.splitext(fname.lower())[1]
+                if fileExt in self.mediaExtensions:
+                    fname = os.path.abspath(os.path.join(path, fname))
+                    print('Cutting media file', fname)
+                    self.mc.cut_media(fname)
+
 
 
 if __name__ == '__main__':

@@ -26,5 +26,6 @@
   "sent_end_punc": "(?:[.!?;;]+(?:[)\\]}>/»]|$)|\\\\n)",
   "sent_start": "^[A-ZÄÖÜА-ЯЁӤӦӴӞӜ0-9]",
   "newline_ends_sent": true,
-  "abbreviations": []
+  "abbreviations": [],
+  "media_length": 60
 }
