@@ -1,6 +1,7 @@
 import json
 import re
 import os
+import math
 
 
 class SentenceViewer:
@@ -513,8 +514,12 @@ class SentenceViewer:
         result['n_sentences'] = response['hits']['total']
         result['contexts'] = []
         srcAlignmentInfo = {}
-        if 'aggregations' in response and 'agg_ndocs' in response['aggregations']:
-            result['n_docs'] = response['aggregations']['agg_ndocs']['value']
+        if 'aggregations' in response:
+            if 'agg_ndocs' in response['aggregations']:
+                result['n_docs'] = response['aggregations']['agg_ndocs']['value']
+            if 'agg_nwords' in response['aggregations']:
+                result['n_occurrences'] = int(math.floor(response['aggregations']['agg_nwords']['sum']
+                                                         - response['aggregations']['agg_nwords']['count']))
         for iHit in range(len(response['hits']['hits'])):
             if 'lang' in response['hits']['hits'][iHit]['_source']:
                 langID = response['hits']['hits'][iHit]['_source']['lang']

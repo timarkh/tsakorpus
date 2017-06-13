@@ -1,4 +1,8 @@
-﻿<p>Search result: {{ data.n_sentences }} sentence(s) found in approximately {{ data.n_docs }} document(s).</p>
+﻿<p>Search result:
+{% if data.n_occurrences > 0 %}
+{{ data.n_occurrences }} occurrence(s),
+{% endif %}
+{{ data.n_sentences }} sentence(s) found in approximately {{ data.n_docs }} document(s).</p>
 
 <div class="sent_results">
 {% for c in data.contexts %}

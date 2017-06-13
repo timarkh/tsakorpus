@@ -170,7 +170,9 @@ class InterfaceQueryParser:
 
     def make_nested_query(self, query, nestedPath, queryName='', highlightFields=None,
                           sortOrder=''):
-        esQuery = {'nested': {'path': nestedPath, 'query': query}}
+        esQuery = {'nested': {'path': nestedPath,
+                              'query': {'constant_score': {'query': query, 'boost': 1}},
+                              'score_mode': 'sum'}}
         if highlightFields is not None:
             esQuery['nested']['inner_hits'] = {'highlight':
                                                {'fields':
@@ -343,7 +345,8 @@ class InterfaceQueryParser:
         if sortOrder == 'random':
             query = self.make_random(query, randomSeed)
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
-        esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'doc_id'}}}
+        esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'doc_id'}},
+                           'agg_nwords': {'stats': {'script': '_score'}}}
         if len(queryDictTop) >= 0:
             esQuery['highlight'] = {'fields': {f: {'number_of_fragments': 100,
                                                    'fragment_size': 2048}
