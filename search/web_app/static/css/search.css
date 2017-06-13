@@ -227,6 +227,7 @@
     font-size: 90%;
 	font-family: "Segoe UI", "Lucida Grande", sans-serif;
     z-index: 100;
+	max-width: 500px;
 }
 
 tr:nth-child(odd) {

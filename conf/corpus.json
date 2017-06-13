@@ -27,7 +27,8 @@
         "num": "(sg|pl|du)(\\.[123](sg|pl|du))?",
         "tense": "(pst|prs|fut|pf1?)(\\.excl)?",
         "pers": "[123](sg|pl|du)\\.([sr]|op?)(\\.excl)?"
-      }
+      },
+      "gr_fields_order": ["tense", "person", "number", "case", "poss"]
     }
   }
 }

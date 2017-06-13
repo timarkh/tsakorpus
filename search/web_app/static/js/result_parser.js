@@ -179,7 +179,7 @@ function assign_para_highlight() {
 }
 
 function assign_src_alignment() {
-	$("span.src").unbind('click');
+	// $("span.src").unbind('click');
 	$('span.src').click(function (e) {
 		curClickedObj = $(e.target);
 		var targetClasses = $(e.target).attr('class').split(' ');
@@ -193,13 +193,34 @@ function assign_gram_popup() {
 	$("span.word").unbind('hover');
 	$("span.word").unbind('mousemove');
 	$('.word').hover(function (e) {
-		$('div#analysis').replaceWith('<div id="analysis">' + $(e.target).attr("data-ana") + '</div>');
-		$('div#analysis').show();
+		$('#analysis').replaceWith('<div id="analysis">' + $(e.target).attr("data-ana") + '</div>');
+		anaWidth = $('#analysis').width();
+		anaHeight = $('#analysis').height();
+		$('#analysis').css('left', $(document).innerWidth() - anaWidth - 30);
+		$('#analysis').css('top', $(document).innerHeight() - anaHeight - 30);
+		$('#analysis').show();
 	}, function () {
-		$('div#analysis').hide();
+		$('#analysis').hide();
 	});
 	$('.word').mousemove(function (e) {
-		$('div#analysis').css('top', e.pageY + moveDown).css('left', e.pageX + moveLeft);
+		anaWidth = $('#analysis').width();
+		anaHeight = $('#analysis').height();
+		if (e.pageX + moveLeft + anaWidth + 30 < $(document).innerWidth()) {
+			$('#analysis').css('left', e.pageX + moveLeft);
+			$('#analysis').width(anaWidth);
+		}
+		else {
+			$('#analysis').css('left', $(document).innerWidth() - anaWidth - 30);
+			$('#analysis').width(anaWidth);
+		}
+		if (e.pageY + moveDown + anaHeight + 30 < $(document).innerHeight()) {
+			$('#analysis').css('top', e.pageY + moveDown);
+			$('#analysis').height(anaHeight);
+		}
+		else {
+			$('#analysis').css('top', $(document).innerHeight() - anaHeight - 30);
+			$('#analysis').height(anaHeight);
+		}
 	});
 }
 

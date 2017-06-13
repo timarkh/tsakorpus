@@ -22,7 +22,25 @@ class SentenceViewer:
         self.sentence_props = ['text']
         self.sc = search_client
 
-    def build_ana_div(self, ana):
+    def build_gr_ana_part(self, grValues, lang):
+        """
+        Build a string with gramtags ordered according to the settings
+        for the language specified by lang.
+        """
+        def key_comp(p):
+            if p[0] not in self.settings['lang_props'][lang]['gr_fields_order']:
+                return len(self.settings['lang_props'][lang]['gr_fields_order'])
+            return self.settings['lang_props'][lang]['gr_fields_order'].index(p[0])
+
+        grAnaPart = ''
+        for fv in sorted(grValues, key=key_comp):
+            if len(grAnaPart) > 0:
+                grAnaPart += ', '
+            grAnaPart += fv[1]
+        return '<span class="popup_field">gr: ' \
+               '<span class="popup_value">' + grAnaPart + '</span></span>'
+
+    def build_ana_div(self, ana, lang):
         """
         Build the contents of a div with one particular analysis.
         """
@@ -31,16 +49,23 @@ class SentenceViewer:
             result += '<span class="popup_lex">' + ana['lex'] + '</span> '
         if 'gr.pos' in ana:
             result += '<span class="popup_pos">' + ana['gr.pos'] + '</span> '
+        grValues = []
+        resultTail = ''
         for field in sorted(ana):
             if field not in ['lex', 'gr.pos']:
                 value = ana[field]
                 if type(value) == list:
                     value = ', '.join(value)
-                result += '<span class="popup_field">' + field +\
-                          ': <span class="popup_value">' + value + '</span></span>'
+                if field.startswith('gr.'):
+                    grValues.append((field[3:], value))
+                else:
+                    resultTail += '<span class="popup_field">' + field +\
+                                  ': <span class="popup_value">' + value + '</span></span>'
+        result += self.build_gr_ana_part(grValues, lang)
+        result += resultTail
         return result
 
-    def build_ana_popup(self, word, matchingAnalyses=None):
+    def build_ana_popup(self, word, lang, matchingAnalyses=None):
         """
         Build a string for a popup with the word and its analyses. 
         """
@@ -57,12 +82,12 @@ class SentenceViewer:
                 popup += '">'
                 if len(word['ana']) > 1:
                     popup += str(iAna + 1) + '. '
-                popup += self.build_ana_div(word['ana'][iAna])
+                popup += self.build_ana_div(word['ana'][iAna], lang)
                 popup += '</div>'
         popup += '</div>'
         return popup
 
-    def prepare_analyses(self, words, indexes, matchWordOffsets=None):
+    def prepare_analyses(self, words, indexes, lang, matchWordOffsets=None):
         """
         Generate viewable analyses for the words with given indexes.
         """
@@ -80,11 +105,11 @@ class SentenceViewer:
             matchingAnalyses = []
             if matchWordOffsets is not None and iStr in matchWordOffsets:
                 matchingAnalyses = [offAna[1] for offAna in matchWordOffsets[iStr]]
-            result += self.build_ana_popup(word, matchingAnalyses)
+            result += self.build_ana_popup(word, lang, matchingAnalyses=matchingAnalyses)
         result = result.replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
         return result
 
-    def build_span(self, sentSrc, curWords, matchWordOffsets):
+    def build_span(self, sentSrc, curWords, lang, matchWordOffsets):
         curClass = ''
         if any(wn.startswith('w') for wn in curWords):
             curClass += ' word '
@@ -95,7 +120,8 @@ class SentenceViewer:
         curClass = curClass.lstrip()
 
         if 'word' in curClass:
-            dataAna = self.prepare_analyses(sentSrc['words'], curWords, matchWordOffsets).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
+            dataAna = self.prepare_analyses(sentSrc['words'], curWords,
+                                            lang, matchWordOffsets).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
         else:
             dataAna = ''
 
@@ -360,7 +386,7 @@ class SentenceViewer:
                 curWords |= offSrcStarts[i]
                 newWord = True
             if len(curWords) > 0 and (len(addition) > 0 or newWord):
-                addition += self.build_span(sSource, curWords, matchWordOffsets)
+                addition += self.build_span(sSource, curWords, lang, matchWordOffsets)
             chars[i] = addition + chars[i]
         if len(curWords) > 0:
             chars[-1] += '</span>'
@@ -395,7 +421,7 @@ class SentenceViewer:
             freq = '0'
         return freq, rank, nSents, nDocs
 
-    def process_word(self, w, docIDs):
+    def process_word(self, w, docIDs, lang):
         """
         Process one word taken from response['hits']['hits'].
         """
@@ -414,7 +440,7 @@ class SentenceViewer:
         else:
             freq, rank, nSents, nDocs = self.count_word_subcorpus_stats(w, docIDs)
         word = '<tr><td><span class="word" data-ana="' +\
-               self.build_ana_popup(wSource).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;') +\
+               self.build_ana_popup(wSource, lang).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;') +\
                '">' + wSource['wf'] +\
                '</span></td><td>' + freq +\
                '</span></td><td>' + rank +\
@@ -504,6 +530,18 @@ class SentenceViewer:
                             offsets[newK] |= newV
         return offsets
 
+    def get_lang_from_hit(self, hit):
+        """
+        Return the ID and the name of the language of the current hit
+        taken from ES response.
+        """
+        if 'lang' in hit['_source']:
+            langID = hit['_source']['lang']
+        else:
+            langID = 0
+        lang = self.settings['languages'][langID]
+        return langID, lang
+
     def process_sent_json(self, response):
         result = {'n_occurrences': 0, 'n_sentences': 0,
                   'n_docs': 0, 'page': 1,
@@ -521,11 +559,7 @@ class SentenceViewer:
                 result['n_occurrences'] = int(math.floor(response['aggregations']['agg_nwords']['sum']
                                                          - response['aggregations']['agg_nwords']['count']))
         for iHit in range(len(response['hits']['hits'])):
-            if 'lang' in response['hits']['hits'][iHit]['_source']:
-                langID = response['hits']['hits'][iHit]['_source']['lang']
-            else:
-                langID = 0
-            lang = self.settings['languages'][langID]
+            langID, lang = self.get_lang_from_hit(response['hits']['hits'][iHit])
             curContext = self.process_sentence(response['hits']['hits'][iHit],
                                                numSent=iHit,
                                                getHeader=True,
@@ -548,7 +582,8 @@ class SentenceViewer:
         result['n_docs'] = response['aggregations']['agg_ndocs']['value']
         result['words'] = []
         for iHit in range(len(response['hits']['hits'])):
-            result['words'].append(self.process_word(response['hits']['hits'][iHit], docIDs))
+            langID, lang = self.get_lang_from_hit(response['hits']['hits'][iHit])
+            result['words'].append(self.process_word(response['hits']['hits'][iHit], docIDs, lang=lang))
         return result
 
     def process_docs_json(self, response):
