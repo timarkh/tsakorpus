@@ -396,7 +396,7 @@ def find_sentences_json(page=0):
     nOccurrences = 0
     if (get_session_data('sort') == 'random'
             and 'n_words' in query
-            and query['n_words'] == 1):
+            and query['n_words'] == '1'):
         nOccurrences = count_occurrences(query)
     esQuery = sc.qp.html2es(query,
                             searchIndex='sentences',

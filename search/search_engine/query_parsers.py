@@ -39,13 +39,22 @@ class InterfaceQueryParser:
         #     self.gramDict[g] = 'ana.gr.' + self.gramDict[g]
 
     @staticmethod
-    def find_operator(strQuery, start=0, end=-1):
+    def find_operator(strQuery, start=0, end=-1, glossField=False):
         if end == -1:
             end = len(strQuery) - 1
         if strQuery[start] == '~':
             return start, '~'
         parenthBalance = 0
+        inCurlyBrackets = False
         for i in range(start, end):
+            if glossField:
+                if inCurlyBrackets:
+                    if strQuery[i] == '}':
+                        inCurlyBrackets = False
+                    continue
+                if strQuery[i] == '{':
+                    inCurlyBrackets = True
+                    continue
             if strQuery[i] == '(':
                 parenthBalance += 1
             elif strQuery[i] == ')':
@@ -53,6 +62,33 @@ class InterfaceQueryParser:
             elif parenthBalance == 0 and strQuery[i] in ',&|':
                 return i, strQuery[i]
         return -1, ''
+
+    def make_gloss_query_src_part(self, text, lang):
+        """
+        Make the part of the gloss query which is inside the curly brackets.
+        Basically, it means checking that all regular expressions within them
+        do not eat anything outside of them.
+        """
+        result = ''
+        inBrackets = False
+        prevBackslash = False
+        for c in text:
+            if prevBackslash:
+                result += c
+                prevBackslash = False
+                continue
+            if c == '\\':
+                result += c
+                prevBackslash = True
+                continue
+            if c == '[':
+                inBrackets = True
+            elif c == ']':
+                inBrackets = False
+            elif c == '.' and not inBrackets:
+                c = '[^{}]'
+            result += c
+        return result
 
     def make_gloss_query_part(self, text, lang):
         """
@@ -73,8 +109,8 @@ class InterfaceQueryParser:
         if mSrc is not None:
             glossTag, glossSrc = mSrc.group(1), mSrc.group(2)
             if len(glossTag) <= 0:
-                return '[^{}]*\\{(' + glossSrc + ')\\}[\\-=<>]'
-            return '(' + glossTag + ')\\{(' + glossSrc + ')\\}[\\-=<>]'
+                return '[^{}]*\\{(' + self.make_gloss_query_src_part(glossSrc, lang) + ')\\}[\\-=<>]'
+            return '(' + glossTag + ')\\{(' + self.make_gloss_query_src_part(glossSrc, lang) + ')\\}[\\-=<>]'
         if ('lang_props' in self.settings and lang in self.settings['lang_props']
                 and 'gloss_shortcuts' in self.settings['lang_props'][lang]
                 and text in self.settings['lang_props'][lang]['gloss_shortcuts']):
@@ -140,7 +176,8 @@ class InterfaceQueryParser:
                 return {'match_none': {}}
         if len(strQuery) <= 0 or start >= end:
             return {'match_none': {}}
-        iOpPos, strOp = self.find_operator(strQuery, start, end)
+        glossField = field.endswith('gloss_index')
+        iOpPos, strOp = self.find_operator(strQuery, start, end, glossField)
         if iOpPos == -1:
             if strQuery[start] == '(' and strQuery[end - 1] == ')':
                 return self.make_bool_query(strQuery, field, lang, start=start + 1, end=end - 1)
