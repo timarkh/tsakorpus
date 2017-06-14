@@ -122,7 +122,7 @@ class InterfaceQueryParser:
         """
         Return a regexp for an entire gloss query.
         """
-        qStart, qEnd = '.*', '.*'
+        qStart, qEnd = '(.*[\\-=<>])?', '.*'
         if text.startswith('#'):
             qStart = ''
             text = text[1:]
