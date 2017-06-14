@@ -113,6 +113,7 @@ $(function() {
 	
 	load_additional_word_fields();
 	assign_input_events();
+	assign_show_hide();
 });
 
 function load_expanded_context(n_sent) {
@@ -142,6 +143,10 @@ function load_additional_word_fields() {
 }
 
 function get_sentences() {
+	if ($("img-swap").attr('class') != "on") {
+		$(".img-swap").click();
+		//$(".show-hide a").click();
+	}
 	get_sentences_page(-1);
 }
 
@@ -177,6 +182,34 @@ function assign_input_events() {
 	$("span.word_plus").click(add_word_inputs);
 	$("span.add_rel").click(add_word_relations);
 	$("input.neg_query").change(negative_query);
+}
+
+function assign_show_hide() {
+	$(".img-swap").click(function() {
+		if ($(this).attr("class") == "img-swap") {
+			this.src = this.src.replace("_up","_down");
+		} else {
+			this.src = this.src.replace("_down","_up");
+		}
+		$(this).toggleClass("on");
+	});
+	//$(".slide").mCustomScrollbar("disable");
+	$(".show-hide a").click(function(e){
+		e.preventDefault();
+		var $this=$(this),
+				rel=$this.attr("rel"),
+				el=$(".slide"),
+				wrapper=$("#search_div"),
+				dur=700;
+		switch(rel){
+			case "toggle-slide":
+				if(!el.is(":animated")){
+					wrapper.removeClass("transitions");
+					el.slideToggle(dur,function(){wrapper.addClass("transitions");});
+				}
+				break;
+		}
+	});
 }
 
 function negative_query(e) {

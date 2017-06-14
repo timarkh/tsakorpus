@@ -15,52 +15,59 @@
 </head>
 <body>
 <p id="header">Corpus name: {{ corpus_name }}.</p>
-<form id="search_main">
-<input type="hidden" name="n_words" id="n_words" value="1">
-<div class="words_search">
-<div class="word_search" id="first_word">
-<div class="query_word_header"><div class="circle circle_w1"></div>Word #1</div>
-Wordform: <input type="text" class="search_input" name="wf1" id="wf1"><br>
-Lemma: <input type="text" class="search_input" name="lex1" id="lex1"><br>
-Grammar: <input type="text" class="search_input" name="gr1" id="gr1"><br>
-Gloss: <input type="text" class="search_input" name="gloss_index1" id="gloss1"><br>
-<div class="add_word_fields"></div>
-<input type="checkbox" class="neg_query" name="negq1" id="negq1" onclick="negative_query();"> Negative query<br>
-<span class="word_plus">add word</span>
+<div id="search_div" class="transitions init-hidden">
+	<div class="show-hide">
+	<div class="slide">
+		<form id="search_main">
+		<input type="hidden" name="n_words" id="n_words" value="1">
+		<div class="words_search">
+		<div class="word_search" id="first_word">
+		<div class="query_word_header"><div class="circle circle_w1"></div>Word #1</div>
+		Wordform: <input type="text" class="search_input" name="wf1" id="wf1"><br>
+		Lemma: <input type="text" class="search_input" name="lex1" id="lex1"><br>
+		Grammar: <input type="text" class="search_input" name="gr1" id="gr1"><br>
+		Gloss: <input type="text" class="search_input" name="gloss_index1" id="gloss1"><br>
+		<div class="add_word_fields"></div>
+		<input type="checkbox" class="neg_query" name="negq1" id="negq1" onclick="negative_query();"> Negative query<br>
+		<span class="word_plus">add word</span>
+		</div>
+		</div>
+		<br>
+		Text search: <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise"> Precise match (not like in google)<br>
+		Sorting:<br>
+		<input type="radio" name="sort" value="random">random<br>
+		<input type="radio" name="sort" value="wf">by word<br>
+		<input type="radio" name="sort" value="lemma">by lemma<br>
+		<input type="radio" name="sort" value="freq">by frequency (word queries)<br>
+		<input type="checkbox" name="distance_strict">Word distance requirements are strict<br>
+		Results per page: <input type="number" name="page_size" id="page_size" value="10"><br>
+		<select name="lang" id="lang">
+		{% for lang in languages %}
+		<option value="{{ lang }}">{{ lang }}</option>
+		{% endfor %}
+		{% if all_lang_search %}
+		<option value="all">all</option>
+		{% endif %}
+		</select>
+		<div class="subcorpus_select">
+		Author: <input type="text" name="author" id="author"> Title: <input type="text" name="title" id="title"><br>
+		Year: from <input type="number" name="year1" id="year1"> to <input type="number" name="year2" id="year2">.
+		Genre: <input type="text" name="genre" id="genre">
+		</div>
+		</form>
+	<button value="Search sentences" id="search_sent" style="width:200px;">Search sentences</button>
+	<button value="Search words" id="search_word" style="width:200px;">Search words</button>
+	<button value="Search words" id="search_doc" style="width:200px;">Search documents</button><br>
+	<button value="Search sentences (q)" id="search_sent_query" style="width:200px;">Search sentences (show query)</button>
+	<button value="Search words (q)" id="search_word_query" style="width:200px;">Search words (show query)</button>
+	<button value="Search documents (q)" id="search_doc_query" style="width:200px;">Search documents (show query)</button><br>
+	<button value="Search sentences (r)" id="search_sent_json" style="width:200px;">Search sentences (show JSON response)</button>
+	<button value="Search words (r)" id="search_word_json" style="width:200px;">Search words (show JSON response)</button>
+	<button value="Search documents (r)" id="search_doc_json" style="width:200px;">Search documents (show JSON response)</button>
+</div>
+<div align="center"><a href="#" rel="toggle-slide"><img src="static/img/arrow_up.png" class="img-swap" /></a></div>
 </div>
 </div>
-<br>
-Text search: <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise"> Precise match (not like in google)<br>
-Sorting:<br>
-<input type="radio" name="sort" value="random">random<br>
-<input type="radio" name="sort" value="wf">by word<br>
-<input type="radio" name="sort" value="lemma">by lemma<br>
-<input type="radio" name="sort" value="freq">by frequency (word queries)<br>
-<input type="checkbox" name="distance_strict">Word distance requirements are strict<br>
-Results per page: <input type="number" name="page_size" id="page_size" value="10"><br>
-<select name="lang" id="lang">
-{% for lang in languages %}
-<option value="{{ lang }}">{{ lang }}</option>
-{% endfor %}
-{% if all_lang_search %}
-<option value="all">all</option>
-{% endif %}
-</select>
-<div class="subcorpus_select">
-Author: <input type="text" name="author" id="author"> Title: <input type="text" name="title" id="title"><br>
-Year: from <input type="number" name="year1" id="year1"> to <input type="number" name="year2" id="year2">.
-Genre: <input type="text" name="genre" id="genre">
-</div>
-</form>
-<button value="Search sentences" id="search_sent" style="width:200px;">Search sentences</button>
-<button value="Search words" id="search_word" style="width:200px;">Search words</button>
-<button value="Search words" id="search_doc" style="width:200px;">Search documents</button><br>
-<button value="Search sentences (q)" id="search_sent_query" style="width:200px;">Search sentences (show query)</button>
-<button value="Search words (q)" id="search_word_query" style="width:200px;">Search words (show query)</button>
-<button value="Search documents (q)" id="search_doc_query" style="width:200px;">Search documents (show query)</button><br>
-<button value="Search sentences (r)" id="search_sent_json" style="width:200px;">Search sentences (show JSON response)</button>
-<button value="Search words (r)" id="search_word_json" style="width:200px;">Search words (show JSON response)</button>
-<button value="Search documents (r)" id="search_doc_json" style="width:200px;">Search documents (show JSON response)</button>
 {% if media %}
 <div id="media_div" style="display: none">
 <video id="src_player" class="video-js" type='video/mpeg' controls preload="auto" width="640" height="264" data-setup="{}">
