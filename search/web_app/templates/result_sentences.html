@@ -49,6 +49,7 @@ var srcAlignments = {{ data.src_alignment | safe }};
 <span class="page_link">...</span>&nbsp;
 {% endif %}
 </div>
+<a href="download_cur_results_csv" download="results-{{ data.page }}.csv">download as CSV</a>
 {% endif %}
 <script type='text/javascript'>assign_word_events();</script>
 {% if data.media %}

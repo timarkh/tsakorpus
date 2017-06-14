@@ -170,6 +170,7 @@ def add_sent_data_for_session(sent, sentData):
                          'src_alignment_files': []})
     langID = 0
     nextID = prevID = -1
+    highlightedText = ''
     if '_source' in sent:
         if 'next_id' in sent['_source']:
             nextID = sent['_source']['next_id']
@@ -177,11 +178,13 @@ def add_sent_data_for_session(sent, sentData):
             prevID = sent['_source']['prev_id']
         if 'lang' in sent['_source']:
             langID = sent['_source']['lang']
+            highlightedText = sentView.process_sentence_csv(sent, lang=settings['languages'][langID])
         lang = settings['languages'][langID]
         if lang not in sentData['languages']:
             sentData['languages'][lang] = {'id': sent['_id'],
                                            'next_id': nextID,
-                                           'prev_id': prevID}
+                                           'prev_id': prevID,
+                                           'highlighted_text': highlightedText}
         else:
             if ('next_id' not in sentData['languages'][lang]
                     or nextID == -1
@@ -431,6 +434,7 @@ def search_sent_json(page=0):
 
 @app.route('/search_sent/<int:page>')
 @app.route('/search_sent')
+@gzipped
 def search_sent(page=0):
     hits = find_sentences_json(page=page)
     add_sent_to_session(hits)
@@ -604,3 +608,34 @@ def get_word_fields():
 def send_media(path):
     return send_from_directory(os.path.join('../media', corpus_name), path)
 
+
+@app.route('/download_cur_results_csv')
+def download_cur_results_csv():
+    sentData = get_session_data('sentence_data')
+    if sentData is None:
+        return ''
+    result = []
+    for sent in sentData:
+        header = ''
+        sentCSV = ''
+        for lang in settings['languages']:
+            if (lang not in sent['languages']
+                    or 'highlighted_text' not in sent['languages'][lang]):
+                sentCSV += '\t'
+                continue
+            sentCSV += '\t' + sent['languages'][lang]['highlighted_text']
+            langID = settings['languages'].index(lang)
+            if 'id' in sent['languages'][lang] and len(header) <= 0:
+                sentJSON = sc.get_sentence_by_id(sent['languages'][lang]['id'])
+                if (len(sentJSON) > 0
+                        and 'hits' in sentJSON
+                        and 'hits' in sentJSON
+                        and len(sentJSON['hits']['hits']) > 0):
+                    sentJSON = sentJSON['hits']['hits'][0]
+                    if '_source' in sentJSON and ('lang' not in sentJSON['_source']
+                                                  or sentJSON['_source']['lang'] != langID):
+                        continue
+                    if len(header) <= 0:
+                        header = sentView.process_sentence_header(sentJSON['_source'], format='csv')
+        result.append(header + sentCSV)
+    return '\n'.join([s for s in result if len(s) > 0])

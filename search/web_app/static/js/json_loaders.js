@@ -145,7 +145,6 @@ function load_additional_word_fields() {
 function get_sentences() {
 	if ($("img-swap").attr('class') != "on") {
 		$(".img-swap").click();
-		//$(".show-hide a").click();
 	}
 	get_sentences_page(-1);
 }

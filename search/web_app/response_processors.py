@@ -159,13 +159,16 @@ class SentenceViewer:
                     offEnds[i - indexSubtr] = {'smatch'}
                 indexSubtr += 5
 
-    def process_sentence_header(self, sentSource):
+    def process_sentence_header(self, sentSource, format='html'):
         """
         Retrieve the metadata of the document the sentence
         belongs to. Return an HTML string with this data that
         can serve as a header for the context on the output page.
         """
-        result = '<span class="context_header" data-meta="">'
+        if format == 'csv':
+            result = ''
+        else:
+            result = '<span class="context_header" data-meta="">'
         docID = sentSource['doc_id']
         meta = self.sc.get_doc_by_id(docID)
         if (meta is None
@@ -178,18 +181,36 @@ class SentenceViewer:
             return result + '</span>'
         meta = meta['_source']
         if 'title' in meta:
-            result += '<span class="ch_title">' + meta['title'] + '</span>'
+            if format == 'csv':
+                result += '"' + meta['title'] + '" '
+            else:
+                result += '<span class="ch_title">' + meta['title'] + '</span>'
         else:
-            result += '<span class="ch_title">-</span>'
+            if format == 'csv':
+                result += '"???" '
+            else:
+                result += '<span class="ch_title">-</span>'
         if 'author' in meta:
-            result += '<span class="ch_author">' + meta['author'] + '</span>'
+            if format == 'csv':
+                result += '(' + meta['author'] + ') '
+            else:
+                result += '<span class="ch_author">' + meta['author'] + '</span>'
         if 'issue' in meta and len(meta['issue']) > 0:
-            result += '<span class="ch_date">' + meta['issue'] + '</span>'
+            if format == 'csv':
+                result += meta['issue'] + ' '
+            else:
+                result += '<span class="ch_date">' + meta['issue'] + '</span>'
         if 'year1' in meta and 'year2' in meta:
             dateDisplayed = str(meta['year1'])
             if meta['year2'] != meta['year1']:
-                dateDisplayed += '&ndash;' + str(meta['year2'])
-            result += '<span class="ch_date">' + dateDisplayed + '</span>'
+                if format == 'csv':
+                    dateDisplayed += '-' + str(meta['year2'])
+                else:
+                    dateDisplayed += '&ndash;' + str(meta['year2'])
+            if format == 'csv':
+                result += '[' + dateDisplayed + ']'
+            else:
+                result += '<span class="ch_date">' + dateDisplayed + '</span>'
         dataMeta = ''
         for metaField in self.settings['viewable_meta']:
             try:
@@ -200,13 +221,16 @@ class SentenceViewer:
             except KeyError:
                 pass
         dataMeta = dataMeta.replace('"', '&quot;')
-        if len(dataMeta) > 0:
+        if len(dataMeta) > 0 and format != 'csv':
             result = result.replace('data-meta=""', 'data-meta="' + dataMeta + '"')
-        return result + '</span>'
+        if format != 'csv':
+            result += '</span>'
+        return result
 
-    def get_word_offsets(self, sSource, numSent):
+    def get_word_offsets(self, sSource, numSent, matchOffsets=None):
         """
-        Find at which offsets which word start and end.
+        Find at which offsets which word start and end. If macthOffsets
+        is not None, find only offsets of the matching words.
         Return two dicts, one with start offsets and the other with end offsets.
         The keys are offsets and the values are the string IDs of the words.
         """
@@ -219,6 +243,8 @@ class SentenceViewer:
             except KeyError:
                 continue
             wn = 'w' + str(numSent) + '_' + str(iWord)
+            if matchOffsets is not None and wn not in matchOffsets:
+                continue
             try:
                 offStarts[offStart].add(wn)
             except KeyError:
@@ -319,7 +345,20 @@ class SentenceViewer:
             alignment['start'] = str(float(alignment['start']) + difference)
             alignment['end'] = str(float(alignment['end']) + difference)
 
-    def process_sentence(self, s, numSent=1, getHeader=False, lang=''):
+    def process_sentence_csv(self, sJSON, lang=''):
+        """
+        Process one sentence taken from response['hits']['hits'].
+        Return a CSV string for this sentence.
+        """
+        sDict = self.process_sentence(sJSON, numSent=0, getHeader=False, format='csv', lang=lang)
+        if ('languages' not in sDict
+                or lang not in sDict['languages']
+                or 'text' not in sDict['languages'][lang]
+                or len(sDict['languages'][lang]['text']) <= 0):
+            return ''
+        return sDict['languages'][lang]['text']
+
+    def process_sentence(self, s, numSent=1, getHeader=False, lang='', format='html'):
         """
         Process one sentence taken from response['hits']['hits'].
         If getHeader is True, retrieve the metadata from the database.
@@ -327,15 +366,15 @@ class SentenceViewer:
                            {'languages': {'<language_name>': {'text': sentence HTML}}}}.
         """
         if '_source' not in s:
-            return {'languages': {lang: {'text': ''}}}
+            return {'languages': {lang: {'text': '', 'highlighted_text': ''}}}
         matchWordOffsets = self.retrieve_highlighted_words(s, numSent)
         sSource = s['_source']
         if 'text' not in sSource or len(sSource['text']) <= 0:
-            return {'languages': {lang: {'text': ''}}}
+            return {'languages': {lang: {'text': '', 'highlighted_text': ''}}}
 
         header = {}
         if getHeader:
-            header = self.process_sentence_header(sSource)
+            header = self.process_sentence_header(sSource, format)
         if 'highlight' in s and 'text' in s['highlight']:
             highlightedText = s['highlight']['text']
             if type(highlightedText) == list:
@@ -346,17 +385,26 @@ class SentenceViewer:
         else:
             highlightedText = sSource['text']
         if 'words' not in sSource:
-            return {'languages': {lang: {'text': highlightedText}}}
+            return {'languages': {lang: {'text': highlightedText,
+                                         'highlighted_text': highlightedText}}}
         chars = list(sSource['text'])
-        offParaStarts, offParaEnds = self.get_para_offsets(sSource)
-        offSrcStarts, offSrcEnds, fragmentInfo = self.get_src_offsets(sSource)
-        offStarts, offEnds = self.get_word_offsets(sSource, numSent)
-        self.add_highlighted_offsets(offStarts, offEnds, highlightedText)
+        if format == 'csv':
+            offParaStarts, offParaEnds = {}, {}
+            offSrcStarts, offSrcEnds, fragmentInfo = {}, {}, {}
+            offStarts, offEnds = self.get_word_offsets(sSource, numSent,
+                                                       matchOffsets=matchWordOffsets)
+        else:
+            offParaStarts, offParaEnds = self.get_para_offsets(sSource)
+            offSrcStarts, offSrcEnds, fragmentInfo = self.get_src_offsets(sSource)
+            offStarts, offEnds = self.get_word_offsets(sSource, numSent)
+            self.add_highlighted_offsets(offStarts, offEnds, highlightedText)
 
         curWords = set()
         for i in range(len(chars)):
             if chars[i] == '\n':
-                if (i == 0 or i == len(chars) - 1
+                if format == 'csv':
+                    chars[i] = '\\n '
+                elif (i == 0 or i == len(chars) - 1
                         or all(chars[j] == '\n'
                                for j in range(i+1, len(chars)))):
                     chars[i] = '<span class="newline"></span>'
@@ -368,7 +416,10 @@ class SentenceViewer:
                 continue
             addition = ''
             if len(curWords) > 0:
-                addition = '</span>'
+                if format == 'csv':
+                    addition = '}}'
+                else:
+                    addition = '</span>'
                 if i in offEnds:
                     curWords -= offEnds[i]
                 if i in offParaEnds:
@@ -386,14 +437,21 @@ class SentenceViewer:
                 curWords |= offSrcStarts[i]
                 newWord = True
             if len(curWords) > 0 and (len(addition) > 0 or newWord):
-                addition += self.build_span(sSource, curWords, lang, matchWordOffsets)
+                if format == 'csv':
+                    addition = '{{'
+                else:
+                    addition += self.build_span(sSource, curWords, lang, matchWordOffsets)
             chars[i] = addition + chars[i]
         if len(curWords) > 0:
-            chars[-1] += '</span>'
+            if format == 'csv':
+                chars[-1] += '}}'
+            else:
+                chars[-1] += '</span>'
         relationsSatisfied = True
         if 'relations_satisfied' in s and not s['relations_satisfied']:
             relationsSatisfied = False
-        return {'header': header, 'languages': {lang: {'text': ''.join(chars)}},
+        return {'header': header, 'languages': {lang: {'text': ''.join(chars),
+                                                       'highlighted_text': highlightedText}},
                 'relations_satisfied': relationsSatisfied,
                 'src_alignment': fragmentInfo}
 
