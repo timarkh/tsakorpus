@@ -9,7 +9,7 @@ class InterfaceQueryParser:
     rxSimpleText = re.compile('^[^\\[\\]()*\\\\{}^$.?+~|]*$')
     rxBooleanText = re.compile('^[^\\[\\]()\\\\{}^$.+|]*$')
     rxParentheses = re.compile('[()]')
-    rxStars = re.compile('^\\**$')
+    rxStars = re.compile('^(\\**|(\\.\\*)*)$')
     rxGlossQueryQuant = re.compile('^\\(([^()]+)\\)([*+?])$')
     rxGlossQuerySrc = re.compile('^([^{}]*)\\{([^{}]*)\\}$')
 
@@ -311,7 +311,7 @@ class InterfaceQueryParser:
         wordAnaFields = {'words.ana.lex', 'words.ana.gr', 'words.ana.gloss_index'}
         for field in self.wordFields:
             wordAnaFields.add('words.ana.' + field)
-        wordFields = {'words.wf'}
+        wordFields = {'words.wf', 'words.wtype'}
         queryDict = {k: queryDict[k] for k in queryDict
                      if queryDict[k] is not None and queryDict[k] != {}}
         queryDictWords, queryDictWordsAna = {}, {}
@@ -460,8 +460,8 @@ class InterfaceQueryParser:
             pathPfx = 'words.'
             if 'sent_ids' in htmlQuery:
                 prelimQuery['sent_ids'] = htmlQuery['sent_ids']
-            if 'wf1' not in htmlQuery or len(htmlQuery['wf1']) <= 0:
-                htmlQuery['wf1'] = '*'
+            # if 'wf1' not in htmlQuery or len(htmlQuery['wf1']) <= 0:
+            #     htmlQuery['wf1'] = '*'
         else:
             pathPfx = ''
 
@@ -474,6 +474,9 @@ class InterfaceQueryParser:
             curPrelimQuery = {}
             strWordNum = str(iWord + 1)
             negQuery = ('negq' + strWordNum in htmlQuery)
+            if searchIndex == 'sentences':
+                curPrelimQuery[pathPfx + 'wtype'] = self.make_bool_query('word',
+                                                                         pathPfx + 'wtype', lang)
             if 'wf' + strWordNum in htmlQuery and len(htmlQuery['wf' + strWordNum]) > 0:
                 curPrelimQuery[pathPfx + 'wf'] = self.make_bool_query(htmlQuery['wf' + strWordNum],
                                                                       pathPfx + 'wf', lang)

@@ -15,7 +15,7 @@
   "all_language_search_enabled": true,
   "lang_props":
   {
-    "adyge":
+    "adyghe":
     {
       "gloss_shortcuts": {
         "case": "(obl(\\.pl)?|abs|erg|ins|adv)",
