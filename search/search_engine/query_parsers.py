@@ -9,6 +9,7 @@ class InterfaceQueryParser:
     rxSimpleText = re.compile('^[^\\[\\]()*\\\\{}^$.?+~|]*$')
     rxBooleanText = re.compile('^[^\\[\\]()\\\\{}^$.+|]*$')
     rxParentheses = re.compile('[()]')
+    rxStars = re.compile('^\\**$')
     rxGlossQueryQuant = re.compile('^\\(([^()]+)\\)([*+?])$')
     rxGlossQuerySrc = re.compile('^([^{}]*)\\{([^{}]*)\\}$')
 
@@ -110,7 +111,9 @@ class InterfaceQueryParser:
             # return {'regexp': {field: text}}
             return {'regexp': {field: self.make_simple_gloss_query(text, lang)}}
         elif not (field == 'ana.gr' or field.endswith('.ana.gr')):
-            if InterfaceQueryParser.rxSimpleText.search(text) is not None:
+            if InterfaceQueryParser.rxStars.search(text) is not None:
+                return {'match_all': {}}
+            elif InterfaceQueryParser.rxSimpleText.search(text) is not None:
                 return {'match': {field: text}}
             elif InterfaceQueryParser.rxBooleanText.search(text) is not None:
                 return {'wildcard': {field: text}}
@@ -420,6 +423,8 @@ class InterfaceQueryParser:
             pathPfx = 'words.'
             if 'sent_ids' in htmlQuery:
                 prelimQuery['sent_ids'] = htmlQuery['sent_ids']
+            if 'wf1' not in htmlQuery or len(htmlQuery['wf1']) <= 0:
+                htmlQuery['wf1'] = '*'
         else:
             pathPfx = ''
 

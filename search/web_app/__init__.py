@@ -247,7 +247,7 @@ def search_page():
 @jsonp
 def search_sent_query(page=0):
     if request.args and page <= 0:
-        query = copy.deepcopy(request.args)
+        query = copy_request_args()
         page = 1
         change_display_options(query)
         set_session_data('last_query', query)
@@ -394,7 +394,9 @@ def find_sentences_json(page=0):
             query['sent_ids'] = sc.qp.filter_sentences(iterator, wordConstraints)
             set_session_data('last_query', query)
     nOccurrences = 0
-    if get_session_data('sort') == 'random':
+    if (get_session_data('sort') == 'random'
+            and 'n_words' in query
+            and query['n_words'] == 1):
         nOccurrences = count_occurrences(query)
     esQuery = sc.qp.html2es(query,
                             searchIndex='sentences',
@@ -403,9 +405,14 @@ def find_sentences_json(page=0):
                             query_size=get_session_data('page_size'),
                             page=get_session_data('page'))
     hits = sc.get_sentences(esQuery)
-    if nOccurrences > 0 and 'aggregations' in hits and 'agg_nwords' in hits['aggregations']:
-        hits['aggregations']['agg_nwords']['sum'] = nOccurrences
-        hits['aggregations']['agg_nwords']['count'] = 0
+    if 'aggregations' in hits and 'agg_nwords' in hits['aggregations']:
+        if nOccurrences > 0:
+            hits['aggregations']['agg_nwords']['sum'] = nOccurrences
+            # hits['aggregations']['agg_nwords']['count'] = 0
+        elif ('n_words' in query and query['n_words'] == 1
+              and 'sum' in hits['aggregations']['agg_nwords']):
+            # only count number of occurrences for one-word queries
+            hits['aggregations']['agg_nwords']['sum'] = 0
     if (len(wordConstraints) > 0
             and not get_session_data('distance_strict')
             and 'hits' in hits and 'hits' in hits['hits']):
