@@ -8,6 +8,7 @@ import copy
 import random
 import uuid
 import math
+import xlsxwriter
 from search_engine.client import SearchClient
 from .response_processors import SentenceViewer
 
@@ -609,21 +610,21 @@ def send_media(path):
     return send_from_directory(os.path.join('../media', corpus_name), path)
 
 
-@app.route('/download_cur_results_csv')
-def download_cur_results_csv():
-    sentData = get_session_data('sentence_data')
-    if sentData is None:
-        return ''
+def prepare_results_for_download(sentData):
+    """
+    Return a list of search results in a format easily transformable
+    to csv/xlsx.
+    """
     result = []
     for sent in sentData:
         header = ''
-        sentCSV = ''
+        sentCSV = []
         for lang in settings['languages']:
             if (lang not in sent['languages']
                     or 'highlighted_text' not in sent['languages'][lang]):
-                sentCSV += '\t'
+                sentCSV.append('')
                 continue
-            sentCSV += '\t' + sent['languages'][lang]['highlighted_text']
+            sentCSV.append(sent['languages'][lang]['highlighted_text'])
             langID = settings['languages'].index(lang)
             if 'id' in sent['languages'][lang] and len(header) <= 0:
                 sentJSON = sc.get_sentence_by_id(sent['languages'][lang]['id'])
@@ -637,5 +638,29 @@ def download_cur_results_csv():
                         continue
                     if len(header) <= 0:
                         header = sentView.process_sentence_header(sentJSON['_source'], format='csv')
-        result.append(header + sentCSV)
-    return '\n'.join([s for s in result if len(s) > 0])
+        result.append([header] + sentCSV)
+    return result
+
+
+@app.route('/download_cur_results_csv')
+def download_cur_results_csv():
+    sentData = get_session_data('sentence_data')
+    if sentData is None:
+        return ''
+    result = prepare_results_for_download(sentData)
+    return '\n'.join(['\t'.join(s) for s in result if len(s) > 0])
+
+@app.route('/download_cur_results_xlsx')
+def download_cur_results_xlsx():
+    sentData = get_session_data('sentence_data')
+    if sentData is None:
+        return None
+    results = prepare_results_for_download(sentData)
+    XLSXFilename = 'results-' + str(uuid.uuid4()) + '.xlsx'
+    workbook = xlsxwriter.Workbook('tmp/' + XLSXFilename)
+    worksheet = workbook.add_worksheet('Search results')
+    for i in range(len(results)):
+        for j in range(len(results[i])):
+            worksheet.write(i, j, results[i][j])
+    workbook.close()
+    return send_from_directory('../tmp', XLSXFilename)
