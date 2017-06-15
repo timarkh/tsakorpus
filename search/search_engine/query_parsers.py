@@ -285,10 +285,10 @@ class InterfaceQueryParser:
                 else:
                     query['bool']['must'].append({'term': {'lang': lang}})
             if docIDs is not None:
-                if 'must' not in query['bool']:
-                    query['bool']['must'] = [{'terms': {'dids': docIDs}}]
+                if 'filter' not in query['bool']:
+                    query['bool']['filter'] = [{'terms': {'dids': docIDs}}]
                 else:
-                    query['bool']['must'].append({'terms': {'dids': docIDs}})
+                    query['bool']['filter'].append({'terms': {'dids': docIDs}})
         if sortOrder == 'random':
             query = self.make_random(query)
         esQuery = {'query': query, 'size': query_size, 'from': query_from,
@@ -383,11 +383,12 @@ class InterfaceQueryParser:
                 query += self.single_word_sentence_query(wordDesc, iQueryWord + 1, sortOrder,
                                                          negative=negQuery)
             query += list(queryDictTop.values())
+            queryFilter = []
             if 'sent_ids' in queryDict:
-                query.append({'ids': {'values': queryDict['sent_ids']}})
+                queryFilter.append({'ids': {'values': queryDict['sent_ids']}})
             elif 'doc_ids' in queryDict:
-                query.append({'terms': {'doc_id': queryDict['doc_ids']}})
-            query = {'bool': {'must': query}}
+                queryFilter.append({'terms': {'doc_id': queryDict['doc_ids']}})
+            query = {'bool': {'must': query, 'filter': queryFilter}}
         if sortOrder == 'random':
             query = self.make_random(query, randomSeed)
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
