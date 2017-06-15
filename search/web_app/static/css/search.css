@@ -174,6 +174,7 @@
 	font-size: 16px;
 	font-family: "Segoe UI", "Lucida Grande", sans-serif;
 	line-height: 22px;
+	float: left;
 }
 
 .word_plus, .add_rel, .search_w {
@@ -257,4 +258,15 @@ td {
 
 .src_highlighted {
 	font-weight: bold;
+}
+
+#media_div {
+	width: 450px;
+	padding: 10px;
+	float: left;
+	display: inline-block;
+}
+
+#lower_part {
+	display: flex;
 }

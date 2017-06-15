@@ -558,6 +558,7 @@ def search_word():
                           query_size=get_session_data('page_size'))
     hits = sc.get_words(query)
     hitsProcessed = sentView.process_word_json(hits, docIDs)
+    hitsProcessed['media'] = settings['media']
     return render_template('result_words.html', data=hitsProcessed)
 
 
@@ -594,6 +595,7 @@ def search_doc():
                                   query_size=get_session_data('page_size'))
     hits = sc.get_docs(query)
     hitsProcessed = sentView.process_docs_json(hits)
+    hitsProcessed['media'] = settings['media']
     return render_template('result_docs.html', data=hitsProcessed)
 
 

@@ -68,9 +68,11 @@
 <div align="center"><a href="#" rel="toggle-slide"><img src="static/img/arrow_up.png" class="img-swap" /></a></div>
 </div>
 </div>
+
+<div id="lower_part">
 {% if media %}
 <div id="media_div" style="display: none">
-<video id="src_player" class="video-js" type='video/mpeg' controls preload="auto" width="640" height="264" data-setup="{}">
+<video id="src_player" class="video-js" type='video/mpeg' controls preload="auto" width="400" height="300" data-setup="{}">
 <p class="vjs-no-js">
 To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
 </p>
@@ -79,6 +81,7 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 {% endif %}
 <div id="res_p">
 <p style="font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;">(Place for results)</p></div>
+</div>
 <div id="analysis"></div>
 </body>
 </html>

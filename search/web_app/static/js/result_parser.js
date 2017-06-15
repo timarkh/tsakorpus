@@ -11,7 +11,7 @@ function print_html(results) {
 }
 
 function show_player() {
-	$('#media_div').css('display', 'block');
+	$('#media_div').css('display', 'inline-block');
 }
 
 function hide_player() {
