@@ -75,13 +75,24 @@
 	font-style: italic;
 }
 
-.expand {
-	font-size: 22px;
-	color: #20A030;
+.glyph_expand {
+	width: 25px;
+	font-size: 26px;
+	color: #48724d;
 	cursor: pointer;
+	top: 50% !important;
+	height: 100%;
+	margin-top: -25%;
+	margin-left: 10px;
+	text-align: center;
+}
+
+.glyph_expand:hover {
+	color: #20A030;
 }
 
 .sentence {
+	width: 95%;
 }
 
 .sent_lang:hover {
@@ -166,8 +177,25 @@
 	margin-top: 12px;
 }
 
-.bad_distances {
+.context_off {
 	opacity: 0.5;
+}
+
+.cx_main {
+	display: flex;
+}
+
+.cx_toggle_div {
+	position: relative;
+}
+
+.cx_toggle_chk {
+	width: 25px;
+	display: inline;
+	top: 50%;
+	height: 100%;
+	margin-top: -25%;
+	text-align: center;
 }
 
 #res_p {

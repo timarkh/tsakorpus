@@ -24,11 +24,13 @@ function assign_word_events() {
 	$("span.context_header").unbind('click');
 	$("span.search_w").unbind('click');
 	$("span.page_link").unbind('click');
+	$(".cx_toggle_chk").unbind('change');
 	$('span.word').click(highlight_cur_word);
 	$('span.expand').click(expand_context);
 	$('span.context_header').click(show_doc_meta);
 	$('span.search_w').click(search_word_from_list);
 	$("span.page_link").click(page_click);
+	$(".cx_toggle_chk").change(context_toggle);
 	assign_para_highlight();
 	assign_src_alignment();
 	assign_gram_popup();
@@ -45,13 +47,19 @@ function highlight_cur_word(e) {
 }
 
 function expand_context(e) {
-	var n_sent = $(e.target).attr('data-nsent');
+	//alert($(e.currentTarget).attr('class'));
+	var n_sent = $(e.currentTarget).attr('data-nsent');
 	load_expanded_context(n_sent);
 	$('#res' + n_sent).html($('#res' + n_sent).html().replace(/<span class="newline"><\/span>/g, "<br>"));
 }
 
+function context_toggle(e) {
+	var contextDiv = $(e.currentTarget).parent().parent().parent();
+	contextDiv.toggleClass('context_off');
+}
+
 function show_doc_meta(e) {
-	var e_obj = $(e.target);
+	var e_obj = $(e.currentTarget);
 	while (e_obj.attr('class') != 'context_header') {
 		e_obj = e_obj.parent();
 	}
@@ -60,7 +68,7 @@ function show_doc_meta(e) {
 }
 
 function search_word_from_list(e) {
-	wf = $(e.target).attr('data-wf');
+	wf = $(e.currentTarget).attr('data-wf');
 	if (wf == "") return;
 	$('.search_input').val("");
 	$('#wf1').val(wf);
@@ -68,7 +76,7 @@ function search_word_from_list(e) {
 }
 
 function page_click(e) {
-	var page = $(e.target).attr("data-page");
+	var page = $(e.currentTarget).attr("data-page");
 	get_sentences_page(page);
 }
 

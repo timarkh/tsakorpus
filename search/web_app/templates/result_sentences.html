@@ -7,8 +7,10 @@
 <div class="sent_results">
 {% for c in data.contexts %}
 	{% set context_loop = loop %}
-	<div class="context {% if not c.relations_satisfied %} bad_distances{% endif %}" id='div_res{{ loop.index - 1 }}'>
+	<div class="context {% if not c.relations_satisfied %} context_off{% endif %}" id='div_res{{ loop.index - 1 }}'>
 	<span class="ch_container">{{ c.header | safe }}</span>
+	<div class="cx_main">
+	<div class="cx_toggle_div"><input type="checkbox" class="cx_toggle_chk" {% if c.relations_satisfied %} checked{% endif %}></div>
 	<span class="sentence" id='res{{ loop.index - 1 }}'>
 	{% for lang in data.languages %}
 		{% if lang in c.languages %}
@@ -19,7 +21,8 @@
 		{% endif %}
 	{% endfor %}
 	</span>
-	<span class='expand' data-nsent="{{ loop.index - 1 }}"><=...=></span>
+	<span class='expand' data-nsent="{{ loop.index - 1 }}"><span class="glyph_expand glyphicon glyphicon-resize-horizontal" aria-hidden="true"></span></span>
+	</div>
 	</div>
 {% endfor %}
 
