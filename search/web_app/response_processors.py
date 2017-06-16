@@ -468,12 +468,12 @@ class SentenceViewer:
             else:
                 chars[-1] += '</span>'
         relationsSatisfied = True
-        if 'relations_satisfied' in s and not s['relations_satisfied']:
+        if 'toggled_on' in s and not s['toggled_on']:
             relationsSatisfied = False
         text = self.transliterate_baseline(''.join(chars), lang=lang, translit=translit)
         return {'header': header, 'languages': {lang: {'text': text,
                                                        'highlighted_text': highlightedText}},
-                'relations_satisfied': relationsSatisfied,
+                'toggled_on': relationsSatisfied,
                 'src_alignment': fragmentInfo}
 
     def count_word_subcorpus_stats(self, w, docIDs):

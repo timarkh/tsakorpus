@@ -253,7 +253,7 @@ def get_page_data(hitsProcessed):
         sentPageDataDict = {'toggled_off': False,
                             'highlighted_text_csv': [],
                             'header_csv': ''}
-        if not hit['relations_satisfied']:
+        if not hit['toggled_on']:
             sentPageDataDict['toggled_off'] = True
         for lang in settings['languages']:
             if lang not in curSentData[iHit]['languages']:
@@ -273,8 +273,14 @@ def sync_page_data(page, hitsProcessed):
     the sentences according to the previously saved page data.
     """
     pageData = get_session_data('page_data')
-    if pageData is not None and page in pageData:
-        return
+    if (pageData is not None and page in pageData
+            and 'contexts' in hitsProcessed
+            and len(hitsProcessed['contexts']) == len(pageData[page])):
+        for iHit in range(len(hitsProcessed['contexts'])):
+            if pageData[page][iHit]['toggled_off']:
+                hitsProcessed['contexts'][iHit]['toggled_on'] = False
+            else:
+                hitsProcessed['contexts'][iHit]['toggled_on'] = True
     elif pageData is None:
         pageData = {}
     curPageData = get_page_data(hitsProcessed)
@@ -491,7 +497,7 @@ def find_sentences_json(page=0):
             and not get_session_data('distance_strict')
             and 'hits' in hits and 'hits' in hits['hits']):
         for hit in hits['hits']['hits']:
-            hit['relations_satisfied'] = sc.qp.wr.check_sentence(hit, wordConstraints)
+            hit['toggled_on'] = sc.qp.wr.check_sentence(hit, wordConstraints)
     return hits
 
 
@@ -523,7 +529,7 @@ def search_sent(page=-1):
     hitsProcessed['page_size'] = get_session_data('page_size')
     hitsProcessed['languages'] = settings['languages']
     hitsProcessed['media'] = settings['media']
-    sync_page_data(page, hitsProcessed)
+    sync_page_data(hitsProcessed['page'], hitsProcessed)
 
     return render_template('result_sentences.html', data=hitsProcessed)
 
@@ -719,7 +725,7 @@ def download_cur_results_csv():
 def download_cur_results_xlsx():
     pageData = get_session_data('page_data')
     if pageData is None or len(pageData) <= 0:
-        return None
+        return ''
     results = prepare_results_for_download(pageData)
     XLSXFilename = 'results-' + str(uuid.uuid4()) + '.xlsx'
     workbook = xlsxwriter.Workbook('tmp/' + XLSXFilename)
@@ -729,3 +735,20 @@ def download_cur_results_xlsx():
             worksheet.write(i, j, results[i][j])
     workbook.close()
     return send_from_directory('../tmp', XLSXFilename)
+
+
+@app.route('/toggle_sentence/<int:sentNum>')
+def toggle_sentence(sentNum):
+    """
+    Togle currently viewed sentence with the given number on or off.
+    """
+    pageData = get_session_data('page_data')
+    page = get_session_data('page')
+    if page is None or page == '':
+        page = 0
+    if pageData is None or page is None or page not in pageData:
+        return json.dumps(pageData)
+    if sentNum < 0 or sentNum >= len(pageData[page]):
+        return ''
+    pageData[page][sentNum]['toggled_off'] = not pageData[page][sentNum]['toggled_off']
+    return ''

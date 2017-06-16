@@ -56,6 +56,8 @@ function expand_context(e) {
 function context_toggle(e) {
 	var contextDiv = $(e.currentTarget).parent().parent().parent();
 	contextDiv.toggleClass('context_off');
+	contextID = contextDiv.attr('id').substring(7);
+	$.ajax({url: "toggle_sentence/" + contextID});
 }
 
 function show_doc_meta(e) {
