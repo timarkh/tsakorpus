@@ -227,7 +227,7 @@ function add_word_inputs(e) {
 	new_word_num += 1;
 	word_div_html = '<div class="word_search" id="wsearch_' + new_word_num + '">\n' + $('#first_word').html();
 	word_div_html = word_div_html.replace(/1/g, new_word_num)
-	word_div_html += '<br><span class="add_rel" data-nword="' + new_word_num + '" data-nrels="0">add relation</span>';
+	word_div_html += '<span class="add_rel glyphicon glyphicon-circle-arrow-down" data-nword="' + new_word_num + '" data-nrels="0"><span class="tooltip_prompt">add&nbsp;relation</span></span>';
 	word_div_html += '</div>';
 	word_div = $.parseHTML(word_div_html);
 	$("div.words_search").append(word_div);

@@ -1,4 +1,9 @@
-﻿.word:hover {
+﻿body {
+	margin: 5px;
+	margin-bottom: 10px;
+}
+
+.word:hover {
 	border-bottom: 1px gray dotted;
 }
 
@@ -209,8 +214,50 @@
 	cursor: pointer;
 }
 
+.add_rel {
+	margin-left: 5px;
+	font-size: 20px;
+}
+
 .word_plus {
 	margin-top: 5px;
+	font-size: 20px;
+}
+
+.word_plus:hover {
+	color: #2664c9;
+}
+
+.add_rel:hover {
+	color: #2664c9;
+}
+
+.tooltip_prompt {
+    visibility: hidden;
+    background-color: white;
+    color: #333;
+    text-align: center;
+    padding: 5px 15px;
+	margin-left: -35%;
+	margin-top: 5px;
+	top: 100%;
+	left: 50%;
+    border-radius: 6px;
+	border: 1px solid gray;
+    position: absolute;
+    z-index: 1;
+	opacity: 0.75;
+	font-size: 16px;
+	font-family: Helvetica, sans-serif;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.add_rel:hover .tooltip_prompt {
+    visibility: visible;
+}
+
+.word_plus:hover .tooltip_prompt {
+    visibility: visible;
 }
 
 .popup_wf {
