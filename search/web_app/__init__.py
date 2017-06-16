@@ -145,13 +145,17 @@ def change_display_options(query):
                 ps = 1
             set_session_data('page_size', ps)
         except:
-            pass
+            set_session_data('page_size', 10)
     if 'sort' in query:
         set_session_data('sort', query['sort'])
     if 'distance_strict' in query:
         set_session_data('distance_strict', True)
     else:
         set_session_data('distance_strict', False)
+    if 'translit' in query:
+        set_session_data('translit', query['translit'])
+    else:
+        set_session_data('translit', None)
 
 
 def add_sent_data_for_session(sent, sentData):
@@ -179,7 +183,8 @@ def add_sent_data_for_session(sent, sentData):
             prevID = sent['_source']['prev_id']
         if 'lang' in sent['_source']:
             langID = sent['_source']['lang']
-            highlightedText = sentView.process_sentence_csv(sent, lang=settings['languages'][langID])
+            highlightedText = sentView.process_sentence_csv(sent, lang=settings['languages'][langID],
+                                                            translit = get_session_data('translit'))
         lang = settings['languages'][langID]
         if lang not in sentData['languages']:
             sentData['languages'][lang] = {'id': sent['_id'],
@@ -239,10 +244,15 @@ def update_expanded_contexts(context, neighboringIDs):
 @app.route('/search')
 def search_page():
     allLangSearch = settings['all_language_search_enabled']
+    if 'transliterations' in settings:
+        transliterations = settings['transliterations']
+    else:
+        transliterations = None
     return render_template('index.html',
                            corpus_name=corpus_name,
                            languages=settings['languages'],
                            all_lang_search=allLangSearch,
+                           transliterations=transliterations,
                            media=settings['media'])
 
 
@@ -297,7 +307,8 @@ def get_parallel_for_one_sent_html(sSource, numHit):
         add_sent_data_for_session(s, curSentIDs[numHit])
         langID = s['_source']['lang']
         lang = settings['languages'][langID]
-        sentHTML = sentView.process_sentence(s, numSent=numSent, getHeader=False, lang=lang)['languages'][lang]['text']
+        sentHTML = sentView.process_sentence(s, numSent=numSent, getHeader=False, lang=lang,
+                                             translit=get_session_data('translit'))['languages'][lang]['text']
         yield sentHTML, lang
 
 
@@ -439,7 +450,8 @@ def search_sent_json(page=0):
 def search_sent(page=0):
     hits = find_sentences_json(page=page)
     add_sent_to_session(hits)
-    hitsProcessed = sentView.process_sent_json(hits)
+    hitsProcessed = sentView.process_sent_json(hits,
+                                               translit=get_session_data('translit'))
     if len(settings['languages']) > 1 and 'hits' in hits and 'hits' in hits['hits']:
         add_parallel(hits['hits']['hits'], hitsProcessed)
     hitsProcessed['page'] = get_session_data('page')
@@ -493,7 +505,8 @@ def get_sent_context(n):
                 expandedContext = sentView.process_sentence(curSent,
                                                             numSent=lastSentNum,
                                                             getHeader=False,
-                                                            lang=lang)
+                                                            lang=lang,
+                                                            translit=get_session_data('translit'))
                 curCxLang[side] = expandedContext['languages'][lang]['text']
                 sentView.relativize_src_alignment(expandedContext, curSentData['src_alignment_files'])
                 context['src_alignment'].update(expandedContext['src_alignment'])
@@ -651,6 +664,7 @@ def download_cur_results_csv():
         return ''
     result = prepare_results_for_download(sentData)
     return '\n'.join(['\t'.join(s) for s in result if len(s) > 0])
+
 
 @app.route('/download_cur_results_xlsx')
 def download_cur_results_xlsx():

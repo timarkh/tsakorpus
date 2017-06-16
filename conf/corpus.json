@@ -12,6 +12,7 @@
     "year2"
   ],
   "languages": ["nganasan", "nganasan_cyrillic", "russian", "english"],
+  "transliterations": ["original", "IPA"],
   "all_language_search_enabled": true,
   "lang_props":
   {

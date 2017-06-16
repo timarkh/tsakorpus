@@ -2,6 +2,7 @@ import json
 import re
 import os
 import math
+from .transliteration import *
 
 
 class SentenceViewer:
@@ -11,6 +12,7 @@ class SentenceViewer:
     """
 
     rxWordNo = re.compile('^w[0-9]+_([0-9]+)$')
+    rxTextSpans = re.compile('</?span.*?>|[^<>]+')
 
     def __init__(self, settings_dir, search_client):
         self.settings_dir = settings_dir
@@ -345,12 +347,13 @@ class SentenceViewer:
             alignment['start'] = str(float(alignment['start']) + difference)
             alignment['end'] = str(float(alignment['end']) + difference)
 
-    def process_sentence_csv(self, sJSON, lang=''):
+    def process_sentence_csv(self, sJSON, lang='', translit=None):
         """
         Process one sentence taken from response['hits']['hits'].
         Return a CSV string for this sentence.
         """
-        sDict = self.process_sentence(sJSON, numSent=0, getHeader=False, format='csv', lang=lang)
+        sDict = self.process_sentence(sJSON, numSent=0, getHeader=False, format='csv',
+                                      lang=lang, translit=translit)
         if ('languages' not in sDict
                 or lang not in sDict['languages']
                 or 'text' not in sDict['languages'][lang]
@@ -358,7 +361,24 @@ class SentenceViewer:
             return ''
         return sDict['languages'][lang]['text']
 
-    def process_sentence(self, s, numSent=1, getHeader=False, lang='', format='html'):
+    def transliterate_baseline(self, text, lang, translit=None):
+        if translit is None or lang not in self.settings['languages']:
+            return text
+        spans = self.rxTextSpans.findall(text)
+        translitFuncName = 'trans_' + translit + '_baseline'
+        localNames = globals()
+        if translitFuncName not in localNames:
+            return text
+        translit_func = localNames[translitFuncName]
+        textTranslit = ''
+        for span in spans:
+            if span.startswith('<'):
+                textTranslit += span
+            else:
+                textTranslit += translit_func(span, lang)
+        return textTranslit
+
+    def process_sentence(self, s, numSent=1, getHeader=False, lang='', translit=None, format='html'):
         """
         Process one sentence taken from response['hits']['hits'].
         If getHeader is True, retrieve the metadata from the database.
@@ -450,7 +470,8 @@ class SentenceViewer:
         relationsSatisfied = True
         if 'relations_satisfied' in s and not s['relations_satisfied']:
             relationsSatisfied = False
-        return {'header': header, 'languages': {lang: {'text': ''.join(chars),
+        text = self.transliterate_baseline(''.join(chars), lang=lang, translit=translit)
+        return {'header': header, 'languages': {lang: {'text': text,
                                                        'highlighted_text': highlightedText}},
                 'relations_satisfied': relationsSatisfied,
                 'src_alignment': fragmentInfo}
@@ -600,7 +621,7 @@ class SentenceViewer:
         lang = self.settings['languages'][langID]
         return langID, lang
 
-    def process_sent_json(self, response):
+    def process_sent_json(self, response, translit=None):
         result = {'n_occurrences': 0, 'n_sentences': 0,
                   'n_docs': 0, 'page': 1,
                   'message': 'Nothing found.'}
@@ -620,7 +641,8 @@ class SentenceViewer:
             curContext = self.process_sentence(response['hits']['hits'][iHit],
                                                numSent=iHit,
                                                getHeader=True,
-                                               lang=lang)
+                                               lang=lang,
+                                               translit=translit)
             if 'src_alignment' in curContext:
                 srcAlignmentInfo.update(curContext['src_alignment'])
             result['contexts'].append(curContext)

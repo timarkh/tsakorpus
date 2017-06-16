@@ -50,6 +50,13 @@
 		<option value="all">all</option>
 		{% endif %}
 		</select>
+		{% if transliterations %}
+			Transliteration: <select name="translit" id="translit">
+			{% for tr in transliterations %}
+			<option value="{{ tr }}">{{ tr }}</option>
+			{% endfor %}
+			</select>
+		{% endif %}
 		<div class="subcorpus_select">
 		Author: <input type="text" name="author" id="author"> Title: <input type="text" name="title" id="title"><br>
 		Year: from <input type="number" name="year1" id="year1"> to <input type="number" name="year2" id="year2">.

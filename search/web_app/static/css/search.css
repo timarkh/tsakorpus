@@ -87,7 +87,7 @@
 	cursor: pointer;
 	top: 50% !important;
 	height: 100%;
-	margin-top: -25%;
+	margin-top: -10% !important;
 	margin-left: 10px;
 	text-align: center;
 }
@@ -110,6 +110,11 @@
 	border-right: 2px #fff solid;
 	margin-bottom: 5px;
 	display: block;
+}
+
+.sent_results {
+	max-height: 900px;
+	overflow-y: scroll;
 }
 
 .p_highlighted {
@@ -182,6 +187,10 @@
 	margin-top: 12px;
 }
 
+.search_input {
+	color: black;
+}
+
 .context_off {
 	opacity: 0.5;
 }
@@ -199,7 +208,7 @@
 	display: inline;
 	top: 50%;
 	height: 100%;
-	margin-top: -25%;
+	margin-top: -25% !important;
 	text-align: center;
 }
 
