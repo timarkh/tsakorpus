@@ -1,8 +1,8 @@
-from flask import Flask, request, after_this_request, render_template, session, jsonify, current_app, send_from_directory
+from flask import Flask, request, after_this_request, render_template, session, jsonify, current_app, send_from_directory, make_response
 import json
 import gzip
 import functools
-from functools import wraps
+from functools import wraps, update_wrapper
 import os
 import copy
 import random
@@ -74,6 +74,19 @@ def gzipped(f):
 app = Flask(__name__)
 app.secret_key = 'kkj6hd)^js7#dFQ'
 sessionData = {}    # session key -> dictionary with the data for current session
+
+
+def nocache(view):
+    @wraps(view)
+    def no_cache(*args, **kwargs):
+        response = make_response(view(*args, **kwargs))
+        # response.headers['Last-Modified'] = http_date(datetime.now())
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
+        return response
+
+    return update_wrapper(no_cache, view)
 
 
 def initialize_session():
@@ -172,7 +185,8 @@ def add_sent_data_for_session(sent, sentData):
         sentData.update({'languages': {},
                          'doc_id': docID,
                          'times_expanded': 0,
-                         'src_alignment_files': []})
+                         'src_alignment_files': [],
+                         'header_csv': ''})
     langID = 0
     nextID = prevID = -1
     highlightedText = ''
@@ -181,6 +195,8 @@ def add_sent_data_for_session(sent, sentData):
             nextID = sent['_source']['next_id']
         if 'prev_id' in sent['_source']:
             prevID = sent['_source']['prev_id']
+        if len(sentData['header_csv']) <= 0:
+            sentData['header_csv'] = sentView.process_sentence_header(sent['_source'], format='csv')
         if 'lang' in sent['_source']:
             langID = sent['_source']['lang']
             highlightedText = sentView.process_sentence_csv(sent, lang=settings['languages'][langID],
@@ -220,6 +236,49 @@ def add_sent_to_session(hits):
         add_sent_data_for_session(sent, curSentID)
         curSentIDs.append(curSentID)
     set_session_data('sentence_data', curSentIDs)
+
+
+def get_page_data(hitsProcessed):
+    """
+    Extract all relevant information from the processed hits
+    of one results page. Return a list of dictionaries, one dictionary
+    per result sentence.
+    """
+    result = []
+    curSentData = get_session_data('sentence_data')
+    if curSentData is None or len(curSentData) != len(hitsProcessed['contexts']):
+        return [{}] * len(hitsProcessed['contexts'])
+    for iHit in range(len(hitsProcessed['contexts'])):
+        hit = hitsProcessed['contexts'][iHit]
+        sentPageDataDict = {'toggled_off': False,
+                            'highlighted_text_csv': [],
+                            'header_csv': ''}
+        if not hit['relations_satisfied']:
+            sentPageDataDict['toggled_off'] = True
+        for lang in settings['languages']:
+            if lang not in curSentData[iHit]['languages']:
+                sentPageDataDict['highlighted_text_csv'].append('')
+            else:
+                sentPageDataDict['highlighted_text_csv'].append(curSentData[iHit]['languages'][lang]['highlighted_text'])
+            if 'header_csv' in curSentData[iHit]:
+                sentPageDataDict['header_csv'] = curSentData[iHit]['header_csv']
+        result.append(sentPageDataDict)
+    return result
+
+
+def sync_page_data(page, hitsProcessed):
+    """
+    If the user is going to see this page for the first time,
+    add relevant information to page_data. Otherwise, toggle on/off
+    the sentences according to the previously saved page data.
+    """
+    pageData = get_session_data('page_data')
+    if pageData is not None and page in pageData:
+        return
+    elif pageData is None:
+        pageData = {}
+    curPageData = get_page_data(hitsProcessed)
+    pageData[page] = curPageData
 
 
 def update_expanded_contexts(context, neighboringIDs):
@@ -439,7 +498,10 @@ def find_sentences_json(page=0):
 @app.route('/search_sent_json/<int:page>')
 @app.route('/search_sent_json')
 @jsonp
-def search_sent_json(page=0):
+def search_sent_json(page=-1):
+    if page < 0:
+        set_session_data('page_data', {})
+        page = 0
     hits = find_sentences_json(page=page)
     return jsonify(hits)
 
@@ -447,7 +509,10 @@ def search_sent_json(page=0):
 @app.route('/search_sent/<int:page>')
 @app.route('/search_sent')
 @gzipped
-def search_sent(page=0):
+def search_sent(page=-1):
+    if page < 0:
+        set_session_data('page_data', {})
+        page = 0
     hits = find_sentences_json(page=page)
     add_sent_to_session(hits)
     hitsProcessed = sentView.process_sent_json(hits,
@@ -458,6 +523,7 @@ def search_sent(page=0):
     hitsProcessed['page_size'] = get_session_data('page_size')
     hitsProcessed['languages'] = settings['languages']
     hitsProcessed['media'] = settings['media']
+    sync_page_data(page, hitsProcessed)
 
     return render_template('result_sentences.html', data=hitsProcessed)
 
@@ -625,53 +691,36 @@ def send_media(path):
     return send_from_directory(os.path.join('../media', corpus_name), path)
 
 
-def prepare_results_for_download(sentData):
+def prepare_results_for_download(pageData):
     """
     Return a list of search results in a format easily transformable
     to csv/xlsx.
     """
     result = []
-    for sent in sentData:
-        header = ''
-        sentCSV = []
-        for lang in settings['languages']:
-            if (lang not in sent['languages']
-                    or 'highlighted_text' not in sent['languages'][lang]):
-                sentCSV.append('')
-                continue
-            sentCSV.append(sent['languages'][lang]['highlighted_text'])
-            langID = settings['languages'].index(lang)
-            if 'id' in sent['languages'][lang] and len(header) <= 0:
-                sentJSON = sc.get_sentence_by_id(sent['languages'][lang]['id'])
-                if (len(sentJSON) > 0
-                        and 'hits' in sentJSON
-                        and 'hits' in sentJSON
-                        and len(sentJSON['hits']['hits']) > 0):
-                    sentJSON = sentJSON['hits']['hits'][0]
-                    if '_source' in sentJSON and ('lang' not in sentJSON['_source']
-                                                  or sentJSON['_source']['lang'] != langID):
-                        continue
-                    if len(header) <= 0:
-                        header = sentView.process_sentence_header(sentJSON['_source'], format='csv')
-        result.append([header] + sentCSV)
+    for page in pageData:
+        for sent in pageData[page]:
+            if not sent['toggled_off']:
+                result.append([sent['header_csv']] + sent['highlighted_text_csv'])
     return result
 
 
 @app.route('/download_cur_results_csv')
+@nocache
 def download_cur_results_csv():
-    sentData = get_session_data('sentence_data')
-    if sentData is None:
+    pageData = get_session_data('page_data')
+    if pageData is None or len(pageData) <= 0:
         return ''
-    result = prepare_results_for_download(sentData)
+    result = prepare_results_for_download(pageData)
     return '\n'.join(['\t'.join(s) for s in result if len(s) > 0])
 
 
 @app.route('/download_cur_results_xlsx')
+@nocache
 def download_cur_results_xlsx():
-    sentData = get_session_data('sentence_data')
-    if sentData is None:
+    pageData = get_session_data('page_data')
+    if pageData is None or len(pageData) <= 0:
         return None
-    results = prepare_results_for_download(sentData)
+    results = prepare_results_for_download(pageData)
     XLSXFilename = 'results-' + str(uuid.uuid4()) + '.xlsx'
     workbook = xlsxwriter.Workbook('tmp/' + XLSXFilename)
     worksheet = workbook.add_worksheet('Search results')
