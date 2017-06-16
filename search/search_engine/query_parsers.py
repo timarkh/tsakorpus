@@ -374,16 +374,16 @@ class InterfaceQueryParser:
                 and len(queryDict['words']) <= 0):
             query = {'match_none': {}}
         else:
+            query = []
             if lang >= 0:
-                query = [{'term': {'lang': {'value': lang, 'boost': 0}}}]
+                queryFilter = [{'term': {'lang': {'value': lang}}}]
             else:
-                query = []
+                queryFilter = []
             for iQueryWord in range(len(queryDict['words'])):
                 wordDesc, negQuery = queryDict['words'][iQueryWord]
                 query += self.single_word_sentence_query(wordDesc, iQueryWord + 1, sortOrder,
                                                          negative=negQuery)
             query += list(queryDictTop.values())
-            queryFilter = []
             if 'sent_ids' in queryDict:
                 queryFilter.append({'ids': {'values': queryDict['sent_ids']}})
             elif 'doc_ids' in queryDict:
