@@ -201,10 +201,10 @@
 
 .cx_toggle_div {
 	position: relative;
+	width: 25px;
 }
 
 .cx_toggle_chk {
-	width: 25px;
 	display: inline;
 	top: 50%;
 	height: 100%;
