@@ -62,18 +62,35 @@ class Splitter:
                 return tokens[i]['wf']
         return ''
 
+    def recalculate_offsets_sentence(self, s):
+        """
+        Recalculate offsets in a single sentence
+        so that they start at the beginning of the sentence.
+        """
+        if len(s['words']) <= 0:
+            return
+        startOffset = s['words'][0]['off_start']
+        for w in s['words']:
+            w['off_start'] -= startOffset
+            w['off_end'] -= startOffset
+
     def recalculate_offsets(self, sentences):
         """
         Recalculate offsets so that they always start at the
         beginning of the sentence.
         """
         for s in sentences:
-            if len(s['words']) <= 0:
-                continue
-            startOffset = s['words'][0]['off_start']
-            for w in s['words']:
-                w['off_start'] -= startOffset
-                w['off_end'] -= startOffset
+            self.recalculate_offsets_sentence(s)
+
+    def add_next_word_id_sentence(self, s):
+        """
+        Insert the ID of the next word in a single sentence. (This is important for
+        the sentences that can have multiple tokenization variants.)
+        """
+        if len(s['words']) <= 0:
+            return
+        for i in range(len(s['words'])):
+            s['words'][i]['next_word'] = i + 1
 
     def add_next_word_id(self, sentences):
         """
@@ -81,8 +98,7 @@ class Splitter:
         the sentences that can have multiple tokenization variants.)
         """
         for s in sentences:
-            for i in range(len(s['words'])):
-                s['words'][i]['next_word'] = i + 1
+            self.add_next_word_id_sentence(s)
 
     def split(self, tokens, text):
         """

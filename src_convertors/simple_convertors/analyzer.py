@@ -26,19 +26,25 @@ class DumbMorphParser:
         self.analyses = {}
         if ('parsed_wordlist_filename' in self.settings
                 and len(self.settings['parsed_wordlist_filename']) > 0):
-            self.load_analyses(os.path.join(self.settings['corpus_dir'],
-                                            self.settings['parsed_wordlist_filename']))
+            if type(self.settings['parsed_wordlist_filename']) == str:
+                self.load_analyses(os.path.join(self.settings['corpus_dir'],
+                                                self.settings['parsed_wordlist_filename']))
+            else:
+                for language in self.settings['parsed_wordlist_filename']:
+                    self.load_analyses(os.path.join(self.settings['corpus_dir'],
+                                                    self.settings['parsed_wordlist_filename'][language]),
+                                       language)
 
-    def load_analyses(self, fname):
+    def load_analyses(self, fname, lang=''):
         """
         Load parsed word list from a file.
         """
-        self.analyses = {}
+        self.analyses[lang] = {}
         f = open(fname, 'r', encoding='utf-8-sig')
         text = f.read()
         f.close()
         if self.settings['parsed_wordlist_format'] == 'xml_rnc':
-            self.load_analyses_xml_rnc(text)
+            self.load_analyses_xml_rnc(text, lang=lang)
 
     def transform_gramm_str(self, grStr, lang=''):
         """
@@ -166,14 +172,16 @@ class DumbMorphParser:
             lang = self.settings['corpus_name']
             # there can be several languages if the corpus is parallel
         analyses = self.rxWordsRNC.findall(text)
+        if lang not in self.analyses:
+            self.analyses[lang] = {}
         for ana in analyses:
             word = ana[1].strip('$&^#%*·;·‒–—―•…‘’‚“‛”„‟"\'')
             if len(word) <= 0:
                 continue
             ana = self.transform_ana_rnc(ana[0], lang=lang)
-            if word not in self.analyses:
-                self.analyses[word] = ana
-        print('Analyses for', len(self.analyses), 'different words loaded.')
+            if word not in self.analyses[lang]:
+                self.analyses[lang][word] = ana
+        print('Analyses for', len(self.analyses[lang]), 'different words loaded.')
 
     def normalize(self, word):
         """
@@ -181,16 +189,18 @@ class DumbMorphParser:
         """
         return word.strip().lower()
 
-    def analyze_word(self, wf):
-        if wf not in self.analyses and (wf.startswith('-') or wf.endswith('-')):
+    def analyze_word(self, wf, lang=''):
+        if lang not in self.analyses:
+            return []
+        if wf not in self.analyses[lang] and (wf.startswith('-') or wf.endswith('-')):
             wf = wf.strip('-')
-        if wf in self.analyses:
-            analyses = copy.deepcopy(self.analyses[wf])
+        if wf in self.analyses[lang]:
+            analyses = copy.deepcopy(self.analyses[lang][wf])
         else:
             analyses = []
         return analyses
 
-    def analyze_hyphened_word(self, words, iWord):
+    def analyze_hyphened_word(self, words, iWord, lang=''):
         """
         Try to analyze a word that contains a hyphen but could
         not be analyzed as a whole. Split the word in several,
@@ -208,7 +218,7 @@ class DumbMorphParser:
                 wfPart = '-' + wfPart
             if iPart < len(parts) - 1:
                 wfPart += '-'
-            partAna = self.analyze_word(wfPart)
+            partAna = self.analyze_word(wfPart, lang)
             partAnalyses.append(partAna)
         if any(pa is not None and len(pa) > 0 for pa in partAnalyses):
             offStart = word['off_start']
@@ -236,28 +246,44 @@ class DumbMorphParser:
             return len(newWords) - 1
         return 0
 
-    def analyze(self, sentences):
+    def analyze_sentence(self, s, lang=''):
+        """
+        Analyze each word in one sentence using preloaded analyses.
+        Return statistics.
+        """
+        nTokens, nWords, nAnalyzed = 0, 0, 0
+        if lang == '':
+            lang = self.settings['corpus_name']
+        if 'words' not in s:
+            return 0, 0, 0
+        iWord = -1
+        while iWord < len(s['words']) - 1:
+            iWord += 1
+            nTokens += 1
+            word = s['words'][iWord]
+            if word['wtype'] != 'word':
+                continue
+            nWords += 1
+            wf = self.normalize(word['wf'])
+            analyses = self.analyze_word(wf, lang)
+            if len(analyses) > 0:
+                word['ana'] = analyses
+                nAnalyzed += 1
+            elif '-' in word['wf']:
+                iWord += self.analyze_hyphened_word(s['words'], iWord, lang)
+        return nTokens, nWords, nAnalyzed
+
+    def analyze(self, sentences, lang=''):
         """
         Analyze each word in each sentence using preloaded analyses.
         Return statistics.
         """
         nTokens, nWords, nAnalyzed = 0, 0, 0
+        if lang == '':
+            lang = self.settings['corpus_name']
         for s in sentences:
-            if 'words' not in s:
-                continue
-            iWord = -1
-            while iWord < len(s['words']) - 1:
-                iWord += 1
-                nTokens += 1
-                word = s['words'][iWord]
-                if word['wtype'] != 'word':
-                    continue
-                nWords += 1
-                wf = self.normalize(word['wf'])
-                analyses = self.analyze_word(wf)
-                if len(analyses) > 0:
-                    word['ana'] = analyses
-                    nAnalyzed += 1
-                elif '-' in word['wf']:
-                    iWord += self.analyze_hyphened_word(s['words'], iWord)
+            nTokensCur, nWordsCur, nAnalyzedCur = self.analyze_sentence(s, lang)
+            nTokens += nTokensCur
+            nWords += nWordsCur
+            nAnalyzed += nAnalyzedCur
         return nTokens, nWords, nAnalyzed
