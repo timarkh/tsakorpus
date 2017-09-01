@@ -19,11 +19,12 @@ class DumbMorphParser:
     rxGlossParts = re.compile('[^ \\-=<>]+')
     rxGlossIndexPart = re.compile('^(.*)\\{(.*?)\\}')
 
-    def __init__(self, settings, categories):
+    def __init__(self, settings, categories, errorLog=''):
         self.settings = copy.deepcopy(settings)
         self.categories = copy.deepcopy(categories)
         self.rxAllGlosses = self.prepare_gloss_regex()
         self.analyses = {}
+        self.errorLog = errorLog
         if ('parsed_wordlist_filename' in self.settings
                 and len(self.settings['parsed_wordlist_filename']) > 0):
             if type(self.settings['parsed_wordlist_filename']) == str:
@@ -34,6 +35,20 @@ class DumbMorphParser:
                     self.load_analyses(os.path.join(self.settings['corpus_dir'],
                                                     self.settings['parsed_wordlist_filename'][language]),
                                        language)
+
+    def log_message(self, message):
+        """
+        If the filename of the error log is not empty, append
+        the message to the file.
+        """
+        if self.errorLog is None or len(self.errorLog) <= 0:
+            return
+        try:
+            fLog = open(self.errorLog, 'a', encoding='utf-8')
+            fLog.write(message + '\n')
+            fLog.close()
+        except:
+            return
 
     def load_analyses(self, fname, lang=''):
         """
@@ -137,6 +152,7 @@ class DumbMorphParser:
         wordParts = self.rxGlossParts.findall(ana['parts'].replace('{', '(').replace('{', ')'))
         glosses = self.rxGlossParts.findall(ana['gloss'])
         if len(wordParts) <= 0 or len(glosses) == 0 or len(wordParts) != len(glosses):
+            self.log_message('Wrong gloss or partitioning: ' + ana['parts'] + ' != ' + ana['gloss'])
             return
         glossIndex = '-'.join(p[1] + '{' + p[0] + '}'
                               for p in zip(wordParts, glosses)) + '-'

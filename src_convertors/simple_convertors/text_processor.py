@@ -13,14 +13,15 @@ class TextProcessor:
     Contains mathods for turning a string into a list of sentences.
     """
 
-    def __init__(self, settings, categories):
+    def __init__(self, settings, categories, errorLog=''):
         self.settings = copy.deepcopy(settings)
         self.categories = copy.deepcopy(categories)
         self.cleaner = TextCleaner(settings=self.settings)
         self.tokenizer = Tokenizer(settings=self.settings)
         self.splitter = Splitter(settings=self.settings)
         self.parser = DumbMorphParser(settings=self.settings,
-                                      categories=self.categories)
+                                      categories=self.categories,
+                                      errorLog=errorLog)
 
     def process_string(self, s):
         """

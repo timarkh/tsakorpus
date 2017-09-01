@@ -22,6 +22,7 @@ class Txt2JSON:
         settings from the corpus directory. These may override the
         initially loaded settings.
         """
+        self.errorLog = ''
         self.settingsDir = settingsDir
         self.corpusSettings = {}
         self.load_settings()
@@ -37,7 +38,8 @@ class Txt2JSON:
         fCategories.close()
         self.meta = {}
         self.tp = TextProcessor(settings=self.corpusSettings,
-                                categories=self.categories)
+                                categories=self.categories,
+                                errorLog=self.errorLog)
         self.srcExt = 'txt'
 
     def load_settings(self):
@@ -47,6 +49,28 @@ class Txt2JSON:
         if self.corpusSettings['json_indent'] < 0:
             self.corpusSettings['json_indent'] = None
         fCorpus.close()
+        if 'error_log' in self.corpusSettings:
+            self.errorLog = self.corpusSettings['error_log']
+            try:
+                # Clean the log
+                fLog = open(self.errorLog, 'w', encoding='utf-8')
+                fLog.close()
+            except:
+                pass
+
+    def log_message(self, message):
+        """
+        If the filename of the error log is not empty, append
+        the message to the file.
+        """
+        if self.errorLog is None or len(self.errorLog) <= 0:
+            return
+        try:
+            fLog = open(self.errorLog, 'a', encoding='utf-8')
+            fLog.write(message + '\n')
+            fLog.close()
+        except:
+            return
 
     def load_meta(self):
         """
@@ -140,6 +164,7 @@ class Txt2JSON:
                 if self.corpusSettings['gzip']:
                     fextTarget = '.json.gz'
                 fnameTarget = self.rxStripExt.sub(fextTarget, fnameTarget)
+                self.log_message('Processing ' + fnameSrc + '...')
                 curTokens, curWords, curAnalyzed = self.convert_file(fnameSrc, fnameTarget)
                 nTokens += curTokens
                 nWords += curWords

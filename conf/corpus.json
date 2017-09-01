@@ -1,15 +1,17 @@
 {
-  "corpus_name": "beserman_examples",
+  "corpus_name": "nganasan",
   "input_format": "json",
-  "media": false,
+  "media": true,
   "media_length": 60,
   "max_context_expand": 3,
   "max_distance_filter": 200000,
   "query_timeout": 20,
   "viewable_meta": [
-    "example_type"
+    "genre",
+    "year1",
+    "year2"
   ],
-  "languages": ["beserman", "russian", "example_comment"],
+  "languages": ["nganasan", "nganasan_cyrillic", "russian", "english"],
   "transliterations": ["original", "IPA"],
   "all_language_search_enabled": true,
   "lang_props":

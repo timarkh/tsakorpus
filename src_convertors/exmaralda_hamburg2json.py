@@ -123,8 +123,10 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                 continue
             ana = {}
             curWordAnno = wordAnno[tupleKey]
-            if 'mp' in curWordAnno:
-                ana['parts'] = curWordAnno['mp']
+            # mp: morph breaks with empty morphemes (corresponds to the mc tier: POS and morph categories)
+            # mb: morph breaks without empty morphemes (corresponds to the gr/ge tiers: actual glosses)
+            if 'mb' in curWordAnno:
+                ana['parts'] = curWordAnno['mb']
             if 'ge' in curWordAnno:
                 ana['gloss'] = curWordAnno['ge']
                 self.glosses |= set(g for g in ana['gloss'].split('-') if g.upper() == g)
@@ -331,7 +333,6 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                     fname = os.path.abspath(os.path.join(path, fname))
                     print('Cutting media file', fname)
                     self.mc.cut_media(fname)
-
 
 
 if __name__ == '__main__':

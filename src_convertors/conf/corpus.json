@@ -1,7 +1,8 @@
 {
-  "corpus_name": "beserman_examples",
+  "corpus_name": "nganasan",
   "corpus_dir": "corpus",
   "meta_filename": "meta.csv",
+  "error_log": "error.log",
   "meta_fields":
   [
     "filename",
