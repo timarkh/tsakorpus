@@ -335,6 +335,12 @@ def search_sent_query(page=0):
     set_session_data('page', page)
     wordConstraints = sc.qp.wr.get_constraints(query)
     wordConstraints = {str(k): v for k, v in wordConstraints.items()}
+
+    if 'para_ids' not in query:
+        query, paraIDs = para_ids(query)
+        if paraIDs is not None:
+            query['para_ids'] = list(paraIDs)
+
     query = sc.qp.html2es(query,
                           searchIndex='sentences',
                           sortOrder=get_session_data('sort'),
@@ -408,6 +414,41 @@ def subcorpus_ids(htmlQuery):
     return docIDs
 
 
+def para_ids(htmlQuery):
+    """
+    If the query contains parts for several languages, find para_ids associated
+    with the sentences in non-first languages that conform to the corresponding
+    parts of the query.
+    Return the query for the first language and para_ids conforming to the other
+    parts of the query.
+    """
+    langQueryParts = sc.qp.split_query_into_languages(htmlQuery)
+    if langQueryParts is None or len(langQueryParts) <= 1:
+        return htmlQuery, None
+    paraIDs = None
+    for i in range(1, len(langQueryParts)):
+        lpHtmlQuery = langQueryParts[i]
+        paraIDQuery = sc.qp.para_id_query(lpHtmlQuery)
+        if paraIDQuery is None:
+            return None
+        curParaIDs = set()
+        iterator = sc.get_all_sentences(paraIDQuery)
+        for dictParaID in iterator:
+            for paraAlignment in dictParaID['_source']['para_alignment']:
+                paraID = paraAlignment['para_id']
+                curParaIDs.add(paraID)
+        if paraIDs is None:
+            paraIDs = curParaIDs
+        else:
+            paraIDs &= curParaIDs
+        if len(paraIDs) <= 0:
+            return langQueryParts[0], list(paraIDs)
+    # iterator = sc.get_all_docs(subcorpusQuery)
+    # for doc in iterator:
+    #     docIDs.append(doc['_id'])
+    return langQueryParts[0], list(paraIDs)
+
+
 def copy_request_args():
     query = {}
     if request.args is None or len(request.args) <= 0:
@@ -455,6 +496,11 @@ def find_sentences_json(page=0):
         docIDs = subcorpus_ids(query)
         if docIDs is not None:
             query['doc_ids'] = docIDs
+
+    if 'para_ids' not in query:
+        query, paraIDs = para_ids(query)
+        if paraIDs is not None:
+            query['para_ids'] = paraIDs
 
     if (len(wordConstraints) > 0
             and get_session_data('distance_strict')

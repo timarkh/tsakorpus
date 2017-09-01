@@ -12,6 +12,7 @@ class InterfaceQueryParser:
     rxStars = re.compile('^(\\**|(\\.\\*)*)$')
     rxGlossQueryQuant = re.compile('^\\(([^()]+)\\)([*+?])$')
     rxGlossQuerySrc = re.compile('^([^{}]*)\\{([^{}]*)\\}$')
+    rxFieldNum = re.compile('^([^0-9]+)([0-9]+)$')
 
     dictOperators = {',': 'must',
                      '&': 'must',
@@ -388,6 +389,11 @@ class InterfaceQueryParser:
                 queryFilter.append({'ids': {'values': queryDict['sent_ids']}})
             elif 'doc_ids' in queryDict:
                 queryFilter.append({'terms': {'doc_id': queryDict['doc_ids']}})
+            if 'para_ids' in queryDict:
+                queryFilter.append({'nested': {'path': 'para_alignment',
+                                               'query':
+                                                   {'terms':
+                                                        {'para_alignment.para_id': queryDict['para_ids']}}}})
             query = {'bool': {'must': query, 'filter': queryFilter}}
         if sortOrder == 'random':
             query = self.make_random(query, randomSeed)
@@ -437,6 +443,54 @@ class InterfaceQueryParser:
             esQuery['sort'] = {sortOrder: {'order': 'asc'}}
         return esQuery
 
+    def split_query_into_languages(self, htmlQuery):
+        """
+        Split single query into language parts, i. e. subqueries that
+        refer to one language each.
+        Return list of single-language queries. 
+        """
+        langQueryParts = {}     # langID -> query
+        usedLangIDs = []        # langIDs of the query parts in the order of their appearance
+        if 'n_words' not in htmlQuery:
+            return None
+        for iWord in range(int(htmlQuery['n_words'])):
+            strWordNum = str(iWord + 1)
+            if ('lang' + strWordNum not in htmlQuery
+                    or htmlQuery['lang' + strWordNum] not in self.settings['languages']):
+                return None
+            else:
+                lang = htmlQuery['lang' + strWordNum]
+                langID = str(self.settings['languages'].index(lang))
+            if langID not in langQueryParts:
+                langQueryParts[langID] = {k: v for k, v in htmlQuery.items()
+                                          if self.rxFieldNum.search(k) is None}
+                langQueryParts[langID]['lang'] = lang
+                usedLangIDs.append(langID)
+            curWordNums = set()
+            for k in langQueryParts[langID]:
+                m = self.rxFieldNum.search(k)
+                if m is not None:
+                    curWordNums.add(int(m.group(2)))
+            if len(curWordNums) <= 0:
+                newWordNum = '1'
+            else:
+                newWordNum = str(max(curWordNums) + 1)
+            langQueryParts[langID]['n_words'] = int(newWordNum)
+            for k in htmlQuery:
+                m = self.rxFieldNum.search(k)
+                if m is not None and m.group(2) == strWordNum:
+                    langQueryParts[langID][m.group(1) + newWordNum] = htmlQuery[k]
+        return [langQueryParts[langID] for langID in usedLangIDs]
+
+    def para_id_query(self, htmlQuery):
+        """
+        Make an ES query to the sentences index that only retrieves paraIDs.
+        """
+        esQuery = self.html2es(htmlQuery, sortOrder='')
+        esQuery['_source'] = 'para_alignment.para_id'
+        return esQuery
+
+
     def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
                 randomSeed=None, searchIndex='sentences'):
         """
@@ -468,6 +522,8 @@ class InterfaceQueryParser:
 
         if 'doc_ids' in htmlQuery:
             prelimQuery['doc_ids'] = htmlQuery['doc_ids']
+        if searchIndex == 'sentences' and 'para_ids' in htmlQuery:
+            prelimQuery['para_ids'] = htmlQuery['para_ids']
 
         if 'n_words' not in htmlQuery:
             return {'query': {'match_none': ''}}

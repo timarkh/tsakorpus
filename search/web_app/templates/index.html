@@ -29,6 +29,11 @@
 		Grammar: <input type="text" class="search_input" name="gr1" id="gr1"><br>
 		Gloss: <input type="text" class="search_input" name="gloss_index1" id="gloss1"><br>
 		<div class="add_word_fields"></div>
+		<select name="lang1" id="lang1">
+		{% for lang in languages %}
+		<option value="{{ lang }}">{{ lang }}</option>
+		{% endfor %}
+		</select><br>
 		<input type="checkbox" class="neg_query" name="negq1" id="negq1" onclick="negative_query();"> Negative query<br>
 		<span class="word_plus glyphicon glyphicon-plus-sign" aria-hidden="true"><span class="tooltip_prompt">add&nbsp;word</span></span>
 		</div>
