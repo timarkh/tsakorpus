@@ -342,7 +342,7 @@ def search_sent_query(page=0):
             query['para_ids'] = list(paraIDs)
 
     query = sc.qp.html2es(query,
-                          searchIndex='sentences',
+                          searchOutput='sentences',
                           sortOrder=get_session_data('sort'),
                           randomSeed=get_session_data('seed'),
                           query_size=get_session_data('page_size'),
@@ -463,7 +463,7 @@ def copy_request_args():
 
 def count_occurrences(query):
     esQuery = sc.qp.html2es(query,
-                            searchIndex='sentences',
+                            searchOutput='sentences',
                             sortOrder='no',
                             query_size=1)
     hits = sc.get_sentences(esQuery)
@@ -504,7 +504,7 @@ def find_sentences_json(page=0):
             and get_session_data('distance_strict')
             and 'sent_ids' not in query):
         esQuery = sc.qp.html2es(query,
-                                searchIndex='sentences',
+                                searchOutput='sentences',
                                 query_size=1)
         hits = sc.get_sentences(esQuery)
         if ('hits' not in hits
@@ -513,7 +513,7 @@ def find_sentences_json(page=0):
             query = {}
         else:
             esQuery = sc.qp.html2es(query,
-                                    searchIndex='sentences')
+                                    searchOutput='sentences')
             iterator = sc.get_all_sentences(esQuery)
             query['sent_ids'] = sc.qp.filter_sentences(iterator, wordConstraints)
             set_session_data('last_query', query)
@@ -523,7 +523,7 @@ def find_sentences_json(page=0):
             and query['n_words'] == '1'):
         nOccurrences = count_occurrences(query)
     esQuery = sc.qp.html2es(query,
-                            searchIndex='sentences',
+                            searchOutput='sentences',
                             sortOrder=get_session_data('sort'),
                             randomSeed=get_session_data('seed'),
                             query_size=get_session_data('page_size'),
@@ -647,7 +647,7 @@ def search_word_query():
             query['doc_ids'] = docIDs
 
     query = sc.qp.html2es(query,
-                          searchIndex='words',
+                          searchOutput='words',
                           sortOrder=get_session_data('sort'),
                           query_size=get_session_data('page_size'))
     return jsonify(query)
@@ -664,11 +664,21 @@ def search_word_json():
         if docIDs is not None:
             query['doc_ids'] = docIDs
 
+    searchIndex = 'words'
+    if 'n_words' in query and int(query['n_words']) > 1:
+        searchIndex = 'sentences'
+
     query = sc.qp.html2es(query,
-                          searchIndex='words',
+                          searchOutput='words',
                           sortOrder=get_session_data('sort'),
                           query_size=get_session_data('page_size'))
-    hits = sc.get_words(query)
+    hits = []
+    if searchIndex == 'words':
+        hits = sc.get_words(query)
+    elif searchIndex == 'sentences':
+        for hit in sc.get_all_sentences(query):
+            hits.append(hit)
+
     return jsonify(hits)
 
 
@@ -683,12 +693,27 @@ def search_word():
     else:
         docIDs = query['doc_ids']
 
+    searchIndex = 'words'
+    if 'n_words' in query and int(query['n_words']) > 1:
+        searchIndex = 'sentences'
+
     query = sc.qp.html2es(query,
-                          searchIndex='words',
+                          searchOutput='words',
                           sortOrder=get_session_data('sort'),
                           query_size=get_session_data('page_size'))
-    hits = sc.get_words(query)
-    hitsProcessed = sentView.process_word_json(hits, docIDs)
+
+    hitsProcessed = {}
+    if searchIndex == 'words':
+        hits = sc.get_words(query)
+        hitsProcessed = sentView.process_word_json(hits, docIDs)
+    elif searchIndex == 'sentences':
+        hitsProcessed = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'words': [],
+                         'doc_ids': set(), 'word_jsons': {}}
+        for hit in sc.get_all_sentences(query):
+            sentView.add_word_from_sentence(hitsProcessed, hit)
+        hitsProcessed['n_docs'] = len(hitsProcessed['doc_ids'])
+        sentView.process_words_collected_from_sentences(hitsProcessed)
+
     hitsProcessed['media'] = settings['media']
     return render_template('result_words.html', data=hitsProcessed)
 

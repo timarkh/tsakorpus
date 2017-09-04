@@ -529,6 +529,38 @@ class SentenceViewer:
                wSource['wf'] + '">&gt;&gt; GO!</td></tr>'
         return word
 
+    def add_word_from_sentence(self, hitsProcessed, hit):
+        """
+        Extract word data from the highlighted w1 in the sentence and
+        add it to the dictionary hitsProcessed.
+        """
+        if '_source' not in hit or 'inner_hits' not in hit or 'w1' not in hit['inner_hits']:
+            return
+        langID, lang = self.get_lang_from_hit(hit)
+        hitsProcessed['n_sentences'] += 1
+        hitsProcessed['doc_ids'].add(hit['_source']['doc_id'])
+        for word in hit['inner_hits']['w1']['hits']['hits']:
+            hitsProcessed['n_occurrences'] += 1
+            word['_source']['lang'] = lang
+            wordJson = json.dumps(word['_source'])
+            try:
+                hitsProcessed['word_jsons'][wordJson] += 1
+            except KeyError:
+                hitsProcessed['word_jsons'][wordJson] = 1
+
+    def process_words_collected_from_sentences(self, hitsProcessed):
+        """
+        Process all words collected from the sentences with a multi-word query.
+        """
+        for wordJson, freq in hitsProcessed['word_jsons'].items():
+            word = {'_source': json.loads(wordJson)}
+            word['_source']['freq'] = freq
+            word['_source']['rank'] = ''
+            word['_source']['n_sents'] = ''
+            word['_source']['n_docs'] = ''
+            hitsProcessed['words'].append(self.process_word(word, docIDs=None, lang=word['_source']['lang']))
+        del hitsProcessed['word_jsons']
+
     def process_doc(self, d):
         """
         Process one document taken from response['hits']['hits'].

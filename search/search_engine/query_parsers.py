@@ -359,10 +359,13 @@ class InterfaceQueryParser:
         return query
 
     def full_sentence_query(self, queryDict, query_from=0, query_size=10,
-                            sortOrder='random', randomSeed=None, lang=0):
+                            sortOrder='random', randomSeed=None, lang=0,
+                            searchOutput='sentences'):
         """
         Make a full ES query for the sentences index out of a dictionary
         with bool queries.
+        searchOutput is either "sentences" (make normal query) or "words"
+        (only highlight the first word; omit everything but the words).
         """
         topLevelFields = {'text'}
         queryDict = {k: queryDict[k] for k in queryDict
@@ -395,6 +398,8 @@ class InterfaceQueryParser:
         if sortOrder == 'random':
             query = self.make_random(query, randomSeed)
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
+        if searchOutput == 'words':
+            esQuery['_source'] = ['doc_id', 'lang']
         esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'doc_id'}},
                            'agg_nwords': {'stats': {'script': '_score'}}}
         if len(queryDictTop) >= 0:
@@ -487,25 +492,42 @@ class InterfaceQueryParser:
         esQuery['_source'] = 'para_ids'
         return esQuery
 
-
-    def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
-                randomSeed=None, searchIndex='sentences'):
+    def check_html_parameters(self, htmlQuery, page=1, query_size=10, searchOutput='sentences'):
         """
-        Make and return a ES query out of the HTML form data.
+        Check if HTML query is valid. If so, calculate and return a number
+        of parameters for subseqent insertion into the ES query.
+        Return None otherwise.
         """
-        if len(htmlQuery) <= 0:
-            return {'query': {'match_none': ''}}
+        if len(htmlQuery) <= 0 or 'n_words' not in htmlQuery:
+            return None, None, None
         query_from = (page - 1) * query_size
-
         if 'lang' not in htmlQuery or htmlQuery['lang'] not in self.settings['languages']:
             if self.settings['all_language_search_enabled']:
                 lang = 'all'
                 langID = -1
             else:
-                return {'query': {'match_none': ''}}
+                return None, None, None
         else:
             lang = htmlQuery['lang']
             langID = self.settings['languages'].index(lang)
+        if int(htmlQuery['n_words']) > 1:
+            searchIndex = 'sentences'
+        else:
+            searchIndex = searchOutput
+        # searchIndex is the name of the ES index where the search is performed.
+        # searchOutput is either "sentences" or "words", depending on how the results
+        # will be viewed.
+        return query_from, langID, lang, searchIndex
+
+    def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
+                randomSeed=None, searchOutput='sentences'):
+        """
+        Make and return a ES query out of the HTML form data.
+        """
+        query_from, langID, lang, searchIndex =\
+            self.check_html_parameters(htmlQuery, page, query_size, searchOutput)
+        if query_from is None:
+            return {'query': {'match_none': ''}}
 
         prelimQuery = {'words': []}
         if searchIndex == 'sentences':
@@ -522,8 +544,6 @@ class InterfaceQueryParser:
         if searchIndex == 'sentences' and 'para_ids' in htmlQuery:
             prelimQuery['para_ids'] = htmlQuery['para_ids']
 
-        if 'n_words' not in htmlQuery:
-            return {'query': {'match_none': ''}}
         for iWord in range(int(htmlQuery['n_words'])):
             curPrelimQuery = {}
             strWordNum = str(iWord + 1)
@@ -554,7 +574,8 @@ class InterfaceQueryParser:
             queryDict = self.full_sentence_query(prelimQuery, query_from,
                                                  query_size, sortOrder,
                                                  randomSeed,
-                                                 lang=langID)
+                                                 lang=langID,
+                                                 searchOutput=searchOutput)
         elif searchIndex == 'words':
             queryDict = self.full_word_query(prelimQuery, query_from, query_size, sortOrder,
                                              lang=langID)
