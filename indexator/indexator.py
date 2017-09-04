@@ -224,9 +224,11 @@ class Indexator:
             else:
                 sentences.append(curAction)
                 if 'para_alignment' in s:
+                    s['para_ids'] = []
                     for pa in s['para_alignment']:
                         paraID = str(self.dID) + '_' + str(pa['para_id'])
                         pa['para_id'] = paraID
+                        s['para_ids'].append(paraID)
                         try:
                             paraIDs[langID][paraID].append(self.sID)
                         except KeyError:

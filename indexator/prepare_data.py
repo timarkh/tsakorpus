@@ -107,6 +107,7 @@ class PrepareData:
                                    'src_id': {'type': 'keyword',
                                               'index': False},
                                }},
+             'para_ids': {'type': 'keyword'},
              'para_alignment': {'type': 'nested',
                                 'properties': {
                                     'off_start': {'type': 'short',

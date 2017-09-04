@@ -390,10 +390,7 @@ class InterfaceQueryParser:
             elif 'doc_ids' in queryDict:
                 queryFilter.append({'terms': {'doc_id': queryDict['doc_ids']}})
             if 'para_ids' in queryDict:
-                queryFilter.append({'nested': {'path': 'para_alignment',
-                                               'query':
-                                                   {'terms':
-                                                        {'para_alignment.para_id': queryDict['para_ids']}}}})
+                queryFilter.append({'terms': {'para_ids': queryDict['para_ids']}})
             query = {'bool': {'must': query, 'filter': queryFilter}}
         if sortOrder == 'random':
             query = self.make_random(query, randomSeed)
@@ -487,7 +484,7 @@ class InterfaceQueryParser:
         Make an ES query to the sentences index that only retrieves paraIDs.
         """
         esQuery = self.html2es(htmlQuery, sortOrder='')
-        esQuery['_source'] = 'para_alignment.para_id'
+        esQuery['_source'] = 'para_ids'
         return esQuery
 
 

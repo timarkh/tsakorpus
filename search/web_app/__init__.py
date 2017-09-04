@@ -434,8 +434,9 @@ def para_ids(htmlQuery):
         curParaIDs = set()
         iterator = sc.get_all_sentences(paraIDQuery)
         for dictParaID in iterator:
-            for paraAlignment in dictParaID['_source']['para_alignment']:
-                paraID = paraAlignment['para_id']
+            if '_source' not in dictParaID or 'para_ids' not in dictParaID['_source']:
+                continue
+            for paraID in dictParaID['_source']['para_ids']:
                 curParaIDs.add(paraID)
         if paraIDs is None:
             paraIDs = curParaIDs
@@ -443,9 +444,6 @@ def para_ids(htmlQuery):
             paraIDs &= curParaIDs
         if len(paraIDs) <= 0:
             return langQueryParts[0], list(paraIDs)
-    # iterator = sc.get_all_docs(subcorpusQuery)
-    # for doc in iterator:
-    #     docIDs.append(doc['_id'])
     return langQueryParts[0], list(paraIDs)
 
 
@@ -530,6 +528,8 @@ def find_sentences_json(page=0):
                             randomSeed=get_session_data('seed'),
                             query_size=get_session_data('page_size'),
                             page=get_session_data('page'))
+
+    # return esQuery
     hits = sc.get_sentences(esQuery)
     if 'aggregations' in hits and 'agg_nwords' in hits['aggregations']:
         if nOccurrences > 0:
