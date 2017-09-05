@@ -177,10 +177,12 @@ function assign_input_events() {
 	$("span.word_plus").unbind('click');
 	$("span.word_minus").unbind('click');
 	$("span.add_rel").unbind('click');
-	$("input.neg_query").unbind('change');
+	//$("neg_query_checkbox").unbind('change');
+	$("span.neg_query").unbind('click');
 	$("span.word_plus").click(add_word_inputs);
 	$("span.add_rel").click(add_word_relations);
-	$("input.neg_query").change(negative_query);
+	//$("neg_query_checkbox").change(negative_query);
+	$("span.neg_query").click(negative_query_span);
 }
 
 function assign_show_hide() {
@@ -211,14 +213,23 @@ function assign_show_hide() {
 	});
 }
 
-function negative_query(e) {
-	var word_div = $(this).parent();
+function negative_query(e, thisSpan) {
+	var word_div = $(thisSpan).parent().parent();
+	var word_r_div = $(thisSpan).parent();
 	if (word_div.css("background-color") != "rgb(20, 20, 20)") {
 		word_div.css({"background-color": "rgb(20, 20, 20)", "color": "#fff"});
+		word_r_div.css({"background-color": "rgb(60, 50, 60)", "color": "#fff"});
 	}
 	else {
 		word_div.css({"background-color": "#fff", "color": "black"});
+		word_r_div.css({"background-color": "#e1e9ef", "color": "black"});
 	}
+}
+
+function negative_query_span(e) {
+	var cx_neg = $(this).parent().find('.neg_query_checkbox');
+	cx_neg.prop('checked', !cx_neg.prop('checked'));
+	negative_query(e, this);
 }
 
 function add_word_inputs(e) {
@@ -227,7 +238,7 @@ function add_word_inputs(e) {
 	new_word_num += 1;
 	word_div_html = '<div class="word_search" id="wsearch_' + new_word_num + '">\n' + $('#first_word').html();
 	word_div_html = word_div_html.replace(/1/g, new_word_num)
-	word_div_html += '<span class="add_rel glyphicon glyphicon-circle-arrow-down" data-nword="' + new_word_num + '" data-nrels="0"><span class="tooltip_prompt">add&nbsp;relation</span></span>';
+	word_div_html = word_div_html.replace('<span class="add_distance_stub">', '<span class="add_rel glyphicon glyphicon-resize-full" data-nword="' + new_word_num + '" data-nrels="0"><span class="tooltip_prompt">add&nbsp;relation</span></span>');
 	word_div_html += '</div>';
 	word_div = $.parseHTML(word_div_html);
 	$("div.words_search").append(word_div);
@@ -245,5 +256,5 @@ function add_word_relations(e) {
 	word_rel_html += 'to <input type="number" class="search_input" name="word_dist_to_' + word_num + '_' + nrels + '"> ';
 	word_rel_html += '</div>';
 	word_rel_div = $.parseHTML(word_rel_html);
-	$("#wsearch_" + word_num).append(word_rel_div);
+	$("#wsearch_" + word_num).find(".word_search_l").append(word_rel_div);
 }

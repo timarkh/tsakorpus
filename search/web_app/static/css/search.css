@@ -179,8 +179,13 @@
 .word_search {
 	float: left;
 	display: inline-block;
-	padding: 15px;
-	border-radius: 5px;
+	padding-left: 15px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	padding-right: 1px;
+	margin-right: 4px;
+	border-radius: 6px;
+	border: 1px solid gray;
 }
 
 .word_rel {
@@ -219,17 +224,25 @@
 	float: left;
 }
 
-.word_plus, .add_rel, .search_w {
+.word_plus, .add_rel, .neg_query, .search_w {
 	cursor: pointer;
 }
 
 .add_rel {
+	margin-top: 5px;
 	margin-left: 5px;
 	font-size: 20px;
 }
 
 .word_plus {
 	margin-top: 5px;
+	margin-left: 5px;
+	font-size: 20px;
+}
+
+.neg_query {
+	margin-top: 5px;
+	margin-left: 5px;
 	font-size: 20px;
 }
 
@@ -238,6 +251,10 @@
 }
 
 .add_rel:hover {
+	color: #2664c9;
+}
+
+.neg_query:hover {
 	color: #2664c9;
 }
 
@@ -267,6 +284,31 @@
 
 .word_plus:hover .tooltip_prompt {
     visibility: visible;
+}
+
+.neg_query:hover .tooltip_prompt {
+    visibility: visible;
+}
+
+.word_search_l {
+	display: inline-block;
+	height: 100%;
+	vertical-align: top;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	padding-right: 15px;
+}
+.word_search_r {
+	display: inline-block;
+	width: 40px;
+	padding: 5px;
+	height: 100%;
+	vertical-align: top;
+	background-color: #e1e9ef;
+}
+
+.hidden_input {
+	visibility: hidden;
 }
 
 .popup_wf {

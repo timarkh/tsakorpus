@@ -22,21 +22,27 @@
 		<form id="search_main">
 		<input type="hidden" name="n_words" id="n_words" value="1">
 		<div class="words_search">
-		<div class="word_search" id="first_word">
-		<div class="query_word_header"><div class="circle circle_w1"></div>Word #1</div>
-		Wordform: <input type="text" class="search_input" name="wf1" id="wf1"><br>
-		Lemma: <input type="text" class="search_input" name="lex1" id="lex1"><br>
-		Grammar: <input type="text" class="search_input" name="gr1" id="gr1"><br>
-		Gloss: <input type="text" class="search_input" name="gloss_index1" id="gloss1"><br>
-		<div class="add_word_fields"></div>
-		<select name="lang1" id="lang1">
-		{% for lang in languages %}
-		<option value="{{ lang }}">{{ lang }}</option>
-		{% endfor %}
-		</select><br>
-		<input type="checkbox" class="neg_query" name="negq1" id="negq1" onclick="negative_query();"> Negative query<br>
-		<span class="word_plus glyphicon glyphicon-plus-sign" aria-hidden="true"><span class="tooltip_prompt">add&nbsp;word</span></span>
-		</div>
+			<div class="word_search" id="first_word">
+				<div class="word_search_l">
+					<div class="query_word_header"><div class="circle circle_w1"></div>Word #1</div>
+					Wordform: <input type="text" class="search_input" name="wf1" id="wf1"><br>
+					Lemma: <input type="text" class="search_input" name="lex1" id="lex1"><br>
+					Grammar: <input type="text" class="search_input" name="gr1" id="gr1"><br>
+					Gloss: <input type="text" class="search_input" name="gloss_index1" id="gloss1"><br>
+					<div class="add_word_fields"></div>
+					<select name="lang1" id="lang1">
+					{% for lang in languages %}
+					<option value="{{ lang }}">{{ lang }}</option>
+					{% endfor %}
+					</select>
+				</div>
+				<div class="word_search_r">
+					<span class="neg_query glyphicon glyphicon-remove-circle" aria-hidden="true"><span class="tooltip_prompt">negative&nbsp;query</span></span><br>
+					<span class="word_plus glyphicon glyphicon-plus-sign" aria-hidden="true"><span class="tooltip_prompt">add&nbsp;word</span></span><br>
+					<span class="add_distance_stub"><br>
+					<input type="checkbox" class="hidden_input neg_query_checkbox" name="negq1" id="negq1" onclick="negative_query();">
+				</div>
+			</div>
 		</div>
 		<br>
 		Text search: <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise"> Precise match (not like in google)<br>
