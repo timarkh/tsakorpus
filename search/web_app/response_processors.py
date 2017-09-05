@@ -542,24 +542,54 @@ class SentenceViewer:
         for word in hit['inner_hits']['w1']['hits']['hits']:
             hitsProcessed['n_occurrences'] += 1
             word['_source']['lang'] = lang
-            wordJson = json.dumps(word['_source'])
+            wordJson = json.dumps({k: v for k, v in word['_source'].items() if k in ('ana', 'wf', 'lang')},
+                                  sort_keys=True)
             try:
-                hitsProcessed['word_jsons'][wordJson] += 1
+                hitsProcessed['word_jsons'][wordJson]['n_occurrences'] += 1
+                hitsProcessed['word_jsons'][wordJson]['n_sents'] += 1
+                hitsProcessed['word_jsons'][wordJson]['doc_ids'].add(hit['_source']['doc_id'])
             except KeyError:
-                hitsProcessed['word_jsons'][wordJson] = 1
+                hitsProcessed['word_jsons'][wordJson] = {'n_occurrences': 1,
+                                                         'n_sents': 1,
+                                                         'doc_ids': {hit['_source']['doc_id']}}
 
     def process_words_collected_from_sentences(self, hitsProcessed):
         """
         Process all words collected from the sentences with a multi-word query.
         """
-        for wordJson, freq in hitsProcessed['word_jsons'].items():
+        for wordJson, freqData in hitsProcessed['word_jsons'].items():
             word = {'_source': json.loads(wordJson)}
-            word['_source']['freq'] = freq
+            word['_source']['freq'] = freqData['n_occurrences']
             word['_source']['rank'] = ''
-            word['_source']['n_sents'] = ''
-            word['_source']['n_docs'] = ''
-            hitsProcessed['words'].append(self.process_word(word, docIDs=None, lang=word['_source']['lang']))
+            word['_source']['n_sents'] = freqData['n_sents']
+            word['_source']['n_docs'] = len(freqData['doc_ids'])
+            hitsProcessed['words'].append(word)
         del hitsProcessed['word_jsons']
+        self.calculate_ranks(hitsProcessed)
+        hitsProcessed['words'] = [self.process_word(word, docIDs=None, lang=word['_source']['lang'])
+                                  for word in hitsProcessed['words']]
+
+    def calculate_ranks(self, hitsProcessed):
+        """
+        Calculate frequency ranks of the words collected from sentences based
+        on their frequency in the hitsProcessed list.
+        For each word, store results in word['_source']['rank']. Return nothing.
+        """
+        freqsSorted = [w['_source']['freq'] for w in hitsProcessed['words']]
+        freqsSorted.sort(reverse=True)
+        quantiles = {}
+        for q in [0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.25, 0.5]:
+            qIndex = math.ceil(q * len(freqsSorted))
+            if qIndex >= len(freqsSorted):
+                qIndex = len(freqsSorted) - 1
+            quantiles[q] = freqsSorted[qIndex]
+        for w in hitsProcessed['words']:
+            if w['_source']['freq'] > 1:
+                if w['_source']['freq'] > quantiles[0.03]:
+                    w['_source']['rank'] = '#' + str(freqsSorted.index(w['_source']['freq']) + 1)
+                else:
+                    w['_source']['rank'] = '&gt; ' + str(min(math.ceil(q * 100) for q in quantiles
+                                                  if w['_source']['freq'] >= quantiles[q])) + '%'
 
     def process_doc(self, d):
         """
