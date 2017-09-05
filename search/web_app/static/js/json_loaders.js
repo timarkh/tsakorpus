@@ -251,7 +251,7 @@ function add_word_relations(e) {
 	if (word_num <= 0) { return; }
 	var nrels = parseInt($(e.target).attr('data-nrels'));
 	$(e.target).attr('data-nrels', nrels + 1);
-	word_rel_html = '<div class="word_rel"> Distance to word #<input type="number" class="search_input" name="word_rel_' + word_num + '_' + nrels + '"><br>';
+	word_rel_html = '<div class="word_rel"> Distance to word #<input type="number" class="search_input distance_input" name="word_rel_' + word_num + '_' + nrels + '"><br>';
 	word_rel_html += 'from <input type="number" class="search_input" name="word_dist_from_' + word_num + '_' + nrels + '"><br>';
 	word_rel_html += 'to <input type="number" class="search_input" name="word_dist_to_' + word_num + '_' + nrels + '"> ';
 	word_rel_html += '</div>';

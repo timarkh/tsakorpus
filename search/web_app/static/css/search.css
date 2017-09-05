@@ -70,10 +70,13 @@
 	margin-right: 8px;
     border-radius: 50%;
 	border: 2px white solid;
+	vertical-align: text-top;
 }
 
 .query_word_header {
 	vertical-align: middle;
+	text-align: left;
+	margin-bottom: 7px;
 }
 
 .smatch {
@@ -186,6 +189,7 @@
 	margin-right: 4px;
 	border-radius: 6px;
 	border: 1px solid gray;
+	resize: vertical;
 }
 
 .word_rel {
@@ -194,6 +198,22 @@
 
 .search_input {
 	color: black;
+	margin-bottom: 1px;
+	margin-left: 1px;
+	border-radius: 2px;
+	border: solid 1px #707070;
+	box-shadow: none;
+	transition: box-shadow 0.3s, border 0.3s;
+}
+
+.distance_input {
+	width: 45px;
+	font-size: 18px;
+}
+
+.search_input:focus {
+	border: solid 1px #894c1f;
+	box-shadow: 0 0 5px 1px #f2c9ab;
 }
 
 .context_off {
@@ -294,7 +314,8 @@
 	display: inline-block;
 	height: 100%;
 	vertical-align: top;
-	padding-top: 15px;
+	text-align: right;
+	padding-top: 10px;
 	padding-bottom: 15px;
 	padding-right: 15px;
 }
@@ -305,6 +326,8 @@
 	height: 100%;
 	vertical-align: top;
 	background-color: #e1e9ef;
+	border-top-right-radius: 6px;
+	border-bottom-right-radius: 6px;
 }
 
 .hidden_input {
