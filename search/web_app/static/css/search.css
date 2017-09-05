@@ -1,6 +1,7 @@
 ﻿body {
 	margin: 5px;
 	margin-bottom: 10px;
+	font-family: Lato, sans-serif;
 }
 
 .word:hover {
@@ -77,6 +78,7 @@
 	vertical-align: middle;
 	text-align: left;
 	margin-bottom: 7px;
+	font-size: 16px;
 }
 
 .smatch {
@@ -244,7 +246,7 @@
 	float: left;
 }
 
-.word_plus, .add_rel, .neg_query, .search_w {
+.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w {
 	cursor: pointer;
 }
 
@@ -260,6 +262,18 @@
 	font-size: 20px;
 }
 
+.word_minus {
+	margin-top: 5px;
+	margin-left: 5px;
+	font-size: 20px;
+}
+
+.word_expand {
+	margin-top: 5px;
+	margin-left: 5px;
+	font-size: 20px;
+}
+
 .neg_query {
 	margin-top: 5px;
 	margin-left: 5px;
@@ -267,6 +281,14 @@
 }
 
 .word_plus:hover {
+	color: #2664c9;
+}
+
+.word_minus:hover {
+	color: #2664c9;
+}
+
+.word_expand:hover {
 	color: #2664c9;
 }
 
@@ -303,6 +325,14 @@
 }
 
 .word_plus:hover .tooltip_prompt {
+    visibility: visible;
+}
+
+.word_minus:hover .tooltip_prompt {
+    visibility: visible;
+}
+
+.word_expand:hover .tooltip_prompt {
     visibility: visible;
 }
 

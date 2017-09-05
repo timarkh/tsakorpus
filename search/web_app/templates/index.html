@@ -7,6 +7,7 @@
 <script type='text/javascript' src='static/js/json_loaders.js'></script>
 <link rel="stylesheet" type="text/css" href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="static/css/search.css">
+<link href="https://fonts.googleapis.com/css?family=Lato:400,400i" rel="stylesheet">
 {% if media %}
 <link href="http://vjs.zencdn.net/5.19.2/video-js.css" rel="stylesheet">
 <link href="static/css/videojs.markers.min.css" rel="stylesheet">
@@ -29,7 +30,7 @@
 					Lemma: <input type="text" class="search_input" name="lex1" id="lex1"><br>
 					Grammar: <input type="text" class="search_input" name="gr1" id="gr1"><br>
 					Gloss: <input type="text" class="search_input" name="gloss_index1" id="gloss1"><br>
-					<div class="add_word_fields"></div>
+					<div class="add_word_fields" style="height: 0px;"></div>
 					<select name="lang1" id="lang1" class="search_input">
 					{% for lang in languages %}
 					<option value="{{ lang }}">{{ lang }}</option>
@@ -37,8 +38,10 @@
 					</select>
 				</div>
 				<div class="word_search_r">
-					<span class="neg_query glyphicon glyphicon-remove-circle" aria-hidden="true"><span class="tooltip_prompt">negative&nbsp;query</span></span><br>
+					<span class="neg_query glyphicon glyphicon-off" aria-hidden="true"><span class="tooltip_prompt">negative&nbsp;query</span></span><br>
 					<span class="word_plus glyphicon glyphicon-plus-sign" aria-hidden="true"><span class="tooltip_prompt">add&nbsp;word</span></span><br>
+					<span class="word_expand glyphicon glyphicon-chevron-down" aria-hidden="true"><span class="tooltip_prompt">more&nbsp;fields</span></span><br>
+					<span class="add_minus_stub"><br>
 					<span class="add_distance_stub"><br>
 					<input type="checkbox" class="hidden_input neg_query_checkbox" name="negq1" id="negq1" onclick="negative_query();">
 				</div>
