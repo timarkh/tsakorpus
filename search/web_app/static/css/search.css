@@ -360,6 +360,20 @@
 	border-bottom-right-radius: 6px;
 }
 
+.add_word_fields {
+	visibility: hidden;
+	transition: max-height 0.5s;
+	height: 0px;
+	max-height: 0px;
+}
+
+hr.separator {
+	border-top: 1px dotted #7b7e7e;
+	border-bottom: 1px dotted #fff;
+	margin-top: 7px;
+	margin-bottom: 7px;
+}
+
 .hidden_input {
 	visibility: hidden;
 }

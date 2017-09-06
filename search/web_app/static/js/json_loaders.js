@@ -241,8 +241,8 @@ function add_word_inputs(e) {
 	new_word_num += 1;
 	word_div_html = '<div class="word_search" id="wsearch_' + new_word_num + '">\n' + $('#first_word').html();
 	word_div_html = word_div_html.replace(/1/g, new_word_num)
-	word_div_html = word_div_html.replace('<span class="add_minus_stub">', '<span class="word_minus glyphicon glyphicon-minus-sign" data-nword="' + new_word_num + '"><span class="tooltip_prompt">remove&nbsp;word</span></span>');
-	word_div_html = word_div_html.replace('<span class="add_distance_stub">', '<span class="add_rel glyphicon glyphicon-resize-full" data-nword="' + new_word_num + '" data-nrels="0"><span class="tooltip_prompt">add&nbsp;distance</span></span>');
+	word_div_html = word_div_html.replace('<span class="add_minus_stub">', '<span class="word_minus glyphicon glyphicon-minus-sign" data-nword="' + new_word_num + '"><span class="tooltip_prompt">remove&nbsp;word</span></span><br>');
+	word_div_html = word_div_html.replace('<span class="add_distance_stub">', '<span class="add_rel glyphicon glyphicon-resize-full" data-nword="' + new_word_num + '" data-nrels="0"><span class="tooltip_prompt">add&nbsp;distance</span></span><br>');
 	word_div_html += '</div>';
 	word_div = $.parseHTML(word_div_html);
 	$("div.words_search").append(word_div);
@@ -266,7 +266,24 @@ function del_word_inputs(e) {
 
 function expand_word_input(e) {
 	var div_extra_fields = $(e.target).parent().parent().find('.add_word_fields');
-	div_extra_fields.style('height', '50px;');
+	div_extra_fields.finish();
+	if (div_extra_fields.css('max-height') == '0px') {
+		div_extra_fields.css('visibility', 'visible');
+		div_extra_fields.css('max-height', '200px');
+		div_extra_fields.css('height', 'initial');
+		$(e.target).find('.tooltip_prompt').html('less&nbsp;fields');
+	}
+	else if (div_extra_fields.css('max-height') == '200px') {
+		div_extra_fields.css('max-height', '0px');
+		div_extra_fields.css('height', '0px');
+		div_extra_fields.css('visibility', 'hidden');
+		$(e.target).find('.tooltip_prompt').html('more&nbsp;fields');
+	}
+	else {
+		return;
+	}
+	$(e.target).toggleClass('glyphicon-chevron-down');
+	$(e.target).toggleClass('glyphicon-chevron-up');
 }
 
 function add_word_relations(e) {
