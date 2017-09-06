@@ -362,7 +362,7 @@ function gloss_selector_ok(e) {
 	var gloss_divs = $('#sortable > div');
 	var gloss_field_val = '';
 	gloss_divs.each(function (index) {
-		var t = $(this).text();
+		var t = $(this).contents().get(0).nodeValue;
 		if (t.length > 0) {
 			gloss_field_val += t + '-';
 		}

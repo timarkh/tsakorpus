@@ -1,17 +1,34 @@
 <link rel="stylesheet" type="text/css" href="static/css/gramm_gloss_selection.css">
-<div id="generic_gloss_placeholders">
-<div class="draggable" class="ui-state-highlight">#</div>
-<div class="draggable" class="ui-state-highlight">*</div>
-<div class="draggable" class="ui-state-highlight">?</div>
+<div class="gloss_choice_panel" id="generic_gloss_placeholders">
+<div class="draggable" class="ui-state-highlight">#<span class="tooltip_prompt">word&nbsp;boundary</span></div>
+<div class="draggable" class="ui-state-highlight">*<span class="tooltip_prompt">any&nbsp;number of&nbsp;morphs</span></div>
+<div class="draggable" class="ui-state-highlight">+<span class="tooltip_prompt">any&nbsp;positive&nbsp;number of&nbsp;morphs</span></div>
+<div class="draggable" class="ui-state-highlight">?<span class="tooltip_prompt">any&nbsp;morph</span></div>
 <div class="draggable" class="ui-state-highlight">STEM</div>
 </div>
  
 <div id="gloss_sort_panel">
 <div id="sortable">
-  <div class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-e-w"></span>*</div>
+  <div class="ui-state-default">STEM</div>
 </div>
 </div>
 <br>
+
+<div class="gloss_choice_panel">
+{% for col in glosses.columns %}
+	<div class="gloss_column">
+	{% for gl in col %}
+	{% if gl.type == "gloss" %}
+		<div class="draggable" class="ui-state-highlight">{{ gl.value }}
+		{% if gl.tooltip %}
+			<span class="tooltip_prompt">{{ gl.tooltip }}</span>
+		{% endif %}
+		</div>
+	{% endif %}
+	{% endfor %}
+	</div>
+{% endfor %}
+</div>
 
 <div id="selector_buttons">
 <button type="button" class="btn btn-default btn-success" aria-label="Left Align" id="gloss_selector_ok">OK</button> <button type="button" class="btn btn-default btn-danger" aria-label="Left Align" id="gloss_selector_cancel">Cancel</button>

@@ -1,8 +1,22 @@
 ﻿#generic_gloss_placeholders {
-	margin: 10px 5%;
+
+}
+
+.gloss_choice_panel {
+	margin: 5px 2%;
 	float: left;
-	width: 90%;
+	width: 96%;
 	font-size: 1em;
+}
+
+.gloss_column {
+	display: inline-block;
+	max-width: 100px;
+	margin: 3px;
+	border-radius: 3px;
+	background-color: #f6f7e1;
+	display: inline-grid;
+	padding: 4px;
 }
 
 .draggable {
@@ -10,20 +24,34 @@
 	padding: 4px 10px;
 	display:inline-block;
 	float: left;
-	cursor: pointer;
+	cursor: move;
 	border: 1px solid #eee;
 	border-radius: 3px;
 	background-color: #fff9b2;
-	transition: font-size 0.5s, height: 0.5s;
+	transition: font-size 0.5s, height 0.5s, background-color 0.5s;
+	min-width: 50px;
+	text-align: center;
+}
+
+.draggable .tooltip_prompt {
+	top: 15px;
+	right: 20px;
+	left: initial;
+	margin-left: -30%;
+	max-width: 150px;
+}
+
+.draggable:hover .tooltip_prompt {
+    visibility: visible;
 }
 
 #gloss_sort_panel {
-	margin: 10px 5%;
-	width: 90%;
+	margin: 10px 2%;
+	width: 96%;
 	float: left;
-	background-color: #eefce8;
+	background-color: #e8f1fc;
 	border-radius: 5px;
-	border: 2px solid #c7e2bc;
+	border: 2px solid #c4d7ef;
 }
 
 #sortable {
@@ -31,6 +59,7 @@
 	margin: 5px auto;
 	display: table;
 	font-size: 1.2em;
+	min-width: 55px;
 }
 
 #sortable div {
@@ -43,10 +72,11 @@
 	border: 1px solid gray;
 	background-color: #eee;
 	border-radius: 3px;
-	cursor: pointer;
+	cursor: move;
 }
 
 #selector_buttons {
 	width: 100%;
 	padding: 20px;
+	margin-top: 20px;
 }
