@@ -823,3 +823,13 @@ def toggle_sentence(sentNum):
         return ''
     pageData[page][sentNum]['toggled_off'] = not pageData[page][sentNum]['toggled_off']
     return ''
+
+
+@app.route('/get_gramm_selector/<lang>')
+def get_gramm_selector(lang=''):
+    return render_template('select_gramm.html')
+
+
+@app.route('/get_gloss_selector/<lang>')
+def get_gloss_selector(lang=''):
+    return render_template('select_gloss.html')

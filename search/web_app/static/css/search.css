@@ -374,6 +374,17 @@ hr.separator {
 	margin-bottom: 7px;
 }
 
+.gram_selector_link {
+	margin-left: -18px;
+	width: 18px;
+	padding-right: 4px;
+	color: #333;
+}
+
+.gram_selector_link:hover {
+	color: #2664c9;
+}
+
 .hidden_input {
 	visibility: hidden;
 }

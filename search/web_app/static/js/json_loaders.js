@@ -178,12 +178,14 @@ function assign_input_events() {
 	$("span.word_minus").unbind('click');
 	$("span.word_expand").unbind('click');
 	$("span.add_rel").unbind('click');
+	$("span.gram_selector_link").unbind('click');
 	//$("neg_query_checkbox").unbind('change');
 	$("span.neg_query").unbind('click');
 	$("span.word_plus").click(add_word_inputs);
 	$("span.word_minus").click(del_word_inputs);
 	$("span.word_expand").click(expand_word_input);
 	$("span.add_rel").click(add_word_relations);
+	$("span.gram_selector_link").click(choose_grammar);
 	//$("neg_query_checkbox").change(negative_query);
 	$("span.neg_query").click(negative_query_span);
 }
@@ -297,4 +299,37 @@ function add_word_relations(e) {
 	word_rel_html += '</div>';
 	word_rel_div = $.parseHTML(word_rel_html);
 	$("#wsearch_" + word_num).find(".word_search_l").append(word_rel_div);
+}
+
+function choose_grammar(e) {
+	var field_type = $(e.target).attr('data-field');
+	var word_num = parseInt($(e.target).attr('data-nword'));
+	var lang = $('#lang' + word_num.toString() + ' option:selected').text();
+	if (field_type == 'gr') {
+		$('#gram_sel_header').html('Select combinations of tags');
+		$.ajax({
+			url: "get_gramm_selector/" + lang,
+			type: "GET",
+			success: function(result) {
+				$("#gram_sel_body").html(result);
+			},
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	}
+	else if (field_type == 'gloss') {
+		$('#gram_sel_header').html('Select glosses');
+		$.ajax({
+			url: "get_gloss_selector/" + lang,
+			type: "GET",
+			success: function(result) {
+				$("#gram_sel_body").html(result);
+			},
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	}
+	$('#gram_selector').modal('show');
 }
