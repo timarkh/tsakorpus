@@ -1,0 +1,52 @@
+﻿#generic_gloss_placeholders {
+	margin: 10px 5%;
+	float: left;
+	width: 90%;
+	font-size: 1em;
+}
+
+.draggable {
+	margin: 0 3px 3px 3px;
+	padding: 4px 10px;
+	display:inline-block;
+	float: left;
+	cursor: pointer;
+	border: 1px solid #eee;
+	border-radius: 3px;
+	background-color: #fff9b2;
+	transition: font-size 0.5s, height: 0.5s;
+}
+
+#gloss_sort_panel {
+	margin: 10px 5%;
+	width: 90%;
+	float: left;
+	background-color: #eefce8;
+	border-radius: 5px;
+	border: 2px solid #c7e2bc;
+}
+
+#sortable {
+	list-style-type: none;
+	margin: 5px auto;
+	display: table;
+	font-size: 1.2em;
+}
+
+#sortable div {
+	margin: 0 3px 3px 3px;
+	padding: 5px 10px;
+	min-height: 30px;
+	max-height: 40px;
+	display:inline-block;
+	float: left;
+	border: 1px solid gray;
+	background-color: #eee;
+	border-radius: 3px;
+	cursor: pointer;
+}
+
+#selector_buttons {
+	width: 100%;
+	padding: 20px;
+}
