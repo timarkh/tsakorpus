@@ -200,6 +200,7 @@
 
 .search_input {
 	color: black;
+	width: 160px;
 	margin-bottom: 1px;
 	margin-left: 1px;
 	border-radius: 2px;
@@ -379,6 +380,10 @@ hr.separator {
 	width: 18px;
 	padding-right: 4px;
 	color: #333;
+}
+
+.gram_selector_input {
+	padding-right: 20px;
 }
 
 .gram_selector_link:hover {

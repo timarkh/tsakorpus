@@ -3,11 +3,13 @@
 <head>
 <title>Corpus search page</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type='text/javascript' src='static/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
 <script type='text/javascript' src='static/js/result_parser.js'></script>
 <script type='text/javascript' src='static/js/json_loaders.js'></script>
 <link rel="stylesheet" type="text/css" href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="static/css/search.css">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,400i" rel="stylesheet"> -->
 {% if media %}
 <link href="http://vjs.zencdn.net/5.19.2/video-js.css" rel="stylesheet">
@@ -29,8 +31,10 @@
 					<div class="query_word_header"><div class="circle circle_w1"></div>Word #1</div>
 					Word: <input type="text" class="search_input" name="wf1" id="wf1"><br>
 					Lemma: <input type="text" class="search_input" name="lex1" id="lex1"><br>
-					Grammar: <input type="text" class="search_input" name="gr1" id="gr1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gr" data-nword="1"></span><br>
-					Gloss: <input type="text" class="search_input" name="gloss_index1" id="gloss1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gloss" data-nword="1"></span><br>
+					Grammar: <input type="text" class="search_input gram_selector_input" name="gr1" id="gr1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gr" data-nword="1"></span><br>
+					{% if gloss_search_enabled %}
+					Gloss: <input type="text" class="search_input gram_selector_input" name="gloss_index1" id="gloss1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gloss" data-nword="1"></span><br>
+					{% endif %}
 					<hr class="separator">
 					<div class="add_word_fields"></div>
 					{% if languages|length > 1 %}
@@ -118,15 +122,15 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 <!-- Hidden elements -->
 <div id="analysis"></div>
 
-<div class="modal fade" id="gram_selector" tabindex="-1" role="dialog" aria-labelledby="gram_sel_header" aria-hidden="true">
+<div class="modal fade" id="gram_selector" tabindex="-1" role="dialog" aria-labelledby="gram_sel_header" aria-hidden="true" data-field="gr1">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="gram_sel_header">Grammar</h4>
+				<h4 class="modal-title" id="gram_sel_header">Grammar selection header</h4>
 			</div>
 			<div class="modal-body" id="gram_sel_body">
-			<p>Grammar</p>
+			<p>Grammar selection body</p>
 			</div>
 		</div>
 	</div>

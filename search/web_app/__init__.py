@@ -318,7 +318,8 @@ def search_page():
                            languages=settings['languages'],
                            all_lang_search=allLangSearch,
                            transliterations=transliterations,
-                           media=settings['media'])
+                           media=settings['media'],
+                           gloss_search_enabled=settings['gloss_search_enabled'])
 
 
 @app.route('/search_sent_query/<int:page>')

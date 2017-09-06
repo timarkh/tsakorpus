@@ -1,2 +1,43 @@
-<p>(gloss selection will be implemented here)</p>
-<button type="button" class="btn btn-default btn-success" aria-label="Left Align">OK</button> <button type="button" class="btn btn-default btn-danger" aria-label="Left Align">Cancel</button> 
+<link rel="stylesheet" type="text/css" href="static/css/gramm_gloss_selection.css">
+<div id="generic_gloss_placeholders">
+<div class="draggable" class="ui-state-highlight">#</div>
+<div class="draggable" class="ui-state-highlight">*</div>
+<div class="draggable" class="ui-state-highlight">?</div>
+<div class="draggable" class="ui-state-highlight">STEM</div>
+</div>
+ 
+<div id="gloss_sort_panel">
+<div id="sortable">
+  <div class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-e-w"></span>*</div>
+</div>
+</div>
+<br>
+
+<div id="selector_buttons">
+<button type="button" class="btn btn-default btn-success" aria-label="Left Align" id="gloss_selector_ok">OK</button> <button type="button" class="btn btn-default btn-danger" aria-label="Left Align" id="gloss_selector_cancel">Cancel</button>
+</div>
+<script>
+  $( function() {
+    $( "#sortable" ).sortable({
+		over: function () {
+            remove_item = false;
+        },
+        out: function () {
+            remove_item = true;
+        },
+        beforeStop: function (event, ui) {
+			var n_siblings = ui.item.siblings().length;
+            if (remove_item && n_siblings > 1) {
+                ui.item.hide();
+                ui.item.remove();
+            }
+        }
+	});
+    $( "#sortable" ).disableSelection();
+	$( ".draggable" ).draggable({
+      connectToSortable: "#sortable",
+      helper: "clone",
+      revert: "invalid"
+    });
+  } );
+  </script>

@@ -26,4 +26,6 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``all_language_search_enabled`` -- boolean value that determines if the user may make language-inspecific queries. Relevant only in a corpus with multiple languages.
 
+* ``gloss_search_enabled`` -- boolean value that determines if the gloss search textbox should be present in the word query form. Should be enabled for glossed corpora.
+
 * ``lang_props`` -- a dictionary where keys are the names of the languages and values are dictionaries with language-specific properties (see below).
