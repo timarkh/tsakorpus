@@ -7,16 +7,34 @@
 	float: left;
 	width: 96%;
 	font-size: 1em;
+	overflow: auto;
+	white-space: nowrap;
 }
 
 .gloss_column {
 	display: inline-block;
-	max-width: 100px;
-	margin: 3px;
+	max-width: 150px;
+	margin: 1px;
+	margin-right: 2px;
 	border-radius: 3px;
 	background-color: #f6f7e1;
 	display: inline-grid;
 	padding: 4px;
+}
+
+.gloss_separator {
+	width: 90%;
+}
+
+.gloss_header {
+	background-color: #f7f0a0;
+	margin: 0 3px 3px 3px;
+	padding: 4px 10px;
+	display:inline-block;
+	float: left;
+	border-radius: 3px;
+	min-width: 50px;
+	text-align: center;
 }
 
 .draggable {
@@ -38,7 +56,7 @@
 	right: 20px;
 	left: initial;
 	margin-left: -30%;
-	max-width: 150px;
+	max-width: 250px;
 }
 
 .draggable:hover .tooltip_prompt {

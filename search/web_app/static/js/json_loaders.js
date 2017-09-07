@@ -313,6 +313,7 @@ function choose_grammar(e) {
 			type: "GET",
 			success: function(result) {
 				gramm_selector_loaded(result);
+				$('#gram_selector').modal('show');
 			},
 			error: function(errorThrown) {
 				alert( JSON.stringify(errorThrown) );
@@ -325,14 +326,18 @@ function choose_grammar(e) {
 			url: "get_gloss_selector/" + lang,
 			type: "GET",
 			success: function(result) {
+				if (result.length <= 0) {
+					alert('No glosses are available for this language.');
+					return;
+				}
 				gloss_selector_loaded(result);
+				$('#gram_selector').modal('show');
 			},
 			error: function(errorThrown) {
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
 	}
-	$('#gram_selector').modal('show');
 }
 
 function gramm_selector_loaded(result) {
@@ -362,12 +367,14 @@ function gloss_selector_ok(e) {
 	var gloss_divs = $('#sortable > div');
 	var gloss_field_val = '';
 	gloss_divs.each(function (index) {
-		var t = $(this).contents().get(0).nodeValue;
+		var t = $(this).contents().get(0).nodeValue.replace(/[\r\n\t ]/g, '');
 		if (t.length > 0) {
 			gloss_field_val += t + '-';
 		}
 	});
 	gloss_field_val = gloss_field_val.replace(/^[* -]*|[* -]$/g, '');
+	gloss_field_val = gloss_field_val.replace(/-?#-?/g, '#');
+	gloss_field_val = gloss_field_val.replace(/(\*-)(\*-)+/g, '*-');
 	$(field).val(gloss_field_val);
 	$('#gram_selector').modal('toggle');
 }

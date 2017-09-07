@@ -833,9 +833,7 @@ def get_gramm_selector(lang=''):
 
 @app.route('/get_gloss_selector/<lang>')
 def get_gloss_selector(lang=''):
-    glossStub = {'columns': [[{'type': 'gloss', 'value': 'INFER', 'tooltip': 'Inferential'},
-                              {'type': 'gloss', 'value': 'PRS', 'tooltip': 'Present tense'}],
-                             [{'type': 'gloss', 'value': 'NOM', 'tooltip': 'Nominative'},
-                              {'type': 'gloss', 'value': 'GEN'}]]
-                 }
-    return render_template('select_gloss.html', glosses=glossStub)
+    if lang not in settings['lang_props'] or 'gloss_selection' not in settings['lang_props'][lang]:
+        return ''
+    glossSelection = settings['lang_props'][lang]['gloss_selection']
+    return render_template('select_gloss.html', glosses=glossSelection)
