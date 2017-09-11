@@ -107,17 +107,18 @@ function make_player_markers(objContext, curFragment) {
 			usedIntervals.push(item);
 			var alignmentInfo = srcAlignments[item];
 			if (item == curFragment) {
-				markers.push({'time': parseFloat(alignmentInfo.start) + 0.01,
+				markers.push({'time': parseFloat(alignmentInfo.start) + 0.1,
 							  'text': $(this).text() + '...',
 							  'class': 'timespan_highlighted',
 							  'id': item});
 			}
 			else {
-				markers.push({'time': parseFloat(alignmentInfo.start) + 0.01,
+				markers.push({'time': parseFloat(alignmentInfo.start) + 0.1,
 							  'text': $(this).text() + '...',
 							  'id': item});
 			}
-			markers.push({'time': parseFloat(alignmentInfo.end) - 0.01, 'text': '[end]'});
+			markers.push({'time': parseFloat(alignmentInfo.end) - 0.1, 'text': '[end]',
+						  'id': '[end]_' + item});
 		}
 	});
 	return markers;
@@ -143,7 +144,7 @@ function src_align_span(item, i) {
 	}
 	catch(err) {
 		srcPlayer.markers({'markers': markers, "markerStyle": {
-			'width': '4px',
+			'width': '2px',
 			'border-radius': '30%',
 			'background-color': 'green'
 		},
@@ -157,10 +158,26 @@ function src_align_span(item, i) {
 
 function markerReached(marker) {
 	var srcPlayer = videojs('src_player');
-	$('.src_highlighted').removeClass('src_highlighted');
-	if (marker.text != "[end]") {
-		// srcPlayer.pause();
+	//$('.src_highlighted').removeClass('src_highlighted');
+	if (marker.text == "[end]") {
+		$('.' + marker.id.replace('[end]_', '')).removeClass('src_highlighted');
+	}
+	else {
 		$('.' + marker.id).addClass('src_highlighted');
+	}
+	var n_markers_to_the_right = 0;
+	var markers = srcPlayer.markers.getMarkers();
+	for (i = 0; i < markers.length; i++) {
+		//alert(markers[i].time.toString() + ' : ' + marker.time.toString());
+		if (markers[i].time > marker.time) {
+			n_markers_to_the_right += 1;
+		}
+		else if (markers[i].text == '[end]') {
+			$('.' + markers[i].id.replace('[end]_', '')).removeClass('src_highlighted');
+		}
+	}
+	if (n_markers_to_the_right == 0) {
+		srcPlayer.pause();
 	}
 }
 
@@ -173,6 +190,8 @@ function show_expanded_context(results) {
 	for (var srcKey in results.src_alignment) {
         srcAlignments[srcKey] = results.src_alignment[srcKey];
     }
+	var srcPlayer = videojs('src_player');
+	srcPlayer.pause();
 	assign_word_events();
 }
 
