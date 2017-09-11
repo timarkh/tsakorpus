@@ -184,13 +184,13 @@ class InterfaceQueryParser:
                 return self.make_bool_query(strQuery, field, lang, start=start + 1, end=end - 1)
             else:
                 return self.make_simple_term_query(strQuery[start:end], field, lang)
-        if strOp in u',|&':
+        if strOp in ',|&':
             resultLeft = self.make_bool_query(strQuery, field, lang, start=start, end=iOpPos)
             resultRight = self.make_bool_query(strQuery, field, lang, start=iOpPos + 1, end=end)
             if len(resultLeft) <= 0 or len(resultRight) <= 0:
                 return {}
             return {'bool': {self.dictOperators[strOp]: [resultLeft, resultRight]}}
-        elif strOp == u'~':
+        elif strOp == '~':
             rest = strQuery[start + 1:end]
             if InterfaceQueryParser.rxParentheses.search(rest) is None:
                 mustNotClause = [self.make_simple_term_query(t, field, lang)

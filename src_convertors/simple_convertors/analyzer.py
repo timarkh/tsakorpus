@@ -54,6 +54,11 @@ class DumbMorphParser:
         """
         Load parsed word list from a file.
         """
+        if lang == '':
+            if 'languages' in self.settings:
+                lang = self.settings['languages'][0]
+            else:
+                lang = self.settings['corpus_name']
         self.analyses[lang] = {}
         f = open(fname, 'r', encoding='utf-8-sig')
         text = f.read()

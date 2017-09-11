@@ -1,5 +1,5 @@
 {
-  "corpus_name": "nganasan",
+  "corpus_name": "beserman_eaf",
   "input_format": "json",
   "media": true,
   "media_length": 60,
@@ -7,12 +7,13 @@
   "max_distance_filter": 200000,
   "query_timeout": 20,
   "viewable_meta": [
+    "filename",
     "genre",
     "year1",
     "year2"
   ],
-  "languages": ["nganasan", "nganasan_cyrillic", "russian", "english"],
-  "transliterations": ["original", "IPA"],
+  "languages": ["beserman", "russian"],
+  "transliterations": ["original", "cyrillic"],
   "all_language_search_enabled": true,
   "gloss_search_enabled": true,
   "lang_props":
@@ -73,6 +74,93 @@
             {"type": "gloss", "value": "ACC.SG.3DU", "tooltip": "Accusative 3du possessive"},
             {"type": "gloss", "value": "ACC.PL", "tooltip": "Accusative plural"},
             {"type": "gloss", "value": "ACC.DU", "tooltip": "Accusative dual"}
+          ],
+          [
+            {"type": "gloss", "value": "GEN.SG", "tooltip": "Genitive singular"},
+            {"type": "gloss", "value": "GEN.SG.1SG", "tooltip": "Genitive 1sg possessive"},
+            {"type": "gloss", "value": "GEN.SG.1PL", "tooltip": "Genitive 1pl possessive"},
+            {"type": "gloss", "value": "GEN.SG.1DU", "tooltip": "Genitive 1du possessive"},
+            {"type": "gloss", "value": "GEN.SG.2SG", "tooltip": "Genitive 2sg possessive"},
+            {"type": "gloss", "value": "GEN.SG.2PL", "tooltip": "Genitive 2pl possessive"},
+            {"type": "gloss", "value": "GEN.SG.2DU", "tooltip": "Genitive 2du possessive"},
+            {"type": "gloss", "value": "GEN.SG.3SG", "tooltip": "Genitive 3sg possessive"},
+            {"type": "gloss", "value": "GEN.SG.3PL", "tooltip": "Genitive 3sg possessive"},
+            {"type": "gloss", "value": "GEN.SG.3DU", "tooltip": "Genitive 3du possessive"},
+            {"type": "gloss", "value": "GEN.PL", "tooltip": "Genitive plural"},
+            {"type": "gloss", "value": "GEN.DU", "tooltip": "Genitive dual"}
+          ],
+          [
+            {"type": "gloss", "value": "INSTR", "tooltip": "Instrumental"},
+            {"type": "gloss", "value": "LOC.SG", "tooltip": "Locative singular"},
+            {"type": "gloss", "value": "LOC.PL", "tooltip": "Locative plural"},
+            {"type": "gloss", "value": "LAT.SG", "tooltip": "Lative singular"},
+            {"type": "gloss", "value": "LAT.PL", "tooltip": "Lative plural"},
+            {"type": "gloss", "value": "ABL.SG", "tooltip": "Ablative singular"},
+            {"type": "gloss", "value": "ABL.PL", "tooltip": "Ablative plural"},
+            {"type": "gloss", "value": "ALL", "tooltip": "Allative"},
+            {"type": "gloss", "value": "TRL", "tooltip": "Translative"},
+            {"type": "gloss", "value": "PROL.SG", "tooltip": "Prolative singular"},
+            {"type": "gloss", "value": "CAR", "tooltip": "Caritive"},
+            {"type": "gloss", "value": "ABES", "tooltip": "Abessive"},
+            {"type": "gloss", "value": "COM", "tooltip": "Comitative"},
+            {"type": "gloss", "value": "VOC.3SG", "tooltip": "Vocative singular"}
+            
+          ]
+        ]
+      }
+    },
+    "beserman":
+    {
+      "gloss_shortcuts": {
+        "case": "(nom|gen2?|acc|dat|ins|loc|ill|el|egr|term|prol|car|app|rcs|adv|dms)(\\.(sg|pl))?",
+        "tense": "(pst2?|prs|fut|evid)(\\.[123](sg|pl)?)?",
+        "deriv": "(detr|iter|caus)",
+        "pers": "[123](sg|pl)"
+      },
+      "gr_fields_order": ["nType", "adjType", "proType", "stemType", "num_deriv", "v_form", "attributivizer", "tense", "person", "number", "case", "poss"],
+      "gloss_selection": {
+        "columns": [
+          [
+            {"type": "gloss", "value": "CASE", "tooltip": "any&nbsp;case&nbsp;marker"},
+            {"type": "gloss", "value": "NOM", "tooltip": "Nominative case"},
+            {"type": "gloss", "value": "ACC", "tooltip": "Marked accusative case"},
+            {"type": "gloss", "value": "ACC.PL", "tooltip": "Accusative (plural) case"},
+            {"type": "gloss", "value": "GEN", "tooltip": "Genitive case"},
+            {"type": "gloss", "value": "GEN2", "tooltip": "2nd genitive (Ablative) case"},
+            {"type": "gloss", "value": "DAT", "tooltip": "Dative case"},
+            {"type": "gloss", "value": "INS", "tooltip": "Instrumental case"},
+            {"type": "gloss", "value": "LOC", "tooltip": "Locative case"},
+            {"type": "gloss", "value": "ILL", "tooltip": "Illative case"},
+            {"type": "gloss", "value": "EL", "tooltip": "Elative case"},
+            {"type": "gloss", "value": "EGR", "tooltip": "Egressive case"},
+            {"type": "gloss", "value": "TERM", "tooltip": "Terminative case"},
+            {"type": "gloss", "value": "PROL", "tooltip": "Prolative case"},
+            {"type": "gloss", "value": "APP", "tooltip": "Approximative case"},
+            {"type": "gloss", "value": "RCS", "tooltip": "Recessive case"}
+          ],
+          [
+            {"type": "gloss", "value": "DMS", "tooltip": "&ldquo;Domus&rdquo; (personal-local marker)"},
+            {"type": "separator"},
+            {"type": "gloss", "value": "PL", "tooltip": "Nominal plural"},
+            {"type": "gloss", "value": "ADJ.PL", "tooltip": "Adjectival plural"},
+            {"type": "separator"},
+            {"type": "gloss", "value": "P.1SG", "tooltip": "1sg possessive"},
+            {"type": "gloss", "value": "P.1PL", "tooltip": "1pl possessive"},
+            {"type": "gloss", "value": "P.2SG", "tooltip": "2sg possessive"},
+            {"type": "gloss", "value": "P.2PL", "tooltip": "2pl possessive"},
+            {"type": "gloss", "value": "P.3SG", "tooltip": "3sg possessive"},
+            {"type": "gloss", "value": "P.3PL", "tooltip": "3pl possessive"}
+          ],
+          [
+            {"type": "gloss", "value": "P.1SG.ACC", "tooltip": "Accusative 1sg possessive"},
+            {"type": "gloss", "value": "P.1PL.ACC", "tooltip": "Accusative 1pl possessive"},
+            {"type": "gloss", "value": "P.2SG.ACC", "tooltip": "Accusative 2sg possessive"},
+            {"type": "gloss", "value": "P.2PL.ACC", "tooltip": "Accusative 2pl possessive"},
+            {"type": "gloss", "value": "P.3SG.ACC", "tooltip": "Accusative 3sg possessive"},
+            {"type": "gloss", "value": "P.3PL.ACC", "tooltip": "Accusative 3pl possessive"},
+            {"type": "separator"},
+            {"type": "gloss", "value": "ATTR", "tooltip": "Attributivizer"},
+            {"type": "gloss", "value": "NEG.ATTR", "tooltip": "Negative attributivizer"}
           ],
           [
             {"type": "gloss", "value": "GEN.SG", "tooltip": "Genitive singular"},
