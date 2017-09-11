@@ -324,7 +324,7 @@ class SentenceViewer:
         re-align them with the same one and recalculate offsets.
         """
         srcFiles = set(srcFiles)
-        if len(srcFiles) > 1 or len(srcFiles) <= 0:
+        if len(srcFiles) > 1 or len(srcFiles) <= 0 or 'src_alignment' not in expandedContext:
             return
         srcFile = list(srcFiles)[0]
         rxSrcFragmentName = re.compile('^(.*?)-(\\d+)-(\\d+)\\.[^.]*$')
