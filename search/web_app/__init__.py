@@ -18,9 +18,6 @@ MAX_PAGE_SIZE = 100
 f = open(os.path.join(SETTINGS_DIR, 'corpus.json'), 'r', encoding='utf-8')
 settings = json.loads(f.read())
 f.close()
-f = open(os.path.join(SETTINGS_DIR, 'word_fields.json'), 'r', encoding='utf-8')
-wordFields = json.loads(f.read())
-f.close()
 corpus_name = settings['corpus_name']
 localizations = {}
 supportedLocales = ['ru', 'en']
@@ -758,9 +755,16 @@ def search_doc():
 
 @app.route('/get_word_fields')
 def get_word_fields():
-    result = '\n'.join(field + ': <input type="text" class="search_input" name="' + field +
-                       '1" id="' + field + '1"><br>'
-                       for field in wordFields)
+    result = ''
+    if 'word_fields' in settings and len(settings['word_fields']) > 0:
+        result += '\n'.join(field + ': <input type="text" class="search_input" name="' + field +
+                            '1" id="' + field + '1"><br>'
+                            for field in settings['word_fields'])
+    if 'sentence_meta' in settings and len('sentence_meta') > 0:
+        result += '\n<hr class="separator">\n'
+        result += '\n'.join(field.capitalize() + ': <input type="text" class="search_input" name="sent_meta_' + field +
+                            '1" id="' + field + '1"><br>'
+                            for field in settings['sentence_meta'])
     return result
 
 

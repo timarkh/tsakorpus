@@ -15,6 +15,15 @@
     "year1",
     "year2"
   ],
+  "sentence_meta": [
+    "year",
+    "speaker",
+    "gender"
+  ],
+  "word_fields":
+  [
+    "trans_ru"
+  ],
   "languages": ["beserman", "russian"],
   "transliterations": ["original", "cyrillic"],
   "all_language_search_enabled": true,

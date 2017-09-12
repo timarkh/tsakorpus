@@ -1,6 +1,7 @@
 import os
 import re
 import html
+import json
 from lxml import etree
 from txt2json import Txt2JSON
 from media_operations import MediaCutter
@@ -20,11 +21,22 @@ class Eaf2JSON(Txt2JSON):
 
     def __init__(self, settingsDir='conf'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
+        self.speakerMeta = self.load_speaker_meta()
         self.mc = MediaCutter(settings=self.corpusSettings)
         self.srcExt = 'eaf'
         self.tlis = {}      # time labels
         self.pID = 0        # id of last aligned segment
         self.glosses = set()
+
+    def load_speaker_meta(self):
+        speakerMeta = {}
+        if 'speaker_meta_filename' not in self.corpusSettings:
+            return speakerMeta
+        f = open(os.path.join(self.corpusSettings['corpus_dir'], self.corpusSettings['speaker_meta_filename']),
+                 'r', encoding='utf-8-sig')
+        speakerMeta = json.loads(f.read())
+        f.close()
+        return speakerMeta
 
     def get_meta(self, fname):
         fname2check = fname
@@ -136,6 +148,9 @@ class Eaf2JSON(Txt2JSON):
                 text = ''
             curSent = {'text': text, 'words': self.tp.tokenizer.tokenize(text), 'lang': langID,
                        'meta': {'speaker': speaker}}
+            if speaker in self.speakerMeta:
+                for k, v in self.speakerMeta[speaker].items():
+                    curSent['meta'][k] = v
             self.tp.splitter.add_next_word_id_sentence(curSent)
             self.tp.parser.analyze_sentence(curSent, lang=lang)
             if not alignedTier and 'ANNOTATION_ID' in segment.attrib:
@@ -211,6 +226,16 @@ class Eaf2JSON(Txt2JSON):
             if 'last' in sentences[i] and sentences[i]['last']:
                 prevSpeaker = ''
 
+    def add_sentence_meta(self, sentences, meta):
+        """
+        Add some of the document-level metadata to the sentences.
+        """
+        for s in sentences:
+            if 'meta' not in s:
+                continue
+            if 'year1' in meta and 'year2' in meta and meta['year1'] == meta['year2']:
+                s['meta']['year'] = meta['year1']
+
     def convert_file(self, fnameSrc, fnameTarget):
         curMeta = self.get_meta(fnameSrc)
         textJSON = {'meta': curMeta, 'sentences': []}
@@ -233,6 +258,7 @@ class Eaf2JSON(Txt2JSON):
         self.tp.splitter.recalculate_offsets(textJSON['sentences'])
         self.tp.splitter.add_next_word_id(textJSON['sentences'])
         self.add_speaker_marks(textJSON['sentences'])
+        self.add_sentence_meta(textJSON['sentences'], curMeta)
         self.write_output(fnameTarget, textJSON)
         return nTokens, nWords, nAnalyze
 

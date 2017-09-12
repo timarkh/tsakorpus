@@ -27,10 +27,10 @@ class InterfaceQueryParser:
                  'r', encoding='utf-8-sig')
         self.settings = json.loads(f.read())
         f.close()
-        f = open(os.path.join(settings_dir, 'word_fields.json'),
-                 'r', encoding='utf-8-sig')
-        self.wordFields = json.loads(f.read())
-        f.close()
+        if 'word_fields' in self.settings:
+            self.wordFields = self.settings['word_fields']
+        else:
+            self.wordFields = []
         self.wr = WordRelations(settings_dir)
         self.docMetaFields = ['author', 'title', 'year1', 'year2', 'genre']
         if 'viewable_meta' in self.settings:
@@ -394,6 +394,12 @@ class InterfaceQueryParser:
                 queryFilter.append({'terms': {'doc_id': queryDict['doc_ids']}})
             if 'para_ids' in queryDict:
                 queryFilter.append({'terms': {'para_ids': queryDict['para_ids']}})
+            for k, v in queryDict.items():
+                if k.startswith('sent_meta_'):
+                    k = 'meta.' + k[10:]
+                    boolQuery = self.make_bool_query(v, k, lang=lang)
+                    if 'match_none' not in boolQuery:
+                        queryFilter.append(boolQuery)
             query = {'bool': {'must': query, 'filter': queryFilter}}
         if sortOrder == 'random':
             query = self.make_random(query, randomSeed)
@@ -565,6 +571,11 @@ class InterfaceQueryParser:
             #                                                               pathPfx + 'ana.gr')
             if len(curPrelimQuery) > 0:
                 prelimQuery['words'].append((curPrelimQuery, negQuery))
+            for k, v in htmlQuery.items():
+                if k.startswith('sent_meta_') and self.rxStars.search(v) is None:
+                    mFieldNum = self.rxFieldNum.search(k)
+                    if mFieldNum is not None:
+                        prelimQuery[mFieldNum.group(1)] = v
         if searchIndex == 'sentences' and 'txt' in htmlQuery and len(htmlQuery['txt']) > 0:
             if 'precise' in htmlQuery and htmlQuery['precise'] == 'on':
                 prelimQuery['text'] = {'match_phrase': {'text': htmlQuery['txt']}}
