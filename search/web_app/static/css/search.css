@@ -85,16 +85,20 @@
 	font-style: italic;
 }
 
+.expand {
+	margin: auto;
+}
+
 .glyph_expand {
 	width: 25px;
 	font-size: 26px;
 	color: #48724d;
 	cursor: pointer;
-	top: 50% !important;
-	height: 100%;
-	margin-top: -10% !important;
+	margin: auto;
 	margin-left: 10px;
+	margin-right: 5px;
 	text-align: center;
+	display: inline-grid;
 }
 
 .glyph_expand:hover {
@@ -103,6 +107,7 @@
 
 .sentence {
 	width: 95%;
+	margin: auto;
 }
 
 .sent_lang:hover {
@@ -203,6 +208,7 @@
 	width: 160px;
 	margin-bottom: 1px;
 	margin-left: 1px;
+	padding-left: 3px;
 	border-radius: 2px;
 	border: solid 1px #707070;
 	box-shadow: none;
@@ -230,6 +236,7 @@
 .cx_toggle_div {
 	position: relative;
 	width: 25px;
+	margin: auto;
 }
 
 .cx_toggle_chk {
@@ -245,6 +252,9 @@
 	font-family: "Segoe UI", "Lucida Grande", sans-serif;
 	line-height: 22px;
 	float: left;
+	width: 100%;
+	max-width: 1100px;
+	margin-left: 3px;
 }
 
 .word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w {

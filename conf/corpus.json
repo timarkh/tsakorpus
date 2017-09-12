@@ -3,7 +3,7 @@
   "input_format": "json",
   "media": true,
   "media_length": 60,
-  "max_context_expand": 3,
+  "max_context_expand": 4,
   "max_distance_filter": 200000,
   "query_timeout": 20,
   "viewable_meta": [
@@ -122,7 +122,7 @@
         "pst_any": "(pst(\\(1sg\\)|\\.[123](sg|pl))?)",
         "fut_any": "(fut(\\(1sg\\)|\\.[123](sg|pl))?)",
         "deriv": "(detr|iter|caus)",
-        "pers": "[123](sg|pl)"
+        "pers": "[123](sg|pl)?"
       },
       "gr_fields_order": ["nType", "adjType", "proType", "stemType", "num_deriv", "v_form", "attributivizer", "tense", "person", "number", "case", "poss"],
       "gloss_selection": {
@@ -187,6 +187,7 @@
             {"type": "gloss", "value": "COMP", "tooltip": "&ldquo;Comparative&rdquo;"}
           ],
           [
+            {"type": "gloss", "value": "DERIV", "tooltip": "Any verbal derivation"},
             {"type": "gloss", "value": "ITER", "tooltip": "Iterative"},
             {"type": "gloss", "value": "CAUS", "tooltip": "Causative"},
             {"type": "gloss", "value": "DETR", "tooltip": "Detransitive"},
@@ -219,6 +220,31 @@
             {"type": "gloss", "value": "FUT.2PL", "tooltip": "Future 2pl"},
             {"type": "gloss", "value": "FUT.3SG", "tooltip": "Future 3sg"},
             {"type": "gloss", "value": "FUT.3PL", "tooltip": "Future 3pl"}
+          ],
+          [
+            {"type": "gloss", "value": "PST2", "tooltip": "2nd (evidential) past"},
+            {"type": "separator"},
+            {"type": "gloss", "value": "PERS", "tooltip": "Any person marker"},
+            {"type": "gloss", "value": "1", "tooltip": "1st peron (in 2nd past)"},
+            {"type": "gloss", "value": "1SG", "tooltip": "1st person singular"},
+            {"type": "gloss", "value": "1PL", "tooltip": "1st person plural"},
+            {"type": "gloss", "value": "2SG", "tooltip": "2nd person singular"},
+            {"type": "gloss", "value": "2PL", "tooltip": "2nd person plural"},
+            {"type": "gloss", "value": "3SG", "tooltip": "3rd person singular"},
+            {"type": "gloss", "value": "3PL", "tooltip": "3rd person plural"}
+          ],
+          [
+            {"type": "gloss", "value": "CVB", "tooltip": "General converb"},
+            {"type": "gloss", "value": "CVB.NEG", "tooltip": "General negative converb"},
+            {"type": "gloss", "value": "CVB.DUR", "tooltip": "Durative converb"},
+            {"type": "gloss", "value": "RES", "tooltip": "Resultative"},
+            {"type": "gloss", "value": "DEB", "tooltip": "Debitive"},
+            {"type": "gloss", "value": "CVB.LIM", "tooltip": "Limitative converb"},
+            {"type": "gloss", "value": "CVB.MON", "tooltip": "Converb in -mon"},
+            {"type": "gloss", "value": "PTCP.PST", "tooltip": "Past participle"},
+            {"type": "gloss", "value": "PTCP.ACT", "tooltip": "Active participle"},
+            {"type": "gloss", "value": "PTCP.NEG.ACT", "tooltip": "Negative active participle"},
+            {"type": "gloss", "value": "PTCP.NEG.PASS", "tooltip": "Negative passive participle"}
           ]
         ]
       }

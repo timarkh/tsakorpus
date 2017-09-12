@@ -50,7 +50,6 @@ function expand_context(e) {
 	//alert($(e.currentTarget).attr('class'));
 	var n_sent = $(e.currentTarget).attr('data-nsent');
 	load_expanded_context(n_sent);
-	$('#res' + n_sent).html($('#res' + n_sent).html().replace(/<span class="newline"><\/span>/g, "<br>"));
 }
 
 function context_toggle(e) {
@@ -183,9 +182,17 @@ function markerReached(marker) {
 
 function show_expanded_context(results) {
 	var n = results.n;
+	if (n == null) {
+		return;
+	}
 	for (lang in results.languages) {
 		var resID = '#res' + n + '_' + lang;
 		$(resID).html(results.languages[lang].prev + ' ' + $(resID).html() + ' ' + results.languages[lang].next);
+		wordSpans = $(resID).find('span');
+		for (i = 1; i < wordSpans.length; i++) {
+			$(wordSpans[i]).html($(wordSpans[i]).html().replace(/<span class="newline"><\/span>/g, "<br>"));
+		}
+		// $(resID).html($(resID).html().replace(/<span class="newline"><\/span>/g, "<br>"));
 	}
 	for (var srcKey in results.src_alignment) {
         srcAlignments[srcKey] = results.src_alignment[srcKey];
