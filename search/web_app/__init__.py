@@ -832,7 +832,10 @@ def toggle_sentence(sentNum):
 
 @app.route('/get_gramm_selector/<lang>')
 def get_gramm_selector(lang=''):
-    return render_template('select_gramm.html')
+    if lang not in settings['lang_props'] or 'gramm_selection' not in settings['lang_props'][lang]:
+        return ''
+    grammSelection = settings['lang_props'][lang]['gramm_selection']
+    return render_template('select_gramm.html', gramm=grammSelection)
 
 
 @app.route('/get_gloss_selector/<lang>')

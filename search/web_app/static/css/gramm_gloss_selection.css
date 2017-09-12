@@ -63,6 +63,35 @@
     visibility: visible;
 }
 
+.switchable_gramm {
+	margin: 0 3px 3px 3px;
+	padding: 4px 8px;
+	display:inline-block;
+	float: left;
+	cursor: pointer;
+	border: 1px solid #eee;
+	border-radius: 3px;
+	background-color: #fffae2;
+	min-width: 50px;
+	text-align: center;
+}
+
+.gramm_enabled {
+	background-color: #fff9b2;
+}
+
+.switchable_gramm .tooltip_prompt {
+	top: 15px;
+	right: 20px;
+	left: initial;
+	margin-left: -30%;
+	max-width: 250px;
+}
+
+.switchable_gramm:hover .tooltip_prompt {
+    visibility: visible;
+}
+
 #gloss_sort_panel {
 	margin: 10px 2%;
 	width: 96%;
@@ -70,6 +99,19 @@
 	background-color: #e8f1fc;
 	border-radius: 5px;
 	border: 2px solid #c4d7ef;
+}
+
+#gramm_query_viewer {
+	margin: 5px 3%;
+	width: 65%;
+	float: left;
+	background-color: #e8f1fc;
+	color: #19477f;
+	border-radius: 5px;
+	border: 2px solid #c4d7ef;
+	text-align: center;
+	padding: 5px 15px;
+	min-height: 3em;
 }
 
 #sortable {

@@ -304,8 +304,9 @@ function add_word_relations(e) {
 function choose_grammar(e) {
 	var field_type = $(e.target).attr('data-field');
 	var word_num = parseInt($(e.target).attr('data-nword'));
+	var field = field_type + word_num.toString();
 	var lang = $('#lang' + word_num.toString() + ' option:selected').text();
-	$('#gram_selector').attr('data-field', field_type + word_num.toString());
+	$('#gram_selector').attr('data-field', field);
 	if (field_type == 'gr') {
 		$('#gram_sel_header').html('Select combinations of tags');
 		$.ajax({
@@ -314,6 +315,7 @@ function choose_grammar(e) {
 			success: function(result) {
 				gramm_selector_loaded(result);
 				$('#gram_selector').modal('show');
+				$('#gramm_query_viewer').text($('#' + field).val());
 			},
 			error: function(errorThrown) {
 				alert( JSON.stringify(errorThrown) );
@@ -358,7 +360,7 @@ function gloss_selector_loaded(result) {
 
 function gram_selector_ok(e) {
 	var field = '#' + $('#gram_selector').attr('data-field');
-	$(field).val('(nom|gen)');
+	$(field).val($('#gramm_query_viewer').text());
 	$('#gram_selector').modal('toggle');
 }
 
