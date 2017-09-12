@@ -13,6 +13,7 @@ class SentenceViewer:
 
     rxWordNo = re.compile('^w[0-9]+_([0-9]+)$')
     rxTextSpans = re.compile('</?span.*?>|[^<>]+')
+    invisibleAnaFields = {'gloss_index'}
 
     def __init__(self, settings_dir, search_client):
         self.settings_dir = settings_dir
@@ -42,19 +43,21 @@ class SentenceViewer:
         return '<span class="popup_field">gr: ' \
                '<span class="popup_value">' + grAnaPart + '</span></span>'
 
-    def build_ana_div(self, ana, lang):
+    def build_ana_div(self, ana, lang, translit=None):
         """
         Build the contents of a div with one particular analysis.
         """
         result = ''
         if 'lex' in ana:
-            result += '<span class="popup_lex">' + ana['lex'] + '</span> '
+            result += '<span class="popup_lex">'
+            result += self.transliterate_baseline(ana['lex'], lang=lang, translit=translit)
+            result += '</span> '
         if 'gr.pos' in ana:
             result += '<span class="popup_pos">' + ana['gr.pos'] + '</span> '
         grValues = []
         resultTail = ''
         for field in sorted(ana):
-            if field not in ['lex', 'gr.pos']:
+            if field not in ['lex', 'gr.pos'] and field not in self.invisibleAnaFields:
                 value = ana[field]
                 if type(value) == list:
                     value = ', '.join(value)
@@ -67,7 +70,7 @@ class SentenceViewer:
         result += resultTail
         return result
 
-    def build_ana_popup(self, word, lang, matchingAnalyses=None):
+    def build_ana_popup(self, word, lang, matchingAnalyses=None, translit=None):
         """
         Build a string for a popup with the word and its analyses. 
         """
@@ -75,7 +78,9 @@ class SentenceViewer:
             matchingAnalyses = []
         popup = '<div class="popup_word">'
         if 'wf' in word:
-            popup += '<span class="popup_wf">' + word['wf'] + '</span>'
+            popup += '<span class="popup_wf">'
+            popup += self.transliterate_baseline(word['wf'], lang=lang, translit=translit)
+            popup += '</span>'
         if 'ana' in word:
             for iAna in range(len(word['ana'])):
                 popup += '<div class="popup_ana'
@@ -84,12 +89,12 @@ class SentenceViewer:
                 popup += '">'
                 if len(word['ana']) > 1:
                     popup += str(iAna + 1) + '. '
-                popup += self.build_ana_div(word['ana'][iAna], lang)
+                popup += self.build_ana_div(word['ana'][iAna], lang, translit=translit)
                 popup += '</div>'
         popup += '</div>'
         return popup
 
-    def prepare_analyses(self, words, indexes, lang, matchWordOffsets=None):
+    def prepare_analyses(self, words, indexes, lang, matchWordOffsets=None, translit=None):
         """
         Generate viewable analyses for the words with given indexes.
         """
@@ -107,11 +112,11 @@ class SentenceViewer:
             matchingAnalyses = []
             if matchWordOffsets is not None and iStr in matchWordOffsets:
                 matchingAnalyses = [offAna[1] for offAna in matchWordOffsets[iStr]]
-            result += self.build_ana_popup(word, lang, matchingAnalyses=matchingAnalyses)
+            result += self.build_ana_popup(word, lang, matchingAnalyses=matchingAnalyses, translit=translit)
         result = result.replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
         return result
 
-    def build_span(self, sentSrc, curWords, lang, matchWordOffsets):
+    def build_span(self, sentSrc, curWords, lang, matchWordOffsets, translit=None):
         curClass = ''
         if any(wn.startswith('w') for wn in curWords):
             curClass += ' word '
@@ -123,7 +128,8 @@ class SentenceViewer:
 
         if 'word' in curClass:
             dataAna = self.prepare_analyses(sentSrc['words'], curWords,
-                                            lang, matchWordOffsets).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
+                                            lang, matchWordOffsets,
+                                            translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
         else:
             dataAna = ''
 
@@ -460,7 +466,7 @@ class SentenceViewer:
                 if format == 'csv':
                     addition = '{{'
                 else:
-                    addition += self.build_span(sSource, curWords, lang, matchWordOffsets)
+                    addition += self.build_span(sSource, curWords, lang, matchWordOffsets, translit=translit)
             chars[i] = addition + chars[i]
         if len(curWords) > 0:
             if format == 'csv':
@@ -500,7 +506,7 @@ class SentenceViewer:
             freq = '0'
         return freq, rank, nSents, nDocs
 
-    def process_word(self, w, docIDs, lang):
+    def process_word(self, w, docIDs, lang, translit=None):
         """
         Process one word taken from response['hits']['hits'].
         """
@@ -519,8 +525,8 @@ class SentenceViewer:
         else:
             freq, rank, nSents, nDocs = self.count_word_subcorpus_stats(w, docIDs)
         word = '<tr><td><span class="word" data-ana="' +\
-               self.build_ana_popup(wSource, lang).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;') +\
-               '">' + wSource['wf'] +\
+               self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;') +\
+               '">' + self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit) +\
                '</span></td><td>' + freq +\
                '</span></td><td>' + rank +\
                '</td><td>' + nSents +\
@@ -712,7 +718,7 @@ class SentenceViewer:
             result['src_alignment'] = json.dumps(srcAlignmentInfo)
         return result
 
-    def process_word_json(self, response, docIDs):
+    def process_word_json(self, response, docIDs, translit=None):
         result = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'message': 'Nothing found.'}
         if ('hits' not in response
                 or 'total' not in response['hits']
@@ -724,7 +730,8 @@ class SentenceViewer:
         result['words'] = []
         for iHit in range(len(response['hits']['hits'])):
             langID, lang = self.get_lang_from_hit(response['hits']['hits'][iHit])
-            result['words'].append(self.process_word(response['hits']['hits'][iHit], docIDs, lang=lang))
+            result['words'].append(self.process_word(response['hits']['hits'][iHit],
+                                                     docIDs, lang=lang, translit=translit))
         return result
 
     def process_docs_json(self, response):

@@ -11,7 +11,7 @@ $(function() {
 	}
 	
 	function parse_initial_value() {
-		var rx_grammtags = /[a-z0-9_.]+/g;
+		var rx_grammtags = /[a-zA-Z0-9_.]+/g;
 		var grammtags = [], found;
 		while (grammtag = rx_grammtags.exec($('#gramm_query_viewer').text())) {
 			grammtags.push(grammtag[0]);

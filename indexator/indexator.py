@@ -31,10 +31,9 @@ class Indexator:
         if self.input_format in ['json', 'json-gzip']:
             self.iterSent = JSONDocReader(format=self.input_format)
         self.goodWordFields = ['lex', 'wf', 'parts', 'gloss', 'gloss_index']
-        f = open(os.path.join(self.SETTINGS_DIR, 'word_fields.json'),
-                 'r', encoding='utf-8')
-        self.AdditionalWordFields = json.loads(f.read())
-        f.close()
+        self.AdditionalWordFields = []
+        if 'word_fields' in self.settings:
+            self.AdditionalWordFields = self.settings['word_fields']
         f = open(os.path.join(self.SETTINGS_DIR, 'categories.json'),
                  'r', encoding='utf-8')
         categories = json.loads(f.read())

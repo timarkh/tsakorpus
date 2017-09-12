@@ -63,43 +63,48 @@
 		</div>
 		<br>
 		Text search: <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise"> Precise match (not like in google)<br>
-		Sorting:<br>
-		<input type="radio" name="sort" value="random">random<br>
-		<input type="radio" name="sort" value="wf">by word<br>
-		<input type="radio" name="sort" value="lemma">by lemma<br>
-		<input type="radio" name="sort" value="freq">by frequency (word queries)<br>
+		Sorting: <select name="sort" id="sort_select" class="search_input">
+			<option value="random">random</option>
+			<option value="wf">by word (word queries)</option>
+			<option value="lemma">by lemma (word queries)</option>
+			<option value="freq">by frequency (word queries)</option>
+			<option value="">no sorting</option>
+		</select>
 		<input type="checkbox" name="distance_strict">Word distance requirements are strict<br>
-		Results per page: <input type="number" name="page_size" id="page_size" value="10"><br>
-		<select name="lang" id="lang">
+		Results per page: <input type="number" name="page_size" id="page_size" value="10" class="search_input"><br>
+		Language/tier: <select name="lang" id="lang" class="search_input">
 		{% for lang in languages %}
-		<option value="{{ lang }}">{{ lang }}</option>
+			<option value="{{ lang }}">{{ lang }}</option>
 		{% endfor %}
 		{% if all_lang_search %}
 		<option value="all">all</option>
 		{% endif %}
 		</select>
 		{% if transliterations %}
-			Transliteration: <select name="translit" id="translit">
+			Transliteration: <select name="translit" id="translit" class="search_input">
 			{% for tr in transliterations %}
 			<option value="{{ tr }}">{{ tr }}</option>
 			{% endfor %}
 			</select>
 		{% endif %}
 		<div class="subcorpus_select">
-		Author: <input type="text" name="author" id="author"> Title: <input type="text" name="title" id="title"><br>
-		Year: from <input type="number" name="year1" id="year1"> to <input type="number" name="year2" id="year2">.
-		Genre: <input type="text" name="genre" id="genre">
+		Author: <input type="text" name="author" id="author" class="search_input"> Title: <input type="text" name="title" id="title"><br>
+		Year: from <input type="number" name="year1" id="year1" class="search_input"> to <input type="number" name="year2" id="year2" class="search_input">.
+		Genre: <input type="text" name="genre" id="genre" class="search_input">
 		</div>
 		</form>
 	<button value="Search sentences" id="search_sent" style="width:200px;">Search sentences</button>
 	<button value="Search words" id="search_word" style="width:200px;">Search words</button>
-	<button value="Search words" id="search_doc" style="width:200px;">Search documents</button><br>
-	<button value="Search sentences (q)" id="search_sent_query" style="width:200px;">Search sentences (show query)</button>
-	<button value="Search words (q)" id="search_word_query" style="width:200px;">Search words (show query)</button>
-	<button value="Search documents (q)" id="search_doc_query" style="width:200px;">Search documents (show query)</button><br>
-	<button value="Search sentences (r)" id="search_sent_json" style="width:200px;">Search sentences (show JSON response)</button>
-	<button value="Search words (r)" id="search_word_json" style="width:200px;">Search words (show JSON response)</button>
-	<button value="Search documents (r)" id="search_doc_json" style="width:200px;">Search documents (show JSON response)</button>
+	<button value="Search documents" id="search_doc" style="width:200px;">Search documents</button>
+	{% if debug %}
+		<br>
+		<button value="Search sentences (q)" id="search_sent_query" style="width:200px;">Search sentences (show query)</button>
+		<button value="Search words (q)" id="search_word_query" style="width:200px;">Search words (show query)</button>
+		<button value="Search documents (q)" id="search_doc_query" style="width:200px;">Search documents (show query)</button><br>
+		<button value="Search sentences (r)" id="search_sent_json" style="width:200px;">Search sentences (show JSON response)</button>
+		<button value="Search words (r)" id="search_word_json" style="width:200px;">Search words (show JSON response)</button>
+		<button value="Search documents (r)" id="search_doc_json" style="width:200px;">Search documents (show JSON response)</button>
+	{% endif %}
 </div>
 <div align="center"><a href="#" rel="toggle-slide"><img src="static/img/arrow_up.png" class="img-swap" /></a></div>
 </div>

@@ -75,7 +75,7 @@ class MediaCutter:
             elif fname.lower().endswith('.avi'):
                 splitStr += ' -vcodec libx264 -b 300k -acodec aac -ab 128k'
                 newExt = '.mp4'
-            elif fname.lower().endswith(('.wav', '.wma')):
+            elif fname.lower().endswith(('.wav', '.wma', '.mp3')):
                 # splitStr += " -ab 196k"
                 # newExt = '.mp3'
                 splitStr = ' -loop 1 -i ' + os.path.abspath('img/sound.png') +\

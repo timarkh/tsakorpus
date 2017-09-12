@@ -12,10 +12,13 @@ class PrepareData:
     rxBadField = re.compile('[^a-z0-9_]|^(?:lex|gr|gloss_index|wf|[wm]type|ana|sent_ids|id)$')
 
     def __init__(self):
-        f = open(os.path.join(self.SETTINGS_DIR, 'word_fields.json'),
+        f = open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
                  'r', encoding='utf-8')
-        self.wordFields = json.loads(f.read())
+        self.settings = json.loads(f.read())
         f.close()
+        self.wordFields = []
+        if 'word_fields' in self.settings:
+            self.wordFields = self.settings['word_fields']
         f = open(os.path.join(self.SETTINGS_DIR, 'categories.json'),
                  'r', encoding='utf-8')
         self.categories = json.loads(f.read())

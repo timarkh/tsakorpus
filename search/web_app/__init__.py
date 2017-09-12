@@ -316,7 +316,8 @@ def search_page():
                            all_lang_search=allLangSearch,
                            transliterations=transliterations,
                            media=settings['media'],
-                           gloss_search_enabled=settings['gloss_search_enabled'])
+                           gloss_search_enabled=settings['gloss_search_enabled'],
+                           debug=settings['debug'])
 
 
 @app.route('/search_sent_query/<int:page>')
@@ -703,7 +704,8 @@ def search_word():
     hitsProcessed = {}
     if searchIndex == 'words':
         hits = sc.get_words(query)
-        hitsProcessed = sentView.process_word_json(hits, docIDs)
+        hitsProcessed = sentView.process_word_json(hits, docIDs,
+                                                   translit=get_session_data('translit'))
     elif searchIndex == 'sentences':
         hitsProcessed = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'words': [],
                          'doc_ids': set(), 'word_jsons': {}}
