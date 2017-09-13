@@ -317,7 +317,8 @@ def search_page():
                            transliterations=transliterations,
                            media=settings['media'],
                            gloss_search_enabled=settings['gloss_search_enabled'],
-                           debug=settings['debug'])
+                           debug=settings['debug'],
+                           subcorpus_selection=settings['search_meta'])
 
 
 @app.route('/search_sent_query/<int:page>')

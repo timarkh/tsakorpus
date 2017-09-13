@@ -21,6 +21,24 @@
     "speaker",
     "gender"
   ],
+  "search_meta": {
+    "columns": [
+      [
+        {"type": "input_text", "name": "author", "placeholder": "Author"},
+        {"type": "input_text", "name": "title", "placeholder": "Title"},
+        {"type": "separator"},
+        {"type": "input_number", "name": "year1", "placeholder": "Year: from"},
+        {"type": "input_number", "name": "year2", "placeholder": "Year: to"}
+      ],
+      [
+        {"type": "input_text", "name": "genre", "placeholder": "Genre"},
+        {"type": "option", "name": "genre", "value": "interview", "text": "Interview"},
+        {"type": "option", "name": "genre", "value": "monologue", "text": "Monologue"},
+        {"type": "option", "name": "genre", "value": "experiment", "text": "Experiment"},
+        {"type": "option", "name": "genre", "value": "interview|monologue|experiment", "text": "Any"}
+      ]
+    ]
+  },
   "word_fields":
   [
     "trans_ru"
