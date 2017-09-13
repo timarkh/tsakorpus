@@ -7,3 +7,4 @@ txt2json/corpus/txt/*
 corpus/*
 search/media/*
 search/tmp/*
+src_convertors/error.log
