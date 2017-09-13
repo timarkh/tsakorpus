@@ -4,7 +4,6 @@
 
 .gloss_choice_panel {
 	margin: 5px 2%;
-	float: left;
 	width: 96%;
 	font-size: 1em;
 	overflow: auto;
@@ -135,8 +134,3 @@
 	cursor: move;
 }
 
-#selector_buttons {
-	width: 100%;
-	padding: 20px;
-	margin-top: 20px;
-}

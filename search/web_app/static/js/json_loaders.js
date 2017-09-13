@@ -41,7 +41,7 @@ $(function() {
 			}
 		});
 	});
-
+/*
 	$("#search_doc").click(function() {
 		//$("#query").html( $("#search_main").serialize() );
 		$.ajax({
@@ -54,7 +54,8 @@ $(function() {
 			}
 		});
 	});
-	
+*/
+
 	$("#search_word_json").click(function() {
 		//$("#query").html( $("#search_main").serialize() );
 		$.ajax({
@@ -179,7 +180,7 @@ function assign_input_events() {
 	$("span.word_expand").unbind('click');
 	$("span.add_rel").unbind('click');
 	$("span.gram_selector_link").unbind('click');
-	$("span.subcorpus_selector_link").unbind('click');
+	$("#search_doc").unbind('click');
 	//$("neg_query_checkbox").unbind('change');
 	$("span.neg_query").unbind('click');
 	$("span.word_plus").click(add_word_inputs);
@@ -187,7 +188,7 @@ function assign_input_events() {
 	$("span.word_expand").click(expand_word_input);
 	$("span.add_rel").click(add_word_relations);
 	$("span.gram_selector_link").click(choose_grammar);
-	$("span.subcorpus_selector_link").click(select_subcorpus);
+	$("#search_doc").click(select_subcorpus);
 	//$("neg_query_checkbox").change(negative_query);
 	$("span.neg_query").click(negative_query_span);
 }

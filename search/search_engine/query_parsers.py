@@ -427,7 +427,8 @@ class InterfaceQueryParser:
         return query
 
     def subcorpus_query(self, htmlQuery, query_from=0, query_size=10,
-                        sortOrder='random', randomSeed=None):
+                        sortOrder='random', randomSeed=None,
+                        exclude=None):
         """
         Make an ES query to the docs index based on subcorpus selection
         fields in htmlQuery.
@@ -436,11 +437,14 @@ class InterfaceQueryParser:
         for field in self.docMetaFields:
             if field in htmlQuery and len(htmlQuery[field]) > 0:
                 queryParts.append(self.make_bool_query(htmlQuery[field], field, 'all'))
-        if len(queryParts) <= 0:
-            return None
-        query = {'bool': {'must': queryParts}}
-        if sortOrder == 'random':
-            query = self.make_random(query, randomSeed)
+        if exclude is not None:
+            queryParts.append({'bool': {'must_not': [{'terms': {'_id': list(exclude)}}]}})
+        if len(queryParts) > 0:
+            query = {'bool': {'must': queryParts}}
+            if sortOrder == 'random':
+                query = self.make_random(query, randomSeed)
+        else:
+            query = {'match_all': {}}
 
         addNWords = {'aggs': {'agg_nwords': {'stat': {'sum': 'n_words'}}}}
         # TODO: add n_words property in the indexator and then add this aggregation

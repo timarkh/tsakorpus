@@ -19,6 +19,8 @@ f = open(os.path.join(SETTINGS_DIR, 'corpus.json'), 'r', encoding='utf-8')
 settings = json.loads(f.read())
 f.close()
 corpus_name = settings['corpus_name']
+if settings['max_docs_retrieve'] >= 10000:
+    settings['max_docs_retrieve'] = 9999
 localizations = {}
 supportedLocales = ['ru', 'en']
 sc = SearchClient(SETTINGS_DIR, mode='test')
@@ -97,7 +99,8 @@ def initialize_session():
                                           'distance_strict': False,
                                           'last_sent_num': -1,
                                           'last_query': {},
-                                          'seed': random.randint(1, 1e6)}
+                                          'seed': random.randint(1, 1e6),
+                                          'excluded_doc_ids': set()}
 
 
 def get_session_data(fieldName):
@@ -116,6 +119,8 @@ def get_session_data(fieldName):
         sessionData[session['session_id']]['last_sent_num'] = -1
     elif fieldName == 'seed' and fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']]['seed'] = random.randint(1, 1e6)
+    elif fieldName == 'excluded_doc_ids' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['excluded_doc_ids'] = set()
     elif fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']][fieldName] = ''
     try:
@@ -404,7 +409,8 @@ def subcorpus_ids(htmlQuery):
     Return IDs of the documents specified by the subcorpus selection
     fields in htmlQuery.
     """
-    subcorpusQuery = sc.qp.subcorpus_query(htmlQuery, sortOrder='')
+    subcorpusQuery = sc.qp.subcorpus_query(htmlQuery, sortOrder='',
+                                           exclude=get_session_data('excluded_doc_ids'))
     if subcorpusQuery is None:
         return None
     iterator = sc.get_all_docs(subcorpusQuery)
@@ -726,7 +732,7 @@ def search_doc_query():
     change_display_options(query)
     query = sc.qp.subcorpus_query(query,
                                   sortOrder=get_session_data('sort'),
-                                  query_size=get_session_data('page_size'))
+                                  query_size=settings['max_docs_retrieve'])
     return jsonify(query)
 
 
@@ -737,7 +743,7 @@ def search_doc_json():
     change_display_options(query)
     query = sc.qp.subcorpus_query(query,
                                   sortOrder=get_session_data('sort'),
-                                  query_size=get_session_data('page_size'))
+                                  query_size=settings['max_docs_retrieve'])
     hits = sc.get_docs(query)
     return jsonify(hits)
 
@@ -749,9 +755,10 @@ def search_doc():
     change_display_options(query)
     query = sc.qp.subcorpus_query(query,
                                   sortOrder=get_session_data('sort'),
-                                  query_size=get_session_data('page_size'))
+                                  query_size=settings['max_docs_retrieve'])
     hits = sc.get_docs(query)
-    hitsProcessed = sentView.process_docs_json(hits)
+    hitsProcessed = sentView.process_docs_json(hits,
+                                               exclude=get_session_data('excluded_doc_ids'))
     hitsProcessed['media'] = settings['media']
     return render_template('result_docs.html', data=hitsProcessed)
 
@@ -830,6 +837,29 @@ def toggle_sentence(sentNum):
     if sentNum < 0 or sentNum >= len(pageData[page]):
         return ''
     pageData[page][sentNum]['toggled_off'] = not pageData[page][sentNum]['toggled_off']
+    return ''
+
+
+@app.route('/toggle_doc/<int:docID>')
+def toggle_document(docID):
+    """
+    Togle given docID on or off. Documents that were switched off are
+    not included in the search.
+    """
+    excludedDocIDs = get_session_data('excluded_doc_ids')
+    if docID in excludedDocIDs:
+        excludedDocIDs.remove(docID)
+    else:
+        excludedDocIDs.add(docID)
+    return ''
+
+
+@app.route('/clear_subcorpus')
+def clear_subcorpus():
+    """
+    Flush the list of excluded document IDs.
+    """
+    set_session_data('excluded_doc_ids', set())
     return ''
 
 

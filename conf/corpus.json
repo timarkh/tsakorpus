@@ -1,11 +1,12 @@
 {
-  "corpus_name": "udmurt_kati",
+  "corpus_name": "beserman_eaf",
   "input_format": "json",
   "debug": false,
   "media": true,
   "media_length": 60,
   "max_context_expand": 4,
   "max_distance_filter": 200000,
+  "max_docs_retrieve": 9999,
   "query_timeout": 20,
   "viewable_meta": [
     "filename",
@@ -43,8 +44,8 @@
   [
     "trans_ru"
   ],
-  "languages": ["udmurt", "comments"],
-  "transliterations": ["original", "IPA"],
+  "languages": ["beserman", "russian"],
+  "transliterations": ["original", "cyrillic"],
   "all_language_search_enabled": true,
   "gloss_search_enabled": true,
   "lang_props":

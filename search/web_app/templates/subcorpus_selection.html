@@ -1,0 +1,47 @@
+<div class="modal fade" id="subcorpus_selector" tabindex="-1" role="dialog" aria-labelledby="subcorpus_sel_header" aria-hidden="true" data-field="gr1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="subcorpus_sel_header">Select subcorpus</h4>
+			</div>
+			<div class="modal-body" id="subcorpus_sel_body">
+				<ul class="nav nav-tabs">
+					<li class="active"><a data-toggle="tab" href="#select_subcorpus_parameters">Specify parameters</a></li>
+					<li><a data-toggle="tab" href="#select_subcorpus_documents" id="load_documents_link">Choose from a list</a></li>
+				</ul>
+				<div class="tab-content">
+					<div id="select_subcorpus_parameters" class="tab-pane fade in active">
+						<h4>Select parameters</h4>
+						{% for col in subcorpus_selection.columns %}
+							<div class="subcorpus_column">
+							{% for option in col %}
+								{% if option.type == "input_text" %}
+									<input type="text" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input" form="search_main" placeholder="{{ option.placeholder|safe }}" title="{{ option.placeholder|safe }}">
+								{% elif option.type == "input_number" %}
+									<input type="number" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input" form="search_main" placeholder="{{ option.placeholder|safe }}" title="{{ option.placeholder|safe }}">
+								{% elif option.type == "option" %}
+									<div class="switchable_subcorpus_option" data-name="{{ option.name|safe }}" data-value="{{ option.value|safe }}">{{ option.text|safe }}
+									</div>
+								{% elif option.type == "separator" %}
+									<hr class="separator subcorpus_separator">
+								{% elif option.type == "header" %}
+									<div class="subcorpus_header">{{ option.value|safe }}</div>
+								{% endif %}
+							{% endfor %}
+							</div>
+						{% endfor %}
+					</div>
+					<div id="select_subcorpus_documents" class="tab-pane fade">
+						<h4>Select documents</h4>
+						<div id="subcorpus_documents">Document list.</div>
+					</div>
+				</div>
+				<div class="selector_buttons">
+					<button type="button" class="btn btn-default btn-success" aria-label="Left Align" id="subcorpus_selector_ok">OK</button> <button type="button" class="btn btn-default btn-danger" aria-label="Left Align" id="subcorpus_selector_clear">Clear subcorpus</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type='text/javascript' src='static/js/select_subcorpus.js'></script>
