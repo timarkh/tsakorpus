@@ -52,6 +52,7 @@ class Indexator:
         self.sID = 0          # current sentence ID for each language
         self.dID = 0          # current document ID
         self.numWords = 0     # number of words in current document
+        self.numWordsLang = [0] * len(self.languages)    # number of words in each language in current document
 
     def delete_indices(self):
         if self.es_ic.exists(index=self.name + '.docs'):
@@ -84,6 +85,7 @@ class Indexator:
             if w['wtype'] != 'word':
                 continue
             self.numWords += 1
+            self.numWordsLang[langID] += 1
             wClean = {'lang': langID}
             for field in w:
                 if field in self.goodWordFields:
@@ -249,7 +251,10 @@ class Indexator:
             print('indexing document', self.dID)
         meta = self.iterSent.get_metadata(fname)
         meta['n_words'] = self.numWords
+        for i in range(len(self.languages)):
+            meta['n_words_' + str(i)] = self.numWordsLang[i]
         self.numWords = 0
+        self.numWordsLang = [0] * len(self.languages)
         self.es.index(index=self.name + '.docs',
                       doc_type='doc',
                       id=self.dID,

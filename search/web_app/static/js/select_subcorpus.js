@@ -18,12 +18,22 @@ $(function() {
 		var docTR = $(e.currentTarget).parent().parent();
 		docTR.toggleClass('context_off');
 		docID = docTR.attr('id').substring(3);
-		$.ajax({url: "toggle_doc/" + docID});
+		$.ajax({
+			url: "toggle_doc/" + docID,
+			dataType : "json",
+			success: update_subcorpus_stats
+		});
 	}
 
 	function toggle_subcorpus_option(e) {
 		$(this).toggleClass('subcorpus_option_enabled');
 		rebuild_subcorpus_queries();
+	}
+	
+	function update_subcorpus_stats(data) {
+		$('#subcorpus_ndocs').html(parseInt($('#subcorpus_ndocs').html()) + data.n_docs);
+		$('#subcorpus_nwords').html(parseInt($('#subcorpus_nwords').html()) + data.n_words);
+		$('#subcorpus_size_percent').html(parseFloat($('#subcorpus_size_percent').html()) + data.size_percent + '%');
 	}
 
 	function rebuild_subcorpus_queries() {

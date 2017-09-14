@@ -736,16 +736,25 @@ class SentenceViewer:
                                                      docIDs, lang=lang, translit=translit))
         return result
 
-    def process_docs_json(self, response, exclude=None):
-        result = {'n_words': 0, 'n_sentences': 0, 'n_docs': 0, 'message': 'Nothing found.',
+    def process_docs_json(self, response, exclude=None, corpusSize=1):
+        result = {'n_words': 0, 'n_sentences': 0, 'n_docs': 0,
+                  'size_percent': 0.0,
+                  'message': 'Nothing found.',
                   'metafields': self.sc.qp.docMetaFields}
         if ('hits' not in response
                 or 'total' not in response['hits']
                 or response['hits']['total'] <= 0):
             return result
+        if corpusSize <= 0:
+            corpusSize = 1
         result['message'] = ''
         result['n_docs'] = response['hits']['total']
+        result['n_words'] = int(round(response['aggregations']['agg_nwords']['value'], 0))
         result['docs'] = []
         for iHit in range(len(response['hits']['hits'])):
+            if exclude is not None and int(response['hits']['hits'][iHit]['_id']) in exclude:
+                result['n_docs'] -= 1
+                result['n_words'] -= response['hits']['hits'][iHit]['_source']['n_words_0']
             result['docs'].append(self.process_doc(response['hits']['hits'][iHit], exclude))
+        result['size_percent'] = round(result['n_words'] * 100 / corpusSize, 3)
         return result

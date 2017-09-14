@@ -26,6 +26,7 @@ supportedLocales = ['ru', 'en']
 sc = SearchClient(SETTINGS_DIR, mode='test')
 sentView = SentenceViewer(SETTINGS_DIR, sc)
 random.seed()
+corpus_size = sc.get_n_words()
 
 
 def jsonp(func):
@@ -758,7 +759,8 @@ def search_doc():
                                   query_size=settings['max_docs_retrieve'])
     hits = sc.get_docs(query)
     hitsProcessed = sentView.process_docs_json(hits,
-                                               exclude=get_session_data('excluded_doc_ids'))
+                                               exclude=get_session_data('excluded_doc_ids'),
+                                               corpusSize=corpus_size)
     hitsProcessed['media'] = settings['media']
     return render_template('result_docs.html', data=hitsProcessed)
 
@@ -847,11 +849,17 @@ def toggle_document(docID):
     not included in the search.
     """
     excludedDocIDs = get_session_data('excluded_doc_ids')
+    nWords = sc.get_n_words_in_document(docId=docID)
+    sizePercent = round(nWords * 100 / corpus_size, 3)
     if docID in excludedDocIDs:
         excludedDocIDs.remove(docID)
+        nDocs = 1
     else:
         excludedDocIDs.add(docID)
-    return ''
+        nWords = -1 * nWords
+        sizePercent = -1 * sizePercent
+        nDocs = -1
+    return jsonify({'n_words': nWords, 'n_docs': nDocs, 'size_percent': sizePercent})
 
 
 @app.route('/clear_subcorpus')

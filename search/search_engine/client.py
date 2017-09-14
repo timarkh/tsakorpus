@@ -74,3 +74,23 @@ class SearchClient:
         hits = self.es.search(index=self.name + '.docs', doc_type='doc',
                               body=esQuery)
         return hits
+
+    def get_n_words(self):
+        """
+        Return total number of words in the primary language in the corpus.
+        """
+        aggNWords = {'agg_nwords': {'sum': {'field': 'n_words_0'}}}
+        esQuery = {'query': {'match_all': {}}, 'from': 0, 'size': 0,
+                   'aggs': aggNWords}
+        hits = self.es.search(index=self.name + '.docs', doc_type='doc',
+                              body=esQuery)
+        return hits['aggregations']['agg_nwords']['value']
+
+    def get_n_words_in_document(self, docId):
+        """
+        Return number of words in the primary language in given document.
+        """
+        response = self.get_doc_by_id(docId=docId)
+        if response['hits']['total'] <= 0:
+            return 0
+        return response['hits']['hits'][0]['_source']['n_words_0']

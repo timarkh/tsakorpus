@@ -446,11 +446,10 @@ class InterfaceQueryParser:
         else:
             query = {'match_all': {}}
 
-        addNWords = {'aggs': {'agg_nwords': {'stat': {'sum': 'n_words'}}}}
-        # TODO: add n_words property in the indexator and then add this aggregation
-
+        aggNWords = {'agg_nwords': {'sum': {'field': 'n_words_0'}}}
         esQuery = {'query': query, 'from': query_from, 'size': query_size,
-                   '_source': {'excludes': ['filename']}}
+                   '_source': {'excludes': ['filename']},
+                   'aggs': aggNWords}
         if sortOrder in self.docMetaFields:
             esQuery['sort'] = {sortOrder: {'order': 'asc'}}
         return esQuery
