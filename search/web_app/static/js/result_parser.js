@@ -71,7 +71,7 @@ function show_doc_meta(e) {
 function search_word_from_list(e) {
 	wf = $(e.currentTarget).attr('data-wf');
 	if (wf == "") return;
-	$('.search_input').val("");
+	$('input.search_input').val("");
 	$('#wf1').val(wf);
 	$("#search_sent").click();
 }

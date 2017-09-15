@@ -123,8 +123,8 @@
 }
 
 .sent_results {
-	max-height: 900px;
-	overflow-y: scroll;
+	max-height: 80vh;
+	overflow-y: auto;
 }
 
 .p_highlighted {
@@ -184,6 +184,9 @@
 
 .words_search {
 	display: flex;
+	overflow-x: auto;
+	overflow-y: hidden;
+	padding-bottom: 3px;
 }
 
 .word_search {
@@ -197,6 +200,7 @@
 	border-radius: 6px;
 	border: 1px solid gray;
 	resize: vertical;
+	white-space: nowrap;
 }
 
 .word_rel {

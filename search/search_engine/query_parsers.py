@@ -439,7 +439,7 @@ class InterfaceQueryParser:
         for field in self.docMetaFields:
             if field in htmlQuery and len(htmlQuery[field]) > 0:
                 queryParts.append(self.make_bool_query(htmlQuery[field], field, 'all'))
-        if exclude is not None:
+        if exclude is not None and len(exclude) > 0:
             queryParts.append({'bool': {'must_not': [{'terms': {'_id': list(exclude)}}]}})
         if len(queryParts) > 0:
             query = {'bool': {'must': queryParts}}

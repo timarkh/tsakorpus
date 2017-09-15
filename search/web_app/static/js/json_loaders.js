@@ -35,7 +35,7 @@ $(function() {
 			url: "search_word",
 			data: $("#search_main").serialize(),
 			type: "GET",
-			success: print_html,
+			success: function(result) {hide_query_panel(); print_html(result)},
 			error: function(errorThrown) {
 				alert( JSON.stringify(errorThrown) );
 			}
@@ -143,10 +143,14 @@ function load_additional_word_fields() {
 	});
 }
 
-function get_sentences() {
+function hide_query_panel() {
 	if ($("img-swap").attr('class') != "on") {
 		$(".img-swap").click();
 	}
+}
+
+function get_sentences() {
+	hide_query_panel();
 	get_sentences_page(-1);
 }
 
@@ -296,9 +300,9 @@ function add_word_relations(e) {
 	if (word_num <= 0) { return; }
 	var nrels = parseInt($(e.target).attr('data-nrels'));
 	$(e.target).attr('data-nrels', nrels + 1);
-	word_rel_html = '<div class="word_rel"> Distance to word #<input type="number" class="search_input distance_input" name="word_rel_' + word_num + '_' + nrels + '"><br>';
-	word_rel_html += 'from <input type="number" class="search_input" name="word_dist_from_' + word_num + '_' + nrels + '"><br>';
-	word_rel_html += 'to <input type="number" class="search_input" name="word_dist_to_' + word_num + '_' + nrels + '"> ';
+	word_rel_html = '<div class="word_rel"> Distance to word #<input type="number" class="search_input distance_input" name="word_rel_' + word_num + '_' + nrels + '" value="' + (word_num - 1).toString() + '"><br>';
+	word_rel_html += 'from <input type="number" class="search_input" name="word_dist_from_' + word_num + '_' + nrels + '" value="1"><br>';
+	word_rel_html += 'to <input type="number" class="search_input" name="word_dist_to_' + word_num + '_' + nrels + '" value="1"> ';
 	word_rel_html += '</div>';
 	word_rel_div = $.parseHTML(word_rel_html);
 	$("#wsearch_" + word_num).find(".word_search_l").append(word_rel_div);
