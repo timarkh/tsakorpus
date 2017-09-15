@@ -187,6 +187,8 @@
 	overflow-x: auto;
 	overflow-y: hidden;
 	padding-bottom: 3px;
+	padding-left: 10px;
+	width: 90%;
 }
 
 .word_search {
@@ -258,6 +260,7 @@
 	float: left;
 	width: 100%;
 	max-width: 1100px;
+	min-width: 400px;
 	margin-left: 3px;
 }
 
@@ -498,7 +501,7 @@ td {
 }
 
 #lower_part {
-	display: flex;
+
 }
 
 .subcorpus_column {
@@ -582,4 +585,124 @@ td {
 	min-width: 35px;
 	background-color: #e2d076;
 	cursor: pointer;
+}
+
+.tabs-left {
+  border-bottom: none;
+  padding-top: 2px;
+}
+
+.tabs-left {
+  border-right: 1px solid #eee;
+}
+
+.tabs-left>li {
+  float: none;
+  margin-bottom: 2px;
+}
+
+.tabs-left>li {
+  margin-right: -1px;
+}
+
+.tabs-left>li.active>a,
+.tabs-left>li.active>a:hover,
+.tabs-left>li.active>a:focus {
+  border-bottom-color: #ccc;
+  border-right-color: transparent;
+  color: #51360b;
+  font-size: 1.1em;
+}
+
+.tabs-left>li>a {
+  border-radius: 4px 0 0 4px;
+  margin-right: 0;
+  display: block;
+}
+
+.vertical-text {
+  margin-top: 100px;
+  border: none;
+  position: relative;
+}
+
+.vertical-text>li {
+  height: 20px;
+  width: 100px;
+  margin-bottom: 80px;
+}
+
+#word_search_li {
+}
+
+.vertical-text>li>a {
+  border-bottom: 1px solid #ccc;
+  border-right-color: transparent;
+  text-align: center;
+  border-radius: 4px 4px 0px 0px;
+}
+
+.vertical-text>li.active>a,
+.vertical-text>li.active>a:hover,
+.vertical-text>li.active>a:focus {
+  border-bottom-color: transparent;
+  border-right-color: #ccc;
+  border-left-color: #ccc;
+}
+
+.vertical-text.tabs-left {
+  left: -50px;
+  top: -60px;
+}
+
+.vertical-text.tabs-right>li {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+.vertical-text.tabs-left>li {
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+}
+
+.vertical_nav_tabs {
+	padding-left: 10px;
+	width: 40px;
+	position: relative;
+	float: left;
+}
+
+.search_buttons {
+	width: 99%;
+	float: left;
+}
+
+.hide_query_button {
+	width: 99%;
+	float: left;
+}
+
+#h3_options {
+	margin-top: 10px;
+	margin-bottom: 15px;
+}
+
+.options_column {
+	float: left;
+	text-align: right;
+	max-width: 350px;
+	margin-right: 3px;
+	border: 1px dotted gray;
+	border-radius: 3px;
+	padding: 10px 15px;
+}
+
+#txt {
+	width: 250px;
+	margin-right: 20px;
 }
