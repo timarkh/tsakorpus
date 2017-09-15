@@ -1,4 +1,5 @@
-from flask import Flask, request, after_this_request, render_template, session, jsonify, current_app, send_from_directory, make_response
+from flask import Flask, request, after_this_request, render_template, session, jsonify, current_app, send_from_directory, make_response, config
+from flask_babel import gettext
 import json
 import gzip
 import functools
@@ -74,6 +75,9 @@ def gzipped(f):
 app = Flask(__name__)
 app.secret_key = 'kkj6hd)^js7#dFQ'
 sessionData = {}    # session key -> dictionary with the data for current session
+app.config.update(dict(
+    LANGUAGES=settings['interface_languages']
+))
 
 
 def nocache(view):
@@ -146,6 +150,10 @@ def in_session(fieldName):
     if 'session_id' not in session:
         return False
     return fieldName in sessionData[session['session_id']]
+
+
+def get_locale():
+    return get_session_data('locale')
 
 
 def change_display_options(query):
@@ -324,7 +332,8 @@ def search_page():
                            media=settings['media'],
                            gloss_search_enabled=settings['gloss_search_enabled'],
                            debug=settings['debug'],
-                           subcorpus_selection=settings['search_meta'])
+                           subcorpus_selection=settings['search_meta'],
+                           locales=settings['interface_languages'])
 
 
 @app.route('/search_sent_query/<int:page>')
@@ -885,3 +894,11 @@ def get_gloss_selector(lang=''):
         return ''
     glossSelection = settings['lang_props'][lang]['gloss_selection']
     return render_template('select_gloss.html', glosses=glossSelection)
+
+
+@app.route('/set_locale/<lang>')
+def set_locale(lang=''):
+    if lang not in settings['interface_languages']:
+        return
+    set_session_data('locale', lang)
+    return ''

@@ -187,6 +187,7 @@ function assign_input_events() {
 	$("#search_doc").unbind('click');
 	//$("neg_query_checkbox").unbind('change');
 	$("span.neg_query").unbind('click');
+	$("span.locale").unbind('click');
 	$("span.word_plus").click(add_word_inputs);
 	$("span.word_minus").click(del_word_inputs);
 	$("span.word_expand").click(expand_word_input);
@@ -195,6 +196,7 @@ function assign_input_events() {
 	$("#search_doc").click(select_subcorpus);
 	//$("neg_query_checkbox").change(negative_query);
 	$("span.neg_query").click(negative_query_span);
+	$("span.locale").click(change_locale);
 }
 
 function assign_show_hide() {
@@ -391,3 +393,9 @@ function gloss_selector_ok(e) {
 	$(field).val(gloss_field_val);
 	$('#gram_selector').modal('toggle');
 }
+
+function change_locale(e) {
+	var new_locale = $(e.target).text().toLowerCase();
+	$.ajax({url: "set_locale/" + new_locale});
+}
+	

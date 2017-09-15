@@ -19,7 +19,17 @@
 {% endif %}
 </head>
 <body>
-<p id="header">Corpus name: {{ corpus_name }}.</p>
+<p id="header">Corpus name: {{ corpus_name }}.
+{% if locales|length > 1 %}
+&nbsp;&nbsp;
+{% for l_code in locales %}
+	<span class="locale" title="{{ locales[l_code] }}">{{ l_code|upper }}</span>&nbsp;
+	{% if not last %}
+		|&nbsp;
+	{% endif %}
+{% endfor %}
+{% endif %}
+</p>
 <div id="search_div" class="transitions init-hidden">
 	<div class="show-hide">
 	<div class="slide">

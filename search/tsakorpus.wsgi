@@ -3,6 +3,13 @@
 # sys.path.insert(0, '.../app/')
 
 from web_app import app as application
+from flask_babel import Babel
 
 if __name__ == "__main__":
+    babel = Babel(application)
+
+    @babel.localeselector
+    def get_locale():
+        return application.get_locale()
+
     application.run(port=7342, host='0.0.0.0', debug=True)

@@ -706,3 +706,8 @@ td {
 	width: 250px;
 	margin-right: 20px;
 }
+
+.locale {
+	font-size: 1.2em;
+	cursor: pointer;
+}
