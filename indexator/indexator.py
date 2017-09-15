@@ -68,7 +68,9 @@ class Indexator:
         self.wordMapping = self.pd.generate_words_mapping()
         self.wordFreqMapping = self.pd.generate_wordfreq_mapping()
         self.sentMapping = self.pd.generate_sentences_mapping(self.wordMapping)
-        self.es_ic.create(index=self.name + '.docs')
+        self.docMapping = self.pd.generate_docs_mapping()
+        self.es_ic.create(index=self.name + '.docs',
+                          body=self.docMapping)
         self.es_ic.create(index=self.name + '.words',
                           body=self.wordMapping)
         self.es_ic.create(index=self.name + '.word_freqs',

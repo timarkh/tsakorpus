@@ -35,7 +35,19 @@ class PrepareData:
                         'type': 'pattern',
                         'pattern': ' ',
                         'lowercase': True
-                    },
+                    }
+                }
+            }
+        }
+        self.docNormalizer = {
+            'analysis': {
+                'analyzer': {
+                    'lowercase_normalizer': {
+                        'type': 'custom',
+                        'tokenizer': 'standard',
+                        'char_filter': [],
+                        'filter': ['lowercase']
+                    }
                 }
             }
         }
@@ -80,6 +92,23 @@ class PrepareData:
              'd_id': {'type': 'integer'},
              'freq': {'type': 'integer'}}
         return {'mappings': {'word_freq': {'properties': m}}}
+
+    def generate_docs_mapping(self):
+        """
+        Return Elasticsearch mapping for the type "doc".
+        Each element of docs index contains metadata about
+        about a single document.
+        """
+        m = {}
+        for meta in self.settings['viewable_meta']:
+            if meta.startswith('year'):
+                m[meta] = {'type': 'integer'}
+            elif meta == 'genre':
+                m[meta] = {'type': 'keyword'}
+            else:
+                m[meta] = {'type': 'text',
+                           'analyzer': 'lowercase_normalizer'}
+        return {'mappings': {'doc': {'properties': m}}, 'settings': self.docNormalizer}
 
     def generate_sentences_mapping(self, word_mapping):
         """
@@ -136,7 +165,9 @@ class PrepareData:
         mWord = self.generate_words_mapping()
         mSent = self.generate_sentences_mapping(mWord)
         mWFreq = self.generate_wordfreq_mapping()
-        mappings = {'sentences': mSent,
+        mDoc = self.generate_docs_mapping()
+        mappings = {'docs': mDoc,
+                    'sentences': mSent,
                     'words': mWord,
                     'word_freqs': mWFreq}
         return mappings

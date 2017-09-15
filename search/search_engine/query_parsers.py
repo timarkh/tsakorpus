@@ -148,6 +148,8 @@ class InterfaceQueryParser:
             # return {'regexp': {field: text}}
             return {'regexp': {field: self.make_simple_gloss_query(text, lang)}}
         elif not (field == 'ana.gr' or field.endswith('.ana.gr')):
+            if field in self.settings['viewable_meta']:
+                text = text.lower()
             if InterfaceQueryParser.rxStars.search(text) is not None:
                 return {'match_all': {}}
             elif InterfaceQueryParser.rxSimpleText.search(text) is not None:
