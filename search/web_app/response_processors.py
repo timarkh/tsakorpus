@@ -665,11 +665,12 @@ class SentenceViewer:
                 return offsets
             for k, v in sentence.items():
                 curQueryWordID = queryWordID
-                if re.search('^w[0-9]+$', k) is not None:
-                    if len(queryWordID) > 0 and queryWordID != k:
+                mQueryWordID = re.search('^(w[0-9]+)(_[0-9]+)?$', k)
+                if mQueryWordID is not None:
+                    if len(queryWordID) > 0 and queryWordID != mQueryWordID.group(1):
                         continue
                     elif len(queryWordID) <= 0:
-                        curQueryWordID = k
+                        curQueryWordID = mQueryWordID.group(1)
                 if type(v) in [dict, list]:
                     newOffsets = self.retrieve_highlighted_words(v, numSent, curQueryWordID)
                     for newK, newV in newOffsets.items():

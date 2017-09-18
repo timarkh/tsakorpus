@@ -1,7 +1,7 @@
 {
   "corpus_name": "beserman_eaf",
   "input_format": "json",
-  "debug": false,
+  "debug": true,
   "media": true,
   "media_length": 60,
   "max_context_expand": 4,

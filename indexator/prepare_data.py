@@ -63,6 +63,7 @@ class PrepareData:
                     'analyzer': 'wf_analyzer'},
              'wtype': {'type': 'keyword'},
              'lang': {'type': 'byte'},
+             'sentence_index': {'type': 'byte'},
              'sids': {'type': 'integer', 'index': False},
              'ana': {'type': 'nested',
                      'properties': {'lex': {'type': 'text'},

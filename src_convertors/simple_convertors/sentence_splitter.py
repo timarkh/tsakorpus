@@ -89,8 +89,11 @@ class Splitter:
         """
         if len(s['words']) <= 0:
             return
-        for i in range(len(s['words'])):
-            s['words'][i]['next_word'] = i + 1
+        words = s['words']
+        for i in range(len(words)):
+            words[i]['next_word'] = i + 1
+            if not (all(words[j]['wtype'] == 'punct' for j in range(i, len(words)))):
+                words[i]['sentence_index'] = i
 
     def add_next_word_id(self, sentences):
         """

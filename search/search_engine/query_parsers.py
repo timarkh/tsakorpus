@@ -304,7 +304,7 @@ class InterfaceQueryParser:
         # if sortOrder in self.sortOrders:
         return esQuery
 
-    def single_word_sentence_query(self, queryDict, queryWordNum, sortOrder, negative=False):
+    def single_word_sentence_query(self, queryDict, queryWordNum, sortOrder, negative=False, sentIndex=-1):
         """
         Make a part of the full sentence query that contains
         a query for a single word, taking a dictionary with
@@ -323,12 +323,16 @@ class InterfaceQueryParser:
                 queryDictWordsAna[k] = v
             elif k in wordFields:
                 queryDictWords[k] = v
+        if not negative and sentIndex >= 0:
+            queryDictWords['words.sentence_index'] = {'match': {'words.sentence_index': sentIndex}}
         if (len(queryDictWords) <= 0
                 and len(queryDictWordsAna) <= 0):
             return []
 
         query = []
         queryName = 'w' + str(queryWordNum)
+        if not negative and sentIndex >= 0:
+            queryName += '_' + str(sentIndex)
         if len(queryDictWordsAna) > 0:
             if len(queryDictWordsAna) == 1:
                 queryWordsAna = list(queryDictWordsAna.values())[0]
@@ -385,10 +389,18 @@ class InterfaceQueryParser:
                 queryFilter = [{'term': {'lang': {'value': lang}}}]
             else:
                 queryFilter = []
-            for iQueryWord in range(len(queryDict['words'])):
-                wordDesc, negQuery = queryDict['words'][iQueryWord]
-                query += self.single_word_sentence_query(wordDesc, iQueryWord + 1, sortOrder,
-                                                         negative=negQuery)
+            distanceQueryTuples = []
+            for firstTermIndex in range(64):
+                distanceQueryTuple = []
+                for iQueryWord in range(len(queryDict['words'])):
+                    wordDesc, negQuery = queryDict['words'][iQueryWord]
+                    distanceQueryTuple += self.single_word_sentence_query(wordDesc, iQueryWord + 1, sortOrder,
+                                                                          negative=negQuery, sentIndex=iQueryWord+firstTermIndex)
+                distanceQueryTuples.append(distanceQueryTuple)
+            if len(distanceQueryTuples) == 1:
+                query += distanceQueryTuples[0]
+            else:
+                query.append({'bool': {'should': [{'bool': {'must': dqt}} for dqt in distanceQueryTuples]}})
             query += list(queryDictTop.values())
             if 'sent_ids' in queryDict:
                 queryFilter.append({'ids': {'values': queryDict['sent_ids']}})
