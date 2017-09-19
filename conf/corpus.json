@@ -7,6 +7,7 @@
   "max_context_expand": 4,
   "max_distance_filter": 200000,
   "max_docs_retrieve": 9999,
+  "max_words_in_sentence": 40,
   "query_timeout": 20,
   "viewable_meta": [
     "filename",

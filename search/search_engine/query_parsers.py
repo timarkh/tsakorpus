@@ -304,11 +304,47 @@ class InterfaceQueryParser:
         # if sortOrder in self.sortOrders:
         return esQuery
 
-    def single_word_sentence_query(self, queryDict, queryWordNum, sortOrder, negative=False, sentIndex=-1):
+    def sentence_index_query(self, sentIndex, mustNot=False):
+        """
+        Make a part of the word query responsible for the index
+        that the word has in the sentence. If mustNot is True,
+        revert the query. sentIndex may be a non-negative integer
+        or a list with two non-negative integers (range).
+        """
+        if sentIndex is None:
+            return []
+        query = {}
+        if type(sentIndex) == int:
+            if not mustNot:
+                query = {'match': {'words.sentence_index': sentIndex}}
+            else:
+                query = {'bool':
+                             {'must_not':
+                                  {'term':
+                                       {'words.sentence_index': sentIndex}
+                                   }
+                              }
+                         }
+        elif type(sentIndex) == list and len(sentIndex) == 2:
+            query = {'range':
+                        {'words.sentence_index':
+                            {
+                                'gte': sentIndex[0],
+                                'lte': sentIndex[1]
+                            }
+                        }
+                    }
+        return query
+
+    def single_word_sentence_query(self, queryDict, queryWordNum, sortOrder,
+                                   negative=False, sentIndexQuery=None, highlightedWordSubindex=None):
         """
         Make a part of the full sentence query that contains
         a query for a single word, taking a dictionary with
         bool queries as input.
+        sentIndexQuery may be None (no restriction on the index the
+        word should have in the sentence), non-negative integer
+        (match sentence index), negative integer 
         """
 
         wordAnaFields = {'words.ana.lex', 'words.ana.gr', 'words.ana.gloss_index'}
@@ -323,16 +359,16 @@ class InterfaceQueryParser:
                 queryDictWordsAna[k] = v
             elif k in wordFields:
                 queryDictWords[k] = v
-        if not negative and sentIndex >= 0:
-            queryDictWords['words.sentence_index'] = {'match': {'words.sentence_index': sentIndex}}
+        if not negative and sentIndexQuery is not None:
+            queryDictWords['words.sentence_index'] = sentIndexQuery
         if (len(queryDictWords) <= 0
                 and len(queryDictWordsAna) <= 0):
             return []
 
         query = []
         queryName = 'w' + str(queryWordNum)
-        if not negative and sentIndex >= 0:
-            queryName += '_' + str(sentIndex)
+        if not negative and highlightedWordSubindex is not None:
+            queryName += '_' + str(highlightedWordSubindex)
         if len(queryDictWordsAna) > 0:
             if len(queryDictWordsAna) == 1:
                 queryWordsAna = list(queryDictWordsAna.values())[0]
@@ -366,7 +402,7 @@ class InterfaceQueryParser:
 
     def full_sentence_query(self, queryDict, query_from=0, query_size=10,
                             sortOrder='random', randomSeed=None, lang=0,
-                            searchOutput='sentences'):
+                            searchOutput='sentences', distances=None):
         """
         Make a full ES query for the sentences index out of a dictionary
         with bool queries.
@@ -390,17 +426,56 @@ class InterfaceQueryParser:
             else:
                 queryFilter = []
             distanceQueryTuples = []
-            for firstTermIndex in range(64):
-                distanceQueryTuple = []
-                for iQueryWord in range(len(queryDict['words'])):
-                    wordDesc, negQuery = queryDict['words'][iQueryWord]
-                    distanceQueryTuple += self.single_word_sentence_query(wordDesc, iQueryWord + 1, sortOrder,
-                                                                          negative=negQuery, sentIndex=iQueryWord+firstTermIndex)
-                distanceQueryTuples.append(distanceQueryTuple)
-            if len(distanceQueryTuples) == 1:
-                query += distanceQueryTuples[0]
+            if len(queryDict['words']) <= 1:
+                wordDesc, negQuery = queryDict['words'][0]
+                query += self.single_word_sentence_query(wordDesc, 1, sortOrder,
+                                                         negative=negQuery)
             else:
-                query.append({'bool': {'should': [{'bool': {'must': dqt}} for dqt in distanceQueryTuples]}})
+                nPivotalTerm = 0
+                constraints = {}
+                if distances is not None and len(distances) > 0:
+                    for wordPair in distances:
+                        for w in wordPair:
+                            if w not in constraints:
+                                constraints[w] = []
+                            constraints[w].append(wordPair)
+                    curMaxConstraints = 0
+                    for w in constraints:
+                        curNConstraints = len(constraints[w])
+                        if curNConstraints > curMaxConstraints:
+                            curMaxConstraints = curNConstraints
+                            nPivotalTerm = w - 1
+
+                for pivotalTermIndex in range(self.settings['max_words_in_sentence']):
+                    distanceQueryTuple = []
+                    for iQueryWord in range(len(queryDict['words'])):
+                        wordDesc, negQuery = queryDict['words'][iQueryWord]
+                        curSentIndex = None
+                        if iQueryWord == nPivotalTerm:
+                            curSentIndex = self.sentence_index_query(pivotalTermIndex)
+                        elif iQueryWord + 1 in constraints:
+                            for wordPair in constraints[iQueryWord + 1]:
+                                if nPivotalTerm + 1 not in wordPair:
+                                    continue
+                                negateDistances = (iQueryWord + 1 == wordPair[1])
+                                constraint = distances[wordPair]
+                                sentIndexFrom, sentIndexTo = constraint['from'], constraint['to']
+                                if negateDistances:
+                                    sentIndexFrom, sentIndexTo = -sentIndexTo, -sentIndexFrom
+                                sentIndexFrom = max(0, sentIndexFrom + pivotalTermIndex)
+                                sentIndexTo = sentIndexTo + pivotalTermIndex
+                                curSentIndex = self.sentence_index_query([sentIndexFrom, sentIndexTo])
+                                break
+                        else:
+                            curSentIndex = self.sentence_index_query(pivotalTermIndex, mustNot=True)
+                        distanceQueryTuple += self.single_word_sentence_query(wordDesc, iQueryWord + 1, sortOrder,
+                                                                              negative=negQuery, sentIndexQuery=curSentIndex,
+                                                                              highlightedWordSubindex=pivotalTermIndex)
+                    distanceQueryTuples.append(distanceQueryTuple)
+                if len(distanceQueryTuples) == 1:
+                    query += distanceQueryTuples[0]
+                else:
+                    query.append({'bool': {'should': [{'bool': {'must': dqt}} for dqt in distanceQueryTuples]}})
             query += list(queryDictTop.values())
             if 'sent_ids' in queryDict:
                 queryFilter.append({'ids': {'values': queryDict['sent_ids']}})
@@ -543,7 +618,7 @@ class InterfaceQueryParser:
         return query_from, langID, lang, searchIndex
 
     def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
-                randomSeed=None, searchOutput='sentences'):
+                randomSeed=None, searchOutput='sentences', distances=None):
         """
         Make and return a ES query out of the HTML form data.
         """
@@ -603,7 +678,8 @@ class InterfaceQueryParser:
                                                  query_size, sortOrder,
                                                  randomSeed,
                                                  lang=langID,
-                                                 searchOutput=searchOutput)
+                                                 searchOutput=searchOutput,
+                                                 distances=distances)
         elif searchIndex == 'words':
             queryDict = self.full_word_query(prelimQuery, query_from, query_size, sortOrder,
                                              lang=langID)

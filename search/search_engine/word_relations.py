@@ -25,6 +25,8 @@ class WordRelations:
         """
         Extract word relation constraints from an HTML query
         and return them in a more usable form.
+        The constraints dictionary returned by this function
+        looks like (nWord1, nWord2) -> {'from': from, 'to': to}.
         """
         constraints = {}
         relIDs = {}
@@ -112,6 +114,9 @@ class WordRelations:
         for c in constraints:
             relevantHighlights.add('w' + str(c[0]))
             relevantHighlights.add('w' + str(c[1]))
+            for pivotalTermPosition in range(self.settings['max_words_in_sentence']):
+                relevantHighlights.add('w' + str(c[0]) + '_' + str(pivotalTermPosition))
+                relevantHighlights.add('w' + str(c[1]) + '_' + str(pivotalTermPosition))
         if len(relevantHighlights) <= 0:
             return {}
         positions = {}
@@ -189,19 +194,29 @@ class WordRelations:
             return False
         wordOffsets = self.get_all_highlight_pos(sentence['inner_hits'], constraints)
         for k, v in constraints.items():
-            wFrom, wTo = 'w' + str(k[0]), 'w' + str(k[1])
-            if wFrom not in wordOffsets or wTo not in wordOffsets:
-                return False
+            # wFrom, wTo = 'w' + str(k[0]), 'w' + str(k[1])
+            # if wFrom not in wordOffsets or wTo not in wordOffsets:
+            #     return False
             pathFound = False
-            for hlFrom in wordOffsets[wFrom]:
-                for hlTo in wordOffsets[wTo]:
-                    if self.word_path_exists(sentence, hlFrom, hlTo, v['from'], v['to'],
-                                             countPunc=False):
-                        pathFound = True
-                        # return {'to': hlTo, 'from': hlFrom,
-                        #         'minEdges': v['from'], 'maxEdges': v['to'],
-                        #         'pathLengths_l2r': list(self.find_word_path_lengths(sentence['_source']['words'], hlFrom, hlTo)),
-                        #         'pathLengths_r2l': list(self.find_word_path_lengths(sentence['_source']['words'], hlTo, hlFrom, left2right=False))}
+            for wFrom in wordOffsets:
+                if wFrom != 'w' + str(k[0]) and not wFrom.startswith('w' + str(k[0]) + '_'):
+                    continue
+                for hlFrom in wordOffsets[wFrom]:
+                    for wTo in wordOffsets:
+                        if wTo != 'w' + str(k[0]) and not wTo.startswith('w' + str(k[1]) + '_'):
+                            continue
+                        for hlTo in wordOffsets[wTo]:
+                            if self.word_path_exists(sentence, hlFrom, hlTo, v['from'], v['to'],
+                                                     countPunc=False):
+                                pathFound = True
+                                # return {'to': hlTo, 'from': hlFrom,
+                                #         'minEdges': v['from'], 'maxEdges': v['to'],
+                                #         'pathLengths_l2r': list(self.find_word_path_lengths(sentence['_source']['words'], hlFrom, hlTo)),
+                                #         'pathLengths_r2l': list(self.find_word_path_lengths(sentence['_source']['words'], hlTo, hlFrom, left2right=False))}
+                                break
+                        if pathFound:
+                            break
+                    if pathFound:
                         break
                 if pathFound:
                     break

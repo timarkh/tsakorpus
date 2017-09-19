@@ -349,7 +349,7 @@ def search_sent_query(page=0):
         query = get_session_data('last_query')
     set_session_data('page', page)
     wordConstraints = sc.qp.wr.get_constraints(query)
-    wordConstraints = {str(k): v for k, v in wordConstraints.items()}
+    wordConstraintsPrint = {str(k): v for k, v in wordConstraints.items()}
 
     if 'para_ids' not in query:
         query, paraIDs = para_ids(query)
@@ -361,8 +361,9 @@ def search_sent_query(page=0):
                           sortOrder=get_session_data('sort'),
                           randomSeed=get_session_data('seed'),
                           query_size=get_session_data('page_size'),
-                          page=get_session_data('page'))
-    return jsonify([query, wordConstraints])
+                          page=get_session_data('page'),
+                          distances=wordConstraints)
+    return jsonify([query, wordConstraintsPrint])
 
 
 def find_parallel_for_one_sent(sSource):
@@ -490,6 +491,28 @@ def count_occurrences(query):
     return 0
 
 
+def distance_constraints_too_complex(wordConstraints):
+    """
+    Decide if the constraints on the distances between pairs
+    of search terms are too complex, i. e. if there is no single word
+    that all pairs include. If the constraints are too complex
+    and the "distance requirements are strict" flag is set,
+    the query will find some invalid results, so further (slow)
+    post-filtering is needed.
+    """
+    if wordConstraints is None or len(wordConstraints) <= 0:
+        return False
+    commonTerms = None
+    for wordPair in wordConstraints:
+        if commonTerms is None:
+            commonTerms = set(wordPair)
+        else:
+            commonTerms &= set(wordPair)
+        if len(commonTerms) <= 0:
+            return True
+    return False
+
+
 def find_sentences_json(page=0):
     """
     Find sentences and change current options using the query in request.args.
@@ -518,10 +541,12 @@ def find_sentences_json(page=0):
 
     if (len(wordConstraints) > 0
             and get_session_data('distance_strict')
-            and 'sent_ids' not in query):
+            and 'sent_ids' not in query
+            and distance_constraints_too_complex(wordConstraints)):
         esQuery = sc.qp.html2es(query,
                                 searchOutput='sentences',
-                                query_size=1)
+                                query_size=1,
+                                distances=wordConstraints)
         hits = sc.get_sentences(esQuery)
         if ('hits' not in hits
                 or 'total' not in hits['hits']
@@ -538,12 +563,17 @@ def find_sentences_json(page=0):
             and 'n_words' in query
             and query['n_words'] == '1'):
         nOccurrences = count_occurrences(query)
+    queryWordConstraints = None
+    if (len(wordConstraints) > 0
+            and get_session_data('distance_strict')):
+        queryWordConstraints = wordConstraints
     esQuery = sc.qp.html2es(query,
                             searchOutput='sentences',
                             sortOrder=get_session_data('sort'),
                             randomSeed=get_session_data('seed'),
                             query_size=get_session_data('page_size'),
-                            page=get_session_data('page'))
+                            page=get_session_data('page'),
+                            distances=queryWordConstraints)
 
     # return esQuery
     hits = sc.get_sentences(esQuery)
