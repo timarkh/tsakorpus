@@ -400,6 +400,51 @@ class InterfaceQueryParser:
             return [{'bool': {'must_not': query}}]
         return query
 
+    def multiple_words_sentence_query(self, queryDict, sortOrder='random', distances=None):
+        """
+        Build the main part of a sentence query. If the query is multi-word,
+        call single word query maker for each word and combine single word
+        queries taking the distance constraints into account.
+        """
+        distanceQueryTuples = []
+        if len(queryDict['words']) <= 1:
+            wordDesc, negQuery = queryDict['words'][0]
+            return self.single_word_sentence_query(wordDesc, 1, sortOrder,
+                                                   negative=negQuery)
+        else:
+            nPivotalTerm, constraints = self.wr.find_pivotal_term(distances)
+            for pivotalTermIndex in range(self.settings['max_words_in_sentence']):
+                distanceQueryTuple = []
+                for iQueryWord in range(len(queryDict['words'])):
+                    wordDesc, negQuery = queryDict['words'][iQueryWord]
+                    curSentIndex = None
+                    if iQueryWord == nPivotalTerm:
+                        curSentIndex = self.sentence_index_query(pivotalTermIndex)
+                    elif iQueryWord + 1 in constraints:
+                        for wordPair in constraints[iQueryWord + 1]:
+                            if nPivotalTerm + 1 not in wordPair:
+                                continue
+                            negateDistances = (iQueryWord + 1 == wordPair[1])
+                            constraint = distances[wordPair]
+                            sentIndexFrom, sentIndexTo = constraint['from'], constraint['to']
+                            if negateDistances:
+                                sentIndexFrom, sentIndexTo = -sentIndexTo, -sentIndexFrom
+                            sentIndexFrom = max(0, sentIndexFrom + pivotalTermIndex)
+                            sentIndexTo = sentIndexTo + pivotalTermIndex
+                            curSentIndex = self.sentence_index_query([sentIndexFrom, sentIndexTo])
+                            break
+                    else:
+                        curSentIndex = self.sentence_index_query(pivotalTermIndex, mustNot=True)
+                    distanceQueryTuple += self.single_word_sentence_query(wordDesc, iQueryWord + 1, sortOrder,
+                                                                          negative=negQuery,
+                                                                          sentIndexQuery=curSentIndex,
+                                                                          highlightedWordSubindex=pivotalTermIndex)
+                distanceQueryTuples.append(distanceQueryTuple)
+            if len(distanceQueryTuples) == 1:
+                return distanceQueryTuples[0]
+            else:
+                return [{'bool': {'should': [{'bool': {'must': dqt}} for dqt in distanceQueryTuples]}}]
+
     def full_sentence_query(self, queryDict, query_from=0, query_size=10,
                             sortOrder='random', randomSeed=None, lang=0,
                             searchOutput='sentences', distances=None):
@@ -425,57 +470,11 @@ class InterfaceQueryParser:
                 queryFilter = [{'term': {'lang': {'value': lang}}}]
             else:
                 queryFilter = []
-            distanceQueryTuples = []
-            if len(queryDict['words']) <= 1:
-                wordDesc, negQuery = queryDict['words'][0]
-                query += self.single_word_sentence_query(wordDesc, 1, sortOrder,
-                                                         negative=negQuery)
-            else:
-                nPivotalTerm = 0
-                constraints = {}
-                if distances is not None and len(distances) > 0:
-                    for wordPair in distances:
-                        for w in wordPair:
-                            if w not in constraints:
-                                constraints[w] = []
-                            constraints[w].append(wordPair)
-                    curMaxConstraints = 0
-                    for w in constraints:
-                        curNConstraints = len(constraints[w])
-                        if curNConstraints > curMaxConstraints:
-                            curMaxConstraints = curNConstraints
-                            nPivotalTerm = w - 1
 
-                for pivotalTermIndex in range(self.settings['max_words_in_sentence']):
-                    distanceQueryTuple = []
-                    for iQueryWord in range(len(queryDict['words'])):
-                        wordDesc, negQuery = queryDict['words'][iQueryWord]
-                        curSentIndex = None
-                        if iQueryWord == nPivotalTerm:
-                            curSentIndex = self.sentence_index_query(pivotalTermIndex)
-                        elif iQueryWord + 1 in constraints:
-                            for wordPair in constraints[iQueryWord + 1]:
-                                if nPivotalTerm + 1 not in wordPair:
-                                    continue
-                                negateDistances = (iQueryWord + 1 == wordPair[1])
-                                constraint = distances[wordPair]
-                                sentIndexFrom, sentIndexTo = constraint['from'], constraint['to']
-                                if negateDistances:
-                                    sentIndexFrom, sentIndexTo = -sentIndexTo, -sentIndexFrom
-                                sentIndexFrom = max(0, sentIndexFrom + pivotalTermIndex)
-                                sentIndexTo = sentIndexTo + pivotalTermIndex
-                                curSentIndex = self.sentence_index_query([sentIndexFrom, sentIndexTo])
-                                break
-                        else:
-                            curSentIndex = self.sentence_index_query(pivotalTermIndex, mustNot=True)
-                        distanceQueryTuple += self.single_word_sentence_query(wordDesc, iQueryWord + 1, sortOrder,
-                                                                              negative=negQuery, sentIndexQuery=curSentIndex,
-                                                                              highlightedWordSubindex=pivotalTermIndex)
-                    distanceQueryTuples.append(distanceQueryTuple)
-                if len(distanceQueryTuples) == 1:
-                    query += distanceQueryTuples[0]
-                else:
-                    query.append({'bool': {'should': [{'bool': {'must': dqt}} for dqt in distanceQueryTuples]}})
+            # Add all word requirements to the query:
+            query += self.multiple_words_sentence_query(queryDict, sortOrder=sortOrder, distances=distances)
+
+            # Add sentence-level requirements to the query:
             query += list(queryDictTop.values())
             if 'sent_ids' in queryDict:
                 queryFilter.append({'ids': {'values': queryDict['sent_ids']}})
@@ -489,7 +488,10 @@ class InterfaceQueryParser:
                     boolQuery = self.make_bool_query(v, k, lang=lang)
                     if 'match_none' not in boolQuery:
                         queryFilter.append(boolQuery)
+
+            # Combine the query with the filters:
             query = {'bool': {'must': query, 'filter': queryFilter}}
+
         if sortOrder == 'random':
             query = self.make_random(query, randomSeed)
         esQuery = {'query': query, 'size': query_size, 'from': query_from}

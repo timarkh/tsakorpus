@@ -88,6 +88,30 @@ class WordRelations:
                     constraints[wordPair]['to'] = relIDs[relID]['to']
         return constraints
 
+    def find_pivotal_term(self, distances):
+        """
+        Find the number of the search term that participates in the
+        largest number of distance constraints.
+        Return the number of the pivotal term (1-based) and
+        a dictionary "term_number -> [word_pairs_with_this_term]".
+        """
+        nPivotalTerm = 0
+        constraints = {}
+        if distances is None or len(distances) <= 0:
+            return nPivotalTerm, constraints
+        for wordPair in distances:
+            for w in wordPair:
+                if w not in constraints:
+                    constraints[w] = []
+                constraints[w].append(wordPair)
+        curMaxConstraints = 0
+        for w in constraints:
+            curNConstraints = len(constraints[w])
+            if curNConstraints > curMaxConstraints:
+                curMaxConstraints = curNConstraints
+                nPivotalTerm = w - 1
+        return nPivotalTerm, constraints
+
     def get_one_highlight_pos(self, highlight):
         """
         Find all offset information in one particular highlight.

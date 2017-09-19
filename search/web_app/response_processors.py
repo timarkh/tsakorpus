@@ -540,24 +540,31 @@ class SentenceViewer:
         Extract word data from the highlighted w1 in the sentence and
         add it to the dictionary hitsProcessed.
         """
-        if '_source' not in hit or 'inner_hits' not in hit or 'w1' not in hit['inner_hits']:
+        if '_source' not in hit or 'inner_hits' not in hit:
             return
         langID, lang = self.get_lang_from_hit(hit)
-        hitsProcessed['n_sentences'] += 1
-        hitsProcessed['doc_ids'].add(hit['_source']['doc_id'])
-        for word in hit['inner_hits']['w1']['hits']['hits']:
-            hitsProcessed['n_occurrences'] += 1
-            word['_source']['lang'] = lang
-            wordJson = json.dumps({k: v for k, v in word['_source'].items() if k in ('ana', 'wf', 'lang')},
-                                  sort_keys=True)
-            try:
-                hitsProcessed['word_jsons'][wordJson]['n_occurrences'] += 1
-                hitsProcessed['word_jsons'][wordJson]['n_sents'] += 1
-                hitsProcessed['word_jsons'][wordJson]['doc_ids'].add(hit['_source']['doc_id'])
-            except KeyError:
-                hitsProcessed['word_jsons'][wordJson] = {'n_occurrences': 1,
-                                                         'n_sents': 1,
-                                                         'doc_ids': {hit['_source']['doc_id']}}
+        bRelevantWordExists = False
+        w1_labels = ['w1'] + ['w1_' + str(i) for i in range(self.settings['max_words_in_sentence'])]
+        for w1_label in w1_labels:
+            if w1_label not in hit['inner_hits']:
+                continue
+            bRelevantWordExists = True
+            for word in hit['inner_hits'][w1_label]['hits']['hits']:
+                hitsProcessed['n_occurrences'] += 1
+                word['_source']['lang'] = lang
+                wordJson = json.dumps({k: v for k, v in word['_source'].items() if k in ('ana', 'wf', 'lang')},
+                                      sort_keys=True)
+                try:
+                    hitsProcessed['word_jsons'][wordJson]['n_occurrences'] += 1
+                    hitsProcessed['word_jsons'][wordJson]['n_sents'] += 1
+                    hitsProcessed['word_jsons'][wordJson]['doc_ids'].add(hit['_source']['doc_id'])
+                except KeyError:
+                    hitsProcessed['word_jsons'][wordJson] = {'n_occurrences': 1,
+                                                             'n_sents': 1,
+                                                             'doc_ids': {hit['_source']['doc_id']}}
+        if bRelevantWordExists:
+            hitsProcessed['n_sentences'] += 1
+            hitsProcessed['doc_ids'].add(hit['_source']['doc_id'])
 
     def process_words_collected_from_sentences(self, hitsProcessed):
         """
@@ -593,9 +600,9 @@ class SentenceViewer:
             if w['_source']['freq'] > 1:
                 if w['_source']['freq'] > quantiles[0.03]:
                     w['_source']['rank'] = '#' + str(freqsSorted.index(w['_source']['freq']) + 1)
-                else:
+                elif w['_source']['freq'] >= quantiles[0.5]:
                     w['_source']['rank'] = '&gt; ' + str(min(math.ceil(q * 100) for q in quantiles
-                                                  if w['_source']['freq'] >= quantiles[q])) + '%'
+                                                             if w['_source']['freq'] >= quantiles[q])) + '%'
 
     def process_doc(self, d, exclude=None):
         """

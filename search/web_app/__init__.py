@@ -740,13 +740,20 @@ def search_word():
         docIDs = query['doc_ids']
 
     searchIndex = 'words'
+    queryWordConstraints = None
     if 'n_words' in query and int(query['n_words']) > 1:
         searchIndex = 'sentences'
+        wordConstraints = sc.qp.wr.get_constraints(query)
+        set_session_data('word_constraints', wordConstraints)
+        if (len(wordConstraints) > 0
+                and get_session_data('distance_strict')):
+            queryWordConstraints = wordConstraints
 
     query = sc.qp.html2es(query,
                           searchOutput='words',
                           sortOrder=get_session_data('sort'),
-                          query_size=get_session_data('page_size'))
+                          query_size=get_session_data('page_size'),
+                          distances=queryWordConstraints)
 
     hitsProcessed = {}
     if searchIndex == 'words':
