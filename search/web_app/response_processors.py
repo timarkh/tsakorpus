@@ -535,7 +535,31 @@ class SentenceViewer:
                wSource['wf'] + '">&gt;&gt; GO!</td></tr>'
         return word
 
-    def add_word_from_sentence(self, hitsProcessed, hit):
+    def filter_multi_word_highlight(self, hit, nWords=1):
+        """
+        Remove those of the highlights that are empty or which do
+        not constitute a full set of search terms.
+        Change the hit dictionary, do not return anything.
+        """
+        if '_source' not in hit or 'inner_hits' not in hit or nWords <= 1:
+            return
+        for iPivotalTermIndex in range(self.settings['max_words_in_sentence']):
+            bAllWords = True
+            for iWord in range(1, nWords + 1):
+                wLabel = 'w' + str(iWord) + '_' + str(iPivotalTermIndex)
+                if wLabel not in hit['inner_hits']:
+                    continue
+                if 'hits' not in hit['inner_hits'][wLabel] or hit['inner_hits'][wLabel]['hits']['total'] <= 0:
+                    bAllWords = False
+                    break
+            if not bAllWords:
+                for iWord in range(1, nWords + 1):
+                    wLabel = 'w' + str(iWord) + '_' + str(iPivotalTermIndex)
+                    if wLabel not in hit['inner_hits']:
+                        continue
+                    del hit['inner_hits'][wLabel]
+
+    def add_word_from_sentence(self, hitsProcessed, hit, nWords=1):
         """
         Extract word data from the highlighted w1 in the sentence and
         add it to the dictionary hitsProcessed.
@@ -544,6 +568,7 @@ class SentenceViewer:
             return
         langID, lang = self.get_lang_from_hit(hit)
         bRelevantWordExists = False
+        self.filter_multi_word_highlight(hit, nWords=nWords)
         w1_labels = ['w1'] + ['w1_' + str(i) for i in range(self.settings['max_words_in_sentence'])]
         for w1_label in w1_labels:
             if w1_label not in hit['inner_hits']:

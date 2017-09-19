@@ -559,9 +559,12 @@ def find_sentences_json(page=0):
             query['sent_ids'] = sc.qp.filter_sentences(iterator, wordConstraints)
             set_session_data('last_query', query)
     nOccurrences = 0
+
+    nWords = 1
+    if 'n_words' in query:
+        nWords = int(query['n_words'])
     if (get_session_data('sort') == 'random'
-            and 'n_words' in query
-            and query['n_words'] == '1'):
+            and nWords == 1):
         nOccurrences = count_occurrences(query)
     queryWordConstraints = None
     if (len(wordConstraints) > 0
@@ -577,6 +580,9 @@ def find_sentences_json(page=0):
 
     # return esQuery
     hits = sc.get_sentences(esQuery)
+    if nWords > 1 and 'hits' in hits and 'hits' in hits['hits']:
+        for hit in hits['hits']['hits']:
+            sentView.filter_multi_word_highlight(hit, nWords=nWords)
     if 'aggregations' in hits and 'agg_nwords' in hits['aggregations']:
         if nOccurrences > 0:
             hits['aggregations']['agg_nwords']['sum'] = nOccurrences
@@ -741,7 +747,9 @@ def search_word():
 
     searchIndex = 'words'
     queryWordConstraints = None
+    nWords = 1
     if 'n_words' in query and int(query['n_words']) > 1:
+        nWords = int(query['n_words'])
         searchIndex = 'sentences'
         wordConstraints = sc.qp.wr.get_constraints(query)
         set_session_data('word_constraints', wordConstraints)
@@ -764,7 +772,7 @@ def search_word():
         hitsProcessed = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'words': [],
                          'doc_ids': set(), 'word_jsons': {}}
         for hit in sc.get_all_sentences(query):
-            sentView.add_word_from_sentence(hitsProcessed, hit)
+            sentView.add_word_from_sentence(hitsProcessed, hit, nWords=nWords)
         hitsProcessed['n_docs'] = len(hitsProcessed['doc_ids'])
         sentView.process_words_collected_from_sentences(hitsProcessed)
 
