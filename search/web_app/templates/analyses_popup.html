@@ -1,0 +1,8 @@
+<div class="popup_word">
+{% if data.wf %}
+<span class="popup_wf">{{ data.wf }}</span>
+{% endif %}
+{% for ana in data.analyses %}
+<div class="popup_ana{% if ana.match %} popup_match{% endif %}">{% if data.analyses|length > 1 %}{{ loop.index }}. {% endif %}{{ ana.ana_div }}</div>
+{% endfor %}
+</div>

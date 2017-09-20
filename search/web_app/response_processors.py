@@ -2,6 +2,7 @@ import json
 import re
 import os
 import math
+from flask import render_template
 from .transliteration import *
 
 
@@ -12,7 +13,7 @@ class SentenceViewer:
     """
 
     rxWordNo = re.compile('^w[0-9]+_([0-9]+)$')
-    rxTextSpans = re.compile('</?span.*?>|[^<>]+')
+    rxTextSpans = re.compile('</?span.*?>|[^<>]+', flags=re.DOTALL)
     invisibleAnaFields = {'gloss_index'}
 
     def __init__(self, settings_dir, search_client):
@@ -40,22 +41,18 @@ class SentenceViewer:
             if len(grAnaPart) > 0:
                 grAnaPart += ', '
             grAnaPart += fv[1]
-        return '<span class="popup_field">gr: ' \
-               '<span class="popup_value">' + grAnaPart + '</span></span>'
+        return render_template('grammar_popup.html', grAnaPart=grAnaPart)
 
     def build_ana_div(self, ana, lang, translit=None):
         """
         Build the contents of a div with one particular analysis.
         """
-        result = ''
+        ana4template = {'lex': '', 'pos': '', 'gr': '', 'other_fields': []}
         if 'lex' in ana:
-            result += '<span class="popup_lex">'
-            result += self.transliterate_baseline(ana['lex'], lang=lang, translit=translit)
-            result += '</span> '
+            ana4template['lex'] = self.transliterate_baseline(ana['lex'], lang=lang, translit=translit)
         if 'gr.pos' in ana:
-            result += '<span class="popup_pos">' + ana['gr.pos'] + '</span> '
+            ana4template['pos'] = ana['gr.pos']
         grValues = []
-        resultTail = ''
         for field in sorted(ana):
             if field not in ['lex', 'gr.pos'] and field not in self.invisibleAnaFields:
                 value = ana[field]
@@ -64,11 +61,9 @@ class SentenceViewer:
                 if field.startswith('gr.'):
                     grValues.append((field[3:], value))
                 else:
-                    resultTail += '<span class="popup_field">' + field +\
-                                  ': <span class="popup_value">' + value + '</span></span>'
-        result += self.build_gr_ana_part(grValues, lang)
-        result += resultTail
-        return result
+                    ana4template['other_fields'].append({'key': field, 'value': value})
+        ana4template['gr'] = self.build_gr_ana_part(grValues, lang)
+        return render_template('analysis_div.html', ana=ana4template).strip()
 
     def build_ana_popup(self, word, lang, matchingAnalyses=None, translit=None):
         """
@@ -76,23 +71,15 @@ class SentenceViewer:
         """
         if matchingAnalyses is None:
             matchingAnalyses = []
-        popup = '<div class="popup_word">'
+        data4template = {'wf': '', 'analyses': []}
         if 'wf' in word:
-            popup += '<span class="popup_wf">'
-            popup += self.transliterate_baseline(word['wf'], lang=lang, translit=translit)
-            popup += '</span>'
+            data4template['wf'] = self.transliterate_baseline(word['wf'], lang=lang, translit=translit)
         if 'ana' in word:
             for iAna in range(len(word['ana'])):
-                popup += '<div class="popup_ana'
-                if iAna in matchingAnalyses:
-                    popup += ' popup_match'
-                popup += '">'
-                if len(word['ana']) > 1:
-                    popup += str(iAna + 1) + '. '
-                popup += self.build_ana_div(word['ana'][iAna], lang, translit=translit)
-                popup += '</div>'
-        popup += '</div>'
-        return popup
+                ana4template = {'match': iAna in matchingAnalyses,
+                                'ana_div': self.build_ana_div(word['ana'][iAna], lang, translit=translit)}
+                data4template['analyses'].append(ana4template)
+        return render_template('analyses_popup.html', data=data4template)
 
     def prepare_analyses(self, words, indexes, lang, matchWordOffsets=None, translit=None):
         """
@@ -113,7 +100,7 @@ class SentenceViewer:
             if matchWordOffsets is not None and iStr in matchWordOffsets:
                 matchingAnalyses = [offAna[1] for offAna in matchWordOffsets[iStr]]
             result += self.build_ana_popup(word, lang, matchingAnalyses=matchingAnalyses, translit=translit)
-        result = result.replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
+        # result = result.replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
         return result
 
     def build_span(self, sentSrc, curWords, lang, matchWordOffsets, translit=None):
@@ -524,16 +511,14 @@ class SentenceViewer:
             nDocs = nDocsAll
         else:
             freq, rank, nSents, nDocs = self.count_word_subcorpus_stats(w, docIDs)
-        word = '<tr><td><span class="word" data-ana="' +\
-               self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;') +\
-               '">' + self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit) +\
-               '</span></td><td>' + freq +\
-               '</span></td><td>' + rank +\
-               '</td><td>' + nSents +\
-               '</td><td>' + nDocs +\
-               '</td><td><span class="search_w" data-wf="' +\
-               wSource['wf'] + '">&gt;&gt; GO!</td></tr>'
-        return word
+        return render_template('word_table_row.html',
+                               ana_popup=self.build_ana_popup(wSource, lang, translit=translit),
+                               wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
+                               freq=freq,
+                               rank=rank,
+                               nSents=nSents,
+                               nDocs=nDocs,
+                               wfSearch=wSource['wf'])
 
     def filter_multi_word_highlight(self, hit, nWords=1):
         """

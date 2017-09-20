@@ -197,8 +197,12 @@ function show_expanded_context(results) {
 	for (var srcKey in results.src_alignment) {
         srcAlignments[srcKey] = results.src_alignment[srcKey];
     }
-	var srcPlayer = videojs('src_player');
-	srcPlayer.pause();
+	var srcPlayer = null;
+	try {
+		srcPlayer = videojs('src_player');
+		srcPlayer.pause();
+	}
+	catch (err) { }
 	assign_word_events();
 }
 

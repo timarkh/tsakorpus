@@ -8,6 +8,7 @@ def trans_IPA_baseline(text, lang):
         return adyghe_translit_ipa(text)
     return text
 
+
 def trans_cyrillic_baseline(text, lang):
     if lang == 'beserman':
         return beserman_translit_cyrillic(text)

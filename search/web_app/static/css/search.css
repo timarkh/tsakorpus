@@ -242,15 +242,14 @@
 .cx_toggle_div {
 	position: relative;
 	width: 25px;
-	margin: auto;
 }
 
 .cx_toggle_chk {
 	display: inline;
 	top: 50%;
 	height: 100%;
-	margin-top: -25% !important;
 	text-align: center;
+	margin-top: 0 !important;
 }
 
 #res_p {
@@ -266,6 +265,11 @@
 
 .word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w {
 	cursor: pointer;
+}
+
+.search_w {
+	padding-left: 10px;
+	padding-right: 5px;
 }
 
 .add_rel {
