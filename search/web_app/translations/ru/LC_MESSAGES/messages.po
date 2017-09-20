@@ -1,0 +1,205 @@
+# Russian translations for PROJECT.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-09-20 17:03+0200\n"
+"PO-Revision-Date: 2017-09-20 17:03+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.5.1\n"
+
+#: templates/index.html:4
+msgid "Corpus search page"
+msgstr ""
+
+#: templates/index.html:22
+msgid "Corpus name"
+msgstr ""
+
+#: templates/index.html:40
+msgid "Query"
+msgstr ""
+
+#: templates/index.html:51
+msgid "Word_header"
+msgstr ""
+
+#: templates/index.html:51
+msgid "Number_sign"
+msgstr ""
+
+#: templates/index.html:52
+msgid "Word:"
+msgstr ""
+
+#: templates/index.html:53
+msgid "Lemma:"
+msgstr ""
+
+#: templates/index.html:54
+msgid "Grammar:"
+msgstr ""
+
+#: templates/index.html:56
+msgid "Gloss:"
+msgstr ""
+
+#: templates/index.html:61
+msgid "Language:"
+msgstr ""
+
+#: templates/index.html:75
+msgid "negative_query"
+msgstr ""
+
+#: templates/index.html:76
+msgid "add_word"
+msgstr ""
+
+#: templates/index.html:79
+msgid "more_fields"
+msgstr ""
+
+#: templates/index.html:85
+msgid "Full-text search:"
+msgstr ""
+
+#: templates/index.html:85
+msgid "Precise match"
+msgstr ""
+
+#: templates/index.html:89
+msgid "Additional search and display options"
+msgstr ""
+
+#: templates/index.html:91
+msgid "Results per page:"
+msgstr ""
+
+#: templates/index.html:92
+msgid "Sorting:"
+msgstr ""
+
+#: templates/index.html:93
+msgid "random"
+msgstr ""
+
+#: templates/index.html:94
+msgid "by word (word queries)"
+msgstr ""
+
+#: templates/index.html:95
+msgid "by lemma (word queries)"
+msgstr ""
+
+#: templates/index.html:96
+msgid "by frequency (word queries)"
+msgstr ""
+
+#: templates/index.html:97
+msgid "no sorting"
+msgstr ""
+
+#: templates/index.html:99
+msgid "Language/tier:"
+msgstr ""
+
+#: templates/index.html:107
+msgid "Word distance requirements are strict"
+msgstr ""
+
+#: templates/index.html:111
+msgid "Transliteration:"
+msgstr ""
+
+#: templates/index.html:124
+msgid "Search sentences"
+msgstr ""
+
+#: templates/index.html:125
+msgid "Search words"
+msgstr ""
+
+#: templates/index.html:126
+msgid "Select subcorpus"
+msgstr ""
+
+#: templates/index.html:153
+msgid "(Place for results)"
+msgstr ""
+
+#: templates/result_docs.html:1
+msgid "Filter result:"
+msgstr ""
+
+#: templates/result_docs.html:1
+msgid "document(s) with"
+msgstr ""
+
+#: templates/result_docs.html:1
+msgid "word(s) found,"
+msgstr ""
+
+#: templates/result_docs.html:1
+msgid "of the entire corpus."
+msgstr ""
+
+#: templates/result_sentences.html:54
+msgid "download as CSV"
+msgstr ""
+
+#: templates/result_sentences.html:55
+msgid "download as XSLX"
+msgstr ""
+
+#: templates/result_words.html:1
+msgid "Search result:"
+msgstr ""
+
+#: templates/result_words.html:1
+msgid "different words in approximately"
+msgstr ""
+
+#: templates/result_words.html:1
+msgid "document(s) found."
+msgstr ""
+
+#: templates/result_words.html:4
+msgid "word_th_word"
+msgstr ""
+
+#: templates/result_words.html:4
+msgid "word_th_frequency"
+msgstr ""
+
+#: templates/result_words.html:4
+msgid "word_th_freq. rank / quantile"
+msgstr ""
+
+#: templates/result_words.html:4
+msgid "word_th_# sentences"
+msgstr ""
+
+#: templates/result_words.html:4
+msgid "word_th_# documents"
+msgstr ""
+
+#: templates/result_words.html:4
+msgid "word_th_search in corpus"
+msgstr ""
+
+#: templates/select_gloss.html:38 templates/select_gramm.html:25
+msgid "Cancel"
+msgstr ""
+

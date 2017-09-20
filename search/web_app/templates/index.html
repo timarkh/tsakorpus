@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-<title>Corpus search page</title>
+<title>{{ _('Corpus search page') }}</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type='text/javascript' src='static/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
@@ -19,7 +19,7 @@
 {% endif %}
 </head>
 <body>
-<p id="header">Corpus name: {{ corpus_name }}.
+<p id="header">{{ _('Corpus name') }}: {{ corpus_name }}.
 {% if locales|length > 1 %}
 &nbsp;&nbsp;
 {% for l_code in locales %}
@@ -37,7 +37,7 @@
 		<input type="hidden" name="n_words" id="n_words" value="1">
 		<div class="vertical_nav_tabs">
             <ul class="nav nav-tabs tabs-left vertical-text">
-                <li class="active" id="word_search_li"><a href="#word_search_tab" data-toggle="tab">Query</a></li>
+                <li class="active" id="word_search_li"><a href="#word_search_tab" data-toggle="tab">{{ _('Query') }}</a></li>
                 <li><a href="#display_options_tab" data-toggle="tab"><span class="glyphicon glyphicon-cog" title="Options"></span></a></li>
             </ul>
         </div>
@@ -48,17 +48,17 @@
 					<div class="words_search">
 						<div class="word_search" id="first_word">
 							<div class="word_search_l">
-								<div class="query_word_header"><div class="circle circle_w1"></div>Word #1</div>
-								Word: <input type="text" class="search_input" name="wf1" id="wf1"><br>
-								Lemma: <input type="text" class="search_input" name="lex1" id="lex1"><br>
-								Grammar: <input type="text" class="search_input gram_selector_input" name="gr1" id="gr1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gr" data-nword="1"></span><br>
+								<div class="query_word_header"><div class="circle circle_w1"></div>{{ _('Word_header') }} {{ _('Number_sign') }}1</div>
+								{{ _('Word:') }} <input type="text" class="search_input" name="wf1" id="wf1"><br>
+								{{ _('Lemma:') }} <input type="text" class="search_input" name="lex1" id="lex1"><br>
+								{{ _('Grammar:') }} <input type="text" class="search_input gram_selector_input" name="gr1" id="gr1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gr" data-nword="1"></span><br>
 								{% if gloss_search_enabled %}
-								Gloss: <input type="text" class="search_input gram_selector_input" name="gloss_index1" id="gloss1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gloss" data-nword="1"></span><br>
+								{{ _('Gloss:') }} <input type="text" class="search_input gram_selector_input" name="gloss_index1" id="gloss1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gloss" data-nword="1"></span><br>
 								{% endif %}
 								<hr class="separator">
 								<div class="add_word_fields"></div>
 								{% if languages|length > 1 %}
-									Language: <select name="lang1" id="lang1" class="search_input">
+									{{ _('Language:') }} <select name="lang1" id="lang1" class="search_input">
 									{% for lang in languages %}
 									<option value="{{ lang }}">{{ lang }}</option>
 									{% endfor %}
@@ -72,31 +72,31 @@
 								{% endif %}
 							</div>
 							<div class="word_search_r">
-								<span class="neg_query glyphicon glyphicon-off" aria-hidden="true"><span class="tooltip_prompt">negative&nbsp;query</span></span><br>
-								<span class="word_plus glyphicon glyphicon-plus-sign" aria-hidden="true"><span class="tooltip_prompt">add&nbsp;word</span></span><br>
+								<span class="neg_query glyphicon glyphicon-off" aria-hidden="true"><span class="tooltip_prompt">{{ _('negative_query') }}</span></span><br>
+								<span class="word_plus glyphicon glyphicon-plus-sign" aria-hidden="true"><span class="tooltip_prompt">{{ _('add_word') }}</span></span><br>
 								<span class="add_minus_stub"></span>
 								<span class="add_distance_stub"></span>
-								<span class="word_expand glyphicon glyphicon-chevron-down" aria-hidden="true"><span class="tooltip_prompt">more&nbsp;fields</span></span><br>
+								<span class="word_expand glyphicon glyphicon-chevron-down" aria-hidden="true"><span class="tooltip_prompt">{{ _('more_fields') }}</span></span><br>
 								<input type="checkbox" class="hidden_input neg_query_checkbox" name="negq1" id="negq1" onclick="negative_query();">
 							</div>
 						</div>
 					</div>
 					<br>
-					Full-text search: <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise"> Precise match (not like in google)<br>
+					{{ _('Full-text search:') }} <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise"> {{ _('Precise match') }}<br>
 				</div>
 		
 				<div class="tab-pane col-xs-9" id="display_options_tab">
-				<h3 id="h3_options">Additional search and display options</h3>
+				<h3 id="h3_options">{{ _('Additional search and display options') }}</h3>
 				<div class="options_column">
-					Results per page: <input type="number" name="page_size" id="page_size" value="10" class="search_input distance_input"><br>
-					Sorting: <select name="sort" id="sort_select" class="search_input">
-						<option value="random">random</option>
-						<option value="wf">by word (word queries)</option>
-						<option value="lemma">by lemma (word queries)</option>
-						<option value="freq">by frequency (word queries)</option>
-						<option value="">no sorting</option>
+					{{ _('Results per page:') }} <input type="number" name="page_size" id="page_size" value="10" class="search_input distance_input"><br>
+					{{ _('Sorting:') }} <select name="sort" id="sort_select" class="search_input">
+						<option value="random">{{ _('random') }}</option>
+						<option value="wf">{{ _('by word (word queries)') }}</option>
+						<option value="lemma">{{ _('by lemma (word queries)') }}</option>
+						<option value="freq">{{ _('by frequency (word queries)') }}</option>
+						<option value="">{{ _('no sorting') }}</option>
 					</select><br>
-					Language/tier: <select name="lang" id="lang" class="search_input">
+					{{ _('Language/tier:') }} <select name="lang" id="lang" class="search_input">
 					{% for lang in languages %}
 						<option value="{{ lang }}">{{ lang }}</option>
 					{% endfor %}
@@ -104,11 +104,11 @@
 					<option value="all">all</option>
 					{% endif %}
 					</select><br>
-					<input type="checkbox" name="distance_strict"> Word distance requirements are strict<br>
+					<input type="checkbox" name="distance_strict"> {{ _('Word distance requirements are strict') }}<br>
 				</div>
 				<div class="options_column">
 				{% if transliterations %}
-					Transliteration: <select name="translit" id="translit" class="search_input">
+					{{ _('Transliteration:') }} <select name="translit" id="translit" class="search_input">
 					{% for tr in transliterations %}
 					<option value="{{ tr }}">{{ tr }}</option>
 					{% endfor %}
@@ -121,9 +121,9 @@
 		</form>
 		<br>
 		<div class="search_buttons">
-			<button value="Search sentences" id="search_sent" style="width:200px;">Search sentences</button>
-			<button value="Search words" id="search_word" style="width:200px;">Search words</button>
-			<button value="Search documents" id="search_doc" style="width:200px;"><span class="subcorpus_selector_link">Select subcorpus</span></button>
+			<button value="Search sentences" id="search_sent" style="width:200px;">{{ _('Search sentences') }}</button>
+			<button value="Search words" id="search_word" style="width:200px;">{{ _('Search words') }}</button>
+			<button value="Search documents" id="search_doc" style="width:200px;"><span class="subcorpus_selector_link">{{ _('Select subcorpus') }}</span></button>
 			{% if debug %}
 				<br>
 				<button value="Search sentences (q)" id="search_sent_query" style="width:200px;">Search sentences (show query)</button>
@@ -150,7 +150,7 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 </div>
 {% endif %}
 <div id="res_p">
-<p style="font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;">(Place for results)</p></div>
+<p style="font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;">{{ _('(Place for results)') }}</p></div>
 </div>
 
 <!-- Hidden elements -->
