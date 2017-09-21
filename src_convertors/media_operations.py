@@ -8,8 +8,16 @@ import sys
 
 class MediaCutter:
     """
-    Contains methods for cutting the source files into smaller
-    pieces and naming them.
+    Contains methods for cutting the source media files into smaller
+    pieces using ffmpeg and naming the pieces in a consistent way.
+    The idea is that each media file is cut into overlapping segments,
+    the length of the segment is specified in the settings. If the length
+    of the segment is L, the media file is first split into segments of
+    the length L with zero offset, the with an offset L/3 then with an
+    offset 2L/3. Therefore, almost each timepoint gets into three overlapping
+    chunks, which provides the possibility of choosing the best chunk for
+    each sentence, i.e. the chunk where the relevant segment occupies
+    the most central position.
     """
 
     rxFname = re.compile('^(.*?)([^/\\\\]*)\\.([^/\\\\.]*)$')
@@ -21,6 +29,9 @@ class MediaCutter:
         """
         Choose the appropriate fragment of the source
         video file and return its name and the new offsets.
+        The name has the following structure:
+        base_name-offset-number_of_chunk_for_this_offset.
+        Offset of 0 means no offset, 1 means L/3, 2 means 2L/3.
         """
         fileLen = self.settings['media_length']
         segmentLen = math.floor(fileLen / 3)
@@ -44,6 +55,11 @@ class MediaCutter:
         return ts1, ts2, fname
 
     def split_file(self, fname, outDir, splitLength, startOffset=0, segmentLen=0):
+        """
+        Split the file into chunks of given length, starting from the
+        given offset (actual offset in seconds equals startOffset * segmentLen).
+        This function calls ffmpeg with relevant parameters.
+        """
         durationProbe = 'ffprobe -v error -show_entries format=duration ' \
                         '-of default=noprint_wrappers=1:nokey=1 "' + fname + '"'
         output = subprocess.Popen(durationProbe,

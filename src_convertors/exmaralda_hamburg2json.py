@@ -20,9 +20,9 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
     def __init__(self, settingsDir='conf'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
         self.mc = MediaCutter(settings=self.corpusSettings)
-        self.srcExt = 'exb'
-        self.tlis = {}      # time labels
-        self.pID = 0        # id of last aligned segment
+        self.srcExt = 'exb'  # extension of the source files to be converted
+        self.tlis = {}       # time labels (id -> {'n': number, 'time': time value})
+        self.pID = 0         # id of last aligned segment
         self.glosses = set()
 
     def get_tlis(self, srcTree):
@@ -54,6 +54,11 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         return -1
 
     def get_sentence_boundaries(self, refTier):
+        """
+        Go over the reference tier (as XML node). For each event
+        in the tier, extract start and end attributes. Return a list
+        with (start time label, end time label) tuples.
+        """
         boundaries = []
         for event in refTier:
             if 'start' not in event.attrib or 'end' not in event.attrib:
@@ -302,8 +307,18 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
             yield curSent
 
     def convert_file(self, fnameSrc, fnameTarget):
+        """
+        Take one source Exmaralda file fnameSrc, parse the XML tree,
+        extract timestamps, align sentences with words and their
+        analyses and ultimately generate a parsed JSON file
+        ready for indexing. Write the output to fnameTarget.
+        Return number of tokens, number of words and number of
+        words with at least one analysis in the document.
+        """
         # curMeta = self.get_meta(fnameSrc)
+        # Currently, no metadata are loaded:
         curMeta = {'title': fnameSrc, 'author': '', 'year1': '1900', 'year2': '2017'}
+
         textJSON = {'meta': curMeta, 'sentences': []}
         nTokens, nWords, nAnalyze = 0, 0, 0
         srcTree = etree.parse(fnameSrc)
@@ -324,6 +339,13 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         return nTokens, nWords, nAnalyze
 
     def process_corpus(self):
+        """
+        Take every Exmaralda file from the source directory subtree, turn it
+        into a parsed json and store it in the target directory.
+        Split all the corpus media files into overlapping chunks of
+        small duration.
+        This is the main function of the class.
+        """
         Txt2JSON.process_corpus(self)
         for path, dirs, files in os.walk(os.path.join(self.corpusSettings['corpus_dir'],
                                                       self.srcExt)):
@@ -338,16 +360,4 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
 if __name__ == '__main__':
     x2j = Exmaralda_Hamburg2JSON()
     x2j.process_corpus()
-    # glosses = set()
-    # for g in x2j.glosses:
-    #     if '[' not in g:
-    #         glosses.add(g)
-    #     else:
-    #         m = re.search('^([^\\[\\]]*)\\[(.*?)\\]', g)
-    #         if m is None:
-    #             print(g)
-    #             continue
-    #         glosses.add(m.group(1))
-    #         for gp in m.group(2).split('.'):
-    #             glosses.add(gp)
-    # print(', '.join('"' + g + '"' for g in sorted(glosses)))
+

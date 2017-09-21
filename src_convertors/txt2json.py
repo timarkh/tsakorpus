@@ -43,6 +43,11 @@ class Txt2JSON:
         self.srcExt = 'txt'
 
     def load_settings(self):
+        """
+        Load settings from the corpus-specific settings file
+        (they may override the general settings loaded earlier).
+        Clean the error log file, if any.
+        """
         fCorpus = open(os.path.join(self.settingsDir, 'corpus.json'), 'r',
                        encoding='utf-8-sig')
         self.corpusSettings.update(json.loads(fCorpus.read()))
@@ -74,8 +79,8 @@ class Txt2JSON:
 
     def load_meta(self):
         """
-        Load the metainformation about the files of the corpus
-        from the tab-delimited meta file.
+        Load the metadata for the files of the corpus from a tab-delimited
+        meta file whose name is indicated in the settings.
         """
         self.meta = {}
         if len(self.corpusSettings['meta_filename']) <= 0:
@@ -101,6 +106,10 @@ class Txt2JSON:
         fMeta.close()
 
     def write_output(self, fnameTarget, textJSON):
+        """
+        Write the JSON text to fnameTarget either as plain text
+        or as gzipped text, dependeing on the settings.
+        """
         if self.corpusSettings['gzip']:
             fTarget = gzip.open(fnameTarget, 'wt', encoding='utf-8')
         else:
@@ -110,6 +119,13 @@ class Txt2JSON:
         fTarget.close()
 
     def get_meta(self, fname):
+        """
+        Return dictionary with metadata for the given filename.
+        The metadata are taken from the dictionary self.meta,
+        which has to be loaded before the conversion starts.
+        If the metadata are not found, return a dictionary with
+        only the filename field.
+        """
         fname2check = fname
         curMeta = {'filename': fname}
         if not self.corpusSettings['meta_files_dir']:
@@ -125,6 +141,12 @@ class Txt2JSON:
         return curMeta
 
     def convert_file(self, fnameSrc, fnameTarget):
+        """
+        Take one text file fnameSrc, turn it into a parsed JSON file
+        ready for indexing and write the output to fnameTarget.
+        Return number of tokens, number of words and number of
+        words with at least one analysis in the document.
+        """
         if fnameSrc == fnameTarget:
             return 0, 0, 0
 
@@ -142,6 +164,7 @@ class Txt2JSON:
         """
         Take every text file from the source directory subtree, turn it
         into a parsed json and store it in the target directory.
+        This is the main function of the class.
         """
         if self.corpusSettings is None or len(self.corpusSettings) <= 0:
             return
