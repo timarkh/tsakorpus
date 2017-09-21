@@ -29,17 +29,14 @@ After these preliminary steps, you have to launch ``indexator/indexator.py`` and
 The indexator creates following elasticsearch indexes:
 
 * ``%corpus_name%.sentences`` -- main index: all sentences of the corpus;
-
 * ``%corpus_name%.docs`` -- metadata for corpus documents;
-
 * ``%corpus_name%.words`` -- all word types with statistics (identical word forms with different annotations are considered different types);
-
 * ``%corpus_name%.word_freqs`` -- statistics for each (type, document) tuple.
 
 ### Running tsakorpus
 You can use tsakorpus either locally or as a web service available from outside. In the first case, it is sufficient to run tsakorpus.wsgi as a Python file. This will start a flask web-server, after which the corpus will be accessible at <http://127.0.0.1:7342/search>.
 
-In the case of the web service, it is recommended to configure your apache server for working with your corpus (supposing you have a Linux server). You have to install and enable mod_wsgi for Python3. (Note that you cannot have mod_wsgi for both Python2 and Python3 on the same server, at least not that easy.) Then you have to specify the URL under which you corpus is going to be available and the path to the corpus files in an apache .conf file (normally by creating a new .conf file in the apache sites-available directory). The directory where your corpus is stored should have relevant read and execute permissions. Here is a sample configuration that you should put to the .conf file:
+In the case of the web service, it is recommended to configure your apache server for working with your corpus (supposing you have a Linux server). You have to install and enable mod_wsgi for Python3. (Note that you cannot have mod_wsgi for both Python2 and Python3 on the same server, at least not that easy.) Then you have to specify the URL under which your corpus is going to be available and the path to the corpus files in an apache .conf file (normally by creating a new .conf file in the apache ``sites-available`` directory). The directory where your corpus is stored should have relevant read and execute permissions. Here is a sample configuration that you should put to the .conf file:
 
 ```
 WSGIDaemonProcess %some_unique_process_name% user=%you% group=www-data home=%path_to_corpus_directory%/search
@@ -53,4 +50,4 @@ WSGIScriptAlias /%url_for_your_corpus% %path_to_corpus_directory%/search/tsakorp
 </Directory>
 ```
 
-After enabling this configuration and reloading apache, your corpus should be available at %your_website_url%/%url_for_your_corpus%/search .
+After enabling this configuration and reloading apache, your corpus should be available at %your_website_url%/%url_for_your_corpus%/search . All search queries the user makes are passed to the backend as Ajax GET-queries.
