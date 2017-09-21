@@ -6,7 +6,7 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``corpus_name`` -- the name of the corpus, which determines the name of ElasticSearch indexes used for indexing or searching. The indexes used by the corpus are ``%corpus_name%.docs``, ``%corpus_name%.words``, ``%corpus_name%.word_freqs`` and ``%corpus_name%.sentences``.
 
-* ``input_format`` -- determines which format the input files have and which input processor should be used when indexing. Currently supports "json" (tsakorpus json files) and "json-gzip" (gzipped tsakorpus json files).
+* ``input_format`` -- determines which format the input files have and which input processor should be used when indexing. Currently supports "json" (tsakorpus JSON files) and "json-gzip" (gzipped tsakorpus JSON files).
 
 * ``debug`` (true/false) -- determines whether additional debug elements, such as "Show JSON query / Show JSON response", are turned on in the web interface.
 
