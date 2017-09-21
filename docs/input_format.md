@@ -2,6 +2,7 @@
 A corpus which can be indexed by tsakorpus is a collection of JSON or gzipped JSON files structured according to the rules described below. The corpus may contain any number of files scattered across a file system subtree starting with ``corpus/%your_corpus_name%``.
 
 Each JSON file stores a dictionary representing one corpus document. Each dictionary should have the following keys:
+
 * ``meta`` -- a dictionary with the metadata for the document.
 * ``sentences`` -- an array of sentences the document consists of.
 
@@ -16,14 +17,16 @@ The document has, therefore, the following structure:
 
 ### The metadata
 The value of the ``meta`` key is a dictionary where keys are the names of the metafields and the values are strings. All metafields listed in the ``viewable_meta`` array in ``conf/corpus.json`` must be present in each document of the corpus. Other than that, there are no restrictions on metadata; the array may even be empty. However, there are several field names which get special treatment in tsakorpus:
+
 * The value of ``filename`` is never included in the search results to avoid accidentally compromising the data of the author of the corpus.
 * The ``title`` and ``author`` fields are displayed as document identifiers next to each context in the search results.
 
 ### The sentence list
 The array with sentences is the main part of the document. Each sentence is a dictionary with the following keys:
+
 * ``text`` -- a string with full text of the sentence.
 * ``words`` -- an array with objects, each representing a token (word or punctuation mark) in the sentence together with all the annotation. There are several reasons why the text of the sentence (or at least most of it) is actually stored twice, first in the ``text`` field and second inside the word objects. One of them is allowing multiple (ambiguous) tokenization options for a single sentence. Another is allowing easy full-text search, which would have been impossible in elasticsearch without the ``text`` field. Yet another is the possibility of normalizing the tokens so that they can look differently in the sentence and in the analysis.
-* ``lang`` -- an one-byte integer representing the language the sentence is written in. This number should be a valid index for the ``languages`` array in ``conf/corpus.json``.
+* ``lang`` -- a one-byte integer representing the language the sentence is written in. This number should be a valid index for the ``languages`` array in ``conf/corpus.json``.
 * ``meta`` -- a dictionary with sentence-level metafields. Sentence-level metafields may include, for example, speaker data for multi-tier (dialogue) files or year in a document that includes data from different years. All metafields listed in the ``sentence_meta`` array in ``conf/corpus.json`` must be present in this dictionary. The values should be strings.
 * ``para_alignment`` (only in parallel corpora, i.e. corpora with several languages where all or some of the sentences in one language are aligned to sentences in another language) -- a list with dictionaries, each representing an alignment of some part of the sentence with a part of another sentence in the corpus.
 * ``src_alignment`` (only for media-aligned corpora) -- a list with dictionaries, each representing an alignment of some part of the sentence with a segment of a video or sound file.
@@ -45,6 +48,7 @@ The elements of the ``sentences`` array therefore look like this:
 
 ### Words
 Each word in the ``words`` array is a dictionary with the following keys and values:
+
 * ``wf`` -- a string with the token (word form), used for word search.
 * ``wtype`` -- type of the token. Currently, two values are possible: "word" and "punct".
 * ``off_start``, ``off_end`` -- character offsets indicating to which segment of the ``text`` string the word corresponds. As mentioned earlier, this can be useful for multiple overlapping tokenization variants, or when the ``wf`` value is normalized for search.
@@ -70,6 +74,7 @@ Overall, a word dictionary looks like this:
 A word can have more than one analysis variant. Usually a word having multiple analyses is the result of automatic morphological annotation without subsequent disambiguation. However, this option is useful even in manually annotated corpora when there is no way to distinguish between several homonymous forms, or when the annotator has doubts (which happens especially often when annotating historical corpora). Search queries will find all words that have at least one analysis conforming to the query.
 
 Each analysis is a dictionary with the following keys and values:
+
 * ``lex`` -- lemma (dictionary form), a string.
 * any number of keys starting with ``gr.`` (such as ``gr.pos`` or ``gr.case``) -- strings or arrays of strings that contain values of grammatical or lexical categories expressed in the word. The name of the category, as well as the value, should be listed in the ``categories.json`` file for the language the sentence is written in, otherwise this information will not be searchable. Each category can have multiple values (this can happen e.g. in case compounding when a stem attaches several case markers).
 * ``gloss``, ``parts`` and ``gloss_index`` (only for corpora with glossing) -- strings representing the glosses for the word (``gloss``), segmentation of the word into morphemes (``parts``) and the combination of these two fields used during search (``gloss_index``). The ``gloss`` field should contain glossing according to the Leipzig glossing rules (the glosses can be arbitrary, but the format should be correct). The stem should be glossed as STEM instead of a short English translation, otherwise it would be impossible to make queries such as "find a genitive marker immediately following the stem". Glossing and segmentation into morphemes should not contain empty morphemes and glosses for them; all categories that are not overtly expressed in the word should be tagged using the ``gr.`` fields. The string ``gloss_index`` has the following format: GLOSS1{morpheme1}-GLOSS2{morpheme2}-... Each gloss is accompanied by the corresponding morpheme in curly brackets. All glosses are separated by hyphens; there should also be a hanging hyphen at the end of the string.
