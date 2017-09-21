@@ -296,7 +296,8 @@ class InterfaceQueryParser:
             query = self.make_random(query)
         esQuery = {'query': query, 'size': query_size, 'from': query_from,
                    '_source': {'excludes': ['sids']}}
-        esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'dids'}}}
+        esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'dids'}},
+                           'agg_freq': {'sum': {'field': 'freq'}}}
         if sortOrder == 'wf':
             esQuery['sort'] = {'wf': {'order': 'asc'}}
         elif sortOrder == 'freq':

@@ -71,7 +71,15 @@ function show_doc_meta(e) {
 function search_word_from_list(e) {
 	wf = $(e.currentTarget).attr('data-wf');
 	if (wf == "") return;
-	$('input.search_input').val("");
+	$('input.search_input').each(function (index) {
+		if ($(this).parent().parent().attr('id') == 'display_options_tab') {
+			return;
+		}
+		if ($(this).attr('id').search(/[^0-9]1$/) < 0) {
+			return;
+		}
+		$(this).val('');
+	});
 	$('#wf1').val(wf);
 	$("#search_sent").click();
 }
@@ -233,7 +241,7 @@ function assign_gram_popup() {
 	$("span.word").unbind('hover');
 	$("span.word").unbind('mousemove');
 	$('.word').hover(function (e) {
-		$('#analysis').replaceWith('<div id="analysis">' + $(e.target).attr("data-ana") + '</div>');
+		$('#analysis').replaceWith('<div id="analysis">' + $("<textarea/>").html(($(e.target).attr("data-ana"))).text() + '</div>');
 		anaWidth = $('#analysis').width();
 		anaHeight = $('#analysis').height();
 		$('#analysis').css('left', $(document).innerWidth() - anaWidth - 30);

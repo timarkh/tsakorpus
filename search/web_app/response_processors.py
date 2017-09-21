@@ -512,7 +512,7 @@ class SentenceViewer:
         else:
             freq, rank, nSents, nDocs = self.count_word_subcorpus_stats(w, docIDs)
         return render_template('word_table_row.html',
-                               ana_popup=self.build_ana_popup(wSource, lang, translit=translit),
+                               ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
                                wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
                                freq=freq,
                                rank=rank,
@@ -560,7 +560,7 @@ class SentenceViewer:
                 continue
             bRelevantWordExists = True
             for word in hit['inner_hits'][w1_label]['hits']['hits']:
-                hitsProcessed['n_occurrences'] += 1
+                hitsProcessed['total_freq'] += 1
                 word['_source']['lang'] = lang
                 wordJson = json.dumps({k: v for k, v in word['_source'].items() if k in ('ana', 'wf', 'lang')},
                                       sort_keys=True)
@@ -569,6 +569,7 @@ class SentenceViewer:
                     hitsProcessed['word_jsons'][wordJson]['n_sents'] += 1
                     hitsProcessed['word_jsons'][wordJson]['doc_ids'].add(hit['_source']['doc_id'])
                 except KeyError:
+                    hitsProcessed['n_occurrences'] += 1
                     hitsProcessed['word_jsons'][wordJson] = {'n_occurrences': 1,
                                                              'n_sents': 1,
                                                              'doc_ids': {hit['_source']['doc_id']}}
@@ -747,6 +748,7 @@ class SentenceViewer:
         result['message'] = ''
         result['n_occurrences'] = response['hits']['total']
         result['n_docs'] = response['aggregations']['agg_ndocs']['value']
+        result['total_freq'] = response['aggregations']['agg_freq']['value']
         result['words'] = []
         for iHit in range(len(response['hits']['hits'])):
             langID, lang = self.get_lang_from_hit(response['hits']['hits'][iHit])

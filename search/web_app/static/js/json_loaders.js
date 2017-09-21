@@ -149,8 +149,13 @@ function hide_query_panel() {
 	}
 }
 
+function show_query_panel() {
+	if ($("img-swap").attr('class') == "on") {
+		$(".img-swap").click();
+	}
+}
+
 function get_sentences() {
-	hide_query_panel();
 	get_sentences_page(-1);
 }
 
@@ -396,6 +401,9 @@ function gloss_selector_ok(e) {
 
 function change_locale(e) {
 	var new_locale = $(e.target).text().toLowerCase();
-	$.ajax({url: "set_locale/" + new_locale});
+	$.ajax({
+		url: "set_locale/" + new_locale,
+		success: function (result) { location.reload(); }
+	});
 }
 	

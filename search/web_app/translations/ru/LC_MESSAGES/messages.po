@@ -21,185 +21,189 @@ msgstr ""
 
 #: templates/index.html:4
 msgid "Corpus search page"
-msgstr ""
+msgstr "Поиск в корпусе"
 
 #: templates/index.html:22
 msgid "Corpus name"
-msgstr ""
+msgstr "Название корпуса"
 
 #: templates/index.html:40
 msgid "Query"
-msgstr ""
+msgstr "Запрос"
 
 #: templates/index.html:51
 msgid "Word_header"
-msgstr ""
+msgstr "Слово"
 
 #: templates/index.html:51
 msgid "Number_sign"
-msgstr ""
+msgstr "№"
 
 #: templates/index.html:52
 msgid "Word:"
-msgstr ""
+msgstr "Слово:"
 
 #: templates/index.html:53
 msgid "Lemma:"
-msgstr ""
+msgstr "Лемма:"
 
 #: templates/index.html:54
 msgid "Grammar:"
-msgstr ""
+msgstr "Грамматика:"
 
 #: templates/index.html:56
 msgid "Gloss:"
-msgstr ""
+msgstr "Глоссы:"
 
 #: templates/index.html:61
 msgid "Language:"
-msgstr ""
+msgstr "Язык:"
 
 #: templates/index.html:75
 msgid "negative_query"
-msgstr ""
+msgstr "отрицательный&nbsp;запрос"
 
 #: templates/index.html:76
 msgid "add_word"
-msgstr ""
+msgstr "добавить слово"
 
 #: templates/index.html:79
 msgid "more_fields"
-msgstr ""
+msgstr "показать все поля"
 
 #: templates/index.html:85
 msgid "Full-text search:"
-msgstr ""
+msgstr "Полнотекстовый поиск:"
 
 #: templates/index.html:85
 msgid "Precise match"
-msgstr ""
+msgstr "точное соответствие"
 
 #: templates/index.html:89
 msgid "Additional search and display options"
-msgstr ""
+msgstr "Дополнительные настройки поиска и отображения"
 
 #: templates/index.html:91
 msgid "Results per page:"
-msgstr ""
+msgstr "Контекстов на странице:"
 
 #: templates/index.html:92
 msgid "Sorting:"
-msgstr ""
+msgstr "Сортировка"
 
 #: templates/index.html:93
 msgid "random"
-msgstr ""
+msgstr "случайная"
 
 #: templates/index.html:94
 msgid "by word (word queries)"
-msgstr ""
+msgstr "по словоформе (поиск слов)"
 
 #: templates/index.html:95
 msgid "by lemma (word queries)"
-msgstr ""
+msgstr "по лемме (поиск слов)"
 
 #: templates/index.html:96
 msgid "by frequency (word queries)"
-msgstr ""
+msgstr "по частотности (поиск слов)"
 
 #: templates/index.html:97
 msgid "no sorting"
-msgstr ""
+msgstr "без сортировки"
 
 #: templates/index.html:99
 msgid "Language/tier:"
-msgstr ""
+msgstr "Язык/слой:"
 
 #: templates/index.html:107
 msgid "Word distance requirements are strict"
-msgstr ""
+msgstr "Расстояния между словами только как в запросе"
 
 #: templates/index.html:111
 msgid "Transliteration:"
-msgstr ""
+msgstr "Транслитерация:"
 
 #: templates/index.html:124
 msgid "Search sentences"
-msgstr ""
+msgstr "Поиск предложений"
 
 #: templates/index.html:125
 msgid "Search words"
-msgstr ""
+msgstr "Поиск слов"
 
 #: templates/index.html:126
 msgid "Select subcorpus"
-msgstr ""
+msgstr "Выбор подкорпуса"
 
 #: templates/index.html:153
 msgid "(Place for results)"
-msgstr ""
+msgstr "(Тут будут результаты.)"
 
 #: templates/result_docs.html:1
 msgid "Filter result:"
-msgstr ""
+msgstr "Результаты отбора:"
 
 #: templates/result_docs.html:1
 msgid "document(s) with"
-msgstr ""
+msgstr "документ(а/ов) с"
 
 #: templates/result_docs.html:1
 msgid "word(s) found,"
-msgstr ""
+msgstr "словами/словом,"
 
 #: templates/result_docs.html:1
 msgid "of the entire corpus."
-msgstr ""
+msgstr "от всего корпуса."
 
 #: templates/result_sentences.html:54
 msgid "download as CSV"
-msgstr ""
+msgstr "Загрузить как CSV"
 
 #: templates/result_sentences.html:55
-msgid "download as XSLX"
-msgstr ""
+msgid "download as XLSX"
+msgstr "Загрузить как XLSX"
 
 #: templates/result_words.html:1
 msgid "Search result:"
-msgstr ""
+msgstr "Результат поиска: найдено"
 
 #: templates/result_words.html:1
 msgid "different words in approximately"
-msgstr ""
+msgstr "разных словоформ примерно в"
 
 #: templates/result_words.html:1
-msgid "document(s) found."
-msgstr ""
+msgid "document(s) found,"
+msgstr "документах,"
+
+#: templates/result_words.html:1
+msgid "total frequency:"
+msgstr "суммарная частотность:"
 
 #: templates/result_words.html:4
 msgid "word_th_word"
-msgstr ""
+msgstr "слово"
 
 #: templates/result_words.html:4
 msgid "word_th_frequency"
-msgstr ""
+msgstr "частотность"
 
 #: templates/result_words.html:4
 msgid "word_th_freq. rank / quantile"
-msgstr ""
+msgstr "част. ранг / квантиль"
 
 #: templates/result_words.html:4
 msgid "word_th_# sentences"
-msgstr ""
+msgstr "кол-во предл."
 
 #: templates/result_words.html:4
 msgid "word_th_# documents"
-msgstr ""
+msgstr "кол-во док."
 
 #: templates/result_words.html:4
 msgid "word_th_search in corpus"
-msgstr ""
+msgstr "искать"
 
 #: templates/select_gloss.html:38 templates/select_gramm.html:25
 msgid "Cancel"
-msgstr ""
+msgstr "Отмена"
 

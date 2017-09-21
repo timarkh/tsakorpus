@@ -689,6 +689,13 @@ td {
 .hide_query_button {
 	width: 99%;
 	float: left;
+	border-bottom: 1px dotted gray;
+	border-radius: 0px 0px 10px 10px;
+	background-color: #eef;
+	margin-top: 5px;
+	margin-bottom: 7px;
+	background: linear-gradient(#fefefe, #eef);
+	padding-bottom: 3px;
 }
 
 #h3_options {

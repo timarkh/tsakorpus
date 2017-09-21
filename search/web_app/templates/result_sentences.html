@@ -37,24 +37,32 @@ var srcAlignments = {{ data.src_alignment | safe }};
 {% endif %}
 
 {% if data.contexts|length > 0 %}
-<div class="pages">
-{% for i_page in range(-5, 6) %}
-{% if (data.page + i_page > 0) and (data.page + i_page < data.n_sentences / data.page_size + 1) %}
-{% if i_page == 0 %}
-<span class="cur_page">{{ data.page + i_page }}</span>&nbsp;
+	<div class="pages">
+	{% for i_page in range(-5, 6) %}
+		{% if (data.page + i_page > 0) and (data.page + i_page < data.n_sentences / data.page_size + 1) %}
+		{% if i_page == 0 %}
+		<span class="cur_page">{{ data.page + i_page }}</span>&nbsp;
+		{% else %}
+		<span class="page_link" data-page="{{ data.page + i_page }}">{{ data.page + i_page }}</span>&nbsp;
+		{% endif %}
+		{% endif %}
+	{% endfor %}
+	{% if data.page + 7 < data.n_sentences / data.page_size + 1 %}
+	<span class="page_link">...</span>&nbsp;
+	{% endif %}
+	</div>
+	<a href="download_cur_results_csv" download="results-{{ data.page }}.csv">{{ _('download as CSV') }}</a>
+	<a href="download_cur_results_xlsx" download="results-{{ data.page }}.xlsx">{{ _('download as XLSX') }}</a>
+	<script type='text/javascript'>assign_word_events();</script>
+	{% if data.media %}
+	<script type='text/javascript'>
+	hide_query_panel();
+	show_player();
+	</script>
+	{% endif %}
 {% else %}
-<span class="page_link" data-page="{{ data.page + i_page }}">{{ data.page + i_page }}</span>&nbsp;
-{% endif %}
-{% endif %}
-{% endfor %}
-{% if data.page + 7 < data.n_sentences / data.page_size + 1 %}
-<span class="page_link">...</span>&nbsp;
-{% endif %}
-</div>
-<a href="download_cur_results_csv" download="results-{{ data.page }}.csv">{{ _('download as CSV') }}</a>
-<a href="download_cur_results_xlsx" download="results-{{ data.page }}.xlsx">{{ _('download as XSLX') }}</a>
-{% endif %}
-<script type='text/javascript'>assign_word_events();</script>
-{% if data.media %}
-<script type='text/javascript'>show_player();</script>
+	<script type='text/javascript'>
+	hide_player();
+	show_query_panel();
+	</script>
 {% endif %}

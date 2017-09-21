@@ -770,8 +770,9 @@ def search_word():
         hitsProcessed = sentView.process_word_json(hits, docIDs,
                                                    translit=get_session_data('translit'))
     elif searchIndex == 'sentences':
-        hitsProcessed = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'words': [],
-                         'doc_ids': set(), 'word_jsons': {}}
+        hitsProcessed = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0,
+                         'total_freq': 0,
+                         'words': [], 'doc_ids': set(), 'word_jsons': {}}
         for hit in sc.get_all_sentences(query):
             sentView.add_word_from_sentence(hitsProcessed, hit, nWords=nWords)
         hitsProcessed['n_docs'] = len(hitsProcessed['doc_ids'])

@@ -159,8 +159,8 @@ msgid "download as CSV"
 msgstr "download as CSV"
 
 #: templates/result_sentences.html:55
-msgid "download as XSLX"
-msgstr "download as XSLX"
+msgid "download as XLSX"
+msgstr "download as XLSX"
 
 #: templates/result_words.html:1
 msgid "Search result:"
@@ -171,8 +171,12 @@ msgid "different words in approximately"
 msgstr "different words in approximately"
 
 #: templates/result_words.html:1
-msgid "document(s) found."
-msgstr "document(s) found."
+msgid "document(s) found,"
+msgstr "document(s) found,"
+
+#: templates/result_words.html:1
+msgid "total frequency:"
+msgstr "total frequency:"
 
 #: templates/result_words.html:4
 msgid "word_th_word"
