@@ -1,6 +1,6 @@
 ﻿<p>{{ _('Search result:') }} {{ data.n_occurrences }} {{ _('different words in approximately') }} {{ data.n_docs }} {{ _('document(s) found,') }} {{ _('total frequency:') }} {{ data.total_freq }}.</p>
 <div class="word_results">
-<table style='border: 1px solid blue'>
+<table class="words_list_table">
 <thead><th>{{ _('word_th_word') }}</th><th>{{ _('word_th_frequency') }}</th><th>{{ _('word_th_freq. rank / quantile') }}</th><th>{{ _('word_th_# sentences') }}</th><th>{{ _('word_th_# documents') }}</th><th>{{ _('word_th_search in corpus') }}</th></thead>
 <tbody>
 {% for w in data.words %}

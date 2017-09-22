@@ -27,6 +27,9 @@ msgstr "Поиск в корпусе"
 msgid "Corpus name"
 msgstr "Название корпуса"
 
+msgid "Show help"
+msgstr "Показать справку"
+
 #: templates/index.html:40
 msgid "Query"
 msgstr "Запрос"

@@ -26,9 +26,12 @@
 	<span class="locale" title="{{ locales[l_code] }}">{{ l_code|upper }}</span>&nbsp;
 	{% if not last %}
 		|&nbsp;
+	{% else %}
+		|&nbsp;&nbsp;
 	{% endif %}
 {% endfor %}
 {% endif %}
+<span id="show_help" class="glyphicon glyphicon-question-sign" aria-hidden="true"><span class="tooltip_prompt">{{ _('Show help') }}</span></span>
 </p>
 <div id="search_div" class="transitions init-hidden">
 	<div class="show-hide">
@@ -121,9 +124,11 @@
 		</form>
 		<br>
 		<div class="search_buttons">
-			<button value="Search sentences" id="search_sent" style="width:200px;">{{ _('Search sentences') }}</button>
-			<button value="Search words" id="search_word" style="width:200px;">{{ _('Search words') }}</button>
-			<button value="Search documents" id="search_doc" style="width:200px;"><span class="subcorpus_selector_link">{{ _('Select subcorpus') }}</span></button>
+			<div class="btn-group">
+			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Search sentences" id="search_sent">{{ _('Search sentences') }}</button>
+			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Search words" id="search_word">{{ _('Search words') }}</button>
+			</div>
+			<button type="button" class="btn btn-default btn-info" aria-label="Left Align" value="Search documents" id="search_doc"><span class="subcorpus_selector_link">{{ _('Select subcorpus') }}</span></button>
 			{% if debug %}
 				<br>
 				<button value="Search sentences (q)" id="search_sent_query" style="width:200px;">Search sentences (show query)</button>
@@ -135,7 +140,7 @@
 			{% endif %}
 		</div>
 	</div>
-<div class="hide_query_button" align="center"><a href="#" rel="toggle-slide"><img src="static/img/arrow_up.png" class="img-swap" /></a></div>
+<div class="hide_query_button" align="center"><a href="#" rel="toggle-slide"><img src="static/img/arrow_up.png" class="img-swap" /><span id="hide_query_caption">Show query panel</span></a></div>
 </div>
 </div>
 
@@ -165,6 +170,20 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 			</div>
 			<div class="modal-body" id="gram_sel_body">
 			<p>Grammar selection body</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="help_dialogue" tabindex="-1" role="dialog" aria-labelledby="help_dialogue_header" aria-hidden="true" data-field="gr1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="help_dialogue_header">Help</h4>
+			</div>
+			<div class="modal-body" id="help_dialogue_body">
+			<p>The help text should be loaded here.</p>
 			</div>
 		</div>
 	</div>

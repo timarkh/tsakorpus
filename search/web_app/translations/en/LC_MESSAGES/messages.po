@@ -26,6 +26,9 @@ msgstr "Corpus search page"
 msgid "Corpus name"
 msgstr "Corpus name"
 
+msgid "Show help"
+msgstr "Show help"
+
 #: templates/index.html:40
 msgid "Query"
 msgstr "Query"

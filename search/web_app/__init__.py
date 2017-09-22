@@ -949,3 +949,11 @@ def set_locale(lang=''):
         return
     set_session_data('locale', lang)
     return ''
+
+
+@app.route('/help_dialogue')
+def help_dialogue():
+    l = get_locale()
+    return render_template('help_dialogue_' + l + '.html',
+                           media=settings['media'],
+                           gloss_search_enabled=settings['gloss_search_enabled'])

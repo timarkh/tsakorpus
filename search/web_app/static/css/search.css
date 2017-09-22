@@ -263,7 +263,7 @@
 	margin-left: 3px;
 }
 
-.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w {
+.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, #show_help {
 	cursor: pointer;
 }
 
@@ -322,6 +322,10 @@
 	color: #2664c9;
 }
 
+#show_help:hover {
+	color: #2664c9;
+}
+
 .tooltip_prompt {
     visibility: hidden;
     background-color: white;
@@ -359,6 +363,10 @@
 }
 
 .neg_query:hover .tooltip_prompt {
+    visibility: visible;
+}
+
+#show_help:hover .tooltip_prompt {
     visibility: visible;
 }
 
@@ -468,26 +476,6 @@ hr.separator {
 	max-width: 500px;
 }
 
-tr:nth-child(odd) {
-	background-color: #d9f0fc; 
-}
-
-tr:nth-child(even) {
-	background-color: #fff;
-}
-
-th {
-	padding: 3px 5px;
-	color: #004b72;
-	min-width: 35px;
-	background-color: #eee;
-	cursor: pointer;
-}
-
-td {
-	padding: 3px 4px;
-}
-
 .timespan_highlighted {
 	color: red;
 	background-color: red !important;
@@ -591,6 +579,35 @@ td {
 	cursor: pointer;
 }
 
+
+.words_list_table {
+	border: solid 1px gray;
+	border-radius: 4px;
+	margin: auto;
+	margin-left: 5px;
+	margin-bottom: 15px;
+}
+
+.words_list_table tr:nth-child(odd) {
+	background-color: #f4f8ff; 
+}
+
+.words_list_table tr:nth-child(even) {
+	background-color: #e3e8ef;
+}
+
+.words_list_table th {
+	padding: 3px 5px;
+	color: #f7fdff;
+	min-width: 35px;
+	background-color: #004b72;
+	cursor: pointer;
+}
+
+.words_list_table td {
+	padding: 3px 4px;
+}
+
 .tabs-left {
   border-bottom: none;
   padding-top: 2px;
@@ -625,7 +642,7 @@ td {
 }
 
 .vertical-text {
-  margin-top: 100px;
+  margin-top: 40px;
   border: none;
   position: relative;
 }
@@ -656,7 +673,7 @@ td {
 
 .vertical-text.tabs-left {
   left: -50px;
-  top: -60px;
+  top: 0px;
 }
 
 .vertical-text.tabs-right>li {
@@ -684,6 +701,13 @@ td {
 .search_buttons {
 	width: 99%;
 	float: left;
+	margin-bottom: 5px;
+}
+
+.search_buttons button {
+	padding-left: 20px;
+	padding-right: 20px;
+	font-size: 1.2em;
 }
 
 .hide_query_button {
@@ -696,6 +720,14 @@ td {
 	margin-bottom: 7px;
 	background: linear-gradient(#fefefe, #eef);
 	padding-bottom: 3px;
+}
+
+#hide_query_caption {
+	display: none;
+	margin-left: 12px;
+	padding-top: 5px;
+	color: #555;
+	font-size: 1.2em;
 }
 
 #h3_options {
