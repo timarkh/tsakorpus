@@ -53,16 +53,17 @@ var srcAlignments = {{ data.src_alignment | safe }};
 	</div>
 	<a href="download_cur_results_csv" download="results-{{ data.page }}.csv">{{ _('download as CSV') }}</a>
 	<a href="download_cur_results_xlsx" download="results-{{ data.page }}.xlsx">{{ _('download as XLSX') }}</a>
-	<script type='text/javascript'>assign_word_events();</script>
+	<script type='text/javascript'>assign_word_events(); hide_query_panel();</script>
 	{% if data.media %}
 	<script type='text/javascript'>
-	hide_query_panel();
 	show_player();
 	</script>
 	{% endif %}
 {% else %}
 	<script type='text/javascript'>
+	{% if data.media %}
 	hide_player();
+	{% endif %}
 	show_query_panel();
 	</script>
 {% endif %}
