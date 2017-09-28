@@ -304,9 +304,19 @@
             {"type": "gramm", "value": "persn", "category": "nType", "tooltip": "Personal name"},
             {"type": "gramm", "value": "famn", "category": "nType", "tooltip": "Last name"},
             {"type": "gramm", "value": "patrn", "category": "nType", "tooltip": "Patronymic"},
+            {"type": "gramm", "value": "anim", "category": "nType", "tooltip": "Animate"},
+            {"type": "gramm", "value": "hum", "category": "nType", "tooltip": "Human"},
+            {"type": "gramm", "value": "supernat", "category": "nType", "tooltip": "Supernatural"},
+            {"type": "gramm", "value": "body", "category": "nType", "tooltip": "Body part"},
+            {"type": "gramm", "value": "transport", "category": "nType", "tooltip": "Transport"}
+          ],
+          [
+            {"type": "header", "value": "Pronoun types"},
             {"type": "gramm", "value": "dem", "category": "proType", "tooltip": "Demonstrative pronoun"},
             {"type": "gramm", "value": "pers", "category": "proType", "tooltip": "Personal pronoun"},
             {"type": "gramm", "value": "refl", "category": "proType", "tooltip": "Reflexive pronoun"},
+            {"type": "header", "value": "Loanwords"},
+            {"type": "gramm", "value": "rus", "category": "additional", "tooltip": "Russian borrowing"},
             {"type": "header", "value": "Number"},
             {"type": "gramm", "value": "sg", "category": "number", "tooltip": "Singular"},
             {"type": "gramm", "value": "pl", "category": "number", "tooltip": "Plural"}

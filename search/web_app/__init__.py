@@ -438,6 +438,53 @@ def add_parallel(hits, htmlResponse):
                 htmlResponse['contexts'][iHit]['languages'][lang] = {'text': sentHTML}
 
 
+def get_doc_ids_for_metafield(fieldName, docIDs=None, maxBuckets=300):
+    """
+    Group all documents into buckets, each corresponding to one
+    of the unique values for the fieldName metafield. Consider
+    only top maxBuckets field values (in terms of document count).
+    Return a dictionary with the values and corresponding document
+    count.
+    """
+    if fieldName not in settings['viewable_meta']:
+        return {}
+    innerQuery = {'match_all': {}}
+    if docIDs is not None:
+        innerQuery = {'ids': {'type': 'doc', 'values': list(docIDs)}}
+    esQuery = {'query': innerQuery,
+               'size': 0,
+               'aggs': {'metafield':
+                            {'terms':
+                                 {'field': fieldName, 'size': maxBuckets},
+                             'aggs':
+                                 {'subagg_n_words': {'sum': {'field': 'n_words'}}}
+                             }
+                        }
+               }
+    hits = sc.get_docs(esQuery)
+    if 'aggregations' not in hits or 'metafield' not in hits['aggregations']:
+        return {}
+    buckets = {}
+    for bucket in hits['aggregations']['metafield']['buckets']:
+        buckets[bucket['key']] = {'n_docs': bucket['doc_count'],
+                                  'n_words': bucket['subagg_n_words']['value']}
+    return buckets
+
+
+@app.route('/doc_stats/<metaField>')
+def get_doc_stats(metaField):
+    """
+    Return JSON with basic statistics concerning the distribution
+    of corpus documents by values of one metafield. This function
+    can be used to visualise (sub)corpus composition.
+    """
+    query = copy_request_args()
+    change_display_options(query)
+    docIDs = subcorpus_ids(query)
+    buckets = get_doc_ids_for_metafield(metaField, docIDs=docIDs)
+    return jsonify(buckets)
+
+
 def subcorpus_ids(htmlQuery):
     """
     Return IDs of the documents specified by the subcorpus selection

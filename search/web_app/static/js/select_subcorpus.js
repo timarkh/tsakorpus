@@ -3,10 +3,12 @@ $(function() {
 		$('.switchable_subcorpus_option').unbind('click');
 		$('#subcorpus_selector_ok').unbind('click');
 		$('#subcorpus_selector_clear').unbind('click');
+		$('#subcorpus_stats_link').unbind('click');
 		$('.switchable_subcorpus_option').click(toggle_subcorpus_option);
 		$('#load_documents_link').click(load_subcorpus_documents);
 		$('#subcorpus_selector_ok').click(close_subcorpus_selector);
 		$('#subcorpus_selector_clear').click(clear_subcorpus);
+		$('#subcorpus_stats_link').click(load_subcorpus_stats);
 	}
 	
 	function assign_document_list_events() {
@@ -58,6 +60,22 @@ $(function() {
 			}
 			$('#' + field).val(formula);
 		}
+	}
+	
+	function load_subcorpus_stats(e) {
+		$.ajax({
+			url: "doc_stats/genre",
+			data: $("#search_main").serialize(),
+			type: "GET",
+			success: display_subcorpus_stats_plot,
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	}
+	
+	function display_subcorpus_stats_plot(results) {
+		$('#subcorpus_stats_plot').html(JSON.stringify(results));
 	}
 	
 	function load_subcorpus_documents(e) {

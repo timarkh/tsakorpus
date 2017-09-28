@@ -25,9 +25,11 @@ class SearchClient:
 
     def get_words(self, esQuery):
         if self.settings['query_timeout'] > 0:
-            esQuery['timeout'] = str(self.settings['query_timeout']) + 's'
-        hits = self.es.search(index=self.name + '.words', doc_type='word',
-                              body=esQuery)
+            hits = self.es.search(index=self.name + '.words', doc_type='word',
+                                  body=esQuery, request_timeout=self.settings['query_timeout'])
+        else:
+            hits = self.es.search(index=self.name + '.words', doc_type='word',
+                                  body=esQuery)
         return hits
 
     def get_word_freqs(self, esQuery):
@@ -50,17 +52,23 @@ class SearchClient:
 
     def get_sentences(self, esQuery):
         if self.settings['query_timeout'] > 0:
-            esQuery['timeout'] = str(self.settings['query_timeout']) + 's'
-        hits = self.es.search(index=self.name + '.sentences', doc_type='sentence',
-                              body=esQuery)
+            hits = self.es.search(index=self.name + '.sentences', doc_type='sentence',
+                                  body=esQuery, request_timeout=self.settings['query_timeout'])
+        else:
+            hits = self.es.search(index=self.name + '.sentences', doc_type='sentence',
+                                  body=esQuery)
         return hits
 
     def get_all_sentences(self, esQuery):
         """
         Iterate over all sentences found with the query.
         """
-        iterator = helpers.scan(self.es, index=self.name + '.sentences', doc_type='sentence',
-                                query=esQuery)
+        if self.settings['query_timeout'] > 0:
+            iterator = helpers.scan(self.es, index=self.name + '.sentences', doc_type='sentence',
+                                    query=esQuery, request_timeout=self.settings['query_timeout'])
+        else:
+            iterator = helpers.scan(self.es, index=self.name + '.sentences', doc_type='sentence',
+                                    query=esQuery)
         return iterator
 
     def get_sentence_by_id(self, sentId):
