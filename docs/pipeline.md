@@ -30,8 +30,7 @@ The indexator creates following elasticsearch indexes:
 
 * ``%corpus_name%.sentences`` -- main index: all sentences of the corpus;
 * ``%corpus_name%.docs`` -- metadata for corpus documents;
-* ``%corpus_name%.words`` -- all word types with statistics (identical word forms with different annotations are considered different types);
-* ``%corpus_name%.word_freqs`` -- statistics for each (type, document) tuple.
+* ``%corpus_name%.words`` -- contains two types, ``word`` and ``word_freq``. The instances of the former are all word types with statistics (identical word forms with different annotations are considered different types). Each instance of the latter contains frequency statictics for each (word, document) tuple.
 
 ### Running tsakorpus
 You can use tsakorpus either locally or as a web service available from outside. In the first case, it is sufficient to run tsakorpus.wsgi as a Python file. This will start a flask web-server, after which the corpus will be accessible at <http://127.0.0.1:7342/search>.

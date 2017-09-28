@@ -41,7 +41,7 @@ class MediaCutter:
         if startOffset < 0:
             startOffset = 0
         else:
-            startOffset = int(math.floor(startOffset / segmentLen))  # in minutes
+            startOffset = int(math.floor(startOffset / segmentLen))  # in seconds
         filenameOffset = startOffset % 3
         filenameNumber = startOffset // 3
         m = re.search('^(.*)\\.([^.]+)$', fname)

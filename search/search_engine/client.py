@@ -31,7 +31,7 @@ class SearchClient:
         return hits
 
     def get_word_freqs(self, esQuery):
-        hits = self.es.search(index=self.name + '.word_freqs',
+        hits = self.es.search(index=self.name + '.words', doc_type='word_freq',
                               body=esQuery)
         return hits
 
@@ -66,6 +66,12 @@ class SearchClient:
     def get_sentence_by_id(self, sentId):
         esQuery = {'query': {'term': {'_id': sentId}}}
         hits = self.es.search(index=self.name + '.sentences', doc_type='sentence',
+                              body=esQuery)
+        return hits
+
+    def get_word_by_id(self, wordId):
+        esQuery = {'query': {'term': {'_id': wordId}}}
+        hits = self.es.search(index=self.name + '.words', doc_type='word',
                               body=esQuery)
         return hits
 

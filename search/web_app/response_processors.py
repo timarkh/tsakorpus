@@ -473,6 +473,7 @@ class SentenceViewer:
         """
         Return statistics about the given word in the subcorpus
         specified by the list of document IDs.
+        This function is currently unused and will probably be deleted.
         """
         query = {'bool':
                  {'must':
@@ -493,24 +494,38 @@ class SentenceViewer:
             freq = '0'
         return freq, rank, nSents, nDocs
 
-    def process_word(self, w, docIDs, lang, translit=None):
+    def process_word(self, w, lang, translit=None):
         """
         Process one word taken from response['hits']['hits'].
         """
         if '_source' not in w:
             return ''
         wSource = w['_source']
-        freqAll = str(wSource['freq'])
-        rankAll = str(wSource['rank'])
-        nSentsAll = str(wSource['n_sents'])
-        nDocsAll = str(wSource['n_docs'])
-        if docIDs is None or len(docIDs) <= 0:
-            freq = freqAll
-            rank = rankAll
-            nSents = nSentsAll
-            nDocs = nDocsAll
-        else:
-            freq, rank, nSents, nDocs = self.count_word_subcorpus_stats(w, docIDs)
+        freq = str(wSource['freq'])
+        rank = str(wSource['rank'])
+        nSents = str(wSource['n_sents'])
+        nDocs = str(wSource['n_docs'])
+        return render_template('word_table_row.html',
+                               ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
+                               wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
+                               freq=freq,
+                               rank=rank,
+                               nSents=nSents,
+                               nDocs=nDocs,
+                               wfSearch=wSource['wf'])
+
+    def process_word_subcorpus(self, w, nDocuments, freq, lang, translit=None):
+        """
+        Process one word taken from response['hits']['hits'] for subcorpus
+        queries (where frequency data comes separately from the aggregations).
+        """
+        if '_source' not in w:
+            return ''
+        wSource = w['_source']
+        freq = str(int(round(freq, 0)))
+        rank = ''
+        nSents = ''
+        nDocs = str(nDocuments)
         return render_template('word_table_row.html',
                                ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
                                wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
@@ -590,7 +605,7 @@ class SentenceViewer:
             hitsProcessed['words'].append(word)
         del hitsProcessed['word_jsons']
         self.calculate_ranks(hitsProcessed)
-        hitsProcessed['words'] = [self.process_word(word, docIDs=None, lang=word['_source']['lang'])
+        hitsProcessed['words'] = [self.process_word(word, lang=word['_source']['lang'])
                                   for word in hitsProcessed['words']]
 
     def calculate_ranks(self, hitsProcessed):
@@ -753,7 +768,33 @@ class SentenceViewer:
         for iHit in range(len(response['hits']['hits'])):
             langID, lang = self.get_lang_from_hit(response['hits']['hits'][iHit])
             result['words'].append(self.process_word(response['hits']['hits'][iHit],
-                                                     docIDs, lang=lang, translit=translit))
+                                                     lang=lang, translit=translit))
+        return result
+
+    def process_word_subcorpus_json(self, response, docIDs, translit=None):
+        result = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'message': 'Nothing found.'}
+        if ('aggregations' not in response
+                or 'agg_freq' not in response['aggregations']
+                or 'value' not in response['aggregations']['agg_freq']
+                or 'hits' not in response
+                or 'total' not in response['hits']
+                or response['hits']['total'] <= 0):
+            return result
+        result['message'] = ''
+        result['n_occurrences'] = response['hits']['total']
+        result['n_docs'] = response['aggregations']['agg_ndocs']['value']
+        result['total_freq'] = response['aggregations']['agg_freq']['value']
+        result['words'] = []
+        for iHit in range(len(response['aggregations']['group_by_word']['buckets'])):
+            wordID = response['aggregations']['group_by_word']['buckets'][iHit]['key']
+            docCount = response['aggregations']['group_by_word']['buckets'][iHit]['doc_count']
+            wordFreq = response['aggregations']['group_by_word']['buckets'][iHit]['subagg_freq']['value']
+            hit = self.sc.get_word_by_id(wordID)
+            langID, lang = self.get_lang_from_hit(hit['hits']['hits'][0])
+            result['words'].append(self.process_word_subcorpus(hit['hits']['hits'][0],
+                                                               nDocuments=docCount,
+                                                               freq=wordFreq,
+                                                               lang=lang, translit=translit))
         return result
 
     def process_docs_json(self, response, exclude=None, corpusSize=1):

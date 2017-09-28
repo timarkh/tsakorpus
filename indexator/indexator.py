@@ -11,7 +11,7 @@ from json_doc_reader import JSONDocReader
 
 class Indexator:
     """
-    Contains methods for loading the data in the corpus
+    Contains methods for loading the JSON documents in the corpus
     database.
     """
     SETTINGS_DIR = '../conf'
@@ -49,6 +49,8 @@ class Indexator:
         self.wordDocFreqs = [{} for i in range(len(self.languages))]  # (word's ID, dID) -> word frequency in the document
         self.wordSIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of sentence IDs
         self.wordDIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of document IDs
+        self.wfs = set()         # set of word forms (for sorting)
+        self.lemmata = set()     # set of lemmata (for sorting)
         self.sID = 0          # current sentence ID for each language
         self.dID = 0          # current document ID
         self.numWords = 0     # number of words in current document
@@ -73,8 +75,6 @@ class Indexator:
                           body=self.docMapping)
         self.es_ic.create(index=self.name + '.words',
                           body=self.wordMapping)
-        self.es_ic.create(index=self.name + '.word_freqs',
-                          body=self.wordFreqMapping)
         self.es_ic.create(index=self.name + '.sentences',
                           body=self.sentMapping)
 
@@ -94,7 +94,9 @@ class Indexator:
                     wClean[field] = w[field]
                     if field == 'wf':
                         wClean[field] = wClean[field].lower()
+                        self.wfs.add(wClean[field])
             if 'ana' in w:
+                self.lemmata.add(self.get_lemma(w))
                 wClean['ana'] = []
                 for ana in w['ana']:
                     cleanAna = {}
@@ -124,6 +126,39 @@ class Indexator:
             except KeyError:
                 self.wordDocFreqs[langID][(wID, self.dID)] = 1
 
+    def sort_words(self):
+        """
+        Sort word forms and lemmata stored at earlier stages.
+        Return dictionaries with positions of word forms and
+        lemmata in the sorted list. Delete the original lists.
+        """
+        wfsSorted = {}
+        iOrder = 0
+        for wf in sorted(self.wfs):
+            wfsSorted[wf] = iOrder
+            iOrder += 1
+        self.wfs = None
+        lemmataSorted = {}
+        iOrder = 0
+        for l in sorted(self.lemmata):
+            lemmataSorted[l] = iOrder
+            iOrder += 1
+        self.lemmata = None
+        return wfsSorted, lemmataSorted
+
+    def get_lemma(self, word):
+        """
+        Join all lemmata in the JSON representation of a word with
+        an analysis and return them as a string.
+        """
+        if 'ana' not in word:
+            return ''
+        curLemmata = set()
+        for ana in word['ana']:
+            if 'lex' in ana:
+                curLemmata.add(ana['lex'].lower())
+        return '/'.join(l for l in sorted(curLemmata))
+
     def iterate_words(self):
         """
         Iterate through all words collected at the previous
@@ -133,6 +168,8 @@ class Indexator:
         iWord = 0
         freqsSorted = [[v for v in sorted(self.wordFreqs[langID].values(), reverse=True)]
                        for langID in range(len(self.languages))]
+        wfsSorted, lemmataSorted = self.sort_words()
+
         for langID in range(len(self.languages)):
             quantiles = {}
             for q in [0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.25, 0.5]:
@@ -145,6 +182,14 @@ class Indexator:
                 if iWord % 500 == 0:
                     print('indexing word', iWord)
                 wJson = json.loads(w)
+                wfOrder = len(wfsSorted) + 1
+                if 'wf' in wJson:
+                    wfOrder = wfsSorted[wJson['wf']]
+                lOrder = len(lemmataSorted) + 1
+                if 'ana' in wJson:
+                    lOrder = lemmataSorted[self.get_lemma(wJson)]
+                wJson['wf_order'] = wfOrder
+                wJson['l_order'] = lOrder
                 wJson['freq'] = self.wordFreqs[langID][wID]
                 wJson['sids'] = [sid for sid in sorted(self.wordSIDs[langID][wID])]
                 wJson['dids'] = [did for did in sorted(self.wordDIDs[langID][wID])]
@@ -162,13 +207,17 @@ class Indexator:
                              '_id': iWord,
                              '_source': wJson}
                 yield curAction
+
                 for docID in wJson['dids']:
                     wfreqJson = {'w_id': iWord,
                                  'd_id': docID,
+                                 'wf_order': wfOrder,
+                                 'l_order': lOrder,
                                  'freq': self.wordDocFreqs[langID][(wID, docID)]}
-                    curAction = {'_index': self.name + '.word_freqs',
+                    curAction = {'_index': self.name + '.words',
                                  '_type': 'word_freq',
-                                 '_source': wfreqJson}
+                                 '_source': wfreqJson,
+                                 '_parent': iWord}
                     yield curAction
                 iWord += 1
 

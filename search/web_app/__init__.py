@@ -15,7 +15,7 @@ from .response_processors import SentenceViewer
 
 
 SETTINGS_DIR = '../conf'
-MAX_PAGE_SIZE = 100
+MAX_PAGE_SIZE = 100     # maximum number of sentences per page
 f = open(os.path.join(SETTINGS_DIR, 'corpus.json'), 'r', encoding='utf-8')
 settings = json.loads(f.read())
 f.close()
@@ -27,7 +27,7 @@ supportedLocales = ['ru', 'en']
 sc = SearchClient(SETTINGS_DIR, mode='test')
 sentView = SentenceViewer(SETTINGS_DIR, sc)
 random.seed()
-corpus_size = sc.get_n_words()
+corpus_size = sc.get_n_words()  # size of the corpus in words
 
 
 def jsonp(func):
@@ -72,15 +72,6 @@ def gzipped(f):
     return view_func
 
 
-app = Flask(__name__)
-app.secret_key = 'kkj6hd)^js7#dFQ'
-sessionData = {}    # session key -> dictionary with the data for current session
-app.config.update(dict(
-    LANGUAGES=settings['interface_languages'],
-    BABEL_DEFAULT_LOCALE='en'
-))
-
-
 def nocache(view):
     @wraps(view)
     def no_cache(*args, **kwargs):
@@ -94,7 +85,21 @@ def nocache(view):
     return update_wrapper(no_cache, view)
 
 
+app = Flask(__name__)
+app.secret_key = 'kkj6hd)^js7#dFQ'
+sessionData = {}    # session key -> dictionary with the data for current session
+app.config.update(dict(
+    LANGUAGES=settings['interface_languages'],
+    BABEL_DEFAULT_LOCALE='en'
+))
+
+
 def initialize_session():
+    """
+    Generate a unique session ID and initialize a dictionary with
+    parameters for the current session. Write it to the global
+    sessionData dictionary.
+    """
     global sessionData
     session['session_id'] = str(uuid.uuid4())
     sessionData[session['session_id']] = {'page_size': 10,
@@ -110,6 +115,12 @@ def initialize_session():
 
 
 def get_session_data(fieldName):
+    """
+    Get the value of the fieldName parameter for the current session.
+    If the session has not yet been initialized, initialize it first.
+    If the parameter is supported, but not in the session dictionary,
+    initialize the parameter first.
+    """
     global sessionData
     if 'session_id' not in session:
         initialize_session()
@@ -138,6 +149,10 @@ def get_session_data(fieldName):
 
 
 def set_session_data(fieldName, value):
+    """
+    Set the value of the fieldName parameter for the current session.
+    If the session has not yet been initialized, initialize it first.
+    """
     global sessionData
     if 'session_id' not in session:
         initialize_session()
@@ -147,6 +162,10 @@ def set_session_data(fieldName, value):
 
 
 def in_session(fieldName):
+    """
+    Check if the fieldName parameter exists in the dictionary with
+    parameters for the current session.
+    """
     global sessionData
     if 'session_id' not in session:
         return False
@@ -320,6 +339,9 @@ def update_expanded_contexts(context, neighboringIDs):
 
 @app.route('/search')
 def search_page():
+    """
+    Return HTML of the search page (the main page of the corpus).
+    """
     allLangSearch = settings['all_language_search_enabled']
     if 'transliterations' in settings:
         transliterations = settings['transliterations']
@@ -466,6 +488,10 @@ def para_ids(htmlQuery):
 
 
 def copy_request_args():
+    """
+    Copy the reauest arguments from request.args to a
+    normal modifiable dictionary. Return the dictionary.
+    """
     query = {}
     if request.args is None or len(request.args) <= 0:
         return query
@@ -716,6 +742,8 @@ def search_word_json():
         docIDs = subcorpus_ids(query)
         if docIDs is not None:
             query['doc_ids'] = docIDs
+    else:
+        docIDs = query['doc_ids']
 
     searchIndex = 'words'
     if 'n_words' in query and int(query['n_words']) > 1:
@@ -727,7 +755,10 @@ def search_word_json():
                           query_size=get_session_data('page_size'))
     hits = []
     if searchIndex == 'words':
-        hits = sc.get_words(query)
+        if docIDs is None:
+            hits = sc.get_words(query)
+        else:
+            hits = sc.get_word_freqs(query)
     elif searchIndex == 'sentences':
         for hit in sc.get_all_sentences(query):
             hits.append(hit)
@@ -766,9 +797,15 @@ def search_word():
 
     hitsProcessed = {}
     if searchIndex == 'words':
-        hits = sc.get_words(query)
-        hitsProcessed = sentView.process_word_json(hits, docIDs,
-                                                   translit=get_session_data('translit'))
+        if docIDs is None:
+            hits = sc.get_words(query)
+            hitsProcessed = sentView.process_word_json(hits, docIDs,
+                                                       translit=get_session_data('translit'))
+        else:
+            hits = sc.get_word_freqs(query)
+            hitsProcessed = sentView.process_word_subcorpus_json(hits, docIDs,
+                                                                 translit=get_session_data('translit'))
+
     elif searchIndex == 'sentences':
         hitsProcessed = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0,
                          'total_freq': 0,
@@ -823,6 +860,10 @@ def search_doc():
 
 @app.route('/get_word_fields')
 def get_word_fields():
+    """
+    Return HTML with form inputs representing all additional
+    word-level annotation fields.
+    """
     result = ''
     if 'word_fields' in settings and len(settings['word_fields']) > 0:
         result += '\n'.join(field + ': <input type="text" class="search_input" name="' + field +
@@ -838,13 +879,16 @@ def get_word_fields():
 
 @app.route('/media/<path:path>')
 def send_media(path):
+    """
+    Return the requested media file.
+    """
     return send_from_directory(os.path.join('../media', corpus_name), path)
 
 
 def prepare_results_for_download(pageData):
     """
     Return a list of search results in a format easily transformable
-    to csv/xlsx.
+    to CSV/XLSX.
     """
     result = []
     for page in pageData:
@@ -857,6 +901,10 @@ def prepare_results_for_download(pageData):
 @app.route('/download_cur_results_csv')
 @nocache
 def download_cur_results_csv():
+    """
+    Write all sentences the user has already seen, except the
+    toggled off ones, to a CSV file. Return the contents of the file. 
+    """
     pageData = get_session_data('page_data')
     if pageData is None or len(pageData) <= 0:
         return ''
@@ -867,6 +915,10 @@ def download_cur_results_csv():
 @app.route('/download_cur_results_xlsx')
 @nocache
 def download_cur_results_xlsx():
+    """
+    Write all sentences the user has already seen, except the
+    toggled off ones, to an XSLX file. Return the file. 
+    """
     pageData = get_session_data('page_data')
     if pageData is None or len(pageData) <= 0:
         return ''
@@ -885,6 +937,8 @@ def download_cur_results_xlsx():
 def toggle_sentence(sentNum):
     """
     Togle currently viewed sentence with the given number on or off.
+    The sentences that have been switched off are not written to the
+    CSV/XLSX when the user wants to download the search results.
     """
     pageData = get_session_data('page_data')
     page = get_session_data('page')
@@ -901,8 +955,8 @@ def toggle_sentence(sentNum):
 @app.route('/toggle_doc/<int:docID>')
 def toggle_document(docID):
     """
-    Togle given docID on or off. Documents that were switched off are
-    not included in the search.
+    Togle given docID on or off. The documents that have been switched off
+    are not included in the search.
     """
     excludedDocIDs = get_session_data('excluded_doc_ids')
     nWords = sc.get_n_words_in_document(docId=docID)
@@ -929,6 +983,9 @@ def clear_subcorpus():
 
 @app.route('/get_gramm_selector/<lang>')
 def get_gramm_selector(lang=''):
+    """
+    Return HTML of the grammatical tags selection dialogue for the given language.
+    """
     if lang not in settings['lang_props'] or 'gramm_selection' not in settings['lang_props'][lang]:
         return ''
     grammSelection = settings['lang_props'][lang]['gramm_selection']
@@ -937,6 +994,9 @@ def get_gramm_selector(lang=''):
 
 @app.route('/get_gloss_selector/<lang>')
 def get_gloss_selector(lang=''):
+    """
+    Return HTML of the gloss selection dialogue for the given language.
+    """
     if lang not in settings['lang_props'] or 'gloss_selection' not in settings['lang_props'][lang]:
         return ''
     glossSelection = settings['lang_props'][lang]['gloss_selection']

@@ -52,11 +52,14 @@ class PrepareData:
             }
         }
 
-    def generate_words_mapping(self):
+    def generate_words_mapping(self, wordFreqs=True):
         """
         Return Elasticsearch mapping for the type "word", based
         on searchable features described in word_fields.json and
         categories.json.
+        If wordFreqs is True, also include mapping for the type
+        "word_freq" (this is needed only for the words index, but
+        not for the sentences index).
         """
         m = {'wf': {'type': 'text',
                     'fielddata': True,
@@ -72,7 +75,9 @@ class PrepareData:
              'freq': {'type': 'integer'},
              'rank': {'type': 'keyword'},
              'n_sents': {'type': 'integer'},
-             'n_docs': {'type': 'integer'}
+             'n_docs': {'type': 'integer'},
+             'wf_order': {'type': 'integer'},   # position of the word form in sorted list of word forms
+             'l_order': {'type': 'integer'}     # position of the lemma in sorted list of lemmata
              }
         for field in self.wordFields:
             if self.rxBadField.search(field) is None:
@@ -81,7 +86,12 @@ class PrepareData:
                          for v in lang.values()):
             if self.rxBadField.search(field) is None:
                 m['ana']['properties']['gr.' + field] = {'type': 'keyword'}
-        return {'mappings': {'word': {'properties': m}}, 'settings': self.wfAnalyzer}
+        if not wordFreqs:
+            return {'mappings': {'word': {'properties': m}},
+                    'settings': self.wfAnalyzer}
+        wordFreqMapping = self.generate_wordfreq_mapping()
+        return {'mappings': {'word': {'properties': m}, 'word_freq': wordFreqMapping},
+                'settings': self.wfAnalyzer}
 
     def generate_wordfreq_mapping(self):
         """
@@ -91,8 +101,11 @@ class PrepareData:
         """
         m = {'w_id': {'type': 'integer'},
              'd_id': {'type': 'integer'},
-             'freq': {'type': 'integer'}}
-        return {'mappings': {'word_freq': {'properties': m}}}
+             'freq': {'type': 'integer'},
+             'wf_order': {'type': 'integer'},   # position of the word form in sorted list of word forms
+             'l_order': {'type': 'integer'}     # position of the lemma in sorted list of lemmata
+             }
+        return {'properties': m, '_parent': {'type': 'word'}}
 
     def generate_docs_mapping(self):
         """
@@ -163,14 +176,14 @@ class PrepareData:
         Return Elasticsearch mappings for all types to be used
         in the corpus database.
         """
+        mSentWord = self.generate_words_mapping(wordFreqs=False)
         mWord = self.generate_words_mapping()
-        mSent = self.generate_sentences_mapping(mWord)
+        mSent = self.generate_sentences_mapping(mSentWord)
         mWFreq = self.generate_wordfreq_mapping()
         mDoc = self.generate_docs_mapping()
         mappings = {'docs': mDoc,
                     'sentences': mSent,
-                    'words': mWord,
-                    'word_freqs': mWFreq}
+                    'words': mWord}
         return mappings
 
     def write_mappings(self, fnameOut):
