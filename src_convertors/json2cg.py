@@ -29,6 +29,10 @@ class JSON2CG:
         self.format = self.settings['input_format']
         self.corpus_dir = os.path.join('corpus', self.name)
         self.load_settings()
+        self.nonDisambAnalyses = 0      # number of analyses for analyzed tokens before disambiguation
+        self.disambAnalyses = 0         # number of analyses after disambiguation
+        self.nWords = 0                 # total number of words in the corpus
+        self.nAnalyzedWords = 0         # number of words with at least one analysis
 
     def load_settings(self):
         """
@@ -185,16 +189,20 @@ class JSON2CG:
                 sDisambJSON[k] = copy.deepcopy(v)
         sDisambJSON['words'] = []
         for iWord in range(len(CGWords)):
+            self.nWords += 1
             wordSrc = s['words'][iWord]
             if 'ana' not in wordSrc or len(wordSrc['ana']) <= 0:
                 sDisambJSON['words'].append(copy.deepcopy(wordSrc))
                 continue
+            self.nAnalyzedWords += 1
+            self.nonDisambAnalyses += len(wordSrc['ana'])
             wordDisamb = {}
             for k, v in wordSrc.items():
                 if k != 'ana':
                     wordDisamb[k] = copy.deepcopy(v)
             wordDisamb['ana'] = [copy.deepcopy(wordSrc['ana'][int(iAna)])
                                  for iAna in self.rxCGAna.findall(CGWords[iWord])]
+            self.disambAnalyses += len(wordDisamb['ana'])
             sDisambJSON['words'].append(wordDisamb)
         return sDisambJSON
 
@@ -247,6 +255,7 @@ class JSON2CG:
         of the languages, just copy the source JSON file to the new
         directory.
         """
+        self.nWords = self.nAnalyzedWords = self.nonDisambAnalyses = self.disambAnalyses = 0
         iDoc = 0
         jsonDirIn = os.path.join(self.corpus_dir, 'json')
         jsonDirOut = os.path.join(self.corpus_dir, 'json_disamb')
@@ -291,7 +300,12 @@ class JSON2CG:
             json.dump(docJSONDisamb, fp=fJsonOut,
                       ensure_ascii=False, indent=self.settings['json_indent'])
             iDoc += 1
-        print('Disambiguation finished,', iDoc, 'documents disambiguated.')
+        print('Disambiguation finished,', iDoc, 'documents disambiguated,',
+              self.nWords, 'words total,', self.nAnalyzedWords, 'words analyzed,',
+              (self.nonDisambAnalyses + 1) / (self.nAnalyzedWords + 1),
+              'analyses per analyzed word before disambiguation,',
+              (self.disambAnalyses + 1) / (self.nAnalyzedWords + 1),
+              'analyses per analyzed word after disambiguation.')
 
     def process_corpus(self):
         """

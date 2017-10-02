@@ -639,7 +639,16 @@
     "subj": "mood",
     "abbr": "additional",
     "rus": "additional",
-    "oblin": "n_deriv"
+    "oblin": "n_deriv",
+    "intr": "v_subcat",
+    "tr": "v_subcat",
+    "with_instr": "v_subcat",
+    "with_dat": "v_subcat",
+    "with_el": "v_subcat",
+    "with_ill": "v_subcat",
+    "with_gen2": "v_subcat",
+    "impers": "v_subcat",
+    "with_inf": "v_subcat"
   },
   "russian": {
     "1p": "pers",
