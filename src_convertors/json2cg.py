@@ -13,7 +13,7 @@ class JSON2CG:
     Constraint Grammar format for subsequent disambiguation and
     backwards.
     """
-    SETTINGS_DIR = '../conf'
+    SETTINGS_DIR = 'conf'
     rxCGWords = re.compile('"<[^<>]*>"\n(?:\t[^\n]*\n)*', flags=re.DOTALL)
     rxCGAna = re.compile('<ana_([0-9]+)>', flags=re.DOTALL)
 
@@ -23,12 +23,14 @@ class JSON2CG:
         self.settings = json.loads(f.read())
         f.close()
         self.name = self.settings['corpus_name']
+        self.corpus_dir = os.path.join('corpus', self.name)
+        self.load_settings()
+        self.format = 'json'
+        if self.settings['gzip']:
+            self.format = 'json-gzip'
         self.languages = self.settings['languages']
         if len(self.languages) <= 0:
             self.languages = [self.name]
-        self.format = self.settings['input_format']
-        self.corpus_dir = os.path.join('corpus', self.name)
-        self.load_settings()
         self.nonDisambAnalyses = 0      # number of analyses for analyzed tokens before disambiguation
         self.disambAnalyses = 0         # number of analyses after disambiguation
         self.nWords = 0                 # total number of words in the corpus
@@ -170,8 +172,17 @@ class JSON2CG:
                 fullFnameIn = os.path.abspath(os.path.join(langDirIn, fname))
                 fullFnameOut = os.path.abspath(os.path.join(langDirOut, fname))
                 cgCmd = 'cg3 -g "' + fullGrammarFname + '" -I "' + fullFnameIn + '" -O "' + fullFnameOut + '"'
-                output = subprocess.Popen(cgCmd, shell=True,
-                                          stdout=subprocess.PIPE).stdout.read()
+                proc = subprocess.Popen('cg3 -g "' + fullGrammarFname + '"',
+                                        stdin=subprocess.PIPE,
+                                        stdout=subprocess.PIPE)
+                fIn = open(fullFnameIn, 'r', encoding='utf-8-sig')
+                text = fIn.read()
+                fIn.close()
+                text, err = proc.communicate(text.encode('utf-8'))
+                proc.wait()
+                fOut = open(fullFnameOut, 'w', encoding='utf-8')
+                fOut.write(text.decode('utf-8').replace('\r', '\n').replace('\n\n', '\n'))
+                fOut.close()
         print('CG disambiguation finished.')
 
     def disambiguate_sentence(self, s, sDisambCG):
