@@ -22,6 +22,7 @@ class Xml_Flex2JSON(Txt2JSON):
         self.grammRules = []
         self.posRules = {}
         self.load_rules()
+        self.POSTags = set()    # All POS tags encountered in the XML
     
     def load_rules(self):
         """
@@ -133,6 +134,7 @@ class Xml_Flex2JSON(Txt2JSON):
         Make and return a JSON analysis out of the glossing in the gls node
         and the segmentation into morphs.
         """
+        # TODO: Not ready yet!
         if glsNode.text is None or len(glsNode.text) <= 0 or len(parts) <= 0:
             return {}
         anaJSON = {'parts': '', 'gloss': ''}
@@ -148,6 +150,64 @@ class Xml_Flex2JSON(Txt2JSON):
                 curGlossList.append(glossesList[i].strip('-=:.'))
             else:
                 self.process_stem(partsList[i], glossesList[i], anaJSON, curGlossList)
+
+    def ana_from_morphemes(self, mNode, parts):
+        """
+        Make and return a JSON analysis out of the glossing in the morphemes
+        node.
+        """
+        # TODO: Not ready yet!
+        anaJSON = {'parts': '', 'gloss': ''}
+        curGlossList = []
+        for morph in mNode:
+            if morph.tag != 'morph':
+                continue
+            if 'type' not in morph.attrib:
+                continue    # TODO: that other format
+            morphType = morph.attrib['type']
+            for element in morph:
+                if element.tag == 'item' and 'type' in element.attrib:
+                    if element.attrib['type'] in ['mb', 'txt']:
+                        if element.text is None:
+                            element.text = ' '
+                        anaJSON['parts'] += element.text
+                        lastPart = element.text
+                    elif element.attrib['type'] == 'gls':
+                        if ('lang' in element.attrib
+                                and element.attrib['lang'] in self.corpusSettings['bad_analysis_languages']):
+                            continue
+                        if element.text is None:
+                            element.text = ' '
+                        gloss = element.text
+                        if (morphType == 'stem'
+                                or (morphType == 'unknown' and element.text not in self.glossList)):
+                            self.process_stem(lastPart, element.text, anaJSON, curGlossList)
+                        else:
+                            if (morphType == 'prefix' and len(gloss) > 0
+                                    and gloss[-1] not in '-=:.'):
+                                gloss += '-'
+                            elif (morphType == 'suffix' and len(gloss) > 0
+                                    and gloss[0] not in '-=:.'):
+                                gloss = '-' + gloss
+                            elif (morphType == 'enclitic' and len(gloss) > 0
+                                    and gloss[0] not in '-=:.'):
+                                gloss = '=' + gloss
+                            elif (morphType == 'proclitic' and len(gloss) > 0
+                                    and gloss[-1] not in '-=:.'):
+                                gloss += '='
+                            self._glossWithoutStem += gloss
+                            curGlossList.append(gloss.strip('-=:.'))
+                        anaJSON['gloss'] += gloss
+                    elif element.attrib['type'] == 'msa' and morphType == 'stem':
+                        if element.text is None:
+                            element.text = ' '
+                        grdic = element.text.strip().replace('.', ' ')
+                        self.POSTags.add(grdic)
+                        if grdic in self.posRules:
+                            grdic = self.posRules[grdic]
+                        if len(self.grdic) > 0:
+                            self.grdic += ' '
+                        self.grdic += grdic
 
     def process_word_node(self, wordNode):
         """
