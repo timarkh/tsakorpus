@@ -592,7 +592,7 @@ class SentenceViewer:
             hitsProcessed['n_sentences'] += 1
             hitsProcessed['doc_ids'].add(hit['_source']['doc_id'])
 
-    def process_words_collected_from_sentences(self, hitsProcessed):
+    def process_words_collected_from_sentences(self, hitsProcessed, sortOrder='freq', pageSize=10):
         """
         Process all words collected from the sentences with a multi-word query.
         """
@@ -605,8 +605,12 @@ class SentenceViewer:
             hitsProcessed['words'].append(word)
         del hitsProcessed['word_jsons']
         self.calculate_ranks(hitsProcessed)
+        if sortOrder == 'freq':
+            hitsProcessed['words'].sort(key=lambda w: (-w['_source']['freq'], w['_source']['wf']))
+        elif sortOrder == 'wf':
+            hitsProcessed['words'].sort(key=lambda w: w['_source']['wf'])
         hitsProcessed['words'] = [self.process_word(word, lang=word['_source']['lang'])
-                                  for word in hitsProcessed['words']]
+                                  for word in hitsProcessed['words'][:pageSize]]
 
     def calculate_ranks(self, hitsProcessed):
         """

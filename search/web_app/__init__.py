@@ -860,7 +860,9 @@ def search_word():
         for hit in sc.get_all_sentences(query):
             sentView.add_word_from_sentence(hitsProcessed, hit, nWords=nWords)
         hitsProcessed['n_docs'] = len(hitsProcessed['doc_ids'])
-        sentView.process_words_collected_from_sentences(hitsProcessed)
+        sentView.process_words_collected_from_sentences(hitsProcessed,
+                                                        sortOrder=get_session_data('sort'),
+                                                        pageSize=get_session_data('page_size'))
 
     hitsProcessed['media'] = settings['media']
     return render_template('result_words.html', data=hitsProcessed)
