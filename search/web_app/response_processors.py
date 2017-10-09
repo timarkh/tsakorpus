@@ -577,17 +577,20 @@ class SentenceViewer:
             for word in hit['inner_hits'][w1_label]['hits']['hits']:
                 hitsProcessed['total_freq'] += 1
                 word['_source']['lang'] = lang
-                wordJson = json.dumps({k: v for k, v in word['_source'].items() if k in ('ana', 'wf', 'lang')},
-                                      sort_keys=True)
+                # wordJson = json.dumps({k: v for k, v in word['_source'].items() if k in ('ana', 'wf', 'lang')},
+                #                       sort_keys=True)
+                wID = word['_source']['w_id']
+                wf = word['_source']['wf'].lower()
                 try:
-                    hitsProcessed['word_jsons'][wordJson]['n_occurrences'] += 1
-                    hitsProcessed['word_jsons'][wordJson]['n_sents'] += 1
-                    hitsProcessed['word_jsons'][wordJson]['doc_ids'].add(hit['_source']['doc_id'])
+                    hitsProcessed['word_ids'][wID]['n_occurrences'] += 1
+                    hitsProcessed['word_ids'][wID]['n_sents'] += 1
+                    hitsProcessed['word_ids'][wID]['doc_ids'].add(hit['_source']['doc_id'])
                 except KeyError:
                     hitsProcessed['n_occurrences'] += 1
-                    hitsProcessed['word_jsons'][wordJson] = {'n_occurrences': 1,
-                                                             'n_sents': 1,
-                                                             'doc_ids': {hit['_source']['doc_id']}}
+                    hitsProcessed['word_ids'][wID] = {'n_occurrences': 1,
+                                                      'n_sents': 1,
+                                                      'doc_ids': {hit['_source']['doc_id']},
+                                                      'wf': wf}
         if bRelevantWordExists:
             hitsProcessed['n_sentences'] += 1
             hitsProcessed['doc_ids'].add(hit['_source']['doc_id'])
@@ -596,21 +599,26 @@ class SentenceViewer:
         """
         Process all words collected from the sentences with a multi-word query.
         """
-        for wordJson, freqData in hitsProcessed['word_jsons'].items():
-            word = {'_source': json.loads(wordJson)}
+        for wID, freqData in hitsProcessed['word_ids'].items():
+            word = {'w_id': wID, '_source': {'wf': freqData['wf']}}
             word['_source']['freq'] = freqData['n_occurrences']
             word['_source']['rank'] = ''
             word['_source']['n_sents'] = freqData['n_sents']
             word['_source']['n_docs'] = len(freqData['doc_ids'])
             hitsProcessed['words'].append(word)
-        del hitsProcessed['word_jsons']
+        del hitsProcessed['word_ids']
         self.calculate_ranks(hitsProcessed)
         if sortOrder == 'freq':
             hitsProcessed['words'].sort(key=lambda w: (-w['_source']['freq'], w['_source']['wf']))
         elif sortOrder == 'wf':
             hitsProcessed['words'].sort(key=lambda w: w['_source']['wf'])
-        hitsProcessed['words'] = [self.process_word(word, lang=word['_source']['lang'])
-                                  for word in hitsProcessed['words'][:pageSize]]
+        processedWords = []
+        for i in range(min(len(hitsProcessed['words']), pageSize)):
+            word = hitsProcessed['words'][i]
+            wordSource = self.sc.get_word_by_id(word['w_id'])['hits']['hits'][0]['_source']
+            word['_source'].update(wordSource)
+            processedWords.append(self.process_word(word, lang=self.settings['languages'][word['_source']['lang']]))
+        hitsProcessed['words'] = processedWords
 
     def calculate_ranks(self, hitsProcessed):
         """

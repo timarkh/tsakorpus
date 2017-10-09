@@ -82,6 +82,7 @@ class Indexator:
         """
         Take words list from a sentence, remove all non-searchable
         fields from them and add them to self.words dictionary.
+        Add w_id property to each word of the words list.
         """
         for w in words:
             if w['wtype'] != 'word':
@@ -110,6 +111,7 @@ class Indexator:
             else:
                 wID = len(self.tmpWordIDs[langID])
                 self.tmpWordIDs[langID][wCleanTxt] = wID
+            w['w_id'] = wID
 
             try:
                 self.wordFreqs[langID][wID] += 1

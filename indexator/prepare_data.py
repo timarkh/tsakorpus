@@ -130,6 +130,8 @@ class PrepareData:
         on searchable features described in word_fields.json and
         categories.json.
         """
+        wordProps = word_mapping['mappings']['word']['properties']
+        wordProps['w_id'] = {'type': 'integer'}
         m = {'prev_id': {'type': 'integer'},
              'next_id': {'type': 'integer'},
              'doc_id': {'type': 'integer'},

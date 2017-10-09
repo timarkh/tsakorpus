@@ -1,8 +1,8 @@
 {
-  "corpus_name": "beserman_eaf",
+  "corpus_name": "albanian",
   "input_format": "json",
   "debug": true,
-  "media": true,
+  "media": false,
   "media_length": 60,
   "max_context_expand": 4,
   "max_distance_filter": 200000,
@@ -11,12 +11,11 @@
   "query_timeout": 20,
   "viewable_meta": [
     "filename",
-    "title",
-    "speakers",
-    "linguists",
+    "title"
     "genre",
     "year1",
-    "year2"
+    "year2",
+    "issue"
   ],
   "sentence_meta": [
     "year",
@@ -65,6 +64,16 @@
         "tense": "(pst|fut|aux)",
         "adj": "(два|три|четыре|пять|сто|большой|старый|новый)",
         "sfx": "(re|ill|el|cont)"
+      }
+    },
+    "albanian":
+    {
+      "gloss_shortcuts": {
+      },
+      "gr_fields_order": ["tense", "mood", "person", "number", "case"],
+      "gloss_selection": {
+        "columns": [
+        ]
       }
     },
     "nganasan":
