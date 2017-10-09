@@ -1,7 +1,9 @@
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
 from elasticsearch.helpers import bulk
+from elasticsearch.exceptions import RequestError
 import json
+import ijson
 import os
 import time
 import math
@@ -308,16 +310,34 @@ class Indexator:
             meta['n_words_' + str(i)] = self.numWordsLang[i]
         self.numWords = 0
         self.numWordsLang = [0] * len(self.languages)
-        self.es.index(index=self.name + '.docs',
-                      doc_type='doc',
-                      id=self.dID,
-                      body=meta)
+        try:
+            self.es.index(index=self.name + '.docs',
+                          doc_type='doc',
+                          id=self.dID,
+                          body=meta)
+        except RequestError as err:
+            print('Metadata error: {0}'.format(err))
+            shortMeta = {}
+            if 'filename' in meta:
+                shortMeta['filename'] = meta['filename']
+            if 'title' in meta:
+                shortMeta['title'] = meta['title']
+                self.es.index(index=self.name + '.docs',
+                              doc_type='doc',
+                              id=self.dID,
+                              body=shortMeta)
         self.dID += 1
 
     def index_dir(self):
         """
-        Index all files from the corpus directory.
+        Index all files from the corpus directory, sorted by their size
+        in decreasing order. Such sorting helps prevent memory errors
+        when indexing large corpora, as the default behavior is to load
+        the whole file is into memory, and there is more free memory
+        in the beginning of the process. If MemoryError occurs, the
+        iterative JSON parser is used, which works much slower.
         """
+        filenames = []
         for root, dirs, files in os.walk(self.corpus_dir):
             for fname in files:
                 if (not ((self.settings['input_format'] == 'json'
@@ -326,8 +346,11 @@ class Indexator:
                              and fname.lower().endswith('.json.gz')))):
                     continue
                 fnameFull = os.path.join(root, fname)
-                bulk(self.es, self.iterate_sentences(fnameFull), chunk_size=300)
-                self.index_doc(fnameFull)
+                filenames.append((fnameFull, os.path.getsize(fnameFull)))
+        for fname, fsize in sorted(filenames, key=lambda p: -p[1]):
+            print(fname, fsize)
+            bulk(self.es, self.iterate_sentences(fname), chunk_size=300)
+            self.index_doc(fname)
         self.index_words()
 
     def load_corpus(self):

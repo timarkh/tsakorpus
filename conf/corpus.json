@@ -1,6 +1,6 @@
 {
   "corpus_name": "albanian",
-  "input_format": "json",
+  "input_format": "json-gzip",
   "debug": true,
   "media": false,
   "media_length": 60,
@@ -11,7 +11,7 @@
   "query_timeout": 20,
   "viewable_meta": [
     "filename",
-    "title"
+    "title",
     "genre",
     "year1",
     "year2",
@@ -44,7 +44,7 @@
   [
     "trans_ru"
   ],
-  "languages": ["beserman", "russian"],
+  "languages": ["albanian"],
   "transliterations": ["original", "cyrillic"],
   "interface_languages": {"en": "English", "ru": "Russian"},
   "all_language_search_enabled": true,
