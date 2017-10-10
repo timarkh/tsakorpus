@@ -10,6 +10,7 @@ import random
 import uuid
 import math
 import xlsxwriter
+import time
 from search_engine.client import SearchClient
 from .response_processors import SentenceViewer
 
@@ -464,10 +465,21 @@ def get_doc_ids_for_metafield(fieldName, docIDs=None, maxBuckets=300):
     hits = sc.get_docs(esQuery)
     if 'aggregations' not in hits or 'metafield' not in hits['aggregations']:
         return {}
-    buckets = {}
+    buckets = []
     for bucket in hits['aggregations']['metafield']['buckets']:
-        buckets[bucket['key']] = {'n_docs': bucket['doc_count'],
-                                  'n_words': bucket['subagg_n_words']['value']}
+        bucketListItem = {'name': bucket['key'],
+                          'n_docs': bucket['doc_count'],
+                          'n_words': bucket['subagg_n_words']['value']}
+        buckets.append(bucketListItem)
+    buckets.sort(key=lambda b: (-b['n_words'], -b['n_docs'], b['name']))
+    if len(buckets) > 25:
+        bucketsFirst = buckets[:25]
+        lastBucket = {'name': '>>', 'n_docs': 0, 'n_words': 0}
+        for i in range(25, len(buckets)):
+            lastBucket['n_docs'] += buckets[i]['n_docs']
+            lastBucket['n_words'] += buckets[i]['n_words']
+        bucketsFirst.append(lastBucket)
+        buckets = bucketsFirst
     return buckets
 
 
@@ -478,6 +490,8 @@ def get_doc_stats(metaField):
     of corpus documents by values of one metafield. This function
     can be used to visualise (sub)corpus composition.
     """
+    if metaField not in settings['viewable_meta']:
+        return jsonify({})
     query = copy_request_args()
     change_display_options(query)
     docIDs = subcorpus_ids(query)
@@ -766,16 +780,32 @@ def get_sent_context(n):
 def search_word_query():
     query = copy_request_args()
     change_display_options(query)
-
     if 'doc_ids' not in query:
         docIDs = subcorpus_ids(query)
         if docIDs is not None:
             query['doc_ids'] = docIDs
+    else:
+        docIDs = query['doc_ids']
+
+    searchIndex = 'words'
+    sortOrder = get_session_data('sort')
+    queryWordConstraints = None
+    nWords = 1
+    if 'n_words' in query and int(query['n_words']) > 1:
+        nWords = int(query['n_words'])
+        searchIndex = 'sentences'
+        sortOrder = 'random'  # in this case, the words are sorted after the search
+        wordConstraints = sc.qp.wr.get_constraints(query)
+        set_session_data('word_constraints', wordConstraints)
+        if (len(wordConstraints) > 0
+                and get_session_data('distance_strict')):
+            queryWordConstraints = wordConstraints
 
     query = sc.qp.html2es(query,
                           searchOutput='words',
-                          sortOrder=get_session_data('sort'),
-                          query_size=get_session_data('page_size'))
+                          sortOrder=sortOrder,
+                          query_size=get_session_data('page_size'),
+                          distances=queryWordConstraints)
     return jsonify(query)
 
 
@@ -825,11 +855,13 @@ def search_word():
         docIDs = query['doc_ids']
 
     searchIndex = 'words'
+    sortOrder = get_session_data('sort')
     queryWordConstraints = None
     nWords = 1
     if 'n_words' in query and int(query['n_words']) > 1:
         nWords = int(query['n_words'])
         searchIndex = 'sentences'
+        sortOrder = 'random'    # in this case, the words are sorted after the search
         wordConstraints = sc.qp.wr.get_constraints(query)
         set_session_data('word_constraints', wordConstraints)
         if (len(wordConstraints) > 0
@@ -838,10 +870,12 @@ def search_word():
 
     query = sc.qp.html2es(query,
                           searchOutput='words',
-                          sortOrder=get_session_data('sort'),
+                          sortOrder=sortOrder,
+                          randomSeed=get_session_data('seed'),
                           query_size=get_session_data('page_size'),
                           distances=queryWordConstraints)
 
+    maxRunTime = time.time() + settings['query_timeout']
     hitsProcessed = {}
     if searchIndex == 'words':
         if docIDs is None:
@@ -859,6 +893,9 @@ def search_word():
                          'words': [], 'doc_ids': set(), 'word_ids': {}}
         for hit in sc.get_all_sentences(query):
             sentView.add_word_from_sentence(hitsProcessed, hit, nWords=nWords)
+            if hitsProcessed['total_freq'] >= 2000 and time.time() > maxRunTime:
+                hitsProcessed['timeout'] = True
+                break
         hitsProcessed['n_docs'] = len(hitsProcessed['doc_ids'])
         sentView.process_words_collected_from_sentences(hitsProcessed,
                                                         sortOrder=get_session_data('sort'),

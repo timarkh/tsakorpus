@@ -4,7 +4,7 @@ All configuration files for the search interface and indexator are stored in the
 ### corpus.json
 The following parameters (dictionary keys) are recognized in corpus.json:
 
-* ``corpus_name`` -- the name of the corpus, which determines the name of ElasticSearch indexes used for indexing or searching. The indexes used by the corpus are ``%corpus_name%.docs``, ``%corpus_name%.words``, ``%corpus_name%.word_freqs`` and ``%corpus_name%.sentences``.
+* ``corpus_name`` -- the name of the corpus, which determines the name of Elasticsearch indexes used for indexing or searching. The indexes used by the corpus are ``%corpus_name%.docs``, ``%corpus_name%.words`` and ``%corpus_name%.sentences``.
 
 * ``input_format`` -- determines which format the input files have and which input processor should be used when indexing. Currently supports "json" (tsakorpus JSON files) and "json-gzip" (gzipped tsakorpus JSON files).
 
@@ -16,15 +16,19 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``max_context_expand`` -- an integer that determines how many times the user may expand a context from search results, which can be important if there are copyright restrictions on the texts. Negative values mean unlimited expanding.
 
-* ``query_timeout`` -- an integer that determines the upper bound on sentence search query execution in seconds.
+* ``query_timeout`` -- an integer that determines the upper bound on sentence search query execution in seconds. This bound is applied stricly for the Elasticsearch query execution and not so strictly when postprocessing results found by Elasticsearch.
 
 * ``max_distance_filter``. When the user specifies distances between search terms in the query and clicks "the distance requirements are strict" checkbox, and the distance constraints are sufficiently complex (there is no single word in their intersection), tsakorpus first gets the search results for the same query without restrictions and then filters them one by one to leave out those that do not satisfy the restrictions. If the raw search result count is too high, this may take significant time and memory. This parameter determines the maximum raw search result count that allows further filtering. Negative values mean no threshold. If your entire corpus has less than 100,000 sentences, it is probably safe to turn off the threshold, but with larger corpora I recommend checking if no threshold is ok for your server.
 
-* ``max_words_in_sentence``. When building a multi-word query with specific distances or distance ranges between the search terms, tsakorpus has to produce a huge query of the kind "(word1 is blah-blah-blah and its index in the sentence is 0, word2 is blah-blah and its index in the sentence is 1 or 2) or (word1 is blah-blah-blah and its index in the sentence is 1, word2 is blah-blah and its index in the sentence is 2 or 3) or ...". The reason for that is that there is no way to impose distance constraints when looking inside a list in elasticsearch, as the lists are interpreted as mere sacks with values. The integer ``max_words_in_sentence`` defines which sentence positions should be enumerated in multi-word queries. This is not an actual upper bound on the sentence length (there is none), but the tails of longer sentences will not be available for some multi-word queries.
+* ``max_words_in_sentence``. When building a multi-word query with specific distances or distance ranges between the search terms, tsakorpus has to produce a huge query of the kind "(word1 is blah-blah-blah and its index in the sentence is 0, word2 is blah-blah and its index in the sentence is 1 or 2) or (word1 is blah-blah-blah and its index in the sentence is 1, word2 is blah-blah and its index in the sentence is 2 or 3) or ...". The reason for that is that there is no way to impose distance constraints when looking inside a list in Elasticsearch, as the lists are interpreted as mere sacks with values. The integer ``max_words_in_sentence`` defines which sentence positions should be enumerated in multi-word queries. This is not an actual upper bound on the sentence length (there is none), but the tails of longer sentences will not be available for some multi-word queries.
 
 * ``viewable_meta`` -- list with names of the document-level metainformation fields that should be shown in search results.
 
 * ``sentence_meta`` -- list with names of the sentence-level metainformation fields that should be available in word-level search queries.
+
+* ``search_meta`` -- dictionary with the description of what should appear on different tabs of the "Select subcorpus" dialogue:
+ * ``search_meta.columns`` -- array with column-by column description of what options should appear on the "Specify parameters" tab;
+ * ``search_meta.stat_options`` -- array with the names of the metafields that should be available for plotting statistics on the "Subcorpus statistics" tab.
 
 * ``word_fields`` -- list with names of the word-level analysis fields that should be available in word-level search queries. These include all fields that can occur inside the ``ana`` nested objects, except ``lex``, ``parts``, ``gloss`` and the grammatical fields that start with ``gr.``.
 

@@ -1,4 +1,7 @@
-﻿<p>{{ _('Search result:') }} {{ data.n_occurrences }} {{ _('different words in approximately') }} {{ data.n_docs }} {{ _('document(s) found,') }} {{ _('total frequency:') }} {{ data.total_freq }}.</p>
+﻿{% if data.timeout %}
+<p class="message">The search was not finished due to the query timeout. You only see partial results.</p>
+{% endif %}
+<p>{{ _('Search result:') }} {{ data.n_occurrences }} {{ _('different words in approximately') }} {{ data.n_docs }} {{ _('document(s) found,') }} {{ _('total frequency:') }} {{ data.total_freq }}.</p>
 <div class="word_results">
 <table class="words_list_table">
 <thead><th>{{ _('word_th_word') }}</th><th>{{ _('word_th_frequency') }}</th><th>{{ _('word_th_freq. rank / quantile') }}</th><th>{{ _('word_th_# sentences') }}</th><th>{{ _('word_th_# documents') }}</th><th>{{ _('word_th_search in corpus') }}</th></thead>

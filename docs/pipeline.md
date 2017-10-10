@@ -24,13 +24,32 @@ Before you run a convertor, you have to adjust settings in the ``src_convertors/
 ### Indexing
 In order to index a copus, you have to adjust settings in the ``conf`` directory (see configuration.md) and put the source JSON or gzipped JSON filed to ``corpus/%corpus_name%``. It is important to choose a unique name for the corpus, as it defines the names of the elasticsearch database indexes where it is stored. Since there is no authorization in elasticsearch, accidentally choosing a name coinciding with another corpus that already exists on the server will lead to the destruction of the latter, even if it was not yours.
 
-After these preliminary steps, you have to launch ``indexator/indexator.py`` and wait until it reports that the corpus has been successfully indexed or that something went wrong. The indexator basically transfers the source JSON files to the database with minor technical additions. Besides, it calculates statistics such as word frequencies, which it also puts to the database. In the course of indexing, it stores all word types with their statistics in the memory, which can lead to huge memory consumption in the case of large corpora (>> 10 million tokens).
+After these preliminary steps, you have to launch ``indexator/indexator.py`` and wait until it reports that the corpus has been successfully indexed or that something went wrong. The indexator basically transfers the source JSON files to the database with minor technical additions. Besides, it calculates statistics such as word frequencies, which it also puts to the database. In the course of indexing, it stores all word types with their statistics in the memory, which can lead to huge memory consumption in the case of large corpora (>> 50 million tokens; see the subsection below).
 
 The indexator creates following elasticsearch indexes:
 
 * ``%corpus_name%.sentences`` -- main index: all sentences of the corpus;
 * ``%corpus_name%.docs`` -- metadata for corpus documents;
 * ``%corpus_name%.words`` -- contains two types, ``word`` and ``word_freq``. The instances of the former are all word types with statistics (identical word forms with different annotations are considered different types). Each instance of the latter contains frequency statictics for each (word, document) tuple.
+
+#### Memory and disk space consumption
+(If your corpus contains less than 1 million tokens or 100,000 sentences, you may safely skip this subsection.)
+
+During the indexation phase, there are following primary causes of memory consumption:
+
+* Elasticsearch server which processes requests of the Python indexator;
+* The word types which are temporarily stored in memory by the indexator until the entire corpus has been indexed;
+* The source JSON documents, each of which is normally first read and loaded into memory, and only then processed.
+
+Loading a source JSON document may require significantly more memory than it takes to store it on a hard drive. Consequently, loading large documents (> 100 Mb, which can happen in the case of e.g. long novels with heavy annotation) may lead to memory errors. If a memory error occurs, the file will still be indexed, but a much slower iterative JSON parser (ijson) will be used to process it.
+
+Memory consumed by Elasticsearch does not depend on the size of the corpus, but normally it occupies 1.5-2 Gb of memory (unless you changed it in the Elasticsearch settings).
+
+Memory consumed by the indexator itself non-linearly depends on several parameters (number of tokens, number of sentences and number of documents), but for the sake of simplicity it can be thought of as depending on the number of tokens more or less linearly. The constant depends, of course, on the amount of annotation you have. In case of full morphological annotation, a ratio of 50-75 Mb per million tokens (for corpora containing 10-50 million tokens) can be expected.
+
+The disk space required by the index depends primarily on the size of the corpus. Again, in case of full morphological annotation, you can expect 1 million tokens to take 0.5-0.7 Gb of disk space.
+
+The time needed to index a corpus may vary significantly depending on the amount of annotation and your hardware characteristics. Very roughly, you can expect 5-10 minutes per million tokens on an ordinary desktop computer.
 
 ### Running tsakorpus
 You can use tsakorpus either locally or as a web service available from outside. In the first case, it is sufficient to run tsakorpus.wsgi as a Python file. This will start a flask web-server, after which the corpus will be accessible at <http://127.0.0.1:7342/search>.

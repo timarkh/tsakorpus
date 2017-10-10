@@ -212,7 +212,7 @@ class InterfaceQueryParser:
             return {'regexp': {field: word}}
 
     def make_nested_query(self, query, nestedPath, queryName='', highlightFields=None,
-                          sortOrder=''):
+                          sortOrder='', searchOutput='sentences'):
         if sortOrder != 'random':
             esQuery = {'nested': {'path': nestedPath,
                                   'query': {'constant_score': {'query': query, 'boost': 1}},
@@ -220,7 +220,8 @@ class InterfaceQueryParser:
         else:
             esQuery = {'nested': {'path': nestedPath,
                                   'query': query}}
-        if highlightFields is not None:
+        if highlightFields is not None and (searchOutput == 'sentences'
+                                            or (queryName == 'w1' or queryName.startswith('w1_'))):
             esQuery['nested']['inner_hits'] = {'highlight':
                                                {'fields':
                                                 {f: {'number_of_fragments': 50,
@@ -324,7 +325,9 @@ class InterfaceQueryParser:
                 else:
                     queryWordsAna = {'bool': {'must': list(queryDictWordsAna.values())}}
                 query.append(self.make_nested_query(queryWordsAna, nestedPath='ana',
-                                                    sortOrder=sortOrder))
+                                                    sortOrder=sortOrder,
+                                                    searchOutput='words'
+                                                    ))
             if len(queryDictWords) > 0:
                 if len(queryDictWords) == 1:
                     queryWords = list(queryDictWords.values())[0]
@@ -380,14 +383,17 @@ class InterfaceQueryParser:
         return query
 
     def single_word_sentence_query(self, queryDict, queryWordNum, sortOrder,
-                                   negative=False, sentIndexQuery=None, highlightedWordSubindex=None):
+                                   negative=False, sentIndexQuery=None,
+                                   highlightedWordSubindex=None,
+                                   searchOutput='sentences'):
         """
         Make a part of the full sentence query that contains
         a query for a single word, taking a dictionary with
         bool queries as input.
         sentIndexQuery may be None (no restriction on the index the
         word should have in the sentence), non-negative integer
-        (match sentence index), negative integer 
+        (match sentence index), negative integer.
+        If searchOutput is 'words', highlight only the first word.
         """
 
         wordAnaFields = {'words.ana.lex', 'words.ana.gr', 'words.ana.gloss_index'}
@@ -422,13 +428,15 @@ class InterfaceQueryParser:
                                                                      nestedPath='words.ana',
                                                                      queryName=queryName,
                                                                      highlightFields=['words.ana'],
-                                                                     sortOrder=sortOrder)
+                                                                     sortOrder=sortOrder,
+                                                                     searchOutput=searchOutput)
             else:
                 query.append(self.make_nested_query(queryWordsAna,
                                                     nestedPath='words.ana',
                                                     queryName=queryName,
                                                     highlightFields=['words.ana'],
-                                                    sortOrder=sortOrder))
+                                                    sortOrder=sortOrder,
+                                                    searchOutput=searchOutput))
         if len(queryDictWords) > 0:
             if len(queryDictWords) == 1:
                 queryWords = list(queryDictWords.values())[0]
@@ -438,12 +446,15 @@ class InterfaceQueryParser:
                                                 nestedPath='words',
                                                 queryName=queryName,
                                                 highlightFields=['words'],
-                                                sortOrder=sortOrder))
+                                                sortOrder=sortOrder,
+                                                searchOutput=searchOutput
+                                                ))
         if negative:
             return [{'bool': {'must_not': query}}]
         return query
 
-    def multiple_words_sentence_query(self, queryDict, sortOrder='random', distances=None):
+    def multiple_words_sentence_query(self, queryDict, sortOrder='random', distances=None,
+                                      searchOutput='sentences'):
         """
         Build the main part of a sentence query. If the query is multi-word,
         call single word query maker for each word and combine single word
@@ -453,7 +464,8 @@ class InterfaceQueryParser:
         if len(queryDict['words']) <= 1:
             wordDesc, negQuery = queryDict['words'][0]
             return self.single_word_sentence_query(wordDesc, 1, sortOrder,
-                                                   negative=negQuery)
+                                                   negative=negQuery,
+                                                   searchOutput=searchOutput)
         else:
             nPivotalTerm, constraints = self.wr.find_pivotal_term(distances)
             for pivotalTermIndex in range(self.settings['max_words_in_sentence']):
@@ -481,7 +493,8 @@ class InterfaceQueryParser:
                     distanceQueryTuple += self.single_word_sentence_query(wordDesc, iQueryWord + 1, sortOrder,
                                                                           negative=negQuery,
                                                                           sentIndexQuery=curSentIndex,
-                                                                          highlightedWordSubindex=pivotalTermIndex)
+                                                                          highlightedWordSubindex=pivotalTermIndex,
+                                                                          searchOutput=searchOutput)
                 distanceQueryTuples.append(distanceQueryTuple)
             if len(distanceQueryTuples) == 1:
                 return distanceQueryTuples[0]
@@ -515,7 +528,8 @@ class InterfaceQueryParser:
                 queryFilter = []
 
             # Add all word requirements to the query:
-            query += self.multiple_words_sentence_query(queryDict, sortOrder=sortOrder, distances=distances)
+            query += self.multiple_words_sentence_query(queryDict, sortOrder=sortOrder, distances=distances,
+                                                        searchOutput=searchOutput)
 
             # Add sentence-level requirements to the query:
             query += list(queryDictTop.values())

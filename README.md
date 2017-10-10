@@ -23,3 +23,4 @@ The following resources are used by tsakorpus, but do not need to be installed:
 * [jQuery](https://jquery.com/) library
 * [video.js](http://videojs.com/) media player
 * [bootstrap](http://getbootstrap.com/) toolkit
+* [D3.js](https://d3js.org/) visualization library

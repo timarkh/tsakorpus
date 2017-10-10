@@ -754,3 +754,36 @@ hr.separator {
 	font-size: 1.2em;
 	cursor: pointer;
 }
+
+.meta_plot {
+}
+
+.bar {
+  fill: steelblue;
+}
+
+.axis text {
+  font: 11px sans-serif;
+  color: #333;
+}
+/*
+.x.axis text {
+  transform: rotate(90deg);
+  transform-origin: left top 0;
+}
+*/
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.message {
+	color: #772814;
+	text-shadow: 2px 2px #fff787;
+}

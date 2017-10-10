@@ -25,6 +25,7 @@ class SentenceViewer:
         self.name = self.settings['corpus_name']
         self.sentence_props = ['text']
         self.sc = search_client
+        self.w1_labels = set(['w1'] + ['w1_' + str(i) for i in range(self.settings['max_words_in_sentence'])])
 
     def build_gr_ana_part(self, grValues, lang):
         """
@@ -569,16 +570,14 @@ class SentenceViewer:
         langID, lang = self.get_lang_from_hit(hit)
         bRelevantWordExists = False
         self.filter_multi_word_highlight(hit, nWords=nWords)
-        w1_labels = ['w1'] + ['w1_' + str(i) for i in range(self.settings['max_words_in_sentence'])]
-        for w1_label in w1_labels:
-            if w1_label not in hit['inner_hits']:
+
+        for innerHitKey in hit['inner_hits']:
+            if innerHitKey not in self.w1_labels:
                 continue
             bRelevantWordExists = True
-            for word in hit['inner_hits'][w1_label]['hits']['hits']:
+            for word in hit['inner_hits'][innerHitKey]['hits']['hits']:
                 hitsProcessed['total_freq'] += 1
                 word['_source']['lang'] = lang
-                # wordJson = json.dumps({k: v for k, v in word['_source'].items() if k in ('ana', 'wf', 'lang')},
-                #                       sort_keys=True)
                 wID = word['_source']['w_id']
                 wf = word['_source']['wf'].lower()
                 try:
@@ -616,7 +615,8 @@ class SentenceViewer:
         for i in range(min(len(hitsProcessed['words']), pageSize)):
             word = hitsProcessed['words'][i]
             wordSource = self.sc.get_word_by_id(word['w_id'])['hits']['hits'][0]['_source']
-            word['_source'].update(wordSource)
+            wordSource.update(word['_source'])
+            word['_source'] = wordSource
             processedWords.append(self.process_word(word, lang=self.settings['languages'][word['_source']['lang']]))
         hitsProcessed['words'] = processedWords
 

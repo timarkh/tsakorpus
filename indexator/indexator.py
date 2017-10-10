@@ -57,6 +57,7 @@ class Indexator:
         self.dID = 0          # current document ID
         self.numWords = 0     # number of words in current document
         self.numWordsLang = [0] * len(self.languages)    # number of words in each language in current document
+        self.totalNumWords = 0
 
     def delete_indices(self):
         if self.es_ic.exists(index=self.name + '.docs'):
@@ -91,6 +92,7 @@ class Indexator:
                 continue
             self.numWords += 1
             self.numWordsLang[langID] += 1
+            self.totalNumWords += 1
             wClean = {'lang': langID}
             for field in w:
                 if field in self.goodWordFields:
@@ -290,7 +292,7 @@ class Indexator:
                         except KeyError:
                             paraIDs[langID][paraID] = [self.sID]
             if self.sID % 500 == 0:
-                print('indexing sentence', self.sID)
+                print('Indexing sentence', self.sID, ',', self.totalNumWords, 'words so far.')
             iSent += 1
             self.sID += 1
         if len(self.languages) > 1:
@@ -303,7 +305,7 @@ class Indexator:
         Store the metadata of the source file.
         """
         if self.dID % 100 == 0:
-            print('indexing document', self.dID)
+            print('Indexing document', self.dID)
         meta = self.iterSent.get_metadata(fname)
         meta['n_words'] = self.numWords
         for i in range(len(self.languages)):
@@ -348,7 +350,7 @@ class Indexator:
                 fnameFull = os.path.join(root, fname)
                 filenames.append((fnameFull, os.path.getsize(fnameFull)))
         for fname, fsize in sorted(filenames, key=lambda p: -p[1]):
-            print(fname, fsize)
+            # print(fname, fsize)
             bulk(self.es, self.iterate_sentences(fname), chunk_size=300)
             self.index_doc(fname)
         self.index_words()
@@ -365,7 +367,8 @@ class Indexator:
         print('Corpus indexed in', t2-t1, 'seconds:',
               self.dID, 'documents,',
               self.sID, 'sentences,',
-              sum(len(self.wordFreqs[i]) for i in range(len(self.languages))), 'different words.')
+              self.totalNumWords, 'words,',
+              sum(len(self.wordFreqs[i]) for i in range(len(self.languages))), 'word types (different words).')
 
 
 if __name__ == '__main__':

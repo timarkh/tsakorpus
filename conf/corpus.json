@@ -8,9 +8,10 @@
   "max_distance_filter": 200000,
   "max_docs_retrieve": 9999,
   "max_words_in_sentence": 40,
-  "query_timeout": 20,
+  "query_timeout": 60,
   "viewable_meta": [
     "filename",
+    "author",
     "title",
     "genre",
     "year1",
@@ -38,6 +39,12 @@
         {"type": "option", "name": "genre", "value": "experiment", "text": "Experiment"},
         {"type": "option", "name": "genre", "value": "interview|monologue|experiment", "text": "Any"}
       ]
+    ],
+    "stat_options": [
+      "genre",
+      "author",
+      "title",
+      "year1"
     ]
   },
   "word_fields":
