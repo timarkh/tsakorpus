@@ -27,6 +27,62 @@ class SentenceViewer:
         self.sc = search_client
         self.w1_labels = set(['w1'] + ['w1_' + str(i) for i in range(self.settings['max_words_in_sentence'])])
 
+    def differing_ana_field(self, ana1, ana2):
+        """
+        Determine if two analyses with equal number of fields only differ
+        in one field. If they do, return the name of the field. If they
+        do not differ at all, return empty string. If they have more than
+        two differing fields, return None.
+        """
+        differingField = ''
+        for key in ana1:
+            if key not in ana2:
+                return None
+            if ana2[key] != ana1[key]:
+                if len(differingField) > 0:
+                    return None
+                differingField = key
+        return differingField
+
+    def simplify_ana(self, analyses, matchingAnalyses):
+        """
+        Collate JSON analyses that only have differences in one field,
+        e.g. [(N,sg,gen), (N,pl,gen)] -> (N,sg/pl,gen). Analyses that
+        match the query (their indices are stored in matchingAnalyses)
+        cannot be collated with those that do not.
+        Return a list with simplified analyses and the matching analyses
+        indices in the new list. The source list is changed in the process.
+        """
+        nAnalyses = len(analyses)
+        simpleAnalyses = []
+        simpleMatchingAnalyses = []
+        usedAnalyses = []
+        for i in range(nAnalyses):
+            if i in usedAnalyses:
+                continue
+            for j in range(i + 1, nAnalyses):
+                if j in usedAnalyses:
+                    continue
+                if i in matchingAnalyses and j not in matchingAnalyses:
+                    continue
+                if j in matchingAnalyses and i not in matchingAnalyses:
+                    continue
+                if len(analyses[i]) != len(analyses[j]):
+                    continue
+                differingField = self.differing_ana_field(analyses[i], analyses[j])
+                if differingField is not None and len(differingField) > 0 and differingField.startswith('gr.'):
+                    values = analyses[i][differingField].split('/') + analyses[j][differingField].split('/')
+                    values.sort()
+                    analyses[i][differingField] = '/'.join(values)
+                    usedAnalyses.append(j)
+            simpleAnalyses.append(analyses[i])
+            if i in matchingAnalyses:
+                simpleMatchingAnalyses.append(len(simpleAnalyses) - 1)
+        if len(simpleAnalyses) < len(analyses):
+            # The procedure may require several recursive steps
+            simpleAnalyses, simpleMatchingAnalyses = self.simplify_ana(simpleAnalyses, simpleMatchingAnalyses)
+        return simpleAnalyses, simpleMatchingAnalyses
+
     def build_gr_ana_part(self, grValues, lang):
         """
         Build a string with gramtags ordered according to the settings
@@ -76,9 +132,10 @@ class SentenceViewer:
         if 'wf' in word:
             data4template['wf'] = self.transliterate_baseline(word['wf'], lang=lang, translit=translit)
         if 'ana' in word:
-            for iAna in range(len(word['ana'])):
-                ana4template = {'match': iAna in matchingAnalyses,
-                                'ana_div': self.build_ana_div(word['ana'][iAna], lang, translit=translit)}
+            simplifiedAnas, simpleMatchingAnalyses = self.simplify_ana(word['ana'], matchingAnalyses)
+            for iAna in range(len(simplifiedAnas)):
+                ana4template = {'match': iAna in simpleMatchingAnalyses,
+                                'ana_div': self.build_ana_div(simplifiedAnas[iAna], lang, translit=translit)}
                 data4template['analyses'].append(ana4template)
         return render_template('analyses_popup.html', data=data4template)
 
