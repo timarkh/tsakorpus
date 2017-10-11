@@ -514,6 +514,19 @@ def get_word_stats(metaField):
     docIDs = subcorpus_ids(htmlQuery)
     buckets = get_buckets_for_metafield(metaField, docIDs=docIDs)
     newBuckets = []
+
+    searchIndex = 'words'
+    nWords = 1
+    queryWordConstraints = None
+    if 'n_words' in htmlQuery and int(htmlQuery['n_words']) > 1:
+        nWords = int(htmlQuery['n_words'])
+        searchIndex = 'sentences'
+        wordConstraints = sc.qp.wr.get_constraints(htmlQuery)
+        set_session_data('word_constraints', wordConstraints)
+        if (len(wordConstraints) > 0
+                and get_session_data('distance_strict')):
+            queryWordConstraints = wordConstraints
+
     for bucket in buckets:
         if bucket['name'] == '>>' or len(bucket['name']) <= 0:
             continue
@@ -524,16 +537,25 @@ def get_word_stats(metaField):
         #     curHtmlQuery[metaField] += ',' + bucket['name']
         curHtmlQuery['doc_ids'] = subcorpus_ids(curHtmlQuery)
         query = sc.qp.html2es(curHtmlQuery,
-                              searchOutput='words',
-                              sortOrder=None,
-                              query_size=1)
-        # return jsonify(curHtmlQuery)
-        # return jsonify(sc.qp.subcorpus_query(curHtmlQuery, sortOrder='',
-        #                                    exclude=get_session_data('excluded_doc_ids')))
-
-        hits = sc.get_word_freqs(query)
-        bucket['n_words'] = hits['aggregations']['agg_freq']['value'] / bucket['n_words'] * 100
-        bucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / bucket['n_docs'] * 100
+                              searchOutput=searchIndex,
+                              sortOrder='',
+                              query_size=1,
+                              distances=queryWordConstraints)
+        if searchIndex == 'words':
+            hits = sc.get_word_freqs(query)
+            bucket['n_words'] = hits['aggregations']['agg_freq']['value'] / bucket['n_words'] * 1000000
+            bucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / bucket['n_docs'] * 1000000
+        elif searchIndex == 'sentences':
+            hits = sc.get_sentences(query)
+            if ('agg_nwords' not in hits['aggregations']
+                    or 'agg_ndocs' not in hits['aggregations']
+                    or hits['aggregations']['agg_ndocs']['value'] is None
+                    or hits['aggregations']['agg_ndocs']['value'] <= 0):
+                continue
+            bucket['n_words'] = hits['aggregations']['agg_nwords']['sum'] / bucket['n_words'] * 1000000
+            if nWords > 1:
+                bucket['n_sents'] = hits['hits']['total']
+            bucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / bucket['n_docs'] * 1000000
         newBuckets.append(bucket)
     return jsonify(newBuckets)
 

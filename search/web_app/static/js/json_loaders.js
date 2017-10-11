@@ -193,6 +193,7 @@ function assign_input_events() {
 	//$("neg_query_checkbox").unbind('change');
 	$("span.neg_query").unbind('click');
 	$("#show_help").unbind('click');
+	$("#show_word_stat").unbind('click');
 	$("span.locale").unbind('click');
 	$(".search_input").unbind('on');
 	$("span.word_plus").click(add_word_inputs);
@@ -204,6 +205,7 @@ function assign_input_events() {
 	//$("neg_query_checkbox").change(negative_query);
 	$("span.neg_query").click(negative_query_span);
 	$("#show_help").click(show_help);
+	$("#show_word_stat").click(show_word_stats);
 	$("span.locale").click(change_locale);
 	$(".search_input").on("keydown", search_if_enter);
 }

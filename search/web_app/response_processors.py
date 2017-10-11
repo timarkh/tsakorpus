@@ -70,7 +70,11 @@ class SentenceViewer:
                 if len(analyses[i]) != len(analyses[j]):
                     continue
                 differingField = self.differing_ana_field(analyses[i], analyses[j])
-                if differingField is not None and len(differingField) > 0 and differingField.startswith('gr.'):
+                if (differingField is not None
+                        and len(differingField) > 0
+                        and differingField.startswith('gr.')
+                        and type(analyses[j][differingField]) == str
+                        and type(analyses[j][differingField]) == str):
                     values = analyses[i][differingField].split('/') + analyses[j][differingField].split('/')
                     values.sort()
                     analyses[i][differingField] = '/'.join(values)
@@ -850,7 +854,8 @@ class SentenceViewer:
                 or response['hits']['total'] <= 0):
             return result
         result['message'] = ''
-        result['n_occurrences'] = response['hits']['total']
+        # result['n_occurrences'] = response['hits']['total']
+        result['n_occurrences'] = response['aggregations']['agg_noccurrences']['value']
         result['n_docs'] = response['aggregations']['agg_ndocs']['value']
         result['total_freq'] = response['aggregations']['agg_freq']['value']
         result['words'] = []

@@ -215,14 +215,19 @@ class InterfaceQueryParser:
             return {'regexp': {field: word}}
 
     def make_nested_query(self, query, nestedPath, queryName='', highlightFields=None,
-                          sortOrder='', searchOutput='sentences'):
-        if sortOrder != 'random':
-            esQuery = {'nested': {'path': nestedPath,
-                                  'query': {'constant_score': {'query': query, 'boost': 1}},
-                                  'score_mode': 'sum'}}
+                          sortOrder='', searchOutput='sentences', constantScore=None):
+        if constantScore is None:
+            if sortOrder != 'random':
+                esQuery = {'nested': {'path': nestedPath,
+                                      'query': {'constant_score': {'query': query, 'boost': 1}},
+                                      'score_mode': 'sum'}}
+            else:
+                esQuery = {'nested': {'path': nestedPath,
+                                      'query': query}}
         else:
             esQuery = {'nested': {'path': nestedPath,
-                                  'query': query}}
+                                  'query': {'constant_score': {'query': query, 'boost': constantScore}},
+                                  'score_mode': 'sum'}}
         if highlightFields is not None and (searchOutput == 'sentences'
                                             or (queryName == 'w1' or queryName.startswith('w1_'))):
             esQuery['nested']['inner_hits'] = {'highlight':
@@ -275,6 +280,7 @@ class InterfaceQueryParser:
             mainAgg = {'group_by_word': {'terms': {'field': 'w_id',
                                                    'size': query_size}},
                        'agg_freq': {'sum': {'field': 'freq'}},
+                       'agg_noccurrences': {'cardinality': {'field': 'w_id'}},
                        'agg_ndocs': {'cardinality': {'field': 'd_id'}}}
             if len(subAggregations) > 0:
                 mainAgg['group_by_word']['aggs'] = subAggregations
@@ -419,6 +425,10 @@ class InterfaceQueryParser:
 
         query = []
         queryName = 'w' + str(queryWordNum)
+        if queryWordNum > 1:
+            constantScore = 0
+        else:
+            constantScore = 1
         if not negative and highlightedWordSubindex is not None:
             queryName += '_' + str(highlightedWordSubindex)
         if len(queryDictWordsAna) > 0:
@@ -439,7 +449,8 @@ class InterfaceQueryParser:
                                                     queryName=queryName,
                                                     highlightFields=['words.ana'],
                                                     sortOrder=sortOrder,
-                                                    searchOutput=searchOutput))
+                                                    searchOutput=searchOutput,
+                                                    constantScore=constantScore))
         if len(queryDictWords) > 0:
             if len(queryDictWords) == 1:
                 queryWords = list(queryDictWords.values())[0]
@@ -450,7 +461,8 @@ class InterfaceQueryParser:
                                                 queryName=queryName,
                                                 highlightFields=['words'],
                                                 sortOrder=sortOrder,
-                                                searchOutput=searchOutput
+                                                searchOutput=searchOutput,
+                                                constantScore=constantScore
                                                 ))
         if negative:
             return [{'bool': {'must_not': query}}]

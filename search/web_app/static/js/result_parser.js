@@ -280,8 +280,14 @@ function assign_gram_popup() {
 
 function show_word_stats(e) {
 	var wf = $(e.currentTarget).attr('data-wf');
-	if (wf == "") return;
-	$('#word_stats_wf').html(wf)
+	if (wf != null && wf != "") {
+		clear_search_form();
+		$('#word_stats_wf').html(wf);
+		$('#wf1').val($("#word_stats_wf").text());
+	}
+	else {
+		$('#word_stats_wf').html('the query');
+	}
 	$('#word_stats').modal('show');
 	$('#select_meta_word_stat').trigger('change');
 }
