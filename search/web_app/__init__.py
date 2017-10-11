@@ -439,7 +439,7 @@ def add_parallel(hits, htmlResponse):
                 htmlResponse['contexts'][iHit]['languages'][lang] = {'text': sentHTML}
 
 
-def get_doc_ids_for_metafield(fieldName, docIDs=None, maxBuckets=300):
+def get_buckets_for_metafield(fieldName, docIDs=None, maxBuckets=300):
     """
     Group all documents into buckets, each corresponding to one
     of the unique values for the fieldName metafield. Consider
@@ -472,7 +472,7 @@ def get_doc_ids_for_metafield(fieldName, docIDs=None, maxBuckets=300):
                           'n_words': bucket['subagg_n_words']['value']}
         buckets.append(bucketListItem)
     buckets.sort(key=lambda b: (-b['n_words'], -b['n_docs'], b['name']))
-    if len(buckets) > 25:
+    if len(buckets) > 25 and not fieldName.startswith('year'):
         bucketsFirst = buckets[:25]
         lastBucket = {'name': '>>', 'n_docs': 0, 'n_words': 0}
         for i in range(25, len(buckets)):
@@ -495,8 +495,47 @@ def get_doc_stats(metaField):
     query = copy_request_args()
     change_display_options(query)
     docIDs = subcorpus_ids(query)
-    buckets = get_doc_ids_for_metafield(metaField, docIDs=docIDs)
+    buckets = get_buckets_for_metafield(metaField, docIDs=docIDs)
     return jsonify(buckets)
+
+
+@app.route('/word_stats/<metaField>')
+def get_word_stats(metaField):
+    """
+    Return JSON with basic statistics concerning the distribution
+    of a particular word form by values of one metafield. This function
+    can be used to visualise word distributions across genres etc.
+    """
+    if metaField not in settings['viewable_meta']:
+        return jsonify({})
+
+    htmlQuery = copy_request_args()
+    change_display_options(htmlQuery)
+    docIDs = subcorpus_ids(htmlQuery)
+    buckets = get_buckets_for_metafield(metaField, docIDs=docIDs)
+    newBuckets = []
+    for bucket in buckets:
+        if bucket['name'] == '>>' or len(bucket['name']) <= 0:
+            continue
+        curHtmlQuery = copy.deepcopy(htmlQuery)
+        # if metaField not in curHtmlQuery or len(curHtmlQuery[metaField]) <= 0:
+        curHtmlQuery[metaField] = bucket['name']
+        # elif type(curHtmlQuery[metaField]) == str:
+        #     curHtmlQuery[metaField] += ',' + bucket['name']
+        curHtmlQuery['doc_ids'] = subcorpus_ids(curHtmlQuery)
+        query = sc.qp.html2es(curHtmlQuery,
+                              searchOutput='words',
+                              sortOrder=None,
+                              query_size=1)
+        # return jsonify(curHtmlQuery)
+        # return jsonify(sc.qp.subcorpus_query(curHtmlQuery, sortOrder='',
+        #                                    exclude=get_session_data('excluded_doc_ids')))
+
+        hits = sc.get_word_freqs(query)
+        bucket['n_words'] = hits['aggregations']['agg_freq']['value'] / bucket['n_words'] * 100
+        bucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / bucket['n_docs'] * 100
+        newBuckets.append(bucket)
+    return jsonify(newBuckets)
 
 
 def subcorpus_ids(htmlQuery):

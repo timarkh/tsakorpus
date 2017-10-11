@@ -206,6 +206,9 @@ msgstr "кол-во док."
 msgid "word_th_search in corpus"
 msgstr "искать"
 
+msgid "word_th_word stats"
+msgstr "статистика"
+
 #: templates/select_gloss.html:38 templates/select_gramm.html:25
 msgid "Cancel"
 msgstr "Отмена"

@@ -164,7 +164,7 @@ class InterfaceQueryParser:
         except KeyError:
             return {}
 
-    def make_bool_query(self, strQuery, field, lang, start=0, end=-1):
+    def make_bool_query(self, strQuery, field, lang, start=0, end=-1, keyword_query=False):
         """
         Make a bool elasticsearch query from a string like (XXX|Y*Z),~ABC.
         If the field is "ana.gr", find categories for every gramtag. If no
@@ -173,7 +173,10 @@ class InterfaceQueryParser:
         delimited by start and end parameters.
         """
         if end == -1:
-            strQuery = strQuery.replace(' ', '')
+            if not keyword_query:
+                strQuery = strQuery.replace(' ', '')
+            else:
+                strQuery = strQuery.strip()
             end = len(strQuery)
             if strQuery.count('(') != strQuery.count(')'):
                 return {'match_none': {}}
@@ -255,8 +258,8 @@ class InterfaceQueryParser:
                 esQuery['sort'] = {'freq': {'order': 'desc'}}
         else:
             hasParentQuery = {'parent_type': 'word', 'score': True, 'query': innerQuery}
-            innerWordFreqQuery = {'bool': {'must': [{'terms': {'d_id': docIDs}},
-                                                    {'has_parent': hasParentQuery}]}}
+            innerWordFreqQuery = {'bool': {'must': [{'has_parent': hasParentQuery}],
+                                           'filter': [{'terms': {'d_id': docIDs}}]}}
             if sortOrder == 'random':
                 innerWordFreqQuery = self.make_random(innerWordFreqQuery)
             subAggregations = {'subagg_freq': {'sum': {'field': 'freq'}}}
@@ -340,11 +343,11 @@ class InterfaceQueryParser:
                     query['bool']['must'] = [{'term': {'lang': lang}}]
                 else:
                     query['bool']['must'].append({'term': {'lang': lang}})
-            if docIDs is not None:
-                if 'filter' not in query['bool']:
-                    query['bool']['filter'] = [{'terms': {'dids': docIDs}}]
-                else:
-                    query['bool']['filter'].append({'terms': {'dids': docIDs}})
+            # if docIDs is not None:
+            #     if 'filter' not in query['bool']:
+            #         query['bool']['filter'] = [{'terms': {'dids': docIDs}}]
+            #     else:
+            #         query['bool']['filter'].append({'terms': {'dids': docIDs}})
         esQuery = self.wrap_inner_word_query(query, query_from=query_from,
                                              query_size=query_size, sortOrder=sortOrder,
                                              docIDs=docIDs)
@@ -584,7 +587,7 @@ class InterfaceQueryParser:
         queryParts = []
         for field in self.docMetaFields:
             if field in htmlQuery and len(htmlQuery[field]) > 0:
-                queryParts.append(self.make_bool_query(htmlQuery[field], field, 'all'))
+                queryParts.append(self.make_bool_query(htmlQuery[field], field, 'all', keyword_query=True))
         if exclude is not None and len(exclude) > 0:
             queryParts.append({'bool': {'must_not': [{'terms': {'_id': list(exclude)}}]}})
         if len(queryParts) > 0:
@@ -656,14 +659,14 @@ class InterfaceQueryParser:
         Return None otherwise.
         """
         if len(htmlQuery) <= 0 or 'n_words' not in htmlQuery:
-            return None, None, None
+            return None, None, None, None
         query_from = (page - 1) * query_size
         if 'lang' not in htmlQuery or htmlQuery['lang'] not in self.settings['languages']:
             if self.settings['all_language_search_enabled']:
                 lang = 'all'
                 langID = -1
             else:
-                return None, None, None
+                return None, None, None, None
         else:
             lang = htmlQuery['lang']
             langID = self.settings['languages'].index(lang)

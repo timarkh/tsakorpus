@@ -113,15 +113,14 @@ class PrepareData:
         Each element of docs index contains metadata about
         about a single document.
         """
-        m = {}
+        m = {'n_words': 'integer'}
         for meta in self.settings['viewable_meta']:
             if meta.startswith('year'):
                 m[meta] = {'type': 'integer'}
-            elif meta == 'genre':
-                m[meta] = {'type': 'keyword'}
             else:
                 m[meta] = {'type': 'text',
                            'analyzer': 'lowercase_normalizer'}
+                m[meta + '_kw'] = {'type': 'keyword'}
         return {'mappings': {'doc': {'properties': m}}, 'settings': self.docNormalizer}
 
     def generate_sentences_mapping(self, word_mapping):

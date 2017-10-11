@@ -300,6 +300,15 @@ class Indexator:
             for s in sentences:
                 yield s
 
+    @staticmethod
+    def add_meta_keywords(meta):
+        """
+        For each text field in the metadata, add a keyword version
+        of the same field.
+        """
+        for field in meta.keys()[:]:
+            meta[field + '_kw'] = meta[field]
+
     def index_doc(self, fname):
         """
         Store the metadata of the source file.
@@ -307,6 +316,7 @@ class Indexator:
         if self.dID % 100 == 0:
             print('Indexing document', self.dID)
         meta = self.iterSent.get_metadata(fname)
+        self.add_meta_keywords(meta)
         meta['n_words'] = self.numWords
         for i in range(len(self.languages)):
             meta['n_words_' + str(i)] = self.numWordsLang[i]

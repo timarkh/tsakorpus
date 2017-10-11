@@ -23,12 +23,14 @@ function assign_word_events() {
 	$("span.expand").unbind('click');
 	$("span.context_header").unbind('click');
 	$("span.search_w").unbind('click');
+	$("span.stat_w").unbind('click');
 	$("span.page_link").unbind('click');
 	$(".cx_toggle_chk").unbind('change');
 	$('span.word').click(highlight_cur_word);
 	$('span.expand').click(expand_context);
 	$('span.context_header').click(show_doc_meta);
 	$('span.search_w').click(search_word_from_list);
+	$('span.stat_w').click(show_word_stats);
 	$("span.page_link").click(page_click);
 	$(".cx_toggle_chk").change(context_toggle);
 	assign_para_highlight();
@@ -68,9 +70,7 @@ function show_doc_meta(e) {
 	alert(doc_meta.replace(/\\n/g, "\n"));
 }
 
-function search_word_from_list(e) {
-	wf = $(e.currentTarget).attr('data-wf');
-	if (wf == "") return;
+function clear_search_form() {
 	$('input.search_input').each(function (index) {
 		if ($(this).parent().parent().attr('id') == 'display_options_tab') {
 			return;
@@ -80,6 +80,12 @@ function search_word_from_list(e) {
 		}
 		$(this).val('');
 	});
+}
+
+function search_word_from_list(e) {
+	wf = $(e.currentTarget).attr('data-wf');
+	if (wf == "") return;
+	clear_search_form();
 	$('#wf1').val(wf);
 	$("#search_sent").click();
 }
@@ -270,6 +276,14 @@ function assign_gram_popup() {
 			$('#analysis').height(anaHeight);
 		}
 	});
+}
+
+function show_word_stats(e) {
+	var wf = $(e.currentTarget).attr('data-wf');
+	if (wf == "") return;
+	$('#word_stats_wf').html(wf)
+	$('#word_stats').modal('show');
+	$('#select_meta_word_stat').trigger('change');
 }
 
 function make_sortable() {

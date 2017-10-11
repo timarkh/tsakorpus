@@ -263,11 +263,11 @@
 	margin-left: 3px;
 }
 
-.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, #show_help {
+.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .stat_w, #show_help {
 	cursor: pointer;
 }
 
-.search_w {
+.search_w, .stat_w {
 	padding-left: 10px;
 	padding-right: 5px;
 }
@@ -368,6 +368,12 @@
 
 #show_help:hover .tooltip_prompt {
     visibility: visible;
+}
+
+.word_stats_header {
+	padding-left: 3px;
+	padding-right: 3px;
+	color: #283859;
 }
 
 .word_search_l {
