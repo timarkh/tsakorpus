@@ -56,7 +56,9 @@ class Indexator:
         self.sID = 0          # current sentence ID for each language
         self.dID = 0          # current document ID
         self.numWords = 0     # number of words in current document
+        self.numSents = 0     # number of sentences in current document
         self.numWordsLang = [0] * len(self.languages)    # number of words in each language in current document
+        self.numSentsLang = [0] * len(self.languages)    # number of sentences in each language in current document
         self.totalNumWords = 0
 
     def delete_indices(self):
@@ -253,7 +255,7 @@ class Indexator:
                         pa['sent_ids'] += paraIDs[i][paraID]
 
     def iterate_sentences(self, fname):
-        iSent = 0
+        self.numSents = 0
         sentences = []
         paraIDs = [{} for i in range(len(self.languages))]
         for s, bLast in self.iterSent.get_sentences(fname):
@@ -264,7 +266,7 @@ class Indexator:
                 s['lang'] = langID
             if 'words' in s:
                 self.process_sentence_words(s['words'], langID)
-            if iSent > 0:
+            if self.numSents > 0:
                 s['prev_id'] = self.sID - 1
             if not bLast and 'last' not in s:
                 s['next_id'] = self.sID + 1
@@ -293,7 +295,8 @@ class Indexator:
                             paraIDs[langID][paraID] = [self.sID]
             if self.sID % 500 == 0:
                 print('Indexing sentence', self.sID, ',', self.totalNumWords, 'words so far.')
-            iSent += 1
+            self.numSents += 1
+            self.numSentsLang[langID] += 1
             self.sID += 1
         if len(self.languages) > 1:
             self.add_parallel_sids(sentences, paraIDs)
@@ -306,7 +309,7 @@ class Indexator:
         For each text field in the metadata, add a keyword version
         of the same field.
         """
-        for field in meta.keys()[:]:
+        for field in [k for k in meta.keys() if not k.startswith('year')]:
             meta[field + '_kw'] = meta[field]
 
     def index_doc(self, fname):
@@ -318,10 +321,15 @@ class Indexator:
         meta = self.iterSent.get_metadata(fname)
         self.add_meta_keywords(meta)
         meta['n_words'] = self.numWords
-        for i in range(len(self.languages)):
-            meta['n_words_' + str(i)] = self.numWordsLang[i]
+        meta['n_sents'] = self.numSents
+        if len(self.settings['languages']) > 1:
+            for i in range(len(self.languages)):
+                meta['n_words_' + self.languages[i]] = self.numWordsLang[i]
+                meta['n_sents_' + self.languages[i]] = self.numSentsLang[i]
         self.numWords = 0
+        self.numSents = 0
         self.numWordsLang = [0] * len(self.languages)
+        self.numSentsLang = [0] * len(self.languages)
         try:
             self.es.index(index=self.name + '.docs',
                           doc_type='doc',
@@ -334,6 +342,7 @@ class Indexator:
                 shortMeta['filename'] = meta['filename']
             if 'title' in meta:
                 shortMeta['title'] = meta['title']
+                shortMeta['title_kw'] = meta['title']
                 self.es.index(index=self.name + '.docs',
                               doc_type='doc',
                               id=self.dID,

@@ -439,26 +439,38 @@ def add_parallel(hits, htmlResponse):
                 htmlResponse['contexts'][iHit]['languages'][lang] = {'text': sentHTML}
 
 
-def get_buckets_for_metafield(fieldName, docIDs=None, maxBuckets=300):
+def get_buckets_for_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=300):
     """
     Group all documents into buckets, each corresponding to one
     of the unique values for the fieldName metafield. Consider
     only top maxBuckets field values (in terms of document count).
+    If langID is provided, count only data for a particular language.
     Return a dictionary with the values and corresponding document
     count.
     """
-    if fieldName not in settings['viewable_meta']:
+    if fieldName not in settings['search_meta']['stat_options'] or langID >= len(settings['languages']) > 1:
         return {}
     innerQuery = {'match_all': {}}
     if docIDs is not None:
         innerQuery = {'ids': {'type': 'doc', 'values': list(docIDs)}}
+    if not fieldName.startswith('year'):
+        queryFieldName = fieldName + '_kw'
+    else:
+        queryFieldName = fieldName
+    if len(settings['languages']) == 1 or langID < 0:
+        nWordsFieldName = 'n_words'
+        nSentsFieldName = 'n_sents'
+    else:
+        nWordsFieldName = 'n_words_' + settings['languages'][langID]
+        nSentsFieldName = 'n_sents_' + settings['languages'][langID]
     esQuery = {'query': innerQuery,
                'size': 0,
                'aggs': {'metafield':
                             {'terms':
-                                 {'field': fieldName, 'size': maxBuckets},
+                                 {'field': queryFieldName, 'size': maxBuckets},
                              'aggs':
-                                 {'subagg_n_words': {'sum': {'field': 'n_words'}}}
+                                 {'subagg_n_words': {'sum': {'field': nWordsFieldName}},
+                                  'subagg_n_sents': {'sum': {'field': nSentsFieldName}}}
                              }
                         }
                }
@@ -471,7 +483,10 @@ def get_buckets_for_metafield(fieldName, docIDs=None, maxBuckets=300):
                           'n_docs': bucket['doc_count'],
                           'n_words': bucket['subagg_n_words']['value']}
         buckets.append(bucketListItem)
-    buckets.sort(key=lambda b: (-b['n_words'], -b['n_docs'], b['name']))
+    if not fieldName.startswith('year'):
+        buckets.sort(key=lambda b: (-b['n_words'], -b['n_docs'], b['name']))
+    else:
+        buckets.sort(key=lambda b: b['name'])
     if len(buckets) > 25 and not fieldName.startswith('year'):
         bucketsFirst = buckets[:25]
         lastBucket = {'name': '>>', 'n_docs': 0, 'n_words': 0}
@@ -490,12 +505,12 @@ def get_doc_stats(metaField):
     of corpus documents by values of one metafield. This function
     can be used to visualise (sub)corpus composition.
     """
-    if metaField not in settings['viewable_meta']:
+    if metaField not in settings['search_meta']['stat_options']:
         return jsonify({})
     query = copy_request_args()
     change_display_options(query)
     docIDs = subcorpus_ids(query)
-    buckets = get_buckets_for_metafield(metaField, docIDs=docIDs)
+    buckets = get_buckets_for_metafield(metaField, langID=-1, docIDs=docIDs)
     return jsonify(buckets)
 
 
@@ -512,12 +527,19 @@ def get_word_stats(metaField):
     htmlQuery = copy_request_args()
     change_display_options(htmlQuery)
     docIDs = subcorpus_ids(htmlQuery)
-    buckets = get_buckets_for_metafield(metaField, docIDs=docIDs)
+    langID = -1
+    if 'lang' in htmlQuery and htmlQuery['lang'] in settings['languages']:
+        langID = settings['languages'].index(htmlQuery['lang'])
+    buckets = get_buckets_for_metafield(metaField, langID=langID, docIDs=docIDs)
     newBuckets = []
 
     searchIndex = 'words'
     nWords = 1
     queryWordConstraints = None
+    if not metaField.startswith('year'):
+        queryFieldName = metaField + '_kw'
+    else:
+        queryFieldName = metaField
     if 'n_words' in htmlQuery and int(htmlQuery['n_words']) > 1:
         nWords = int(htmlQuery['n_words'])
         searchIndex = 'sentences'
@@ -528,11 +550,12 @@ def get_word_stats(metaField):
             queryWordConstraints = wordConstraints
 
     for bucket in buckets:
-        if bucket['name'] == '>>' or len(bucket['name']) <= 0:
+        if (bucket['name'] == '>>'
+                or (type(bucket['name']) == str and len(bucket['name']) <= 0)):
             continue
         curHtmlQuery = copy.deepcopy(htmlQuery)
         # if metaField not in curHtmlQuery or len(curHtmlQuery[metaField]) <= 0:
-        curHtmlQuery[metaField] = bucket['name']
+        curHtmlQuery[queryFieldName] = bucket['name']
         # elif type(curHtmlQuery[metaField]) == str:
         #     curHtmlQuery[metaField] += ',' + bucket['name']
         curHtmlQuery['doc_ids'] = subcorpus_ids(curHtmlQuery)
@@ -541,13 +564,20 @@ def get_word_stats(metaField):
                               sortOrder='',
                               query_size=1,
                               distances=queryWordConstraints)
-        if searchIndex == 'words':
+        if searchIndex == 'words' and bucket['n_words'] > 0:
             hits = sc.get_word_freqs(query)
+            if ('aggregations' not in hits
+                    or 'agg_freq' not in hits['aggregations']
+                    or 'agg_ndocs' not in hits['aggregations']
+                    or hits['aggregations']['agg_ndocs']['value'] is None
+                    or hits['aggregations']['agg_ndocs']['value'] <= 0):
+                continue
             bucket['n_words'] = hits['aggregations']['agg_freq']['value'] / bucket['n_words'] * 1000000
-            bucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / bucket['n_docs'] * 1000000
-        elif searchIndex == 'sentences':
+            bucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / bucket['n_docs'] * 100
+        elif searchIndex == 'sentences' and bucket['n_words'] > 0:
             hits = sc.get_sentences(query)
-            if ('agg_nwords' not in hits['aggregations']
+            if ('aggregations' not in hits
+                    or 'agg_nwords' not in hits['aggregations']
                     or 'agg_ndocs' not in hits['aggregations']
                     or hits['aggregations']['agg_ndocs']['value'] is None
                     or hits['aggregations']['agg_ndocs']['value'] <= 0):
@@ -555,7 +585,7 @@ def get_word_stats(metaField):
             bucket['n_words'] = hits['aggregations']['agg_nwords']['sum'] / bucket['n_words'] * 1000000
             if nWords > 1:
                 bucket['n_sents'] = hits['hits']['total']
-            bucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / bucket['n_docs'] * 1000000
+            bucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / bucket['n_docs'] * 100
         newBuckets.append(bucket)
     return jsonify(newBuckets)
 

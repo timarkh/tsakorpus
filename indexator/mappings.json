@@ -1,4 +1,70 @@
 {
+  "docs": {
+    "mappings": {
+      "doc": {
+        "properties": {
+          "n_words": {
+            "type": "integer"
+          },
+          "filename": {
+            "type": "text",
+            "analyzer": "lowercase_normalizer"
+          },
+          "filename_kw": {
+            "type": "keyword"
+          },
+          "title": {
+            "type": "text",
+            "analyzer": "lowercase_normalizer"
+          },
+          "title_kw": {
+            "type": "keyword"
+          },
+          "genre": {
+            "type": "text",
+            "analyzer": "lowercase_normalizer"
+          },
+          "genre_kw": {
+            "type": "keyword"
+          },
+          "year1": {
+            "type": "integer"
+          },
+          "year2": {
+            "type": "integer"
+          },
+          "speakers": {
+            "type": "text",
+            "analyzer": "lowercase_normalizer"
+          },
+          "speakers_kw": {
+            "type": "keyword"
+          },
+          "linguists": {
+            "type": "text",
+            "analyzer": "lowercase_normalizer"
+          },
+          "linguists_kw": {
+            "type": "keyword"
+          }
+        }
+      }
+    },
+    "settings": {
+      "analysis": {
+        "analyzer": {
+          "lowercase_normalizer": {
+            "type": "custom",
+            "tokenizer": "standard",
+            "char_filter": [],
+            "filter": [
+              "lowercase"
+            ]
+          }
+        }
+      }
+    }
+  },
   "sentences": {
     "mappings": {
       "sentence": {
@@ -15,7 +81,9 @@
           "text": {
             "type": "text"
           },
-          "lang": "byte",
+          "lang": {
+            "type": "byte"
+          },
           "src_alignment": {
             "type": "nested",
             "properties": {
@@ -26,29 +94,55 @@
                 "type": "keyword",
                 "index": false
               },
-              "off_src": {
-                "type": "integer",
+              "off_start_src": {
+                "type": "float",
                 "index": false
               },
-              "off_sent": {
+              "off_start_sent": {
+                "type": "short",
+                "index": false
+              },
+              "off_end_src": {
+                "type": "float",
+                "index": false
+              },
+              "off_end_sent": {
                 "type": "short",
                 "index": false
               },
               "rect_src": {
                 "type": "integer",
                 "index": false
+              },
+              "src_id": {
+                "type": "keyword",
+                "index": false
               }
             }
+          },
+          "para_ids": {
+            "type": "keyword"
           },
           "para_alignment": {
             "type": "nested",
             "properties": {
-              "off_start": "short",
-              "off_end": "short",
-              "para_id": "keyword",
-              "sent_ids": "integer"
-            },
-            "index": false
+              "off_start": {
+                "type": "short",
+                "index": false
+              },
+              "off_end": {
+                "type": "short",
+                "index": false
+              },
+              "para_id": {
+                "type": "keyword",
+                "index": false
+              },
+              "sent_ids": {
+                "type": "integer",
+                "index": false
+              }
+            }
           },
           "segment_ids": {
             "type": "integer",
@@ -65,7 +159,12 @@
               "wtype": {
                 "type": "keyword"
               },
-              "lang": "byte",
+              "lang": {
+                "type": "byte"
+              },
+              "sentence_index": {
+                "type": "short"
+              },
               "sids": {
                 "type": "integer",
                 "index": false
@@ -83,58 +182,109 @@
                   "trans_ru": {
                     "type": "text"
                   },
-                  "lex2": {
-                    "type": "text"
-                  },
-                  "trans_ru2": {
-                    "type": "text"
-                  },
-                  "gr.appl": {
-                    "type": "keyword"
-                  },
-                  "gr.pos": {
-                    "type": "keyword"
-                  },
-                  "gr.case": {
-                    "type": "keyword"
-                  },
-                  "gr.tense": {
-                    "type": "keyword"
-                  },
                   "gr.v_form": {
-                    "type": "keyword"
-                  },
-                  "gr.ptcp_form": {
-                    "type": "keyword"
-                  },
-                  "gr.pers": {
-                    "type": "keyword"
-                  },
-                  "gr.poss": {
-                    "type": "keyword"
-                  },
-                  "gr.v_deriv": {
-                    "type": "keyword"
-                  },
-                  "gr.tr": {
-                    "type": "keyword"
-                  },
-                  "gr.number": {
-                    "type": "keyword"
-                  },
-                  "gr.dyn": {
-                    "type": "keyword"
-                  },
-                  "gr.numeral": {
-                    "type": "keyword"
-                  },
-                  "gr.clitics": {
                     "type": "keyword"
                   },
                   "gr.adj_form": {
                     "type": "keyword"
                   },
+                  "gr.attributivizer": {
+                    "type": "keyword"
+                  },
+                  "gr.clitics": {
+                    "type": "keyword"
+                  },
+                  "gr.n_deriv": {
+                    "type": "keyword"
+                  },
+                  "gr.gender": {
+                    "type": "keyword"
+                  },
+                  "gr.adj_comp": {
+                    "type": "keyword"
+                  },
+                  "gr.definiteness": {
+                    "type": "keyword"
+                  },
+                  "gr.case_c": {
+                    "type": "keyword"
+                  },
                   "gr.dir": {
+                    "type": "keyword"
+                  },
+                  "gr.pos": {
+                    "type": "keyword"
+                  },
+                  "gr.number": {
+                    "type": "keyword"
+                  },
+                  "gr.case": {
+                    "type": "keyword"
+                  },
+                  "gr.aspect": {
+                    "type": "keyword"
+                  },
+                  "gr.add": {
+                    "type": "keyword"
+                  },
+                  "gr.dyn": {
+                    "type": "keyword"
+                  },
+                  "gr.voice": {
+                    "type": "keyword"
+                  },
+                  "gr.num_deriv": {
+                    "type": "keyword"
+                  },
+                  "gr.tense": {
+                    "type": "keyword"
+                  },
+                  "gr.pers": {
+                    "type": "keyword"
+                  },
+                  "gr.comp": {
+                    "type": "keyword"
+                  },
+                  "gr.remark": {
+                    "type": "keyword"
+                  },
+                  "gr.poss": {
+                    "type": "keyword"
+                  },
+                  "gr.transitivity": {
+                    "type": "keyword"
+                  },
+                  "gr.numeral": {
+                    "type": "keyword"
+                  },
+                  "gr.tr": {
+                    "type": "keyword"
+                  },
+                  "gr.mood": {
+                    "type": "keyword"
+                  },
+                  "gr.additional": {
+                    "type": "keyword"
+                  },
+                  "gr.appl": {
+                    "type": "keyword"
+                  },
+                  "gr.cnv_form": {
+                    "type": "keyword"
+                  },
+                  "gr.ptcp_form": {
+                    "type": "keyword"
+                  },
+                  "gr.v_deriv": {
+                    "type": "keyword"
+                  },
+                  "gr.conjtype": {
+                    "type": "keyword"
+                  },
+                  "gr.v_subcat": {
+                    "type": "keyword"
+                  },
+                  "gr.animacy": {
                     "type": "keyword"
                   }
                 }
@@ -149,6 +299,15 @@
                 "type": "integer"
               },
               "n_docs": {
+                "type": "integer"
+              },
+              "wf_order": {
+                "type": "integer"
+              },
+              "l_order": {
+                "type": "integer"
+              },
+              "w_id": {
                 "type": "integer"
               }
             }
@@ -185,7 +344,12 @@
           "wtype": {
             "type": "keyword"
           },
-          "lang": "byte",
+          "lang": {
+            "type": "byte"
+          },
+          "sentence_index": {
+            "type": "short"
+          },
           "sids": {
             "type": "integer",
             "index": false
@@ -203,58 +367,109 @@
               "trans_ru": {
                 "type": "text"
               },
-              "lex2": {
-                "type": "text"
-              },
-              "trans_ru2": {
-                "type": "text"
-              },
-              "gr.appl": {
-                "type": "keyword"
-              },
-              "gr.pos": {
-                "type": "keyword"
-              },
-              "gr.case": {
-                "type": "keyword"
-              },
-              "gr.tense": {
-                "type": "keyword"
-              },
               "gr.v_form": {
-                "type": "keyword"
-              },
-              "gr.ptcp_form": {
-                "type": "keyword"
-              },
-              "gr.pers": {
-                "type": "keyword"
-              },
-              "gr.poss": {
-                "type": "keyword"
-              },
-              "gr.v_deriv": {
-                "type": "keyword"
-              },
-              "gr.tr": {
-                "type": "keyword"
-              },
-              "gr.number": {
-                "type": "keyword"
-              },
-              "gr.dyn": {
-                "type": "keyword"
-              },
-              "gr.numeral": {
-                "type": "keyword"
-              },
-              "gr.clitics": {
                 "type": "keyword"
               },
               "gr.adj_form": {
                 "type": "keyword"
               },
+              "gr.attributivizer": {
+                "type": "keyword"
+              },
+              "gr.clitics": {
+                "type": "keyword"
+              },
+              "gr.n_deriv": {
+                "type": "keyword"
+              },
+              "gr.gender": {
+                "type": "keyword"
+              },
+              "gr.adj_comp": {
+                "type": "keyword"
+              },
+              "gr.definiteness": {
+                "type": "keyword"
+              },
+              "gr.case_c": {
+                "type": "keyword"
+              },
               "gr.dir": {
+                "type": "keyword"
+              },
+              "gr.pos": {
+                "type": "keyword"
+              },
+              "gr.number": {
+                "type": "keyword"
+              },
+              "gr.case": {
+                "type": "keyword"
+              },
+              "gr.aspect": {
+                "type": "keyword"
+              },
+              "gr.add": {
+                "type": "keyword"
+              },
+              "gr.dyn": {
+                "type": "keyword"
+              },
+              "gr.voice": {
+                "type": "keyword"
+              },
+              "gr.num_deriv": {
+                "type": "keyword"
+              },
+              "gr.tense": {
+                "type": "keyword"
+              },
+              "gr.pers": {
+                "type": "keyword"
+              },
+              "gr.comp": {
+                "type": "keyword"
+              },
+              "gr.remark": {
+                "type": "keyword"
+              },
+              "gr.poss": {
+                "type": "keyword"
+              },
+              "gr.transitivity": {
+                "type": "keyword"
+              },
+              "gr.numeral": {
+                "type": "keyword"
+              },
+              "gr.tr": {
+                "type": "keyword"
+              },
+              "gr.mood": {
+                "type": "keyword"
+              },
+              "gr.additional": {
+                "type": "keyword"
+              },
+              "gr.appl": {
+                "type": "keyword"
+              },
+              "gr.cnv_form": {
+                "type": "keyword"
+              },
+              "gr.ptcp_form": {
+                "type": "keyword"
+              },
+              "gr.v_deriv": {
+                "type": "keyword"
+              },
+              "gr.conjtype": {
+                "type": "keyword"
+              },
+              "gr.v_subcat": {
+                "type": "keyword"
+              },
+              "gr.animacy": {
                 "type": "keyword"
               }
             }
@@ -270,7 +485,35 @@
           },
           "n_docs": {
             "type": "integer"
+          },
+          "wf_order": {
+            "type": "integer"
+          },
+          "l_order": {
+            "type": "integer"
           }
+        }
+      },
+      "word_freq": {
+        "properties": {
+          "w_id": {
+            "type": "integer"
+          },
+          "d_id": {
+            "type": "integer"
+          },
+          "freq": {
+            "type": "integer"
+          },
+          "wf_order": {
+            "type": "integer"
+          },
+          "l_order": {
+            "type": "integer"
+          }
+        },
+        "_parent": {
+          "type": "word"
         }
       }
     },

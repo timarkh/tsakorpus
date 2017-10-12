@@ -1,8 +1,8 @@
 {
-  "corpus_name": "albanian",
-  "input_format": "json-gzip",
+  "corpus_name": "beserman_eaf",
+  "input_format": "json",
   "debug": true,
-  "media": false,
+  "media": true,
   "media_length": 60,
   "max_context_expand": 4,
   "max_distance_filter": 200000,
@@ -11,12 +11,11 @@
   "query_timeout": 60,
   "viewable_meta": [
     "filename",
-    "author",
     "title",
     "genre",
-    "year1",
-    "year2",
-    "issue"
+    "year",
+    "speakers",
+    "linguists"
   ],
   "sentence_meta": [
     "year",
@@ -42,16 +41,17 @@
     ],
     "stat_options": [
       "genre",
-      "author",
+      "linguists",
+      "speakers",
       "title",
-      "year1"
+      "year"
     ]
   },
   "word_fields":
   [
     "trans_ru"
   ],
-  "languages": ["albanian"],
+  "languages": ["beserman", "russian"],
   "transliterations": ["original", "cyrillic"],
   "interface_languages": {"en": "English", "ru": "Russian"},
   "all_language_search_enabled": true,

@@ -720,6 +720,8 @@ class SentenceViewer:
                 dateDisplayed += '&ndash;' + str(dSource['year2'])
         doc['date_displayed'] = dateDisplayed
         for field in self.sc.qp.docMetaFields:
+            if field.endswith('_kw'):
+                continue
             if field in dSource:
                 doc['fields'].append(dSource[field])
             else:
@@ -875,7 +877,7 @@ class SentenceViewer:
         result = {'n_words': 0, 'n_sentences': 0, 'n_docs': 0,
                   'size_percent': 0.0,
                   'message': 'Nothing found.',
-                  'metafields': self.sc.qp.docMetaFields}
+                  'metafields': [field for field in self.sc.qp.docMetaFields if not field.endswith('_kw')]}
         if ('hits' not in response
                 or 'total' not in response['hits']
                 or response['hits']['total'] <= 0):

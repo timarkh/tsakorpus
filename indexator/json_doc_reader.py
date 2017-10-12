@@ -16,6 +16,30 @@ class JSONDocReader:
         self.format = format
         self.lastDocMeta = None         # for lazy calculations
 
+    @staticmethod
+    def insert_meta_year(metadata):
+        """
+        If there is no year field in metadata, but there are year1 and
+        year2 fields denoting a range whose values do not differ too much,
+        insert the year field. In the opposite case, insert year1 and year2 fields.
+        """
+        for yearField in ['year', 'year1', 'year2']:
+            if yearField in metadata and type(metadata[yearField]) == str:
+                try:
+                    metadata[yearField] = int(metadata[yearField])
+                except:
+                    del metadata[yearField]
+        if 'year' not in metadata and 'year1' in metadata and 'year2' in metadata:
+            if metadata['year1'] == metadata['year2']:
+                metadata['year'] = metadata['year1']
+            elif 0 < int(metadata['year2']) - int(metadata['year1']) <= 2:
+                metadata['year'] = (metadata['year2'] + metadata['year1']) // 2
+        elif 'year' in metadata:
+            if 'year1' not in metadata:
+                metadata['year1'] = metadata['year']
+            if 'year2' not in metadata:
+                metadata['year2'] = metadata['year']
+
     def get_metadata(self, fname):
         """
         If the file is not too large, return its metadata.
@@ -23,6 +47,7 @@ class JSONDocReader:
         if os.stat(fname).st_size > self.filesize_limit > 0:
             return
         if fname == self.lastFileName and self.lastDocMeta is not None:
+            self.insert_meta_year(self.lastDocMeta)
             return self.lastDocMeta
         self.lastFileName = fname
         if self.format == 'json':
@@ -43,6 +68,7 @@ class JSONDocReader:
                 break
         self.lastDocMeta = metadata
         fIn.close()
+        self.insert_meta_year(metadata)
         return metadata
 
     def get_sentences(self, fname):

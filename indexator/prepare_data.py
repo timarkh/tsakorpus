@@ -113,7 +113,13 @@ class PrepareData:
         Each element of docs index contains metadata about
         about a single document.
         """
-        m = {'n_words': 'integer'}
+        m = {}
+        m['n_words'] = {'type': 'integer'}
+        m['n_sents'] = {'type': 'integer'}
+        if len(self.settings['languages']) > 1:
+            for lang in self.settings['languages']:
+                m['n_words_' + lang] = {'type': 'integer'}
+                m['n_sents_' + lang] = {'type': 'integer'}
         for meta in self.settings['viewable_meta']:
             if meta.startswith('year'):
                 m[meta] = {'type': 'integer'}

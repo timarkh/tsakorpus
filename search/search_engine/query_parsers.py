@@ -36,6 +36,11 @@ class InterfaceQueryParser:
         if 'viewable_meta' in self.settings:
             self.docMetaFields += [f for f in self.settings['viewable_meta']
                                    if f not in self.docMetaFields and f != 'filename']
+        if 'search_meta' in self.settings and 'stat_options' in self.settings['search_meta']:
+            self.docMetaFields += [f for f in self.settings['search_meta']['stat_options']
+                                   if f not in self.docMetaFields and f != 'filename']
+        kwMetaFields = [f + '_kw' for f in self.docMetaFields if not f.startswith('year')]
+        self.docMetaFields += kwMetaFields
         # for g in self.gramDict:
         #     self.gramDict[g] = 'ana.gr.' + self.gramDict[g]
 
@@ -135,18 +140,20 @@ class InterfaceQueryParser:
                          for part in parts if len(part) > 0)
         return qStart + result + qEnd
 
-    def make_simple_term_query(self, text, field, lang):
+    def make_simple_term_query(self, text, field, lang, keyword_query=False):
         """
         Make a term query that will become one of the inner parts
         of the compound bool query. Recognize simple wildcards and regexps.
         If the field is "ana.gr", find categories for every gramtag. If no
         category is available for some tag, return empty query.
         """
-        if len(text) <= 0:
+        if type(text) == str and len(text) <= 0:
             return {}
         if field == 'ana.gloss_index' or field.endswith('.ana.gloss_index'):
             # return {'regexp': {field: text}}
             return {'regexp': {field: self.make_simple_gloss_query(text, lang)}}
+        elif keyword_query:
+            return {'match': {field: text}}
         elif not (field == 'ana.gr' or field.endswith('.ana.gr')):
             if field in self.settings['viewable_meta']:
                 text = text.lower()
@@ -173,10 +180,15 @@ class InterfaceQueryParser:
         delimited by start and end parameters.
         """
         if end == -1:
+            if type(strQuery) == int:
+                return self.make_simple_term_query(strQuery, field, lang, keyword_query=True)
             if not keyword_query:
                 strQuery = strQuery.replace(' ', '')
             else:
                 strQuery = strQuery.strip()
+                if '|' not in strQuery:
+                    # Metadata query: metafields can contain commas and parentheses
+                    return self.make_simple_term_query(strQuery, field, lang, keyword_query=keyword_query)
             end = len(strQuery)
             if strQuery.count('(') != strQuery.count(')'):
                 return {'match_none': {}}
@@ -598,7 +610,7 @@ class InterfaceQueryParser:
         """
         queryParts = []
         for field in self.docMetaFields:
-            if field in htmlQuery and len(htmlQuery[field]) > 0:
+            if field in htmlQuery and (type(htmlQuery[field]) == int or len(htmlQuery[field]) > 0):
                 queryParts.append(self.make_bool_query(htmlQuery[field], field, 'all', keyword_query=True))
         if exclude is not None and len(exclude) > 0:
             queryParts.append({'bool': {'must_not': [{'terms': {'_id': list(exclude)}}]}})
@@ -609,7 +621,7 @@ class InterfaceQueryParser:
         else:
             query = {'match_all': {}}
 
-        aggNWords = {'agg_nwords': {'sum': {'field': 'n_words_0'}}}
+        aggNWords = {'agg_nwords': {'sum': {'field': 'n_words'}}}
         esQuery = {'query': query, 'from': query_from, 'size': query_size,
                    '_source': {'excludes': ['filename']},
                    'aggs': aggNWords}

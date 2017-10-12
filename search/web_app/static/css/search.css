@@ -789,6 +789,12 @@ hr.separator {
   display: none;
 }
 
+.plot_line {
+  fill: none;
+  stroke: #c66d00;
+  stroke-width: 2px;
+}
+
 .message {
 	color: #772814;
 	text-shadow: 2px 2px #fff787;
