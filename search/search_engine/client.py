@@ -93,7 +93,7 @@ class SearchClient:
         """
         Return total number of words in the primary language in the corpus.
         """
-        aggNWords = {'agg_nwords': {'sum': {'field': 'n_words_0'}}}
+        aggNWords = {'agg_nwords': {'sum': {'field': 'n_words'}}}
         esQuery = {'query': {'match_all': {}}, 'from': 0, 'size': 0,
                    'aggs': aggNWords}
         hits = self.es.search(index=self.name + '.docs', doc_type='doc',
@@ -107,4 +107,4 @@ class SearchClient:
         response = self.get_doc_by_id(docId=docId)
         if response['hits']['total'] <= 0:
             return 0
-        return response['hits']['hits'][0]['_source']['n_words_0']
+        return response['hits']['hits'][0]['_source']['n_words']

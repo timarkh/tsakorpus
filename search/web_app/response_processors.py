@@ -655,6 +655,20 @@ class SentenceViewer:
             hitsProcessed['n_sentences'] += 1
             hitsProcessed['doc_ids'].add(hit['_source']['doc_id'])
 
+    @staticmethod
+    def get_lemma(word):
+        """
+        Join all lemmata in the JSON representation of a word with
+        an analysis and return them as a string.
+        """
+        if 'ana' not in word:
+            return ''
+        curLemmata = set()
+        for ana in word['ana']:
+            if 'lex' in ana:
+                curLemmata.add(ana['lex'].lower())
+        return '/'.join(l for l in sorted(curLemmata))
+
     def process_words_collected_from_sentences(self, hitsProcessed, sortOrder='freq', pageSize=10):
         """
         Process all words collected from the sentences with a multi-word query.

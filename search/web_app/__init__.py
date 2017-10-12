@@ -521,7 +521,7 @@ def get_word_stats(metaField):
     of a particular word form by values of one metafield. This function
     can be used to visualise word distributions across genres etc.
     """
-    if metaField not in settings['viewable_meta']:
+    if metaField not in settings['search_meta']['stat_options']:
         return jsonify({})
 
     htmlQuery = copy_request_args()
@@ -570,7 +570,8 @@ def get_word_stats(metaField):
                     or 'agg_freq' not in hits['aggregations']
                     or 'agg_ndocs' not in hits['aggregations']
                     or hits['aggregations']['agg_ndocs']['value'] is None
-                    or hits['aggregations']['agg_ndocs']['value'] <= 0):
+                    or (hits['aggregations']['agg_ndocs']['value'] <= 0
+                        and not metaField.startswith('year'))):
                 continue
             bucket['n_words'] = hits['aggregations']['agg_freq']['value'] / bucket['n_words'] * 1000000
             bucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / bucket['n_docs'] * 100
@@ -580,7 +581,8 @@ def get_word_stats(metaField):
                     or 'agg_nwords' not in hits['aggregations']
                     or 'agg_ndocs' not in hits['aggregations']
                     or hits['aggregations']['agg_ndocs']['value'] is None
-                    or hits['aggregations']['agg_ndocs']['value'] <= 0):
+                    or (hits['aggregations']['agg_ndocs']['value'] <= 0
+                        and not metaField.startswith('year'))):
                 continue
             bucket['n_words'] = hits['aggregations']['agg_nwords']['sum'] / bucket['n_words'] * 1000000
             if nWords > 1:
