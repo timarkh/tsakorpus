@@ -41,17 +41,13 @@ function assign_word_events() {
 }
 
 function highlight_cur_word(e) {
-	//alert('Highlight called.');
-	//alert($(e.target).attr('class'));
 	targetClasses = $(e.target).attr('class').split(' ');
 	$('.w_highlighted').css({'border-style': 'none'});
 	$('.w_highlighted').removeClass('w_highlighted');
 	targetClasses.forEach(highlight_word_spans);
-	//alert($(e.target).attr('data-ana').replace(/\\n/g, "\n"));
 }
 
 function expand_context(e) {
-	//alert($(e.currentTarget).attr('class'));
 	var n_sent = $(e.currentTarget).attr('data-nsent');
 	load_expanded_context(n_sent);
 }

@@ -35,6 +35,8 @@ $(function() {
 			url: "search_word",
 			data: $("#search_main").serialize(),
 			type: "GET",
+			beforeSend: start_progress_bar,
+			complete: stop_progress_bar,
 			success: function(result) {hide_query_panel(); print_html(result)},
 			error: function(errorThrown) {
 				alert( JSON.stringify(errorThrown) );
@@ -117,6 +119,25 @@ $(function() {
 	assign_show_hide();
 });
 
+function start_progress_bar() {
+	$('#res_p').html('0');
+	$('#res_p').addClass('in_progress');
+	continue_progress_bar();
+}
+
+function continue_progress_bar() {
+	setTimeout(function () {
+		if ($('#res_p').hasClass('in_progress')) {
+			$('#res_p').html((parseInt($('#res_p').html().replace(/[^0-9]/g, '')) + 1) + ' seconds elapsed')
+			continue_progress_bar();
+		}
+    }, 1000)
+}
+
+function stop_progress_bar() {
+	$('#res_p').removeClass('in_progress');
+}
+
 function load_expanded_context(n_sent) {
 	$.ajax({
 		url: "get_sent_context/" + n_sent,
@@ -144,13 +165,13 @@ function load_additional_word_fields() {
 }
 
 function hide_query_panel() {
-	if ($("img-swap").attr('class') != "on") {
+	if (!$(".img-swap").hasClass('on')) {
 		$(".img-swap").click();
 	}
 }
 
 function show_query_panel() {
-	if ($("img-swap").attr('class') == "on") {
+	if ($(".img-swap").hasClass('on')) {
 		$(".img-swap").click();
 	}
 }

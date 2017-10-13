@@ -112,7 +112,8 @@ def initialize_session():
                                           'last_sent_num': -1,
                                           'last_query': {},
                                           'seed': random.randint(1, 1e6),
-                                          'excluded_doc_ids': set()}
+                                          'excluded_doc_ids': set(),
+                                          'progress': 100}
 
 
 def get_session_data(fieldName):
@@ -139,6 +140,8 @@ def get_session_data(fieldName):
         sessionData[session['session_id']]['seed'] = random.randint(1, 1e6)
     elif fieldName == 'excluded_doc_ids' and fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']]['excluded_doc_ids'] = set()
+    elif fieldName == 'progress' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['progress'] = 0
     elif fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']][fieldName] = ''
     try:
@@ -960,6 +963,7 @@ def search_word_json():
 
 @app.route('/search_word')
 def search_word():
+    set_session_data('progress', 0)
     query = copy_request_args()
     change_display_options(query)
     if 'doc_ids' not in query:
@@ -1018,6 +1022,7 @@ def search_word():
                                                             pageSize=get_session_data('page_size'))
 
     hitsProcessed['media'] = settings['media']
+    set_session_data('progress', 100)
     return render_template('result_words.html', data=hitsProcessed)
 
 
