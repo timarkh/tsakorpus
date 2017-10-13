@@ -232,7 +232,7 @@ def add_sent_data_for_session(sent, sentData):
         if 'lang' in sent['_source']:
             langID = sent['_source']['lang']
             highlightedText = sentView.process_sentence_csv(sent, lang=settings['languages'][langID],
-                                                            translit = get_session_data('translit'))
+                                                            translit=get_session_data('translit'))
         lang = settings['languages'][langID]
         if lang not in sentData['languages']:
             sentData['languages'][lang] = {'id': sent['_id'],
@@ -659,11 +659,12 @@ def copy_request_args():
     return query
 
 
-def count_occurrences(query):
+def count_occurrences(query, distances=None):
     esQuery = sc.qp.html2es(query,
                             searchOutput='sentences',
                             sortOrder='no',
-                            query_size=1)
+                            query_size=1,
+                            distances=distances)
     hits = sc.get_sentences(esQuery)
     if ('aggregations' in hits
             and 'agg_nwords' in hits['aggregations']
@@ -739,18 +740,22 @@ def find_sentences_json(page=0):
             iterator = sc.get_all_sentences(esQuery)
             query['sent_ids'] = sc.qp.filter_sentences(iterator, wordConstraints)
             set_session_data('last_query', query)
-    nOccurrences = 0
 
-    nWords = 1
-    if 'n_words' in query:
-        nWords = int(query['n_words'])
-    if (get_session_data('sort') == 'random'
-            and nWords == 1):
-        nOccurrences = count_occurrences(query)
     queryWordConstraints = None
     if (len(wordConstraints) > 0
             and get_session_data('distance_strict')):
         queryWordConstraints = wordConstraints
+
+    nOccurrences = 0
+    nWords = 1
+    if 'n_words' in query:
+        nWords = int(query['n_words'])
+    if (get_session_data('sort') == 'random'
+            and (nWords == 1
+                 or len(wordConstraints) <= 0
+                 or not distance_constraints_too_complex(wordConstraints))):
+        nOccurrences = count_occurrences(query, distances=queryWordConstraints)
+
     esQuery = sc.qp.html2es(query,
                             searchOutput='sentences',
                             sortOrder=get_session_data('sort'),
@@ -891,12 +896,13 @@ def search_word_query():
         wordConstraints = sc.qp.wr.get_constraints(query)
         set_session_data('word_constraints', wordConstraints)
         if (len(wordConstraints) > 0
-                and get_session_data('distance_strict')):
+            and get_session_data('distance_strict')):
             queryWordConstraints = wordConstraints
 
     query = sc.qp.html2es(query,
                           searchOutput='words',
                           sortOrder=sortOrder,
+                          randomSeed=get_session_data('seed'),
                           query_size=get_session_data('page_size'),
                           distances=queryWordConstraints)
     return jsonify(query)
@@ -907,7 +913,6 @@ def search_word_query():
 def search_word_json():
     query = copy_request_args()
     change_display_options(query)
-
     if 'doc_ids' not in query:
         docIDs = subcorpus_ids(query)
         if docIDs is not None:
@@ -916,13 +921,26 @@ def search_word_json():
         docIDs = query['doc_ids']
 
     searchIndex = 'words'
+    sortOrder = get_session_data('sort')
+    queryWordConstraints = None
+    nWords = 1
     if 'n_words' in query and int(query['n_words']) > 1:
+        nWords = int(query['n_words'])
         searchIndex = 'sentences'
+        sortOrder = 'random'  # in this case, the words are sorted after the search
+        wordConstraints = sc.qp.wr.get_constraints(query)
+        set_session_data('word_constraints', wordConstraints)
+        if (len(wordConstraints) > 0
+                and get_session_data('distance_strict')):
+            queryWordConstraints = wordConstraints
 
     query = sc.qp.html2es(query,
                           searchOutput='words',
-                          sortOrder=get_session_data('sort'),
-                          query_size=get_session_data('page_size'))
+                          sortOrder=sortOrder,
+                          randomSeed=get_session_data('seed'),
+                          query_size=get_session_data('page_size'),
+                          distances=queryWordConstraints)
+
     hits = []
     if searchIndex == 'words':
         if docIDs is None:
@@ -930,7 +948,11 @@ def search_word_json():
         else:
             hits = sc.get_word_freqs(query)
     elif searchIndex == 'sentences':
+        iSent = 0
         for hit in sc.get_all_sentences(query):
+            if iSent >= 5:
+                break
+            iSent += 1
             hits.append(hit)
 
     return jsonify(hits)
@@ -990,9 +1012,10 @@ def search_word():
                 hitsProcessed['timeout'] = True
                 break
         hitsProcessed['n_docs'] = len(hitsProcessed['doc_ids'])
-        sentView.process_words_collected_from_sentences(hitsProcessed,
-                                                        sortOrder=get_session_data('sort'),
-                                                        pageSize=get_session_data('page_size'))
+        if hitsProcessed['n_docs'] > 0:
+            sentView.process_words_collected_from_sentences(hitsProcessed,
+                                                            sortOrder=get_session_data('sort'),
+                                                            pageSize=get_session_data('page_size'))
 
     hitsProcessed['media'] = settings['media']
     return render_template('result_words.html', data=hitsProcessed)

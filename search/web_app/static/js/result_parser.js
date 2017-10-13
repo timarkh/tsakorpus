@@ -2,11 +2,13 @@
 
 function print_json(results) {
 	//alert("success" + JSON.stringify(results));
+	$('#analysis').css('display', 'none');
 	$("#res_p").html( "<p style=\"font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;\">Success!<hr>" + JSON.stringify(results, null, 2).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;") ) + "</p>";
 }
 
 function print_html(results) {
 	//alert("success" + JSON.stringify(results));
+	$('#analysis').css('display', 'none');
 	$("#res_p").html( results );
 }
 

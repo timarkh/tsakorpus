@@ -13,6 +13,7 @@ class SentenceViewer:
     """
 
     rxWordNo = re.compile('^w[0-9]+_([0-9]+)$')
+    rxHitWordNo = re.compile('(?<=^w)[0-9]+')
     rxTextSpans = re.compile('</?span.*?>|[^<>]+', flags=re.DOTALL)
     invisibleAnaFields = {'gloss_index'}
 
@@ -597,29 +598,37 @@ class SentenceViewer:
                                nDocs=nDocs,
                                wfSearch=wSource['wf'])
 
-    def filter_multi_word_highlight(self, hit, nWords=1):
+    def filter_multi_word_highlight_iter(self, hit, nWords=1, keepOnlyFirst=False):
         """
         Remove those of the highlights that are empty or which do
-        not constitute a full set of search terms.
-        Change the hit dictionary, do not return anything.
+        not constitute a full set of search terms. If keepOnlyFirst
+        is True, remove highlights for all non-first query words.
+        Iterate over filtered inner hits.
         """
-        if '_source' not in hit or 'inner_hits' not in hit or nWords <= 1:
+        if 'inner_hits' not in hit:
             return
-        for iPivotalTermIndex in range(self.settings['max_words_in_sentence']):
-            bAllWords = True
-            for iWord in range(1, nWords + 1):
-                wLabel = 'w' + str(iWord) + '_' + str(iPivotalTermIndex)
-                if wLabel not in hit['inner_hits']:
-                    continue
-                if 'hits' not in hit['inner_hits'][wLabel] or hit['inner_hits'][wLabel]['hits']['total'] <= 0:
-                    bAllWords = False
-                    break
-            if not bAllWords:
-                for iWord in range(1, nWords + 1):
-                    wLabel = 'w' + str(iWord) + '_' + str(iPivotalTermIndex)
-                    if wLabel not in hit['inner_hits']:
-                        continue
-                    del hit['inner_hits'][wLabel]
+        if keepOnlyFirst:
+            for key, ih in hit['inner_hits'].items():
+                if (key in self.w1_labels
+                    and all(hit['inner_hits']['w' + str(iWord + 1) + '_' + key[3:]]['hits']['total'] > 0
+                            for iWord in range(1, nWords))):
+                    yield key, ih
+        else:
+            for key, ih in hit['inner_hits'].items():
+                if (all(hit['inner_hits'][self.rxHitWordNo.sub(str(iWord + 1), key, 1)]['hits']['total'] > 0
+                        for iWord in range(nWords))
+                        or '_' not in key):
+                    yield key, ih
+
+    def filter_multi_word_highlight(self, hit, nWords=1, keepOnlyFirst=False):
+        """
+        Non-iterative version of filter_multi_word_highlight_iter whic
+        replaces hits['inner_hits'] dictionary.
+        """
+        if 'inner_hits' not in hit or nWords <= 1:
+            return
+        hit['inner_hits'] = {key: ih for key, ih in self.filter_multi_word_highlight_iter(hit, nWords=nWords,
+                                                                                          keepOnlyFirst=keepOnlyFirst)}
 
     def add_word_from_sentence(self, hitsProcessed, hit, nWords=1):
         """
@@ -630,13 +639,13 @@ class SentenceViewer:
             return
         langID, lang = self.get_lang_from_hit(hit)
         bRelevantWordExists = False
-        self.filter_multi_word_highlight(hit, nWords=nWords)
+        # self.filter_multi_word_highlight(hit, nWords=nWords, keepOnlyFirst=True)
 
-        for innerHitKey in hit['inner_hits']:
-            if innerHitKey not in self.w1_labels:
-                continue
+        for innerHitKey, innerHit in self.filter_multi_word_highlight_iter(hit, nWords=nWords, keepOnlyFirst=True):
+            # if innerHitKey not in self.w1_labels:
+            #     continue
             bRelevantWordExists = True
-            for word in hit['inner_hits'][innerHitKey]['hits']['hits']:
+            for word in innerHit['hits']['hits']:
                 hitsProcessed['total_freq'] += 1
                 word['_source']['lang'] = lang
                 wID = word['_source']['w_id']

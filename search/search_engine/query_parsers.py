@@ -240,8 +240,7 @@ class InterfaceQueryParser:
             esQuery = {'nested': {'path': nestedPath,
                                   'query': {'constant_score': {'query': query, 'boost': constantScore}},
                                   'score_mode': 'sum'}}
-        if highlightFields is not None and (searchOutput == 'sentences'
-                                            or (queryName == 'w1' or queryName.startswith('w1_'))):
+        if highlightFields is not None:
             esQuery['nested']['inner_hits'] = {'highlight':
                                                {'fields':
                                                 {f: {'number_of_fragments': 50,
