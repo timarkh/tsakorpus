@@ -376,21 +376,39 @@ def search_sent_query(page=0):
         query = get_session_data('last_query')
     set_session_data('page', page)
     wordConstraints = sc.qp.wr.get_constraints(query)
-    wordConstraintsPrint = {str(k): v for k, v in wordConstraints.items()}
+    # wordConstraintsPrint = {str(k): v for k, v in wordConstraints.items()}
 
     if 'para_ids' not in query:
         query, paraIDs = para_ids(query)
         if paraIDs is not None:
             query['para_ids'] = list(paraIDs)
 
-    query = sc.qp.html2es(query,
-                          searchOutput='sentences',
-                          sortOrder=get_session_data('sort'),
-                          randomSeed=get_session_data('seed'),
-                          query_size=get_session_data('page_size'),
-                          page=get_session_data('page'),
-                          distances=wordConstraints)
-    return jsonify([query, wordConstraintsPrint])
+    if (len(wordConstraints) > 0
+            and get_session_data('distance_strict')
+            and 'sent_ids' not in query
+            and distance_constraints_too_complex(wordConstraints)):
+        esQuery = sc.qp.html2es(query,
+                                searchOutput='sentences',
+                                query_size=1,
+                                distances=wordConstraints)
+        hits = sc.get_sentences(esQuery)
+        if ('hits' not in hits
+                or 'total' not in hits['hits']
+                or hits['hits']['total'] > settings['max_distance_filter']):
+            esQuery = {}
+        else:
+            esQuery = sc.qp.html2es(query,
+                                    searchOutput='sentences',
+                                    distances=wordConstraints)
+    else:
+        esQuery = sc.qp.html2es(query,
+                                searchOutput='sentences',
+                                sortOrder=get_session_data('sort'),
+                                randomSeed=get_session_data('seed'),
+                                query_size=get_session_data('page_size'),
+                                page=get_session_data('page'),
+                                distances=wordConstraints)
+    return jsonify(esQuery)
 
 
 def find_parallel_for_one_sent(sSource):
@@ -739,9 +757,11 @@ def find_sentences_json(page=0):
             query = {}
         else:
             esQuery = sc.qp.html2es(query,
-                                    searchOutput='sentences')
-            iterator = sc.get_all_sentences(esQuery)
-            query['sent_ids'] = sc.qp.filter_sentences(iterator, wordConstraints)
+                                    searchOutput='sentences',
+                                    distances=wordConstraints)
+            # TODO: separate threshold for this
+            # iterator = sc.get_all_sentences(esQuery)
+            # query['sent_ids'] = sc.qp.filter_sentences(iterator, wordConstraints)
             set_session_data('last_query', query)
 
     queryWordConstraints = None
@@ -781,7 +801,8 @@ def find_sentences_json(page=0):
             # only count number of occurrences for one-word queries
             hits['aggregations']['agg_nwords']['sum'] = 0
     if (len(wordConstraints) > 0
-            and not get_session_data('distance_strict')
+            and (not get_session_data('distance_strict')
+                 or distance_constraints_too_complex(wordConstraints))
             and 'hits' in hits and 'hits' in hits['hits']):
         for hit in hits['hits']['hits']:
             hit['toggled_on'] = sc.qp.wr.check_sentence(hit, wordConstraints)
@@ -806,7 +827,10 @@ def search_sent(page=-1):
     if page < 0:
         set_session_data('page_data', {})
         page = 0
-    hits = find_sentences_json(page=page)
+    try:
+        hits = find_sentences_json(page=page)
+    except:
+        return render_template('result_sentences.html', message='Request timeout.')
     add_sent_to_session(hits)
     hitsProcessed = sentView.process_sent_json(hits,
                                                translit=get_session_data('translit'))
