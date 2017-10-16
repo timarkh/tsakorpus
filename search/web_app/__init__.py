@@ -27,6 +27,8 @@ localizations = {}
 supportedLocales = ['ru', 'en']
 sc = SearchClient(SETTINGS_DIR, mode='test')
 sentView = SentenceViewer(SETTINGS_DIR, sc)
+sc.qp.rp = sentView
+sc.qp.wr.rp = sentView
 random.seed()
 corpus_size = sc.get_n_words()  # size of the corpus in words
 
@@ -732,6 +734,10 @@ def find_sentences_json(page=0):
         wordConstraints = get_session_data('word_constraints')
     set_session_data('page', page)
 
+    nWords = 1
+    if 'n_words' in query:
+        nWords = int(query['n_words'])
+
     if 'doc_ids' not in query and 'sent_ids' not in query:
         docIDs = subcorpus_ids(query)
         if docIDs is not None:
@@ -759,9 +765,13 @@ def find_sentences_json(page=0):
             esQuery = sc.qp.html2es(query,
                                     searchOutput='sentences',
                                     distances=wordConstraints)
-            # TODO: separate threshold for this
-            # iterator = sc.get_all_sentences(esQuery)
-            # query['sent_ids'] = sc.qp.filter_sentences(iterator, wordConstraints)
+            if '_source' not in esQuery:
+                esQuery['_source'] = {}
+            # esQuery['_source']['excludes'] = ['words.ana', 'words.wf']
+            esQuery['_source'] = ['words.next_word', 'words.wtype']
+            # TODO: separate threshold for this?
+            iterator = sc.get_all_sentences(esQuery)
+            query['sent_ids'] = sc.qp.filter_sentences(iterator, wordConstraints, nWords=nWords)
             set_session_data('last_query', query)
 
     queryWordConstraints = None
@@ -770,9 +780,6 @@ def find_sentences_json(page=0):
         queryWordConstraints = wordConstraints
 
     nOccurrences = 0
-    nWords = 1
-    if 'n_words' in query:
-        nWords = int(query['n_words'])
     if (get_session_data('sort') == 'random'
             and (nWords == 1
                  or len(wordConstraints) <= 0
@@ -805,7 +812,7 @@ def find_sentences_json(page=0):
                  or distance_constraints_too_complex(wordConstraints))
             and 'hits' in hits and 'hits' in hits['hits']):
         for hit in hits['hits']['hits']:
-            hit['toggled_on'] = sc.qp.wr.check_sentence(hit, wordConstraints)
+            hit['toggled_on'] = sc.qp.wr.check_sentence(hit, wordConstraints, nWords=nWords)
     return hits
 
 
@@ -827,10 +834,10 @@ def search_sent(page=-1):
     if page < 0:
         set_session_data('page_data', {})
         page = 0
-    try:
-        hits = find_sentences_json(page=page)
-    except:
-        return render_template('result_sentences.html', message='Request timeout.')
+    # try:
+    hits = find_sentences_json(page=page)
+    # except:
+    #     return render_template('result_sentences.html', message='Request timeout.')
     add_sent_to_session(hits)
     hitsProcessed = sentView.process_sent_json(hits,
                                                translit=get_session_data('translit'))
@@ -1000,6 +1007,7 @@ def search_word():
     searchIndex = 'words'
     sortOrder = get_session_data('sort')
     queryWordConstraints = None
+    constraintsTooComplex = False
     nWords = 1
     if 'n_words' in query and int(query['n_words']) > 1:
         nWords = int(query['n_words'])
@@ -1010,13 +1018,16 @@ def search_word():
         if (len(wordConstraints) > 0
                 and get_session_data('distance_strict')):
             queryWordConstraints = wordConstraints
+            if distance_constraints_too_complex(wordConstraints):
+                constraintsTooComplex = True
 
     query = sc.qp.html2es(query,
                           searchOutput='words',
                           sortOrder=sortOrder,
                           randomSeed=get_session_data('seed'),
                           query_size=get_session_data('page_size'),
-                          distances=queryWordConstraints)
+                          distances=queryWordConstraints,
+                          includeNextWordField=constraintsTooComplex)
 
     maxRunTime = time.time() + settings['query_timeout']
     hitsProcessed = {}
@@ -1035,6 +1046,9 @@ def search_word():
                          'total_freq': 0,
                          'words': [], 'doc_ids': set(), 'word_ids': {}}
         for hit in sc.get_all_sentences(query):
+            if constraintsTooComplex:
+                if not sc.qp.wr.check_sentence(hit, wordConstraints, nWords=nWords):
+                    continue
             sentView.add_word_from_sentence(hitsProcessed, hit, nWords=nWords)
             if hitsProcessed['total_freq'] >= 2000 and time.time() > maxRunTime:
                 hitsProcessed['timeout'] = True

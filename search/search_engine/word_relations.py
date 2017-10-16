@@ -12,13 +12,14 @@ class WordRelations:
 
     rxWordRelFields = re.compile('^word_(?:dist_)?(rel|from|to)_([0-9]+)_([0-9]+)')
 
-    def __init__(self, settings_dir):
+    def __init__(self, settings_dir, rp=None):
         self.settings_dir = settings_dir
         f = open(os.path.join(self.settings_dir, 'corpus.json'),
                  'r', encoding='utf-8')
         self.settings = json.loads(f.read())
         f.close()
         self.name = self.settings['corpus_name']
+        self.rp = rp    # ResponseProcessor instance
         # self.sentView = sentence_viewer
 
     def get_constraints(self, htmlQuery):
@@ -145,9 +146,7 @@ class WordRelations:
             return {}
         positions = {}
         for hl in relevantHighlights:
-            if hl not in innerHits:
-                positions[hl] = []
-            else:
+            if hl in innerHits:
                 positions[hl] = [p for p in sorted(self.get_one_highlight_pos(innerHits[hl]))]
         return positions
 
@@ -210,12 +209,13 @@ class WordRelations:
             return True
         return False
 
-    def check_sentence(self, sentence, constraints):
+    def check_sentence(self, sentence, constraints, nWords=1):
         """
         Check if the sentence satisfies the word relation constraints.
         """
         if 'inner_hits' not in sentence:
             return False
+        self.rp.filter_multi_word_highlight(sentence, nWords=nWords)
         wordOffsets = self.get_all_highlight_pos(sentence['inner_hits'], constraints)
         for k, v in constraints.items():
             # wFrom, wTo = 'w' + str(k[0]), 'w' + str(k[1])

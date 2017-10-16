@@ -18,7 +18,7 @@ class InterfaceQueryParser:
                      '&': 'must',
                      '|': 'should'}
 
-    def __init__(self, settings_dir):
+    def __init__(self, settings_dir, rp=None):
         f = open(os.path.join(settings_dir, 'categories.json'),
                  'r', encoding='utf-8-sig')
         self.gramDict = json.loads(f.read())
@@ -31,7 +31,7 @@ class InterfaceQueryParser:
             self.wordFields = self.settings['word_fields']
         else:
             self.wordFields = []
-        self.wr = WordRelations(settings_dir)
+        self.wr = WordRelations(settings_dir, rp=rp)
         self.docMetaFields = ['author', 'title', 'year1', 'year2', 'genre']
         if 'viewable_meta' in self.settings:
             self.docMetaFields += [f for f in self.settings['viewable_meta']
@@ -41,6 +41,7 @@ class InterfaceQueryParser:
                                    if f not in self.docMetaFields and f != 'filename']
         kwMetaFields = [f + '_kw' for f in self.docMetaFields if not f.startswith('year')]
         self.docMetaFields += kwMetaFields
+        self.rp = rp    # ResponseProcessor instance
         # for g in self.gramDict:
         #     self.gramDict[g] = 'ana.gr.' + self.gramDict[g]
 
@@ -529,7 +530,8 @@ class InterfaceQueryParser:
 
     def full_sentence_query(self, queryDict, query_from=0, query_size=10,
                             sortOrder='random', randomSeed=None, lang=0,
-                            searchOutput='sentences', distances=None):
+                            searchOutput='sentences', distances=None,
+                            includeNextWordField=False):
         """
         Make a full ES query for the sentences index out of a dictionary
         with bool queries.
@@ -580,6 +582,8 @@ class InterfaceQueryParser:
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
         if searchOutput == 'words':
             esQuery['_source'] = ['doc_id', 'lang']
+            if includeNextWordField:
+                esQuery['_source'] += ['words.wtype', 'words.next_word']
         esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'doc_id'}},
                            'agg_nwords': {'stats': {'script': '_score'}}}
         if len(queryDictTop) >= 0:
@@ -703,7 +707,8 @@ class InterfaceQueryParser:
         return query_from, langID, lang, searchIndex
 
     def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
-                randomSeed=None, searchOutput='sentences', distances=None):
+                randomSeed=None, searchOutput='sentences', distances=None,
+                includeNextWordField=False):
         """
         Make and return a ES query out of the HTML form data.
         """
@@ -764,7 +769,8 @@ class InterfaceQueryParser:
                                                  randomSeed,
                                                  lang=langID,
                                                  searchOutput=searchOutput,
-                                                 distances=distances)
+                                                 distances=distances,
+                                                 includeNextWordField=includeNextWordField)
         elif searchIndex == 'words':
             queryDict = self.full_word_query(prelimQuery, query_from, query_size, sortOrder,
                                              lang=langID)
@@ -772,13 +778,14 @@ class InterfaceQueryParser:
             queryDict = {'query': {'match_none': ''}}
         return queryDict
 
-    def filter_sentences(self, iterSent, constraints):
+    def filter_sentences(self, iterSent, constraints, nWords=1):
         """
         Remove sentences that do not satisfy the word relation constraints.
         """
         goodSentIDs = []
         for sent in iterSent:
-            if self.wr.check_sentence(sent, constraints):
+            # sent['inner_hits'] = s
+            if self.wr.check_sentence(sent, constraints, nWords=nWords):
                 goodSentIDs.append(sent['_id'])
         return goodSentIDs
 
