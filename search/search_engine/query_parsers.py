@@ -13,6 +13,7 @@ class InterfaceQueryParser:
     rxGlossQueryQuant = re.compile('^\\(([^()]+)\\)([*+?])$')
     rxGlossQuerySrc = re.compile('^([^{}]*)\\{([^{}]*)\\}$')
     rxFieldNum = re.compile('^([^0-9]+)([0-9]+)$')
+    rxNumber = re.compile('^(?:0|[1-9][0-9]*)$')
 
     dictOperators = {',': 'must',
                      '&': 'must',
@@ -219,6 +220,19 @@ class InterfaceQueryParser:
             return {'bool': {'must_not': mustNotClause}}
         return {}
 
+    def make_n_ana_query(self, strQuery, field):
+        """
+        Make a simple bool query for the n_ana field, recognizing one of
+        the several available options in strQuery.
+        """
+        if strQuery == 'nonambiguous':
+            return {'match': {field: 1}}
+        elif strQuery == 'none':
+            return {'match': {field: 0}}
+        elif strQuery == 'ambiguous':
+            return {'range': {field: {'gte': 2}}}
+        return {}
+
     def parse_word_query(self, word, field, lang):
         if InterfaceQueryParser.rxSimpleText.search(word) is not None:
             return {'term': {field: word}}
@@ -420,7 +434,7 @@ class InterfaceQueryParser:
         wordAnaFields = {'words.ana.lex', 'words.ana.gr', 'words.ana.gloss_index'}
         for field in self.wordFields:
             wordAnaFields.add('words.ana.' + field)
-        wordFields = {'words.wf', 'words.wtype'}
+        wordFields = {'words.wf', 'words.wtype', 'words.n_ana', 'words.sentence_index'}
         queryDict = {k: queryDict[k] for k in queryDict
                      if queryDict[k] is not None and queryDict[k] != {}}
         queryDictWords, queryDictWordsAna = {}, {}
@@ -429,7 +443,7 @@ class InterfaceQueryParser:
                 queryDictWordsAna[k] = v
             elif k in wordFields:
                 queryDictWords[k] = v
-        if not negative and sentIndexQuery is not None:
+        if not negative and sentIndexQuery is not None and 'words.sentence_index' not in queryDictWords:
             queryDictWords['words.sentence_index'] = sentIndexQuery
         if (len(queryDictWords) <= 0
                 and len(queryDictWordsAna) <= 0):
@@ -567,6 +581,7 @@ class InterfaceQueryParser:
                 queryFilter.append({'terms': {'doc_id': queryDict['doc_ids']}})
             if 'para_ids' in queryDict:
                 queryFilter.append({'terms': {'para_ids': queryDict['para_ids']}})
+
             for k, v in queryDict.items():
                 if k.startswith('sent_meta_'):
                     k = 'meta.' + k[10:]
@@ -699,6 +714,11 @@ class InterfaceQueryParser:
             langID = self.settings['languages'].index(lang)
         if int(htmlQuery['n_words']) > 1:
             searchIndex = 'sentences'
+        elif ('sentence_index1' in htmlQuery
+                    and len(htmlQuery['sentence_index1']) > 0
+                    and self.rxNumber.search(htmlQuery['sentence_index1']) is not None
+                    and int(htmlQuery['sentence_index1']) > 0):
+            searchIndex = 'sentences'
         else:
             searchIndex = searchOutput
         # searchIndex is the name of the ES index where the search is performed.
@@ -742,6 +762,16 @@ class InterfaceQueryParser:
             if 'wf' + strWordNum in htmlQuery and len(htmlQuery['wf' + strWordNum]) > 0:
                 curPrelimQuery[pathPfx + 'wf'] = self.make_bool_query(htmlQuery['wf' + strWordNum],
                                                                       pathPfx + 'wf', lang)
+            if ('sentence_index' + strWordNum in htmlQuery
+                    and len(htmlQuery['sentence_index' + strWordNum]) > 0
+                    and self.rxNumber.search(htmlQuery['sentence_index' + strWordNum]) is not None
+                    and int(htmlQuery['sentence_index' + strWordNum]) > 0):
+                sentIndex = int(htmlQuery['sentence_index' + strWordNum]) - 1
+                curPrelimQuery[pathPfx + 'sentence_index'] = self.make_bool_query(sentIndex,
+                                                                                  pathPfx + 'sentence_index', lang)
+            if 'n_ana' + strWordNum in htmlQuery and htmlQuery['n_ana' + strWordNum] != 'any':
+                curPrelimQuery[pathPfx + 'n_ana'] = self.make_n_ana_query(htmlQuery['n_ana' + strWordNum],
+                                                                          pathPfx + 'n_ana')
             for anaField in ['lex', 'gr', 'gloss_index'] + self.wordFields:
                 if (anaField + strWordNum in htmlQuery
                         and len(htmlQuery[anaField + strWordNum]) > 0):

@@ -191,6 +191,14 @@
 	width: 90%;
 }
 
+.options_div {
+	overflow-x: auto;
+	overflow-y: hidden;
+	padding-bottom: 3px;
+	padding-left: 10px;
+	width: 90%;
+}
+
 .word_search {
 	float: left;
 	display: inline-block;
@@ -220,6 +228,7 @@
 	box-shadow: none;
 	transition: box-shadow 0.3s, border 0.3s;
 }
+
 
 .distance_input {
 	width: 45px;

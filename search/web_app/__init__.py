@@ -571,6 +571,8 @@ def get_word_stats(metaField):
         if (len(wordConstraints) > 0
                 and get_session_data('distance_strict')):
             queryWordConstraints = wordConstraints
+    elif 'sentence_index1' in htmlQuery and len(htmlQuery['sentence_index1']) > 0:
+        searchIndex = 'sentences'
 
     for bucket in buckets:
         if (bucket['name'] == '>>'
@@ -967,6 +969,9 @@ def search_word_json():
         if (len(wordConstraints) > 0
                 and get_session_data('distance_strict')):
             queryWordConstraints = wordConstraints
+    elif 'sentence_index1' in query and len(query['sentence_index1']) > 0:
+        searchIndex = 'sentences'
+        sortOrder = 'random'
 
     query = sc.qp.html2es(query,
                           searchOutput='words',
@@ -1006,6 +1011,7 @@ def search_word():
 
     searchIndex = 'words'
     sortOrder = get_session_data('sort')
+    wordConstraints = None
     queryWordConstraints = None
     constraintsTooComplex = False
     nWords = 1
@@ -1020,6 +1026,9 @@ def search_word():
             queryWordConstraints = wordConstraints
             if distance_constraints_too_complex(wordConstraints):
                 constraintsTooComplex = True
+    elif 'sentence_index1' in query and len(query['sentence_index1']) > 0:
+        searchIndex = 'sentences'
+        sortOrder = 'random'
 
     query = sc.qp.html2es(query,
                           searchOutput='words',
@@ -1119,6 +1128,8 @@ def get_word_fields():
         result += '\n'.join(field.capitalize() + ': <input type="text" class="search_input" name="sent_meta_' + field +
                             '1" id="' + field + '1"><br>'
                             for field in settings['sentence_meta'])
+    result += render_template('common_additional_search_fields.html',
+                              ambiguous_analyses=settings['ambiguous_analyses'])
     return result
 
 

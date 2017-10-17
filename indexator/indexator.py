@@ -32,7 +32,7 @@ class Indexator:
         self.iterSent = None
         if self.input_format in ['json', 'json-gzip']:
             self.iterSent = JSONDocReader(format=self.input_format)
-        self.goodWordFields = ['lex', 'wf', 'parts', 'gloss', 'gloss_index']
+        self.goodWordFields = ['lex', 'wf', 'parts', 'gloss', 'gloss_index', 'n_ana', 'trans_en', 'trans_ru']
         self.AdditionalWordFields = []
         if 'word_fields' in self.settings:
             self.AdditionalWordFields = self.settings['word_fields']
@@ -48,8 +48,9 @@ class Indexator:
         self.es_ic = IndicesClient(self.es)
         self.tmpWordIDs = [{} for i in range(len(self.languages))]    # word as JSON -> its integer ID
         self.wordFreqs = [{} for i in range(len(self.languages))]     # word's ID -> its frequency
+        self.wordSFreqs = [{} for i in range(len(self.languages))]     # word's ID -> its number of sentences
         self.wordDocFreqs = [{} for i in range(len(self.languages))]  # (word's ID, dID) -> word frequency in the document
-        self.wordSIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of sentence IDs
+        # self.wordSIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of sentence IDs
         self.wordDIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of document IDs
         self.wfs = set()         # set of word forms (for sorting)
         self.lemmata = set()     # set of lemmata (for sorting)
@@ -83,18 +84,31 @@ class Indexator:
         self.es_ic.create(index=self.name + '.sentences',
                           body=self.sentMapping)
 
+    def enhance_word(self, word):
+        """
+        Add some calculated fields to the JSON word.
+        """
+        if 'ana' not in word:
+            word['n_ana'] = 0
+        else:
+            word['n_ana'] = len(word['ana'])
+            if word['n_ana'] >= 255:
+                word['n_ana'] = 255
+
     def process_sentence_words(self, words, langID):
         """
         Take words list from a sentence, remove all non-searchable
         fields from them and add them to self.words dictionary.
         Add w_id property to each word of the words list.
         """
+        sIDAdded = set()   # word IDs for which the current settence ID has been counted for it
         for w in words:
             if w['wtype'] != 'word':
                 continue
             self.numWords += 1
             self.numWordsLang[langID] += 1
             self.totalNumWords += 1
+            self.enhance_word(w)
             wClean = {'lang': langID}
             for field in w:
                 if field in self.goodWordFields:
@@ -121,10 +135,14 @@ class Indexator:
 
             try:
                 self.wordFreqs[langID][wID] += 1
-                self.wordSIDs[langID][wID].add(self.sID)
             except KeyError:
                 self.wordFreqs[langID][wID] = 1
-                self.wordSIDs[langID][wID] = {self.sID}
+            if wID not in sIDAdded:
+                sIDAdded.add(wID)
+                try:
+                    self.wordSFreqs[langID][wID] += 1
+                except KeyError:
+                    self.wordSFreqs[langID][wID] = 1
             try:
                 self.wordDIDs[langID][wID].add(self.dID)
             except KeyError:
@@ -199,9 +217,9 @@ class Indexator:
                 wJson['wf_order'] = wfOrder
                 wJson['l_order'] = lOrder
                 wJson['freq'] = self.wordFreqs[langID][wID]
-                wJson['sids'] = [sid for sid in sorted(self.wordSIDs[langID][wID])]
+                # wJson['sids'] = [sid for sid in sorted(self.wordSIDs[langID][wID])]
                 wJson['dids'] = [did for did in sorted(self.wordDIDs[langID][wID])]
-                wJson['n_sents'] = len(wJson['sids'])
+                wJson['n_sents'] = self.wordSFreqs[langID][wID]
                 wJson['n_docs'] = len(wJson['dids'])
                 wJson['rank'] = ''
                 if wJson['freq'] > 1:
