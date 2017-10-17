@@ -715,9 +715,9 @@ class InterfaceQueryParser:
         if int(htmlQuery['n_words']) > 1:
             searchIndex = 'sentences'
         elif ('sentence_index1' in htmlQuery
-                    and len(htmlQuery['sentence_index1']) > 0
-                    and self.rxNumber.search(htmlQuery['sentence_index1']) is not None
-                    and int(htmlQuery['sentence_index1']) > 0):
+                and len(htmlQuery['sentence_index1']) > 0
+                and self.rxNumber.search(htmlQuery['sentence_index1']) is not None
+                and int(htmlQuery['sentence_index1']) > 0):
             searchIndex = 'sentences'
         else:
             searchIndex = searchOutput
