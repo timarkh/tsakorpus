@@ -594,6 +594,8 @@ class InterfaceQueryParser:
 
         if sortOrder == 'random':
             query = self.make_random(query, randomSeed)
+        elif sortOrder == 'freq':
+            query = self.make_half_random(query, randomSeed)
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
         if searchOutput == 'words':
             esQuery['_source'] = ['doc_id', 'lang']
@@ -614,6 +616,18 @@ class InterfaceQueryParser:
         """
         query = {'function_score': {'query': query,
                                     'boost_mode': 'replace',
+                                    'random_score': {}}}
+        if randomSeed is not None:
+            query['function_score']['random_score']['seed'] = str(randomSeed)
+        return query
+
+    def make_half_random(self, query, randomSeed=None):
+        """
+        Add random ordering to the ES query while preserving the ordering
+        by number of terms found.
+        """
+        query = {'function_score': {'query': query,
+                                    'boost_mode': 'sum',
                                     'random_score': {}}}
         if randomSeed is not None:
             query['function_score']['random_score']['seed'] = str(randomSeed)
