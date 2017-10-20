@@ -80,6 +80,38 @@ Each analysis is a dictionary with the following keys and values:
 * ``gloss``, ``parts`` and ``gloss_index`` (only for corpora with glossing) -- strings representing the glosses for the word (``gloss``), segmentation of the word into morphemes (``parts``) and the combination of these two fields used during search (``gloss_index``). The ``gloss`` field should contain glossing according to the Leipzig glossing rules (the glosses can be arbitrary, but the format should be correct). The stem should be glossed as STEM instead of a short English translation, otherwise it would be impossible to make queries such as "find a genitive marker immediately following the stem". Glossing and segmentation into morphemes should not contain empty morphemes and glosses for them; all categories that are not overtly expressed in the word should be tagged using the ``gr.`` fields. The string ``gloss_index`` has the following format: GLOSS1{morpheme1}-GLOSS2{morpheme2}-... Each gloss is accompanied by the corresponding morpheme in curly brackets. All glosses are separated by hyphens; there should also be a hanging hyphen at the end of the string.
 * any number of other keys with string values, such as ``trans_en``. All fields used here have to be listed in the ``word_fields`` array in ``conf/corpus.json``.
 
+### Parallel alignment
+If all or some of the documents in your corpus have several parallel tiers, e.g. original text and its translations into other languages, the tiers have to be assigned different language IDs, starting from zero. These IDs should correspond to the names of the languages in the ``languages`` array in ``conf/corpus.conf`` file. The sentences of all tiers should be stored in one JSON file, but independently. The sentences in the file should be ordered by language ID. In order to indicate that a certain part of a sentence is aligned with a certain part of another sentence in another tier, these sentences should contain the following dictionary in their ``para_alignment`` arrays:
+
+```
+{
+  "off_start": ...,
+  "off_end": ...,
+  "para_id": ...
+}
+```
+
+The ``off_start`` and ``off_end`` parameters are integers that determine the aligned span in characters. The ``para_id`` parameter is an integer uniquely (at the document level) identifying a bunch of aligned segments: it should have the same value in all tiers of an aligned segment. The aligned segment may be shorter or longer than the sentence. In the first case, the sentence will contain several dictionaries in the ``para_alignment`` array. In the second case, several consecutive sentences in the same tier will have alignments with the same ``para_id``.
+
+
+### Source alignment
+If all or some of the documents in your corpus were aligned with sound or video, the aligned sentences (in all tiers, if there are several) should contain the following dictionary in their ``src_alignment`` arrays:
+
+```
+{
+  "off_start_src": ...,
+  "off_end_src": ...,
+  "off_start_sent": ...,
+  "off_end_sent": ...,
+  "mtype": "audio|video",
+  "src_id": "...",
+  "src": "..."
+}
+```
+
+The ``off_start_src`` and ``off_end_src`` parameters are numbers (float) that determine the relevant segment in the media file in seconds. The ``off_start_sent`` and ``off_end_sent`` parameters are integers that determine the aligned span in the sentence in characters. The ``mtype`` is a string that says if the media is a sound file or a video file. The ``src_id`` parameter is a string uniquely (at the document level) identifying an aligned segment. The ``src`` parameter is the name and the relative path to the media file. All media files have to be located in the ``search/media/%corpus_name%`` directory. Just as with ``para_alignment``, it is possible to have several aligned segments in a sentence or several sentences in an aligned segment.
+
+
 ### Sentence example
 Here is an example of a sentence from the Beserman corpus. It contains both parallel alignment (the texts are aligned with their Russian translations) and media alignment.
 
@@ -177,7 +209,6 @@ Here is an example of a sentence from the Beserman corpus. It contains both para
     {
       "off_start_src": "0.05",
       "off_end_src": "1.3",
-      "true_off_start_src": 0.05,
       "off_start_sent": 0,
       "off_end_sent": 18,
       "mtype": "audio",
