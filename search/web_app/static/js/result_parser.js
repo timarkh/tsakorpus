@@ -3,12 +3,14 @@
 function print_json(results) {
 	//alert("success" + JSON.stringify(results));
 	$('#analysis').css('display', 'none');
+	$('#w_id1').val('');
 	$("#res_p").html( "<p style=\"font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;\">Success!<hr>" + JSON.stringify(results, null, 2).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;") ) + "</p>";
 }
 
 function print_html(results) {
 	//alert("success" + JSON.stringify(results));
 	$('#analysis').css('display', 'none');
+	$('#w_id1').val('');
 	$("#res_p").html( results );
 }
 
@@ -81,10 +83,10 @@ function clear_search_form() {
 }
 
 function search_word_from_list(e) {
-	wf = $(e.currentTarget).attr('data-wf');
-	if (wf == "") return;
+	var wID = $(e.currentTarget).attr('data-wid');
+	if (wID == "") return;
 	clear_search_form();
-	$('#wf1').val(wf);
+	$('#w_id1').val(wID);
 	$("#search_sent").click();
 }
 

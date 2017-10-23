@@ -159,6 +159,8 @@ class InterfaceQueryParser:
         elif not (field == 'ana.gr' or field.endswith('.ana.gr')):
             if field in self.settings['viewable_meta']:
                 text = text.lower()
+            elif field == 'w_id':
+                field = '_id'   # search for word ID: _id in words index, but words.w_id in sentences index
             if InterfaceQueryParser.rxStars.search(text) is not None:
                 return {'match_all': {}}
             elif InterfaceQueryParser.rxSimpleText.search(text) is not None:
@@ -349,6 +351,8 @@ class InterfaceQueryParser:
             if k in wordAnaFields:
                 queryDictWordsAna[k] = v
             else:
+                if k == 'w_id':
+                    k = '_id'
                 queryDictWords[k] = v
         if len(queryDict) <= 0:
             query = {'match_none': {}}
@@ -434,7 +438,8 @@ class InterfaceQueryParser:
         wordAnaFields = {'words.ana.lex', 'words.ana.gr', 'words.ana.gloss_index'}
         for field in self.wordFields:
             wordAnaFields.add('words.ana.' + field)
-        wordFields = {'words.wf', 'words.wtype', 'words.n_ana', 'words.sentence_index'}
+        wordFields = {'words.wf', 'words.wtype', 'words.n_ana', 'words.sentence_index',
+                      'words.w_id'}
         queryDict = {k: queryDict[k] for k in queryDict
                      if queryDict[k] is not None and queryDict[k] != {}}
         queryDictWords, queryDictWordsAna = {}, {}
@@ -776,6 +781,9 @@ class InterfaceQueryParser:
             if 'wf' + strWordNum in htmlQuery and len(htmlQuery['wf' + strWordNum]) > 0:
                 curPrelimQuery[pathPfx + 'wf'] = self.make_bool_query(htmlQuery['wf' + strWordNum],
                                                                       pathPfx + 'wf', lang)
+            if 'w_id' + strWordNum in htmlQuery and len(htmlQuery['w_id' + strWordNum]) > 0:
+                curPrelimQuery[pathPfx + 'w_id'] = self.make_bool_query(htmlQuery['w_id' + strWordNum],
+                                                                        pathPfx + 'w_id', lang)
             if ('sentence_index' + strWordNum in htmlQuery
                     and len(htmlQuery['sentence_index' + strWordNum]) > 0
                     and self.rxNumber.search(htmlQuery['sentence_index' + strWordNum]) is not None

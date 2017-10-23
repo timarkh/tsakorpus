@@ -568,6 +568,11 @@ class SentenceViewer:
         rank = str(wSource['rank'])
         nSents = str(wSource['n_sents'])
         nDocs = str(wSource['n_docs'])
+        wID = -1
+        if 'w_id' in w:
+            wID = w['w_id']
+        else:
+            wID = w['_id']
         return render_template('word_table_row.html',
                                ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
                                wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
@@ -575,7 +580,7 @@ class SentenceViewer:
                                rank=rank,
                                nSents=nSents,
                                nDocs=nDocs,
-                               wfSearch=wSource['wf'])
+                               wID=wID)
 
     def process_word_subcorpus(self, w, nDocuments, freq, lang, translit=None):
         """
@@ -596,7 +601,7 @@ class SentenceViewer:
                                rank=rank,
                                nSents=nSents,
                                nDocs=nDocs,
-                               wfSearch=wSource['wf'])
+                               wID=w['_id'])
 
     def filter_multi_word_highlight_iter(self, hit, nWords=1, keepOnlyFirst=False):
         """
