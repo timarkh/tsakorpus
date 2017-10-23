@@ -279,11 +279,12 @@ function assign_gram_popup() {
 }
 
 function show_word_stats(e) {
+	var wID = $(e.currentTarget).attr('data-wid');
 	var wf = $(e.currentTarget).attr('data-wf');
-	if (wf != null && wf != "") {
+	if (wID != null && wID != "" && wf != null && wf != "") {
 		clear_search_form();
 		$('#word_stats_wf').html(wf);
-		$('#wf1').val($("#word_stats_wf").text());
+		$('#w_id1').val(wID);
 	}
 	else {
 		$('#word_stats_wf').html('the query');

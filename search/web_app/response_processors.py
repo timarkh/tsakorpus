@@ -580,7 +580,8 @@ class SentenceViewer:
                                rank=rank,
                                nSents=nSents,
                                nDocs=nDocs,
-                               wID=wID)
+                               wID=wID,
+                               wfSearch=wSource['wf'])
 
     def process_word_subcorpus(self, w, nDocuments, freq, lang, translit=None):
         """
@@ -601,7 +602,8 @@ class SentenceViewer:
                                rank=rank,
                                nSents=nSents,
                                nDocs=nDocs,
-                               wID=w['_id'])
+                               wID=w['_id'],
+                               wfSearch=wSource['wf'])
 
     def filter_multi_word_highlight_iter(self, hit, nWords=1, keepOnlyFirst=False):
         """
