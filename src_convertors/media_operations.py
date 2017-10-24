@@ -88,7 +88,7 @@ class MediaCutter:
             if fname.lower().endswith('.mp4'):
                 splitStr += ' -vcodec copy -acodec copy'
                 newExt = '.mp4'
-            elif fname.lower().endswith('.avi'):
+            elif fname.lower().endswith(('.avi', '.mts')):
                 splitStr += ' -vcodec libx264 -b 300k -acodec aac -ab 128k'
                 newExt = '.mp4'
             elif fname.lower().endswith(('.wav', '.wma', '.mp3')):
@@ -129,11 +129,11 @@ class MediaCutter:
 
 
 if __name__ == '__main__':
-    settings = {'corpus_dir': 'corpus/nganasan', 'media_length': 60}
+    settings = {'corpus_dir': 'corpus/beserman_eaf', 'media_length': 60}
     mc = MediaCutter(settings)
     for path, dirs, files in os.walk(settings['corpus_dir']):
         for fname in files:
-            if fname.lower().endswith('.wav'):
+            if fname.lower().endswith('.mts'):
                 fname = os.path.abspath(os.path.join(path, fname))
                 print('Starting', fname)
                 mc.cut_media(fname)

@@ -93,7 +93,8 @@ class JSONDocReader:
                 if i < len(doc['sentences']) - 1:
                     yield doc['sentences'][i], False
                 else:
-                    return doc['sentences'][i], True
+                    yield doc['sentences'][i], True
+                    return
         except MemoryError:
             print('Memory error when reading', fname, ', trying iterative JSON parser (will work slowly).')
             fIn.close()
@@ -110,4 +111,5 @@ class JSONDocReader:
                     yield prevSent, False
                 prevSent = sentence
             fIn.close()
-            return prevSent, True
+            yield prevSent, True
+            return

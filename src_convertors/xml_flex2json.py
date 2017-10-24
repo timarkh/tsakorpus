@@ -13,6 +13,7 @@ class Xml_Flex2JSON(Txt2JSON):
 
     rxSplitParts = re.compile(u'(?:^|[-=])[^-=]+|<[^<>]+>')
     rxFindStem = re.compile(u'[-.=]?[{(‹][A-Z0-9.-:]+[})›][-.=]?|[-=.:][A-Z0-9]+$|^[=-]')
+    rxFindGloss = re.compile(u'[-.=]?[{(][A-Z0-9a-z]+[})][-.=]?|[-=.:][A-Z0-9a-z]+$|^[=-]')
 
     def __init__(self, settingsDir='conf'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
@@ -23,20 +24,23 @@ class Xml_Flex2JSON(Txt2JSON):
         self.posRules = {}
         self.load_rules()
         self.POSTags = set()    # All POS tags encountered in the XML
+        self.rxStemGlosses = re.compile('^$')
     
     def load_rules(self):
         """
         Load rules for converting the glosses into bags of grammatical
         tags.
         """
-        self.load_glosses(os.path.join(self.corpusSettings['corpus_dir'], 'glossList.txt'))
-        self.load_gram_rules(os.path.join(self.corpusSettings['corpus_dir'], 'gramRules.txt'))
-        self.load_pos_rules(os.path.join(self.corpusSettings['corpus_dir'], 'posRules.txt'))
+        self.load_glosses(os.path.join(self.corpusSettings['corpus_dir'], 'conf/glossList.txt'))
+        self.load_gramm_rules(os.path.join(self.corpusSettings['corpus_dir'], 'conf/gramRules.txt'))
+        self.load_pos_rules(os.path.join(self.corpusSettings['corpus_dir'], 'conf/posRules.txt'))
     
     def load_glosses(self, fname):
         """
         Load gloss list.
         """
+        if len(fname) <= 0 or not os.path.isfile(fname):
+            return
         f = open(fname, 'r', encoding='utf-8-sig')
         glosses = set()
         for line in f:
@@ -46,6 +50,7 @@ class Xml_Flex2JSON(Txt2JSON):
                     for j in ['-', '=', '.', '‹', '›', '{', '}', '']:
                         glosses.add(i + line + j)
         f.close()
+        self.rxStemGlosses = re.compile('\\b' + '|'.join(re.escape(gl) for gl in glosses) + '\\b')
         self.glosses = glosses
 
     @staticmethod
@@ -57,25 +62,27 @@ class Xml_Flex2JSON(Txt2JSON):
             if "'" in s:
                 return ''
             return ' re.search(\'' + s +\
-                   '\', self.parts) is not None or ' +\
+                   '\', ana[\'parts\']) is not None or ' +\
                    're.search(\'' + s +\
-                   '\', self.gloss) is not None '
+                   '\', ana[\'gloss\']) is not None '
         ruleParts = rule.split('"')
         rule = ''
         for i in range(len(ruleParts)):
             if i % 2 == 0:
-                rule += re.sub('([^\\[\\]~|& \t\']+)', ' \'\\1\' in (self.grdic.split() + self._glossList) ',
+                rule += re.sub('([^\\[\\]~|& \t\']+)', ' \'\\1\' in tagsAndGlosses ',
                                ruleParts[i]).replace('|', ' or ').replace('&', ' and ')\
                                             .replace('~', ' not ').replace('[', '(').replace(']', ')')
             else:
                 rule += replReg(ruleParts[i])
         return rule
 
-    def load_gram_rules(self, fname):
+    def load_gramm_rules(self, fname):
         """
         Load main set of rules for converting the glosses into bags
         of grammatical tags.
         """
+        if len(fname) <= 0 or not os.path.isfile(fname):
+            return
         rules = []
         f = open(fname, 'r', encoding='utf-8-sig')
         for line in f:
@@ -94,6 +101,8 @@ class Xml_Flex2JSON(Txt2JSON):
         """
         Load mapping of the FLEX POS tags to your corpus POS tags.
         """
+        if len(fname) <= 0 or not os.path.isfile(fname):
+            return
         rules = {}
         f = open(fname, 'r', encoding='utf-8-sig')
         for line in f:
@@ -106,28 +115,100 @@ class Xml_Flex2JSON(Txt2JSON):
         f.close()
         self.posRules = rules
 
-    def process_stem(self, stem, stemGloss, anaJSON, curGlossList):
+    def add_pos_ana(self, ana, pos):
+        """
+        Add the part of speech tag to single JSON analysis, taking into
+        account the correspondences between FLEX tags and the target
+        corpus tags. Change the analysis, do not return anything.
+        """
+        if pos in self.posRules:
+            pos = self.posRules[pos]
+        if 'gr.pos' not in ana:
+            ana['gr.pos'] = pos
+        elif type(ana['gr.pos']) == str and ana['gr.pos'] != pos:
+            ana['gr.pos'] = [ana['gr.pos'], pos]
+        elif pos not in ana['gr.pos']:
+            ana['gr.pos'].append(pos)
+
+    def add_pos_word(self, word, pos):
+        """
+        Add the part of speech tag to the JSON word, taking into
+        account the correspondences between FLEX tags and the target
+        corpus tags. Change the word, do not return anything.
+        """
+        if 'ana' not in word or len(word['ana']) <= 0:
+            word['ana'] = [{}]
+        for ana in word['ana']:
+            self.add_pos_ana(ana, pos)
+
+    def restore_gramm(self, word):
+        """
+        Restore grammatical tags from the glosses using the rules
+        provided in gramRules.txt. Change the word, do not return
+        anuthing.
+        """
+        if 'wtype' not in word or word['wtype'] != 'word' or 'ana' not in word:
+            return
+        # print(json.dumps(word, ensure_ascii=False))
+        mainLangCategories = None
+        if self.corpusSettings['languages'][0] in self.categories:
+            mainLangCategories = self.categories[self.corpusSettings['languages'][0]]
+        for ana in word['ana']:
+            addedGrammTags = set()
+            tagsAndGlosses = set()
+            for field in ana:
+                if field.startswith('gr.'):
+                    if type(ana[field]) == str:
+                        tagsAndGlosses.add(ana[field])
+                    elif type(ana[field]) == list:
+                        tagsAndGlosses |= set(ana[field])
+            if 'gloss' in ana:
+                tagsAndGlosses |= set(gl.strip('-=:.<>') for gl in self.rxSplitParts.findall(ana['gloss']))
+            if len(self.grammRules) > 0:
+                for rule in self.grammRules:
+                    if eval(rule[0]):
+                        addedGrammTags |= rule[1]
+            elif 'gloss' in ana:
+                glosses = set(self.rxSplitParts.findall(ana['gloss']))
+                for gl in glosses:
+                    if gl.upper() == gl:
+                        gl = gl.lower()
+                    addedGrammTags.add(gl)
+            # print(list(addedGrammTags), list(tagsAndGlosses))
+            for tag in addedGrammTags:
+                if tag in mainLangCategories:
+                    anaCatName = 'gr.' + mainLangCategories[tag]
+                    if anaCatName not in ana:
+                        ana[anaCatName] = tag
+                    elif type(ana[anaCatName]) == str:
+                        ana[anaCatName] = [ana[anaCatName], tag]
+                    else:
+                        ana[anaCatName].append(tag)
+
+    def process_stem(self, stem, stemGloss, glossLang, anaJSON, curGlossList):
         """
         Add the lemma and its translation.
         """
         if stem[0] in '-=':
             stem = stem[1:]
         anaJSON['lex'] = stem
+        transField = 'trans_' + glossLang
         if len(stemGloss) > 0 and stemGloss[0] in '-=':
             stemGloss = stemGloss[1:]
-        anaJSON['trans_en'] = stemGloss
-        pureStem = self.regFindStem.sub('', anaJSON['lex'])
-        pureTrans = self.regFindGlossRu.sub('', anaJSON['trans_en'])
-        if pureTrans != anaJSON['trans_en']:
-            anaJSON['gloss'] += \
-                '[' + '[STEM]'.join(self.rxFindStem.findall(anaJSON['trans_en'])) + ']'
-            curGlossList += [g.strip('-=:.‹›{}')
-                             for g in self.regStemGlosses.findall(anaJSON['trans_en'])]
-            anaJSON['trans_en'] = pureTrans
+        anaJSON[transField] = stemGloss
+        pureStem = self.rxFindStem.sub('', anaJSON['lex'])
+        pureTrans = self.rxFindGloss.sub('', anaJSON[transField])
+        anaJSON['gloss'] += anaJSON[transField].replace(' ', '.').replace('-', '_')
+        anaJSON['gloss_index'] += 'STEM{' + pureStem + '}-'
+        if pureTrans != anaJSON[transField]:
+            # anaJSON['gloss'] += \
+            #     '[' + '[STEM]'.join(self.rxFindStem.findall(anaJSON[transField])) + ']'
+            if len(self.glosses) > 0:
+                curGlossList += [g.strip('-=:.‹›{}')
+                                 for g in self.rxStemGlosses.findall(anaJSON[transField])]
+            anaJSON[transField] = pureTrans
             anaJSON['lex'] = pureStem
-        else:
-            anaJSON['gloss'] += '[STEM]'
-        # TODO: different gloss languages
+        # else:
 
     def ana_from_gls(self, glsNode, parts):
         """
@@ -137,9 +218,12 @@ class Xml_Flex2JSON(Txt2JSON):
         # TODO: Not ready yet!
         if glsNode.text is None or len(glsNode.text) <= 0 or len(parts) <= 0:
             return {}
-        anaJSON = {'parts': '', 'gloss': ''}
+        glossLang = 'en'
+        if 'lang' in glsNode.attrib:
+            glossLang = re.sub('-.*', '', glsNode.attrib['lang'])
+        anaJSON = {'parts': '', 'gloss': '', 'gloss_index': ''}
         curGlossList = []
-        parts = parts.replace('', '=')
+        parts = parts.replace('', '=').replace('‹', '<').replace('‹', '<')
         glosses = glsNode.text.strip()
         partsList = self.rxSplitParts.findall(parts)
         glossesList = self.rxSplitParts.findall(glosses)
@@ -147,24 +231,27 @@ class Xml_Flex2JSON(Txt2JSON):
             if glossesList[i] in self.glossList \
                     or re.search('^[-=<>0-9A-Z.:,()\\[\\]]+$', glossesList[i]) is not None:
                 anaJSON['gloss'] += glossesList[i]
-                curGlossList.append(glossesList[i].strip('-=:.'))
+                curGlossList.append(glossesList[i].strip('-=:.<>'))
             else:
-                self.process_stem(partsList[i], glossesList[i], anaJSON, curGlossList)
+                self.process_stem(partsList[i], glossesList[i], glossLang, anaJSON, curGlossList)
+        return anaJSON
 
-    def ana_from_morphemes(self, mNode, parts):
+    def ana_from_morphemes(self, mNode):
         """
         Make and return a JSON analysis out of the glossing in the morphemes
         node.
         """
         # TODO: Not ready yet!
-        anaJSON = {'parts': '', 'gloss': ''}
+        anaJSON = {'parts': '', 'gloss': '', 'gloss_index': ''}
         curGlossList = []
+        lastPart = ''
         for morph in mNode:
             if morph.tag != 'morph':
                 continue
             if 'type' not in morph.attrib:
-                continue    # TODO: that other format
-            morphType = morph.attrib['type']
+                morphType = 'unknown'
+            else:
+                morphType = morph.attrib['type']
             for element in morph:
                 if element.tag == 'item' and 'type' in element.attrib:
                     if element.attrib['type'] in ['mb', 'txt']:
@@ -173,15 +260,19 @@ class Xml_Flex2JSON(Txt2JSON):
                         anaJSON['parts'] += element.text
                         lastPart = element.text
                     elif element.attrib['type'] == 'gls':
-                        if ('lang' in element.attrib
-                                and element.attrib['lang'] in self.corpusSettings['bad_analysis_languages']):
-                            continue
+                        glossLang = 'en'
+                        if 'lang' in element.attrib:
+                            if element.attrib['lang'] in self.corpusSettings['bad_analysis_languages']:
+                                continue
+                            glossLang = re.sub('-.*', '', element.attrib['lang'])
                         if element.text is None:
                             element.text = ' '
                         gloss = element.text
+                        glossIndex = element.text + '{' + lastPart.strip('-=:.<>') + '}-'
                         if (morphType == 'stem'
-                                or (morphType == 'unknown' and element.text not in self.glossList)):
-                            self.process_stem(lastPart, element.text, anaJSON, curGlossList)
+                                or (morphType == 'unknown' and element.text not in self.glossList))\
+                                or (morphType in ('enclitic', 'proclitic') and len(mNode) == 1):
+                            self.process_stem(lastPart, element.text, glossLang, anaJSON, curGlossList)
                         else:
                             if (morphType == 'prefix' and len(gloss) > 0
                                     and gloss[-1] not in '-=:.'):
@@ -195,19 +286,16 @@ class Xml_Flex2JSON(Txt2JSON):
                             elif (morphType == 'proclitic' and len(gloss) > 0
                                     and gloss[-1] not in '-=:.'):
                                 gloss += '='
-                            self._glossWithoutStem += gloss
                             curGlossList.append(gloss.strip('-=:.'))
-                        anaJSON['gloss'] += gloss
+                            anaJSON['gloss'] += gloss
+                            anaJSON['gloss_index'] += glossIndex
                     elif element.attrib['type'] == 'msa' and morphType == 'stem':
                         if element.text is None:
                             element.text = ' '
-                        grdic = element.text.strip().replace('.', ' ')
-                        self.POSTags.add(grdic)
-                        if grdic in self.posRules:
-                            grdic = self.posRules[grdic]
-                        if len(self.grdic) > 0:
-                            self.grdic += ' '
-                        self.grdic += grdic
+                        pos = element.text.strip().replace('.', ' ')
+                        self.POSTags.add(pos)
+                        self.add_pos_ana(anaJSON, pos)
+        return anaJSON
 
     def process_word_node(self, wordNode):
         """
@@ -216,7 +304,8 @@ class Xml_Flex2JSON(Txt2JSON):
         """
         if (len(wordNode) == 1 and 'type' in wordNode[0].attrib
                 and wordNode[0].attrib['type'] == 'punct'):
-            return {'wtype': 'punct', 'wf': wordNode[0].text}
+            yield {'wtype': 'punct', 'wf': wordNode[0].text}
+            return
         wordJSON = {'wtype': 'word', 'wf': ''}
         wordPos = ''
         for el in wordNode:
@@ -245,55 +334,11 @@ class Xml_Flex2JSON(Txt2JSON):
                 wordJSON['wf'] = re.sub('[-=<>∅]', '', wordJSON['wf'])
             elif el.attrib['type'] == 'pos':
                 wordPos = el.text.strip()
-                if wordPos in self.posRules:
-                    wordPos = self.posRules[wordPos]
             # TODO: nt
-        if wordPos != '' and 'ana' in wordJSON and len(wordJSON['ana']) > 0:
-            for ana in wordJSON['ana']:
-                ana['gr.pos'] = wordPos
+        if wordPos != '':
+            self.add_pos_word(wordJSON, wordPos)
+        self.restore_gramm(wordJSON)
         yield wordJSON
-
-    @staticmethod
-    def restore_sentence_text(words):
-        """
-        Restore sentence text as a string based on a list
-        of JSON words it consists of. Indert start and end
-        offset in each JSON word. Return the text of the
-        sentence.
-        """
-        text = ''
-        for word in words:
-            if 'wf' not in word:
-                continue
-            word['off_start'] = len(text)
-            if word['wtype'] == 'word':
-                text += word['wf'] + ' '
-                word['off_end'] = len(text) - 1
-            elif word['wtype'] == 'punctl':
-                text += word['wf']
-                word['wtype'] = 'punct'
-                word['off_end'] = len(text)
-            elif word['wtype'] == 'punctr':
-                if text.endswith(' '):
-                    word['off_start'] -= 1
-                    text = text[:-1]
-                text += word['wf'] + ' '
-                word['wtype'] = 'punct'
-                word['off_end'] = len(text) - 1
-            else:
-                if word['wf'].startswith(('(', '[', '{', '<')):
-                    text += word['wf']
-                    word['off_end'] = len(text)
-                elif word['wf'].startswith((')', ']', '}', '>')):
-                    if text.endswith(' '):
-                        word['off_start'] -= 1
-                        text = text[:-1]
-                    text += word['wf']
-                    word['off_end'] = len(text)
-                else:
-                    text += word['wf'] + ' '
-                    word['off_end'] = len(text) - 1
-        return text.strip()
 
     def process_se_node(self, se):
         """
@@ -322,7 +367,7 @@ class Xml_Flex2JSON(Txt2JSON):
         words = [{'wtype': 'punct', 'wf': seNum + '.'}]
         words += [w for wn in se.xpath('words/word')
                   for w in self.process_word_node(wn)]
-        seText = self.restore_sentence_text(words)
+        seText = self.tp.restore_sentence_text(words)
         paraAlignment = {'off_start': 0, 'off_end': len(seText), 'para_id': self.pID}
         yield {'lang': 0, 'words': words, 'text': seText, 'para_alignment': [paraAlignment]}
         
@@ -341,16 +386,17 @@ class Xml_Flex2JSON(Txt2JSON):
         for interlinear in interlinears:
             curFnameTarget = re.sub('(\\.[^.]*$)', '-' + str(nDoc) + '\\1', fnameTarget)
             nDoc += 1
-            titleNode = interlinear.xpath('./title')
+            titleNode = interlinear.xpath('./title | ./item[@type="title"]')
             curMeta = {}
             title = ''
             if len(titleNode) > 0:
-                title = etree.tostring(titleNode[0], encoding='unicode')
+                title = titleNode[0].text
                 curMeta = self.get_meta(fnameSrc)
             if len(curMeta) <= 1:
                 curMeta = {'title': title, 'filename': fnameSrc}
             textJSON = {'meta': curMeta, 'sentences': []}
-            textJSON['sentences'] = [s for sNode in interlinear.xpath('./paragraphs/paragraph/phrases/phrase | ./paragraphs/paragraph/phrases/word')
+            textJSON['sentences'] = [s for sNode in interlinear.xpath('./paragraphs/paragraph/phrases/phrase | '
+                                                                      './paragraphs/paragraph/phrases/word')
                                      for s in self.process_se_node(sNode)]
             textJSON['sentences'].sort(key=lambda s: s['lang'])
             for i in range(len(textJSON['sentences']) - 1):

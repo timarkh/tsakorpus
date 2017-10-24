@@ -60,11 +60,16 @@ class DumbMorphParser:
             else:
                 lang = self.settings['corpus_name']
         self.analyses[lang] = {}
-        f = open(fname, 'r', encoding='utf-8-sig')
-        text = f.read()
-        f.close()
-        if self.settings['parsed_wordlist_format'] == 'xml_rnc':
-            self.load_analyses_xml_rnc(text, lang=lang)
+        try:
+            f = open(fname, 'r', encoding='utf-8-sig')
+            text = f.read()
+            f.close()
+            if self.settings['parsed_wordlist_format'] == 'xml_rnc':
+                self.load_analyses_xml_rnc(text, lang=lang)
+        except FileNotFoundError:
+            fLog = open(self.errorLog, 'a', encoding='utf-8')
+            fLog.write('File not found: ' + fname + '\n')
+            fLog.close()
 
     def transform_gramm_str(self, grStr, lang=''):
         """
