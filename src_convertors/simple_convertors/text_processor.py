@@ -65,10 +65,10 @@ class TextProcessor:
                 word['wtype'] = 'punct'
                 word['off_end'] = len(text) - 1
             else:
-                if word['wf'].startswith(('(', '[', '{', '<')):
+                if word['wf'].startswith(('(', '[', '{', '<', '“')):
                     text += word['wf']
                     word['off_end'] = len(text)
-                elif word['wf'].startswith((')', ']', '}', '>', '.', ',', '?', '!')):
+                elif word['wf'].startswith((')', ']', '}', '>', '.', ',', '?', '!', '”', '…')):
                     if text.endswith(' '):
                         word['off_start'] -= 1
                         text = text[:-1]

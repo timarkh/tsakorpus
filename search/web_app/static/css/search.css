@@ -217,6 +217,16 @@
 	margin-top: 12px;
 }
 
+.word {
+	display: inline-grid;
+}
+
+.ana_interlinear {
+	font-size: 0.7em;
+	line-height: 1.2em;
+	margin-bottom: 10px;
+}
+
 .search_input {
 	color: black;
 	width: 160px;
@@ -458,6 +468,7 @@ hr.separator {
 	margin-left: 5px;
 	color: #564b84;
 	display: inline-block;
+	line-height: 1.5em;
 }
 
 .popup_field {

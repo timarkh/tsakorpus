@@ -225,7 +225,7 @@ function assign_para_highlight() {
 	$("span.para").unbind('mousemove');
 	$('span.para').hover(function (e) {
 		$('.p_highlighted').removeClass('p_highlighted');
-		var targetClasses = $(e.target).attr('class').split(' ');
+		var targetClasses = $(this).attr('class').split(' ');
 		targetClasses.forEach(highlight_para_spans);
 	}, function () {
 		$('.p_highlighted').removeClass('p_highlighted');
@@ -247,7 +247,7 @@ function assign_gram_popup() {
 	$("span.word").unbind('hover');
 	$("span.word").unbind('mousemove');
 	$('.word').hover(function (e) {
-		$('#analysis').replaceWith('<div id="analysis">' + $("<textarea/>").html(($(e.target).attr("data-ana"))).text() + '</div>');
+		$('#analysis').replaceWith('<div id="analysis">' + $("<textarea/>").html(($(this).attr("data-ana"))).text() + '</div>');
 		anaWidth = $('#analysis').width();
 		anaHeight = $('#analysis').height();
 		$('#analysis').css('left', $(document).innerWidth() - anaWidth - 30);
@@ -291,6 +291,19 @@ function show_word_stats(e) {
 	}
 	$('#word_stats').modal('show');
 	$('#select_meta_word_stat').trigger('change');
+}
+
+function show_analyses() {
+	$('span.word').each(function (index) {
+		var data_ana = $(this).attr('data-ana');
+		if (data_ana == null || data_ana.length <= 0) {
+			data_ana = '<div class="popup_word"> </div>';
+		}
+		data_ana = data_ana.replace('class="popup_word"', 'class="popup_word ana_interlinear"');
+		data_ana = data_ana.replace(/<span class="popup_(key|wf)">.*?<\/span>/g, '');
+		data_ana = data_ana.replace('class="popup_value"', 'class="popup_value_small"');
+		$(this).html($(this).html() + '<br>' + data_ana);
+	});
 }
 
 function make_sortable() {

@@ -228,11 +228,14 @@ class Xml_Flex2JSON(Txt2JSON):
         partsList = self.rxSplitParts.findall(parts)
         glossesList = self.rxSplitParts.findall(glosses)
         for i in range(min(len(partsList), len(glossesList))):
-            if glossesList[i] in self.glossList \
+            if glossesList[i] in self.glosses \
                     or re.search('^[-=<>0-9A-Z.:,()\\[\\]]+$', glossesList[i]) is not None:
                 anaJSON['gloss'] += glossesList[i]
+                anaJSON['gloss_index'] += glossesList[i].strip('-=:.<>') + '{' + partsList[i].strip('-=:.<>') + '}-'
+                anaJSON['parts'] += partsList[i]
                 curGlossList.append(glossesList[i].strip('-=:.<>'))
             else:
+                anaJSON['parts'] += partsList[i]
                 self.process_stem(partsList[i], glossesList[i], glossLang, anaJSON, curGlossList)
         return anaJSON
 
@@ -241,7 +244,6 @@ class Xml_Flex2JSON(Txt2JSON):
         Make and return a JSON analysis out of the glossing in the morphemes
         node.
         """
-        # TODO: Not ready yet!
         anaJSON = {'parts': '', 'gloss': '', 'gloss_index': ''}
         curGlossList = []
         lastPart = ''
@@ -364,7 +366,11 @@ class Xml_Flex2JSON(Txt2JSON):
                         seTrans[transLang] = ''
                 elif element.attrib['type'] == 'nt':
                     seComment = element.text
-        words = [{'wtype': 'punct', 'wf': seNum + '.'}]
+        if not seNum.endswith('.') and len(seNum) > 0:
+            seNum += '.'
+        words = []
+        if len(seNum) > 0:
+            words.append({'wtype': 'punct', 'wf': seNum})
         words += [w for wn in se.xpath('words/word')
                   for w in self.process_word_node(wn)]
         seText = self.tp.restore_sentence_text(words)
