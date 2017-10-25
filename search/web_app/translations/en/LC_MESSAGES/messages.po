@@ -185,13 +185,16 @@ msgstr "total frequency:"
 msgid "word_th_word"
 msgstr "word"
 
+msgid "word_th_lemma"
+msgstr "lemma"
+
 #: templates/result_words.html:4
 msgid "word_th_frequency"
 msgstr "freq"
 
 #: templates/result_words.html:4
 msgid "word_th_freq. rank / quantile"
-msgstr "freq. rank / quantile"
+msgstr "freq. rank /<br>quantile"
 
 #: templates/result_words.html:4
 msgid "word_th_# sentences"
@@ -203,7 +206,7 @@ msgstr "# documents"
 
 #: templates/result_words.html:4
 msgid "word_th_search in corpus"
-msgstr "search in corpus"
+msgstr "search"
 
 msgid "word_th_word stats"
 msgstr "statistics"

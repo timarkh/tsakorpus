@@ -615,6 +615,7 @@ class SentenceViewer:
         return render_template('word_table_row.html',
                                ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
                                wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
+                               lemma=self.get_lemma(wSource),
                                freq=freq,
                                rank=rank,
                                nSents=nSents,
@@ -637,6 +638,7 @@ class SentenceViewer:
         return render_template('word_table_row.html',
                                ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
                                wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
+                               lemma=self.get_lemma(wSource),
                                freq=freq,
                                rank=rank,
                                nSents=nSents,
@@ -721,7 +723,7 @@ class SentenceViewer:
         curLemmata = set()
         for ana in word['ana']:
             if 'lex' in ana:
-                curLemmata.add(ana['lex'].lower())
+                curLemmata.add(ana['lex'])
         return '/'.join(l for l in sorted(curLemmata))
 
     def process_words_collected_from_sentences(self, hitsProcessed, sortOrder='freq', pageSize=10):

@@ -186,13 +186,16 @@ msgstr "суммарная частотность:"
 msgid "word_th_word"
 msgstr "слово"
 
+msgid "word_th_lemma"
+msgstr "лемма"
+
 #: templates/result_words.html:4
 msgid "word_th_frequency"
 msgstr "частотность"
 
 #: templates/result_words.html:4
 msgid "word_th_freq. rank / quantile"
-msgstr "част. ранг / квантиль"
+msgstr "част. ранг /<br>квантиль"
 
 #: templates/result_words.html:4
 msgid "word_th_# sentences"
