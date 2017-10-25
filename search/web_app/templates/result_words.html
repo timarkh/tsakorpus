@@ -1,5 +1,5 @@
 ﻿{% if data.timeout %}
-<p class="message">The search was not finished due to the query timeout. You only see partial results.</p>
+<p class="message">{{ _('The search was not finished due to the query timeout. You only see partial results.') }}</p>
 {% endif %}
 <p>{{ _('Search result:') }} {{ data.n_occurrences }} {{ _('different words in approximately') }} {{ data.n_docs }} {{ _('document(s) found,') }} {{ _('total frequency:') }} {{ data.total_freq }}.</p>
 <div class="word_results">

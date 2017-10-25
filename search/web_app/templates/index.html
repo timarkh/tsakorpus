@@ -112,9 +112,9 @@
 							<input type="checkbox" name="distance_strict"> {{ _('Word distance requirements are strict') }}<br>
 						</div>
 						<div class="options_column">
-						View: <select name="viewing_mode" id="viewing_mode" class="search_input">
-							<option value="standard">standard</option>
-							<option value="glossed">glossed</option>
+						{{ _('Viewing mode:') }} <select name="viewing_mode" id="viewing_mode" class="search_input">
+							<option value="standard">{{ _('view_standard') }}</option>
+							<option value="glossed">{{ _('view_glossed') }}</option>
 						</select><br>
 						{% if transliterations %}
 							{{ _('Transliteration:') }} <select name="translit" id="translit" class="search_input">

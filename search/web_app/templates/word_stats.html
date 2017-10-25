@@ -3,16 +3,16 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="word_stats_header">Select subcorpus</h4>
+				<h4 class="modal-title" id="word_stats_header">{{ _('Word statistics header') }}</h4>
 			</div>
 			<div class="modal-body" id="word_stats_body">
-				<h4>Word statistics for <span id="word_stats_wf"></span></h4>
+				<h4>{{ _('Word statistics for ') }}<span id="word_stats_wf"></span></h4>
 				<select name="select_meta_word_stat" id="select_meta_word_stat" class="search_input">
 				{% for stat_option in subcorpus_selection.stat_options %}
 					<option value="{{ stat_option }}">{{ stat_option }}</option>
 				{% endfor %}
 				</select>
-				<div id="word_stats_plot">(please wait for the plot to load)</div>
+				<div id="word_stats_plot">{{ _('(please wait for the plot to load)') }}</div>
 				<div class="selector_buttons">
 					<button type="button" class="btn btn-default btn-success" aria-label="Left Align" id="word_stats_ok">OK</button>
 				</div>

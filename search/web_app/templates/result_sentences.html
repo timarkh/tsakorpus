@@ -1,8 +1,11 @@
-﻿<p>Search result:
-{% if data.n_occurrences > 0 %}
-{{ data.n_occurrences }} occurrence(s),
+﻿{% if data.timeout %}
+<p class="message">{{ _('The search was not finished due to the query timeout. You only see partial results.') }}</p>
 {% endif %}
-{{ data.n_sentences }} sentence(s) found in approximately {{ data.n_docs }} document(s).</p>
+<p>{{ _('Search result:') }}
+{% if data.n_occurrences > 0 %}
+{{ data.n_occurrences }} {% if data.n_occurrences == 1 %}{{ _('occurrence') }}{% elif data.n_occurrences % 10 == 1 and data.n_occurrences % 100 != 11 %}{{ _('occurrence_1') }}{% elif 2 <= data.n_occurrences % 10 <= 4 and not 12 <= data.n_occurrences % 100 <= 14 %}{{ _('occurrences_2-4') }}{% else %}{{ _('occurrences') }}{% endif %},
+{% endif %}
+{{ data.n_sentences }} {{ _('sentence(s) found in approximately') }} {{ data.n_docs }} {{ _('document(s)') }}.</p>
 
 <div class="sent_results">
 {% for c in data.contexts %}
@@ -27,7 +30,7 @@
 {% endfor %}
 </div>
 {% if data.message %}
-<p class="message">Message: {{ data.message }}</p>
+<p class="message">{{ data.message }}</p>
 {% endif %}
 
 {% if data.src_alignment %}

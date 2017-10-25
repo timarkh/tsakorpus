@@ -213,3 +213,68 @@ msgstr "статистика"
 msgid "Cancel"
 msgstr "Отмена"
 
+msgid "Word statistics header"
+msgstr "Статистика по словоформам"
+
+msgid "Word statistics for "
+msgstr "Статистика для "
+
+msgid "(please wait for the plot to load)"
+msgstr "(подождите немного, график загружается)"
+
+msgid "Select subcorpus"
+msgstr "Выбор подкорпуса"
+
+msgid "Specify parameters"
+msgstr "Выбор параметров"
+
+msgid "Choose from a list"
+msgstr "Выбор из списка"
+
+msgid "Subcorpus statistics"
+msgstr "Статистика подкорпуса"
+
+msgid "Select parameters"
+msgstr "Выберите параметры"
+
+msgid "Select documents"
+msgstr "Выберите тексты"
+
+msgid "(please wait for the document list to load)"
+msgstr "(подождите немного, список текстов загружается)"
+
+msgid "Selected subcorpus composition"
+msgstr "Состав выбранного подкорпуса"
+
+msgid "Clear subcorpus"
+msgstr "Очистить подкорпус"
+
+msgid "The search was not finished due to the query timeout. You only see partial results."
+msgstr "Поиск не был завершён, потому что истекло время ожидания. Показаны не все результаты."
+
+msgid "occurrence"
+msgstr "словоформа"
+
+msgid "occurrence_1"
+msgstr "словоформа"
+
+msgid "occurrences_2-4"
+msgstr "словоформы"
+
+msgid "occurrences"
+msgstr "словоформ"
+
+msgid "sentence(s) found in approximately"
+msgstr "предложений примерно в"
+
+msgid "document(s)"
+msgstr "документах"
+
+msgid "Viewing mode:"
+msgstr "Выдача:"
+
+msgid "view_standard"
+msgstr "обычная"
+
+msgid "view_glossed"
+msgstr "глоссированная"

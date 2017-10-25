@@ -212,3 +212,68 @@ msgstr "statistics"
 msgid "Cancel"
 msgstr "Cancel"
 
+msgid "Word statistics header"
+msgstr "Word statistics"
+
+msgid "Word statistics for "
+msgstr "Word statistics for "
+
+msgid "(please wait for the plot to load)"
+msgstr "(please wait for the plot to load)"
+
+msgid "Select subcorpus"
+msgstr "Select subcorpus"
+
+msgid "Specify parameters"
+msgstr "Specify parameters"
+
+msgid "Choose from a list"
+msgstr "Choose from a list"
+
+msgid "Subcorpus statistics"
+msgstr "Subcorpus statistics"
+
+msgid "Select parameters"
+msgstr "Select parameters"
+
+msgid "Select documents"
+msgstr "Select documents"
+
+msgid "(please wait for the document list to load)"
+msgstr "(please wait for the document list to load)"
+
+msgid "Selected subcorpus composition"
+msgstr "Selected subcorpus composition"
+
+msgid "Clear subcorpus"
+msgstr "Clear subcorpus"
+
+msgid "The search was not finished due to the query timeout. You only see partial results."
+msgstr "The search was not finished due to the query timeout. You only see partial results."
+
+msgid "occurrence"
+msgstr "occurrence"
+
+msgid "occurrence_1"
+msgstr "occurrences"
+
+msgid "occurrences_2-4"
+msgstr "occurrences"
+
+msgid "occurrences"
+msgstr "occurrences"
+
+msgid "sentence(s) found in approximately"
+msgstr "sentence(s) found in approximately"
+
+msgid "document(s)"
+msgstr "document(s)"
+
+msgid "Viewing mode:"
+msgstr "View:"
+
+msgid "view_standard"
+msgstr "standard"
+
+msgid "view_glossed"
+msgstr "glossed"
