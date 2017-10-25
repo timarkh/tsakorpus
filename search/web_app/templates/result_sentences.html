@@ -59,11 +59,14 @@ var srcAlignments = {{ data.src_alignment | safe }};
 	show_player();
 	</script>
 	{% endif %}
+	<script type='text/javascript'>searchType = 'sentences';</script>
 {% else %}
 	<script type='text/javascript'>
 	{% if data.media %}
 	hide_player();
 	{% endif %}
 	show_query_panel();
+	searchType = 'none';
 	</script>
 {% endif %}
+

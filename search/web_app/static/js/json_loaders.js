@@ -1,4 +1,5 @@
 $(function() {
+	
 	$("#search_sent").click(get_sentences);
 	
 	$("#search_sent_json").click(function() {
@@ -37,7 +38,7 @@ $(function() {
 			type: "GET",
 			beforeSend: start_progress_bar,
 			complete: stop_progress_bar,
-			success: function(result) {hide_query_panel(); print_html(result)},
+			success: print_html,
 			error: function(errorThrown) {
 				alert( JSON.stringify(errorThrown) );
 			}
@@ -217,6 +218,7 @@ function assign_input_events() {
 	$("#show_word_stat").unbind('click');
 	$("span.locale").unbind('click');
 	$(".search_input").unbind('on');
+	$("#viewing_mode").unbind('change');
 	$("span.word_plus").click(add_word_inputs);
 	$("span.word_minus").click(del_word_inputs);
 	$("span.word_expand").click(expand_word_input);
@@ -229,6 +231,7 @@ function assign_input_events() {
 	$("#show_word_stat").click(show_word_stats);
 	$("span.locale").click(change_locale);
 	$(".search_input").on("keydown", search_if_enter);
+	$("#viewing_mode").change(toggle_interlinear);
 }
 
 function assign_show_hide() {

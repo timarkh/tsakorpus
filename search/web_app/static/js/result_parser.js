@@ -1,4 +1,5 @@
 ﻿var curClickedObj = null;
+var searchType = 'none';
 
 function print_json(results) {
 	//alert("success" + JSON.stringify(results));
@@ -11,7 +12,8 @@ function print_html(results) {
 	//alert("success" + JSON.stringify(results));
 	$('#analysis').css('display', 'none');
 	$('#w_id1').val('');
-	$("#res_p").html( results );
+	$("#res_p").html(results);
+	toggle_interlinear();
 }
 
 function show_player() {
@@ -218,6 +220,7 @@ function show_expanded_context(results) {
 	}
 	catch (err) { }
 	assign_word_events();
+	toggle_interlinear();
 }
 
 function assign_para_highlight() {
@@ -293,17 +296,34 @@ function show_word_stats(e) {
 	$('#select_meta_word_stat').trigger('change');
 }
 
-function show_analyses() {
-	$('span.word').each(function (index) {
-		var data_ana = $(this).attr('data-ana');
-		if (data_ana == null || data_ana.length <= 0) {
-			data_ana = '<div class="popup_word"> </div>';
-		}
-		data_ana = data_ana.replace('class="popup_word"', 'class="popup_word ana_interlinear"');
-		data_ana = data_ana.replace(/<span class="popup_(key|wf)">.*?<\/span>/g, '');
-		data_ana = data_ana.replace('class="popup_value"', 'class="popup_value_small"');
-		$(this).html($(this).html() + '<br>' + data_ana);
-	});
+function toggle_interlinear() {
+	if (searchType != 'sentences') {
+		return;
+	}
+	if ($('#viewing_mode option:selected').attr('value') == 'glossed')
+	{
+		$('span.word').each(function (index) {
+			if ($(this).find('.ana_interlinear').length > 0) {
+				return;
+			}
+			var data_ana = $(this).attr('data-ana');
+			if (data_ana == null || data_ana.length <= 0) {
+				// data_ana = '<div class="popup_word"> </div>';
+				return;
+			}
+			data_ana = data_ana.replace('class="popup_word"', 'class="popup_word ana_interlinear"');
+			data_ana = data_ana.replace(/<span class="popup_(key|wf)">.*?<\/span>/g, '');
+			data_ana = data_ana.replace('class="popup_value"', 'class="popup_value_small"');
+			data_ana = data_ana.replace(/(class="popup_value">[^<>]{38,100}?)[ ,;][^<>]{3,}/g, '$1...');
+			if (/<div class="popup_word[^<>]*>\s*<\/div>\s*/.test(data_ana)) {
+				return;
+			}
+			$(this).html($(this).html() + '<br>' + data_ana);
+		});
+	}
+	else {
+		$('.ana_interlinear').remove();
+	}
 }
 
 function make_sortable() {

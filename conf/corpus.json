@@ -1,8 +1,8 @@
 {
-  "corpus_name": "beserman_flex",
+  "corpus_name": "beserman_eaf",
   "input_format": "json",
   "debug": true,
-  "media": false,
+  "media": true,
   "media_length": 60,
   "max_context_expand": 4,
   "max_distance_filter": 200000,

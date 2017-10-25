@@ -36,7 +36,6 @@
 <div id="search_div" class="transitions init-hidden">
 	<div class="show-hide">
 	<div class="slide">
-		<button onclick="show_analyses()" value="Show analyses"></button>
 		<form id="search_main">
 		<input type="hidden" name="n_words" id="n_words" value="1">
 		<div class="vertical_nav_tabs">
@@ -113,14 +112,18 @@
 							<input type="checkbox" name="distance_strict"> {{ _('Word distance requirements are strict') }}<br>
 						</div>
 						<div class="options_column">
+						View: <select name="viewing_mode" id="viewing_mode" class="search_input">
+							<option value="standard">standard</option>
+							<option value="glossed">glossed</option>
+						</select><br>
 						{% if transliterations %}
 							{{ _('Transliteration:') }} <select name="translit" id="translit" class="search_input">
 							{% for tr in transliterations %}
 							<option value="{{ tr }}">{{ tr }}</option>
 							{% endfor %}
 							</select>
-						</div>
 						{% endif %}
+						</div>
 					</div>
 				</div>
 			</div>

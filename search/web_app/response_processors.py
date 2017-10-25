@@ -31,19 +31,51 @@ class SentenceViewer:
     def differing_ana_field(self, ana1, ana2):
         """
         Determine if two analyses with equal number of fields only differ
-        in one field. If they do, return the name of the field. If they
-        do not differ at all, return empty string. If they have more than
-        two differing fields, return None.
+        in one field, with the possible exception of the gloss field.
+        If they do, return the name of the field. If they do not differ
+        at all, return empty string. If they have more than one
+        differing fields, return None.
         """
         differingField = ''
         for key in ana1:
             if key not in ana2:
                 return None
+            if key in ('gloss', 'gloss_index'):
+                continue
             if ana2[key] != ana1[key]:
                 if len(differingField) > 0:
                     return None
                 differingField = key
         return differingField
+
+    def join_ana_gloss_variants(self, ana1, ana2):
+        """
+        Check if the gloss field values in the analyses differ only
+        in one gloss. If so, return a string with joined glossing, e.g.
+        (STEM-PL-GEN) + (STEM-SG-GEN) would give (STEM-PL/SG-GEN). If not,
+        return None.
+        """
+        if 'gloss' not in ana1 or 'gloss' not in ana2:
+            return None
+        if ana1['gloss'] == ana2['gloss']:
+            return ana1['gloss']
+        glossParts1 = ana1['gloss'].split('-')
+        glossParts2 = ana2['gloss'].split('-')
+        if len(glossParts1) != len(glossParts2):
+            return None
+        nDifferences = 0
+        joinedGloss = ''
+        for iGloss in range(len(glossParts1)):
+            if iGloss != 0:
+                joinedGloss += '-'
+            if glossParts1[iGloss] == glossParts2[iGloss]:
+                joinedGloss += glossParts1[iGloss]
+            else:
+                if nDifferences >= 1:
+                    return None
+                nDifferences += 1
+                joinedGloss += glossParts1[iGloss] + '/' + glossParts2[iGloss]
+        return joinedGloss
 
     def simplify_ana(self, analyses, matchingAnalyses):
         """
@@ -74,8 +106,13 @@ class SentenceViewer:
                 if (differingField is not None
                         and len(differingField) > 0
                         and differingField.startswith('gr.')
-                        and type(analyses[j][differingField]) == str
+                        and type(analyses[i][differingField]) == str
                         and type(analyses[j][differingField]) == str):
+                    if 'gloss' in analyses[i] or 'gloss' in analyses[j]:
+                        joinedGloss = self.join_ana_gloss_variants(analyses[i], analyses[j])
+                        if joinedGloss is None:
+                            continue
+                        analyses[i]['gloss'] = joinedGloss
                     values = analyses[i][differingField].split('/') + analyses[j][differingField].split('/')
                     values.sort()
                     analyses[i][differingField] = '/'.join(values)
@@ -103,7 +140,7 @@ class SentenceViewer:
             if len(grAnaPart) > 0:
                 grAnaPart += ', '
             grAnaPart += fv[1]
-        return render_template('grammar_popup.html', grAnaPart=grAnaPart)
+        return render_template('grammar_popup.html', grAnaPart=grAnaPart).strip()
 
     def build_ana_div(self, ana, lang, translit=None):
         """

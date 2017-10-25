@@ -19,4 +19,14 @@
 {% if data.media %}
 <script type='text/javascript'>hide_player();</script>
 {% endif %}
-
+{% if data.n_occurrences > 0 %}
+<script type='text/javascript'>
+	searchType = 'words';
+	hide_query_panel();
+</script>
+{% else %}
+<script type='text/javascript'>
+	show_query_panel();
+	searchType = 'none';
+</script>
+{% endif %}

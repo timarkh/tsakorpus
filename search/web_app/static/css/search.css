@@ -224,7 +224,11 @@
 .ana_interlinear {
 	font-size: 0.7em;
 	line-height: 1.2em;
-	margin-bottom: 10px;
+	margin-bottom: 5px;
+}
+
+.popup_ana {
+	margin-bottom: 5px;
 }
 
 .search_input {
@@ -464,6 +468,10 @@ hr.separator {
 	color: #564b84;
 }
 
+.popup_gloss {
+	color: #223344;
+}
+
 .popup_pos {
 	margin-left: 5px;
 	color: #564b84;
@@ -472,7 +480,7 @@ hr.separator {
 }
 
 .popup_field {
-	display: block;
+	display: inline-block;
 }
 
 .popup_value {
