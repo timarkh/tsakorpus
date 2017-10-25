@@ -45,8 +45,7 @@ function assign_word_events() {
 }
 
 function highlight_cur_word(e) {
-	targetClasses = $(e.target).attr('class').split(' ');
-	$('.w_highlighted').css({'border-style': 'none'});
+	targetClasses = $(this).attr('class').split(' ');
 	$('.w_highlighted').removeClass('w_highlighted');
 	targetClasses.forEach(highlight_word_spans);
 }
@@ -99,8 +98,6 @@ function page_click(e) {
 
 function highlight_word_spans(item, i) {
 	if (item == "word" || item.includes('match') || !item.startsWith("w")) return;
-	$('.' + item).css({'border-color': '#FF9000', 'border-radius': '5px',
-					   'border-width': '2px', 'border-style': 'solid'});
 	$('.' + item).addClass('w_highlighted');
 }
 
@@ -308,7 +305,6 @@ function toggle_interlinear() {
 			}
 			var data_ana = $(this).attr('data-ana');
 			if (data_ana == null || data_ana.length <= 0) {
-				// data_ana = '<div class="popup_word"> </div>';
 				return;
 			}
 			data_ana = data_ana.replace('class="popup_word"', 'class="popup_word ana_interlinear"');

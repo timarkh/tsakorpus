@@ -225,10 +225,19 @@
 	font-size: 0.7em;
 	line-height: 1.2em;
 	margin-bottom: 5px;
+	padding-right: 2px;
 }
 
 .popup_ana {
 	margin-bottom: 5px;
+}
+
+.w_highlighted {
+	padding: 0 1px;
+	border-color: #FF9000;
+	border-radius: 5px;
+	border-width: 2px;
+	border-style: solid;
 }
 
 .search_input {

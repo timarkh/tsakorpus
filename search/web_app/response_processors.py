@@ -308,6 +308,8 @@ class SentenceViewer:
                 result += '<span class="ch_date">' + dateDisplayed + '</span>'
         dataMeta = ''
         for metaField in self.settings['viewable_meta']:
+            if metaField == 'filename':
+                continue
             try:
                 metaValue = meta[metaField]
                 if type(metaValue) != str:

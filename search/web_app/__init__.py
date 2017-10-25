@@ -818,6 +818,25 @@ def find_sentences_json(page=0):
     return hits
 
 
+def remove_sensitive_data(hits):
+    """
+    Remove data that should not be shown to the user, i.e. the ids
+    of the sentences (the user can use this information to download 
+    the whole corpus if the sentences are numbered consecutively).
+    Change the hits dictionary, do not return anything.
+    """
+    if type(hits) != dict or 'hits' not in hits or 'hits' not in hits['hits']:
+        return
+    for hit in hits['hits']['hits']:
+        if '_id' in hit:
+            del hit['_id']
+        if '_source' in hit:
+            if 'prev_id' in hit['_source']:
+                del hit['_source']['prev_id']
+            if 'next_id' in hit['_source']:
+                del hit['_source']['next_id']
+
+
 @app.route('/search_sent_json/<int:page>')
 @app.route('/search_sent_json')
 @jsonp
@@ -826,6 +845,7 @@ def search_sent_json(page=-1):
         set_session_data('page_data', {})
         page = 0
     hits = find_sentences_json(page=page)
+    remove_sensitive_data(hits)
     return jsonify(hits)
 
 
