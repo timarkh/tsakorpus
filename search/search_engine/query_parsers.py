@@ -835,6 +835,24 @@ class InterfaceQueryParser:
             queryDict = {'query': {'match_none': ''}}
         return queryDict
 
+    def word_freqs_query(self, htmlQuery):
+        """
+        Make an ES query for obtaining the frequency data bucketed
+        by frequency rank. Subcorpus and all non-first words in the
+        query are ignored.
+        """
+        htmlQuery['n_words'] = 1
+        for k in [_ for _ in htmlQuery.keys()]:
+            if k not in ('n_words', 'lang', 'lang1') and re.search('[^0-9]1$', k) is None:
+                del htmlQuery[k]
+            elif re.search('^sentence_index', k) is not None:
+                del htmlQuery[k]
+        esQuery = self.html2es(htmlQuery, query_size=0, sortOrder='', searchOutput='words')
+        esQuery['aggs'] = {'agg_rank': {'terms': {'field': 'rank_true',
+                                                  'order': {'_term': 'asc'},
+                                                  'size': 10000}}}
+        return esQuery
+
     def filter_sentences(self, iterSent, constraints, nWords=1):
         """
         Remove sentences that do not satisfy the word relation constraints.

@@ -280,3 +280,12 @@ msgstr "standard"
 
 msgid "view_glossed"
 msgstr "glossed"
+
+msgid "By metadata values"
+msgstr "By metadata values"
+
+msgid "By frequency"
+msgstr "By frequency"
+
+msgid "Distribution by frequency rank"
+msgstr "Distribution by frequency rank"

@@ -966,3 +966,22 @@ class SentenceViewer:
             result['docs'].append(self.process_doc(response['hits']['hits'][iHit], exclude))
         result['size_percent'] = round(result['n_words'] * 100 / corpusSize, 3)
         return result
+
+    def extract_cumulative_freq_by_rank(self, hits):
+        """
+        Process search results that contain buckets with frequency rank. Each
+        bucket contains the total frequency of a word of a given frequency rank.
+        Buckets should be ordered by frequency rank.
+        Return a dictionary of the kind {frequency rank: total frequency of the words
+        whose rank is less or equal to this rank}.
+        """
+        if ('aggregations' not in hits
+                or 'agg_rank' not in hits['aggregations']
+                or 'buckets' not in hits['aggregations']['agg_rank']):
+            return {}
+        cumulFreq = 0
+        freqByRank = {}
+        for bucket in hits['aggregations']['agg_rank']['buckets']:
+            cumulFreq += bucket['doc_count']
+            freqByRank[bucket['key']] = cumulFreq
+        return freqByRank

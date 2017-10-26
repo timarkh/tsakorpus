@@ -31,6 +31,9 @@ sc.qp.rp = sentView
 sc.qp.wr.rp = sentView
 random.seed()
 corpus_size = sc.get_n_words()  # size of the corpus in words
+freq_by_rank = []
+for lang in settings['languages']:
+    freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_freq_by_rank(lang)))    # number of types for each requency rank
 
 
 def jsonp(func):
@@ -536,6 +539,37 @@ def get_doc_stats(metaField):
     change_display_options(query)
     docIDs = subcorpus_ids(query)
     buckets = get_buckets_for_metafield(metaField, langID=-1, docIDs=docIDs)
+    return jsonify(buckets)
+
+
+@app.route('/word_freq_stats')
+def get_word_freq_stats():
+    """
+    Return JSON with the distribution of a particular kind of words
+    by frequency rank. This function is used for visualisation.
+    Currently, it can only return statistics for a context-insensitive
+    query for the whole corpus (the subcorpus constraints and all
+    non-first words are discarded from the query).
+    """
+    htmlQuery = copy_request_args()
+    change_display_options(htmlQuery)
+    langID = 0
+    if 'lang' in htmlQuery and htmlQuery['lang'] in settings['languages']:
+        langID = settings['languages'].index(htmlQuery['lang'])
+    esQuery = sc.qp.word_freqs_query(htmlQuery)
+    # return jsonify(esQuery)
+    hits = sc.get_words(esQuery)
+    curFreqByRank = sentView.extract_cumulative_freq_by_rank(hits)
+    buckets = []
+    prevFreq = 0
+    for freqRank in sorted(freq_by_rank[langID]):
+        bucket = {'name': freqRank, 'n_words': 0}
+        if freqRank in curFreqByRank:
+            bucket['n_words'] = curFreqByRank[freqRank] / freq_by_rank[langID][freqRank]
+            prevFreq = curFreqByRank[freqRank]
+        else:
+            bucket['n_words'] = prevFreq / freq_by_rank[langID][freqRank]
+        buckets.append(bucket)
     return jsonify(buckets)
 
 

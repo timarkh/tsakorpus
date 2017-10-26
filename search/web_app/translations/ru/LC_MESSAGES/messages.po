@@ -281,3 +281,12 @@ msgstr "обычная"
 
 msgid "view_glossed"
 msgstr "глоссированная"
+
+msgid "By metadata values"
+msgstr "По значениям метаданных"
+
+msgid "By frequency"
+msgstr "По частотности"
+
+msgid "Distribution by frequency rank"
+msgstr "Распределение слов по частотным рангам"

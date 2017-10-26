@@ -194,6 +194,20 @@ class Indexator:
         iWord = 0
         freqsSorted = [[v for v in sorted(self.wordFreqs[langID].values(), reverse=True)]
                        for langID in range(len(self.languages))]
+        freqToRank = [{} for langID in range(len(self.languages))]
+        prevFreq = 0
+        prevRank = 0
+        for langID in range(len(self.languages)):
+            for i in range(len(freqsSorted[langID])):
+                v = freqsSorted[langID][i]
+                if v != prevFreq:
+                    if prevFreq != 0:
+                        freqToRank[langID][prevFreq] = prevRank + (i - prevRank) // 2
+                    prevRank = i
+                    prevFreq = v
+            if prevFreq != 0:
+                freqToRank[langID][prevFreq] = prevRank + (len(freqsSorted[langID]) - prevRank) // 2
+
         wfsSorted, lemmataSorted = self.sort_words()
 
         for langID in range(len(self.languages)):
@@ -221,10 +235,11 @@ class Indexator:
                 wJson['dids'] = [did for did in sorted(self.wordDIDs[langID][wID])]
                 wJson['n_sents'] = self.wordSFreqs[langID][wID]
                 wJson['n_docs'] = len(wJson['dids'])
-                wJson['rank'] = ''
+                wJson['rank'] = ''                                      # for the user
+                wJson['rank_true'] = freqToRank[langID][wJson['freq']]  # for the calculations
                 if wJson['freq'] > 1:
                     if wJson['freq'] > quantiles[0.03]:
-                        wJson['rank'] = '#' + str(freqsSorted[langID].index(wJson['freq']) + 1)
+                        wJson['rank'] = '#' + str(wJson['rank_true'] + 1)
                     else:
                         wJson['rank'] = '&gt; ' + str(min(math.ceil(q * 100) for q in quantiles
                                                       if wJson['freq'] >= quantiles[q])) + '%'

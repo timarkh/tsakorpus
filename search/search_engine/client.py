@@ -108,3 +108,14 @@ class SearchClient:
         if response['hits']['total'] <= 0:
             return 0
         return response['hits']['hits'][0]['_source']['n_words']
+
+    def get_freq_by_rank(self, lang):
+        """
+        Return word frequencies in the entire corpus aggregated by their
+        frequency rank.
+        """
+        htmlQuery = {'lang': lang, 'lang1': lang, 'wf1': '*', 'n_ana1': 'any'}
+        esQuery = self.qp.word_freqs_query(htmlQuery)
+        hits = self.es.search(index=self.name + '.words', doc_type='word',
+                              body=esQuery)
+        return hits

@@ -75,6 +75,7 @@ class PrepareData:
                                                     'analyzer': 'gloss_analyzer'}}},
              'freq': {'type': 'integer'},
              'rank': {'type': 'keyword'},
+             'rank_true': {'type': 'integer'},
              'n_sents': {'type': 'integer'},
              'n_docs': {'type': 'integer'},
              'wf_order': {'type': 'integer'},   # position of the word form in sorted list of word forms

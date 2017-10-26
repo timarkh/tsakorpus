@@ -2,8 +2,12 @@ $(function() {
 	function assign_word_stats_events() {
 		$('#select_meta_word_stat').unbind('change');
 		$('#word_stats_ok').unbind('click');
+		$('#load_word_freq_stats').unbind('click');
+		$('#load_word_meta_stats').unbind('click');
 		$('#select_meta_word_stat').change(load_word_stats);
 		$('#word_stats_ok').click(close_word_stats);
+		$('#load_word_freq_stats').click(load_word_freq_stats);
+		$('#load_word_meta_stats').click(load_word_stats);
 	}
 
 	function load_word_stats(e) {
@@ -25,12 +29,27 @@ $(function() {
 		});
 	}
 	
+	function load_word_freq_stats(e) {
+		$.ajax({
+			url: "word_freq_stats",
+			data: $("#search_main").serialize(),
+			dataType : "json",
+			type: "GET",
+			success: display_word_freq_stats_plot,
+			//success: print_json,
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	}
+	
 	function close_word_stats() {
 		$('#word_stats').modal('toggle');
 	}
 	
-	function clear_word_stats_plot(results) {
-		$('#word_stats_plot').html('<svg class="word_meta_plot"></svg>');
+	function clear_word_stats_plots(results) {
+		$('#word_stats_plot').html('<svg></svg>');
+		$('#word_freq_rank_stats_plot').html('<svg></svg>');
 	}
 	
 	function show_bar_chart(results, maxHeight, margin) {
@@ -127,16 +146,25 @@ $(function() {
             .x(function(v) { return x(parseInt(v.name)); })
             .y(function(v) { return y(v.n_words); })
 			.curve(d3.curveBasis);
+			//.curve(d3.curveLinear);
 		chart.append("path")
             .data([results])
             .attr("class", "plot_line")
             .attr("d", valueline);
+		chart.selectAll("dot")
+            .data(results)
+          .enter().append("circle")
+            .attr("r", 3.5)
+            .attr("cx", function(v) { return x(parseInt(v.name)); })
+            .attr("cy", function(v) { return y(v.n_words); });
 		chart.attr("height", 320 + margin.top + margin.bottom);
 	}
 	
 	function display_word_stats_plot(results) {
+		clear_word_stats_plots();
+		var plotObj = $('#word_stats_plot');
 		if (results.length <= 0) {
-			$('#word_stats_plot').html('<p>Nothing found.</p>');
+			plotObj.html('<p>Nothing found.</p>');
 			return;
 		}
 		var metaField = $('#select_meta_word_stat option:selected').text();
@@ -145,7 +173,7 @@ $(function() {
 		}
 		var maxHeight = d3.max(results, function(v) { return v.n_words; });
 		var margin = {"top": 20, "right": 30, "bottom": 30, "left": 65};
-		$('#word_stats_plot').html('<svg class="word_meta_plot"></svg>');
+		plotObj.html('<svg class="word_meta_plot"></svg>');
 		if (metaField.startsWith('year')) {
 			show_line_plot(results, maxHeight, margin);
 		}
@@ -153,6 +181,19 @@ $(function() {
 		{
 			show_bar_chart(results, maxHeight, margin);
 		}
+	}
+	
+	function display_word_freq_stats_plot(results) {
+		clear_word_stats_plots();
+		var plotObj = $('#word_freq_rank_stats_plot');
+		if (results.length <= 0) {
+			plotObj.html('<p>Nothing found.</p>');
+			return;
+		}
+		var maxHeight = d3.max(results, function(v) { return v.n_words; });
+		var margin = {"top": 20, "right": 30, "bottom": 30, "left": 65};
+		plotObj.html('<svg class="word_meta_plot"></svg>');
+		show_line_plot(results, maxHeight, margin);
 	}
 
 	assign_word_stats_events();

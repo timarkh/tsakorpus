@@ -6,13 +6,25 @@
 				<h4 class="modal-title" id="word_stats_header">{{ _('Word statistics header') }}</h4>
 			</div>
 			<div class="modal-body" id="word_stats_body">
-				<h4>{{ _('Word statistics for ') }}<span id="word_stats_wf"></span></h4>
-				<select name="select_meta_word_stat" id="select_meta_word_stat" class="search_input">
-				{% for stat_option in subcorpus_selection.stat_options %}
-					<option value="{{ stat_option }}">{{ stat_option }}</option>
-				{% endfor %}
-				</select>
-				<div id="word_stats_plot">{{ _('(please wait for the plot to load)') }}</div>
+				<ul class="nav nav-tabs">
+					<li class="active"><a data-toggle="tab" href="#word_stats_by_meta" id="load_word_meta_stats">{{ _('By metadata values') }}</a></li>
+					<li><a data-toggle="tab" href="#word_stats_by_freq" id="load_word_freq_stats">{{ _('By frequency') }}</a></li>
+				</ul>
+				<div class="tab-content">
+					<div id="word_stats_by_meta" class="tab-pane fade in active">
+						<h4>{{ _('Word statistics for ') }}<span id="word_stats_wf"></span></h4>
+						<select name="select_meta_word_stat" id="select_meta_word_stat" class="search_input">
+						{% for stat_option in subcorpus_selection.stat_options %}
+							<option value="{{ stat_option }}">{{ stat_option }}</option>
+						{% endfor %}
+						</select>
+						<div id="word_stats_plot">{{ _('(please wait for the plot to load)') }}</div>
+					</div>
+					<div id="word_stats_by_freq" class="tab-pane fade">
+						<h4>{{ _('Distribution by frequency rank') }}</h4>
+						<div id="word_freq_rank_stats_plot">{{ _('(please wait for the plot to load)') }}</div>
+					</div>
+				</div>
 				<div class="selector_buttons">
 					<button type="button" class="btn btn-default btn-success" aria-label="Left Align" id="word_stats_ok">OK</button>
 				</div>

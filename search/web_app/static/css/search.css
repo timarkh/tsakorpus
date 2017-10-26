@@ -832,6 +832,11 @@ hr.separator {
   stroke-width: 2px;
 }
 
+svg circle {
+	fill: white;
+	stroke: #aaa;
+}
+
 .message {
 	color: #772814;
 	text-shadow: 2px 2px #fff787;
