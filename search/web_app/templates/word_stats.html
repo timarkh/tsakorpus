@@ -22,6 +22,8 @@
 					</div>
 					<div id="word_stats_by_freq" class="tab-pane fade">
 						<h4>{{ _('Distribution by frequency rank') }}</h4>
+						<p>The plot below works as follows. On the <i>x</i> axis, you see frequency ranks, i.e. positions in the full list of all word forms of the corpus, ordered by decreasing frequency. If multiple words have the same frequency, they get the same rank equal to the average of their positions. For each frequency rank <i>r</i>, <strong>the plot shows the proportion of words that conform to your query (each word counts only once) among all words with frequency rank less or equal to <i>r</i></strong> on the <i>y</i> axis. The rightmost point, therefore, shows the total proportion of such words among all types (different words) in the corpus.</p>
+						<p>The subcorpus constraints and all words in the query, except the first one, are not taken into account here.</p>
 						<div id="word_freq_rank_stats_plot">{{ _('(please wait for the plot to load)') }}</div>
 					</div>
 				</div>
