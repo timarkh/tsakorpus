@@ -22,12 +22,69 @@ class WordRelations:
         self.rp = rp    # ResponseProcessor instance
         # self.sentView = sentence_viewer
 
+    def make_pivotal(self, constraints):
+        """
+        Replace as many word distance constraints as possible with equivalent
+        constraints that would include the pivotal word, i. e. the word that
+        already has the largest number of constraints. Change the
+        constraints dictionary, do not return anything.
+        """
+        if len(constraints) < 3:
+            return
+        nPivotalTerm, constraintsByTerm = self.find_pivotal_term(constraints)
+        nextTermsStack = [nPivotalTerm]
+        processedTerms = []
+        while len(nextTermsStack) > 0:
+            curTerm = nextTermsStack.pop()
+            processedTerms.append(curTerm)
+            if curTerm not in constraintsByTerm:
+                continue
+            for c in constraintsByTerm[curTerm]:
+                if c[0] != curTerm:
+                    if c[0] in processedTerms:
+                        continue
+                    nextTermsStack.append(c[0])
+                elif c[1] != curTerm:
+                    if c[1] in processedTerms:
+                        continue
+                    nextTermsStack.append(c[1])
+                if curTerm == nPivotalTerm:
+                    continue
+                if nPivotalTerm < curTerm:
+                    curPivotalPair = (nPivotalTerm, curTerm)
+                else:
+                    curPivotalPair = (curTerm, nPivotalTerm)
+                if curPivotalPair not in constraints:
+                    continue
+                if constraints[curPivotalPair]['from'] != constraints[curPivotalPair]['to']:
+                    continue
+                nextTerm = nextTermsStack[-1]
+                pivotToCurDist = constraints[curPivotalPair]['from']
+                if nPivotalTerm > curTerm:
+                    pivotToCurDist *= -1
+                curToNextDistFrom = constraints[c]['from']
+                curToNextDistTo = constraints[c]['to']
+                if curTerm > nextTerm:
+                    curToNextDistFrom, curToNextDistTo = -curToNextDistTo, -curToNextDistFrom
+                pivotToNextDistFrom = pivotToCurDist + curToNextDistFrom
+                pivotToNextDistTo = pivotToCurDist + curToNextDistTo
+                if nPivotalTerm < nextTerm:
+                    nextPivotalPair = (nPivotalTerm, nextTerm)
+                    constraints[nextPivotalPair] = {'from': pivotToNextDistFrom,
+                                                    'to': pivotToNextDistTo}
+                else:
+                    nextPivotalPair = (nextTerm, nPivotalTerm)
+                    constraints[nextPivotalPair] = {'to': -pivotToNextDistFrom,
+                                                    'from': -pivotToNextDistTo}
+                del constraints[c]
+
     def get_constraints(self, htmlQuery):
         """
         Extract word relation constraints from an HTML query
         and return them in a more usable form.
         The constraints dictionary returned by this function
-        looks like (nWord1, nWord2) -> {'from': from, 'to': to}.
+        looks like (nWord1, nWord2) -> {'from': from, 'to': to},
+        where nWord1 < nWord2.
         """
         constraints = {}
         relIDs = {}
@@ -87,6 +144,7 @@ class WordRelations:
                     constraints[wordPair]['from'] = relIDs[relID]['from']
                 if 'to' in relIDs[relID]:
                     constraints[wordPair]['to'] = relIDs[relID]['to']
+            self.make_pivotal(constraints)
         return constraints
 
     def find_pivotal_term(self, distances):
@@ -110,7 +168,7 @@ class WordRelations:
             curNConstraints = len(constraints[w])
             if curNConstraints > curMaxConstraints:
                 curMaxConstraints = curNConstraints
-                nPivotalTerm = w - 1
+                nPivotalTerm = w
         return nPivotalTerm, constraints
 
     def get_one_highlight_pos(self, highlight):

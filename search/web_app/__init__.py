@@ -369,6 +369,8 @@ def search_page():
 @app.route('/search_sent_query')
 @jsonp
 def search_sent_query(page=0):
+    if not settings['debug']:
+        return jsonify({})
     if request.args and page <= 0:
         query = copy_request_args()
         page = 1
@@ -932,6 +934,8 @@ def get_sent_context(n):
 @app.route('/search_word_query')
 @jsonp
 def search_word_query():
+    if not settings['debug']:
+        return jsonify({})
     query = copy_request_args()
     change_display_options(query)
     if 'doc_ids' not in query:
@@ -1096,6 +1100,8 @@ def search_word():
 @app.route('/search_doc_query')
 @jsonp
 def search_doc_query():
+    if not settings['debug']:
+        return jsonify({})
     query = copy_request_args()
     change_display_options(query)
     query = sc.qp.subcorpus_query(query,

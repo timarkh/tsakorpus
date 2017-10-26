@@ -397,8 +397,13 @@ class InterfaceQueryParser:
         or a list with two non-negative integers (range).
         """
         if sentIndex is None:
-            return []
+            return {}
         query = {}
+        if type(sentIndex) == list and len(sentIndex) == 2:
+            if sentIndex[0] < 0 and sentIndex[1] >= 0:
+                sentIndex[0] = 0
+            if sentIndex[0] == sentIndex[1]:
+                sentIndex = sentIndex[0]
         if type(sentIndex) == int:
             if not mustNot:
                 query = {'match': {'words.sentence_index': sentIndex}}
@@ -519,11 +524,11 @@ class InterfaceQueryParser:
                 for iQueryWord in range(len(queryDict['words'])):
                     wordDesc, negQuery = queryDict['words'][iQueryWord]
                     curSentIndex = None
-                    if iQueryWord == nPivotalTerm:
+                    if iQueryWord == nPivotalTerm - 1:  # nPivotalTerm is 1-based
                         curSentIndex = self.sentence_index_query(pivotalTermIndex)
                     elif iQueryWord + 1 in constraints:
                         for wordPair in constraints[iQueryWord + 1]:
-                            if nPivotalTerm + 1 not in wordPair:
+                            if nPivotalTerm not in wordPair:
                                 continue
                             negateDistances = (iQueryWord + 1 == wordPair[1])
                             constraint = distances[wordPair]
