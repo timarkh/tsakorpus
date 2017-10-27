@@ -133,6 +133,9 @@ msgstr "Search sentences"
 msgid "Search words"
 msgstr "Search words"
 
+msgid "Search lemmata"
+msgstr "Search lemmata"
+
 #: templates/index.html:126
 msgid "Select subcorpus"
 msgstr "Select subcorpus"

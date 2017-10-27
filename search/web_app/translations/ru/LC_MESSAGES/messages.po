@@ -134,6 +134,9 @@ msgstr "Поиск предложений"
 msgid "Search words"
 msgstr "Поиск слов"
 
+msgid "Search lemmata"
+msgstr "Поиск лексем"
+
 #: templates/index.html:126
 msgid "Select subcorpus"
 msgstr "Выбор подкорпуса"

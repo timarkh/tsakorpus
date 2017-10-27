@@ -32,6 +32,15 @@ class SearchClient:
                                   body=esQuery)
         return hits
 
+    def get_lemmata(self, esQuery):
+        if self.settings['query_timeout'] > 0:
+            hits = self.es.search(index=self.name + '.words', doc_type='lemma',
+                                  body=esQuery, request_timeout=self.settings['query_timeout'])
+        else:
+            hits = self.es.search(index=self.name + '.words', doc_type='lemma',
+                                  body=esQuery)
+        return hits
+
     def get_word_freqs(self, esQuery):
         hits = self.es.search(index=self.name + '.words', doc_type='word_freq',
                               body=esQuery)
@@ -109,13 +118,24 @@ class SearchClient:
             return 0
         return response['hits']['hits'][0]['_source']['n_words']
 
-    def get_freq_by_rank(self, lang):
+    def get_word_freq_by_rank(self, lang):
         """
         Return word frequencies in the entire corpus aggregated by their
         frequency rank.
         """
         htmlQuery = {'lang': lang, 'lang1': lang, 'wf1': '*', 'n_ana1': 'any'}
-        esQuery = self.qp.word_freqs_query(htmlQuery)
+        esQuery = self.qp.word_freqs_query(htmlQuery, searchType='word')
         hits = self.es.search(index=self.name + '.words', doc_type='word',
+                              body=esQuery)
+        return hits
+
+    def get_lemma_freq_by_rank(self, lang):
+        """
+        Return lemma frequencies in the entire corpus aggregated by their
+        frequency rank.
+        """
+        htmlQuery = {'lang': lang, 'lang1': lang, 'wf1': '*', 'n_ana1': 'any'}
+        esQuery = self.qp.word_freqs_query(htmlQuery, searchType='lemma')
+        hits = self.es.search(index=self.name + '.words', doc_type='lemma',
                               body=esQuery)
         return hits

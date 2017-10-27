@@ -47,8 +47,10 @@ class Indexator:
         self.es = Elasticsearch()
         self.es_ic = IndicesClient(self.es)
         self.tmpWordIDs = [{} for i in range(len(self.languages))]    # word as JSON -> its integer ID
+        self.tmpLemmaIDs = [{} for i in range(len(self.languages))]   # lemma as string -> its integer ID
+        self.word2lemma = [{} for i in range(len(self.languages))]    # word's ID -> ID of its lemma (or -1, if none)
         self.wordFreqs = [{} for i in range(len(self.languages))]     # word's ID -> its frequency
-        self.wordSFreqs = [{} for i in range(len(self.languages))]     # word's ID -> its number of sentences
+        self.wordSFreqs = [{} for i in range(len(self.languages))]    # word's ID -> its number of sentences
         self.wordDocFreqs = [{} for i in range(len(self.languages))]  # (word's ID, dID) -> word frequency in the document
         # self.wordSIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of sentence IDs
         self.wordDIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of document IDs
@@ -56,6 +58,7 @@ class Indexator:
         self.lemmata = set()     # set of lemmata (for sorting)
         self.sID = 0          # current sentence ID for each language
         self.dID = 0          # current document ID
+        self.wID = 0          # current word ID
         self.numWords = 0     # number of words in current document
         self.numSents = 0     # number of sentences in current document
         self.numWordsLang = [0] * len(self.languages)    # number of words in each language in current document
@@ -110,6 +113,7 @@ class Indexator:
             self.totalNumWords += 1
             self.enhance_word(w)
             wClean = {'lang': langID}
+            lemma = ''
             for field in w:
                 if field in self.goodWordFields:
                     wClean[field] = w[field]
@@ -117,7 +121,8 @@ class Indexator:
                         wClean[field] = wClean[field].lower()
                         self.wfs.add(wClean[field])
             if 'ana' in w:
-                self.lemmata.add(self.get_lemma(w))
+                lemma = self.get_lemma(w)
+                self.lemmata.add(lemma)
                 wClean['ana'] = []
                 for ana in w['ana']:
                     cleanAna = {}
@@ -132,6 +137,13 @@ class Indexator:
                 wID = len(self.tmpWordIDs[langID])
                 self.tmpWordIDs[langID][wCleanTxt] = wID
             w['w_id'] = wID
+            if len(lemma) > 0:
+                try:
+                    lemmaID = self.tmpLemmaIDs[langID][lemma]
+                except KeyError:
+                    lemmaID = len(self.tmpLemmaIDs[langID]) + 1
+                    self.tmpLemmaIDs[langID][lemma] = lemmaID
+                self.word2lemma[langID][wID] = lemmaID
 
             try:
                 self.wordFreqs[langID][wID] += 1
@@ -172,6 +184,44 @@ class Indexator:
         self.lemmata = None
         return wfsSorted, lemmataSorted
 
+    def get_freq_ranks(self, freqsSorted):
+        """
+        Calculate frequency ranks and rank/quantile labels for words
+        or lemmata.
+        """
+        freqToRank = {}
+        quantiles = {}
+        prevFreq = 0
+        prevRank = 0
+        for i in range(len(freqsSorted)):
+            v = freqsSorted[i]
+            if v != prevFreq:
+                if prevFreq != 0:
+                    freqToRank[prevFreq] = prevRank + (i - prevRank) // 2
+                prevRank = i
+                prevFreq = v
+        if prevFreq != 0:
+            freqToRank[prevFreq] = prevRank + (len(freqsSorted) - prevRank) // 2
+        for q in [0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.25, 0.5]:
+            qIndex = math.ceil(q * len(freqsSorted))
+            if qIndex >= len(freqsSorted):
+                qIndex = len(freqsSorted) - 1
+            quantiles[q] = freqsSorted[qIndex]
+        return freqToRank, quantiles
+
+    def quantile_label(self, freq, rank, quantiles):
+        """
+        Return a string label of the frequency rank (for frequent items)
+        or quantile. This label is showed to the user in word query results.
+        """
+        if freq > 1 and freq >= quantiles[0.5]:
+            if freq > quantiles[0.03]:
+                return '#' + str(rank + 1)
+            else:
+                return '&gt; ' + str(min(math.ceil(q * 100) for q in quantiles
+                                     if freq >= quantiles[q])) + '%'
+        return ''
+
     def get_lemma(self, word):
         """
         Join all lemmata in the JSON representation of a word with
@@ -185,42 +235,55 @@ class Indexator:
                 curLemmata.add(ana['lex'].lower())
         return '/'.join(l for l in sorted(curLemmata))
 
+    def iterate_lemmata(self, langID, lemmaFreqs, lemmaDIDs):
+        """
+        Iterate over all lemmata for one language collected at the
+        word iteration stage.
+        """
+        lFreqsSorted = [v for v in sorted(lemmaFreqs.values(), reverse=True)]
+        freqToRank, quantiles = self.get_freq_ranks(lFreqsSorted)
+        iLemma = 0
+        for l, lID in self.tmpLemmaIDs[langID].items():
+            if iLemma % 250 == 0:
+                print('indexing lemma', iLemma)
+            lemmaJson = {'wf': l,
+                         'freq': lemmaFreqs[lID],
+                         'rank_true': freqToRank[lemmaFreqs[lID]],
+                         'rank': self.quantile_label(lemmaFreqs[lID],
+                                                     freqToRank[lemmaFreqs[lID]],
+                                                     quantiles),
+                         'n_docs': len(lemmaDIDs[lID])}
+            curAction = {'_index': self.name + '.words',
+                         '_type': 'lemma',
+                         '_id': lID,
+                         '_source': lemmaJson}
+            iLemma += 1
+            yield curAction
+
     def iterate_words(self):
         """
         Iterate through all words collected at the previous
         stage. Return JSON objects with actions for bulk indexing
         in Elasticsearch.
         """
-        iWord = 0
-        freqsSorted = [[v for v in sorted(self.wordFreqs[langID].values(), reverse=True)]
-                       for langID in range(len(self.languages))]
-        freqToRank = [{} for langID in range(len(self.languages))]
-        prevFreq = 0
-        prevRank = 0
-        for langID in range(len(self.languages)):
-            for i in range(len(freqsSorted[langID])):
-                v = freqsSorted[langID][i]
-                if v != prevFreq:
-                    if prevFreq != 0:
-                        freqToRank[langID][prevFreq] = prevRank + (i - prevRank) // 2
-                    prevRank = i
-                    prevFreq = v
-            if prevFreq != 0:
-                freqToRank[langID][prevFreq] = prevRank + (len(freqsSorted[langID]) - prevRank) // 2
-
+        self.wID = 0
         wfsSorted, lemmataSorted = self.sort_words()
 
         for langID in range(len(self.languages)):
-            quantiles = {}
-            for q in [0.03, 0.04, 0.05, 0.1, 0.15, 0.2, 0.25, 0.5]:
-                qIndex = math.ceil(q * len(freqsSorted[langID]))
-                if qIndex >= len(freqsSorted[langID]):
-                    qIndex = len(freqsSorted[langID]) - 1
-                quantiles[q] = freqsSorted[langID][qIndex]
+            iWord = 0
+            print('Processing words in ' + self.languages[langID] + '...')
+            lemmaFreqs = {}       # lemma ID -> its frequency
+            lemmaDIDs = {}        # lemma ID -> its document IDs
+            wFreqsSorted = [v for v in sorted(self.wordFreqs[langID].values(), reverse=True)]
+            freqToRank, quantiles = self.get_freq_ranks(wFreqsSorted)
             # for wID in self.wordFreqs[langID]:
             for w, wID in self.tmpWordIDs[langID].items():
                 if iWord % 500 == 0:
                     print('indexing word', iWord)
+                try:
+                    lID = self.word2lemma[langID][wID]
+                except KeyError:
+                    lID = 0
                 wJson = json.loads(w)
                 wfOrder = len(wfsSorted) + 1
                 if 'wf' in wJson:
@@ -230,27 +293,34 @@ class Indexator:
                     lOrder = lemmataSorted[self.get_lemma(wJson)]
                 wJson['wf_order'] = wfOrder
                 wJson['l_order'] = lOrder
-                wJson['freq'] = self.wordFreqs[langID][wID]
+                wordFreq = self.wordFreqs[langID][wID]
+                wJson['freq'] = wordFreq
+                try:
+                    lemmaFreqs[lID] += wordFreq
+                except KeyError:
+                    lemmaFreqs[lID] = wordFreq
+                if lID != 0:
+                    try:
+                        lemmaDIDs[lID] |= self.wordDIDs[langID][wID]
+                    except KeyError:
+                        lemmaDIDs[lID] = set(self.wordDIDs[langID][wID])
                 # wJson['sids'] = [sid for sid in sorted(self.wordSIDs[langID][wID])]
                 wJson['dids'] = [did for did in sorted(self.wordDIDs[langID][wID])]
                 wJson['n_sents'] = self.wordSFreqs[langID][wID]
                 wJson['n_docs'] = len(wJson['dids'])
-                wJson['rank'] = ''                                      # for the user
-                wJson['rank_true'] = freqToRank[langID][wJson['freq']]  # for the calculations
-                if wJson['freq'] > 1:
-                    if wJson['freq'] > quantiles[0.03]:
-                        wJson['rank'] = '#' + str(wJson['rank_true'] + 1)
-                    else:
-                        wJson['rank'] = '&gt; ' + str(min(math.ceil(q * 100) for q in quantiles
-                                                      if wJson['freq'] >= quantiles[q])) + '%'
+                wJson['rank_true'] = freqToRank[wJson['freq']]  # for the calculations
+                wJson['rank'] = self.quantile_label(wJson['freq'],
+                                                    wJson['rank_true'],
+                                                    quantiles)  # for the user
                 curAction = {'_index': self.name + '.words',
                              '_type': 'word',
-                             '_id': iWord,
-                             '_source': wJson}
+                             '_id': self.wID,
+                             '_source': wJson,
+                             '_parent': lID}
                 yield curAction
 
                 for docID in wJson['dids']:
-                    wfreqJson = {'w_id': iWord,
+                    wfreqJson = {'w_id': self.wID,
                                  'd_id': docID,
                                  'wf_order': wfOrder,
                                  'l_order': lOrder,
@@ -258,9 +328,20 @@ class Indexator:
                     curAction = {'_index': self.name + '.words',
                                  '_type': 'word_freq',
                                  '_source': wfreqJson,
-                                 '_parent': iWord}
+                                 '_parent': self.wID}
                     yield curAction
                 iWord += 1
+                self.wID += 1
+            for lAction in self.iterate_lemmata(langID, lemmaFreqs, lemmaDIDs):
+                yield lAction
+        emptyLemmaJson = {'wf': 0,
+                          'freq': 0,
+                          'rank_true': -1}
+        curAction = {'_index': self.name + '.words',
+                     '_type': 'lemma',
+                     '_id': 0,
+                     '_source': emptyLemmaJson}
+        yield curAction
 
     def index_words(self):
         """

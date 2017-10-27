@@ -28,7 +28,7 @@ class PrepareData:
                 'analyzer': {
                     'wf_analyzer': {
                         'type': 'pattern',
-                        'pattern': '[\\-\n()]',
+                        'pattern': '[\\-\n()/]',
                         'lowercase': True
                     },
                     'gloss_analyzer': {
@@ -91,9 +91,29 @@ class PrepareData:
         if not wordFreqs:
             return {'mappings': {'word': {'properties': m}},
                     'settings': self.wfAnalyzer}
+        lemmaMapping = self.generate_lemma_mapping()
         wordFreqMapping = self.generate_wordfreq_mapping()
-        return {'mappings': {'word': {'properties': m}, 'word_freq': wordFreqMapping},
+        return {'mappings': {'lemma': lemmaMapping,
+                             'word': {'properties': m, '_parent': {'type': 'lemma'}},
+                             'word_freq': wordFreqMapping},
                 'settings': self.wfAnalyzer}
+
+    def generate_lemma_mapping(self):
+        """
+        Return Elasticsearch mapping for the type "lemma".
+        """
+        m = {'wf': {'type': 'text',
+                    'fielddata': True,
+                    'analyzer': 'wf_analyzer'},
+             'lang': {'type': 'byte'},
+             'freq': {'type': 'integer'},
+             'rank': {'type': 'keyword'},
+             'rank_true': {'type': 'integer'},
+             'n_sents': {'type': 'integer'},
+             'n_docs': {'type': 'integer'},
+             'l_order': {'type': 'integer'}
+            }
+        return {'properties': m}
 
     def generate_wordfreq_mapping(self):
         """
@@ -188,7 +208,6 @@ class PrepareData:
         mSentWord = self.generate_words_mapping(wordFreqs=False)
         mWord = self.generate_words_mapping()
         mSent = self.generate_sentences_mapping(mSentWord)
-        mWFreq = self.generate_wordfreq_mapping()
         mDoc = self.generate_docs_mapping()
         mappings = {'docs': mDoc,
                     'sentences': mSent,

@@ -134,6 +134,7 @@
 			<div class="btn-group">
 			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Search sentences" id="search_sent">{{ _('Search sentences') }}</button>
 			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Search words" id="search_word">{{ _('Search words') }}</button>
+			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Search lemmata" id="search_lemma">{{ _('Search lemmata') }}</button>
 			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Words statistics" id="show_word_stat"><span class="stat_w glyphicon glyphicon-stats"> </span></button>
 			</div>
 			<button type="button" class="btn btn-default btn-info" aria-label="Left Align" value="Search documents" id="search_doc"><span class="subcorpus_selector_link">{{ _('Select subcorpus') }}</span></button>
@@ -141,9 +142,11 @@
 				<br>
 				<button value="Search sentences (q)" id="search_sent_query" style="width:200px;">Search sentences (show query)</button>
 				<button value="Search words (q)" id="search_word_query" style="width:200px;">Search words (show query)</button>
+				<button value="Search lemmata (q)" id="search_lemma_query" style="width:200px;">Search lemmata (show query)</button>
 				<button value="Search documents (q)" id="search_doc_query" style="width:200px;">Search documents (show query)</button><br>
 				<button value="Search sentences (r)" id="search_sent_json" style="width:200px;">Search sentences (show JSON response)</button>
 				<button value="Search words (r)" id="search_word_json" style="width:200px;">Search words (show JSON response)</button>
+				<button value="Search lemmata (r)" id="search_lemma_json" style="width:200px;">Search lemmata (show JSON response)</button>
 				<button value="Search documents (r)" id="search_doc_json" style="width:200px;">Search documents (show JSON response)</button>
 			{% endif %}
 		</div>

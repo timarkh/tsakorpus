@@ -596,7 +596,7 @@ class SentenceViewer:
             freq = '0'
         return freq, rank, nSents, nDocs
 
-    def process_word(self, w, lang, translit=None):
+    def process_word(self, w, lang, searchType='word', translit=None):
         """
         Process one word taken from response['hits']['hits'].
         """
@@ -605,8 +605,15 @@ class SentenceViewer:
         wSource = w['_source']
         freq = str(wSource['freq'])
         rank = str(wSource['rank'])
-        nSents = str(wSource['n_sents'])
         nDocs = str(wSource['n_docs'])
+        if searchType == 'word':
+            nSents = str(wSource['n_sents'])
+            wf = self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit)
+            lemma = self.get_lemma(wSource)
+        else:
+            nSents = 0
+            wf = ''
+            lemma = self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit)
         wID = -1
         if 'w_id' in w:
             wID = w['w_id']
@@ -614,8 +621,8 @@ class SentenceViewer:
             wID = w['_id']
         return render_template('word_table_row.html',
                                ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
-                               wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
-                               lemma=self.get_lemma(wSource),
+                               wf=wf,
+                               lemma=lemma,
                                freq=freq,
                                rank=rank,
                                nSents=nSents,
@@ -900,7 +907,7 @@ class SentenceViewer:
             result['src_alignment'] = json.dumps(srcAlignmentInfo)
         return result
 
-    def process_word_json(self, response, docIDs, translit=None):
+    def process_word_json(self, response, docIDs, searchType='word', translit=None):
         result = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'message': 'Nothing found.'}
         if ('hits' not in response
                 or 'total' not in response['hits']
@@ -914,6 +921,7 @@ class SentenceViewer:
         for iHit in range(len(response['hits']['hits'])):
             langID, lang = self.get_lang_from_hit(response['hits']['hits'][iHit])
             result['words'].append(self.process_word(response['hits']['hits'][iHit],
+                                                     searchType=searchType,
                                                      lang=lang, translit=translit))
         return result
 

@@ -44,6 +44,21 @@ $(function() {
 			}
 		});
 	});
+		
+	$("#search_lemma").click(function() {
+		//$("#query").html( $("#search_main").serialize() );
+		$.ajax({
+			url: "search_lemma",
+			data: $("#search_main").serialize(),
+			type: "GET",
+			beforeSend: start_progress_bar,
+			complete: stop_progress_bar,
+			success: print_html,
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	});
 /*
 	$("#search_doc").click(function() {
 		//$("#query").html( $("#search_main").serialize() );
@@ -73,6 +88,20 @@ $(function() {
 		});
 	});
 	
+	$("#search_lemma_json").click(function() {
+		//$("#query").html( $("#search_main").serialize() );
+		$.ajax({
+			url: "search_lemma_json",
+			data: $("#search_main").serialize(),
+			type: "GET",
+			dataType : "json",
+			success: print_json,
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	});
+	
 	$("#search_doc_json").click(function() {
 		//$("#query").html( $("#search_main").serialize() );
 		$.ajax({
@@ -91,6 +120,20 @@ $(function() {
 		//$("#query").html( $("#search_main").serialize() );
 		$.ajax({
 			url: "search_word_query",
+			data: $("#search_main").serialize(),
+			type: "GET",
+			dataType : "json",
+			success: print_json,
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	});
+	
+	$("#search_lemma_query").click(function() {
+		//$("#query").html( $("#search_main").serialize() );
+		$.ajax({
+			url: "search_lemma_query",
 			data: $("#search_main").serialize(),
 			type: "GET",
 			dataType : "json",

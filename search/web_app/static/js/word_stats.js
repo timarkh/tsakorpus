@@ -1,19 +1,21 @@
 $(function() {
 	function assign_word_stats_events() {
 		$('#select_meta_word_stat').unbind('change');
+		$('#select_freq_stat_type').unbind('change');
 		$('#word_stats_ok').unbind('click');
-		$('#load_word_freq_stats').unbind('click');
 		$('#load_word_meta_stats').unbind('click');
+		$('#load_word_freq_stats').unbind('click');
 		$('#select_meta_word_stat').change(load_word_stats);
+		$('#select_freq_stat_type').change(load_freq_stats);
 		$('#word_stats_ok').click(close_word_stats);
-		$('#load_word_freq_stats').click(load_word_freq_stats);
 		$('#load_word_meta_stats').click(load_word_stats);
+		$('#load_word_freq_stats').click(load_freq_stats);
 	}
 
 	function load_word_stats(e) {
-		var metaField = $('#select_meta_word_stat option:selected').text();
+		var metaField = $('#select_meta_word_stat option:selected').attr('value');
 		if (metaField == '') {
-			clear_word_stats_plot();
+			clear_word_stats_plots();
 			return;
 		}
 		
@@ -29,9 +31,15 @@ $(function() {
 		});
 	}
 	
-	function load_word_freq_stats(e) {
+	function load_freq_stats(e) {
+		var freqStatType = $('#select_freq_stat_type option:selected').attr('value');
+		if (freqStatType == '') {
+			clear_word_stats_plots();
+			return;
+		}
+		
 		$.ajax({
-			url: "word_freq_stats",
+			url: "word_freq_stats/" + freqStatType,
 			data: $("#search_main").serialize(),
 			dataType : "json",
 			type: "GET",
@@ -102,7 +110,7 @@ $(function() {
 		chart.attr("height", 320 + margin.top + margin.bottom);
 	}
 	
-	function show_line_plot(results, maxHeight, margin) {
+	function show_line_plot(results, maxHeight, margin, multiplier, yLabel) {
 		var nResults = results.length;
 		var barWidth = 20;
 		var maxBars = 25;
@@ -117,7 +125,7 @@ $(function() {
 			.range([200, 0]);
 
 		var xAxis = d3.axisBottom().scale(x);
-		var yAxis = d3.axisLeft().scale(y).tickFormat(function (d) { return d + ' ipm'; });
+		var yAxis = d3.axisLeft().scale(y).tickFormat(function (d) { return d + yLabel; });
 
 		var chart = d3.select(".word_meta_plot")
 			.attr("width", 350 + margin.left + margin.right)
@@ -125,7 +133,7 @@ $(function() {
 		  .append("g")
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 		
-		y.domain([0, maxHeight]);
+		y.domain([0, maxHeight * multiplier]);
 		x.domain(xDomain);
 		
 		chart.append("g")
@@ -144,7 +152,7 @@ $(function() {
 		
 		var valueline = d3.line()
             .x(function(v) { return x(parseInt(v.name)); })
-            .y(function(v) { return y(v.n_words); })
+            .y(function(v) { return y(v.n_words * multiplier); })
 			.curve(d3.curveBasis);
 			//.curve(d3.curveLinear);
 		chart.append("path")
@@ -156,7 +164,7 @@ $(function() {
           .enter().append("circle")
             .attr("r", 3.5)
             .attr("cx", function(v) { return x(parseInt(v.name)); })
-            .attr("cy", function(v) { return y(v.n_words); });
+            .attr("cy", function(v) { return y(v.n_words * multiplier); });
 		chart.attr("height", 320 + margin.top + margin.bottom);
 	}
 	
@@ -175,7 +183,7 @@ $(function() {
 		var margin = {"top": 20, "right": 30, "bottom": 30, "left": 65};
 		plotObj.html('<svg class="word_meta_plot"></svg>');
 		if (metaField.startsWith('year')) {
-			show_line_plot(results, maxHeight, margin);
+			show_line_plot(results, maxHeight, margin, 1, ' ipm');
 		}
 		else
 		{
@@ -193,7 +201,7 @@ $(function() {
 		var maxHeight = d3.max(results, function(v) { return v.n_words; });
 		var margin = {"top": 20, "right": 30, "bottom": 30, "left": 65};
 		plotObj.html('<svg class="word_meta_plot"></svg>');
-		show_line_plot(results, maxHeight, margin);
+		show_line_plot(results, maxHeight, margin, 100, '%');
 	}
 
 	assign_word_stats_events();

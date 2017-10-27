@@ -31,9 +31,13 @@ sc.qp.rp = sentView
 sc.qp.wr.rp = sentView
 random.seed()
 corpus_size = sc.get_n_words()  # size of the corpus in words
-freq_by_rank = []
+word_freq_by_rank = []
+lemma_freq_by_rank = []
 for lang in settings['languages']:
-    freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_freq_by_rank(lang)))    # number of types for each requency rank
+    # number of word types for each frequency rank
+    word_freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_word_freq_by_rank(lang)))
+    # number of lemmata for each frequency rank
+    lemma_freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_lemma_freq_by_rank(lang)))
 
 
 def jsonp(func):
@@ -542,11 +546,11 @@ def get_doc_stats(metaField):
     return jsonify(buckets)
 
 
-@app.route('/word_freq_stats')
-def get_word_freq_stats():
+@app.route('/word_freq_stats/<searchType>')
+def get_word_freq_stats(searchType='word'):
     """
     Return JSON with the distribution of a particular kind of words
-    by frequency rank. This function is used for visualisation.
+    or lemmata by frequency rank. This function is used for visualisation.
     Currently, it can only return statistics for a context-insensitive
     query for the whole corpus (the subcorpus constraints and all
     non-first words are discarded from the query).
@@ -554,14 +558,24 @@ def get_word_freq_stats():
     htmlQuery = copy_request_args()
     change_display_options(htmlQuery)
     langID = 0
+    if searchType not in ('word', 'lemma'):
+        searchType = 'word'
     if 'lang' in htmlQuery and htmlQuery['lang'] in settings['languages']:
         langID = settings['languages'].index(htmlQuery['lang'])
-    esQuery = sc.qp.word_freqs_query(htmlQuery)
+    esQuery = sc.qp.word_freqs_query(htmlQuery, searchType=searchType)
     # return jsonify(esQuery)
-    hits = sc.get_words(esQuery)
+    if searchType == 'word':
+        hits = sc.get_words(esQuery)
+    else:
+        hits = sc.get_lemmata(esQuery)
+    # return jsonify(hits)
     curFreqByRank = sentView.extract_cumulative_freq_by_rank(hits)
     buckets = []
     prevFreq = 0
+    if searchType == 'lemma':
+        freq_by_rank = lemma_freq_by_rank
+    else:
+        freq_by_rank = word_freq_by_rank
     for freqRank in sorted(freq_by_rank[langID]):
         bucket = {'name': freqRank, 'n_words': 0}
         if freqRank in curFreqByRank:
@@ -965,9 +979,15 @@ def get_sent_context(n):
     return jsonify(context)
 
 
+@app.route('/search_lemma_query')
+@jsonp
+def search_lemma_query():
+    return search_word_query(searchType='lemma')
+
+
 @app.route('/search_word_query')
 @jsonp
-def search_word_query():
+def search_word_query(searchType='word'):
     if not settings['debug']:
         return jsonify({})
     query = copy_request_args()
@@ -999,12 +1019,20 @@ def search_word_query():
                           randomSeed=get_session_data('seed'),
                           query_size=get_session_data('page_size'),
                           distances=queryWordConstraints)
+    if searchType == 'lemma':
+        sc.qp.lemmatize_word_query(query)
     return jsonify(query)
+
+
+@app.route('/search_lemma_json')
+@jsonp
+def search_lemma_json():
+    return search_word_json(searchType='lemma')
 
 
 @app.route('/search_word_json')
 @jsonp
-def search_word_json():
+def search_word_json(searchType='word'):
     query = copy_request_args()
     change_display_options(query)
     if 'doc_ids' not in query:
@@ -1041,7 +1069,11 @@ def search_word_json():
     hits = []
     if searchIndex == 'words':
         if docIDs is None:
-            hits = sc.get_words(query)
+            if searchType == 'lemma':
+                sc.qp.lemmatize_word_query(query)
+                hits = sc.get_lemmata(query)
+            else:
+                hits = sc.get_words(query)
         else:
             hits = sc.get_word_freqs(query)
     elif searchIndex == 'sentences':
@@ -1055,8 +1087,13 @@ def search_word_json():
     return jsonify(hits)
 
 
+@app.route('/search_lemma')
+def search_lemma():
+    return search_word(searchType='lemma')
+
+
 @app.route('/search_word')
-def search_word():
+def search_word(searchType='word'):
     set_session_data('progress', 0)
     query = copy_request_args()
     change_display_options(query)
@@ -1100,8 +1137,13 @@ def search_word():
     hitsProcessed = {}
     if searchIndex == 'words':
         if docIDs is None:
-            hits = sc.get_words(query)
+            if searchType == 'lemma':
+                sc.qp.lemmatize_word_query(query)
+                hits = sc.get_lemmata(query)
+            else:
+                hits = sc.get_words(query)
             hitsProcessed = sentView.process_word_json(hits, docIDs,
+                                                       searchType=searchType,
                                                        translit=get_session_data('translit'))
         else:
             hits = sc.get_word_freqs(query)

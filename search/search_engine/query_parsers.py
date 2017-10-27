@@ -835,7 +835,15 @@ class InterfaceQueryParser:
             queryDict = {'query': {'match_none': ''}}
         return queryDict
 
-    def word_freqs_query(self, htmlQuery):
+    def lemmatize_word_query(self, esQuery):
+        """
+        Make a lemma query out of a word query.
+        Change the original query, do not return anything.
+        """
+        childQuery = {'has_child': {'type': 'word', 'query': esQuery['query']}}
+        esQuery['query'] = {'bool': {'must': childQuery, 'must_not': {'match': {'_id': 0}}}}
+
+    def word_freqs_query(self, htmlQuery, searchType='word'):
         """
         Make an ES query for obtaining the frequency data bucketed
         by frequency rank. Subcorpus and all non-first words in the
@@ -848,6 +856,8 @@ class InterfaceQueryParser:
             elif re.search('^sentence_index', k) is not None:
                 del htmlQuery[k]
         esQuery = self.html2es(htmlQuery, query_size=0, sortOrder='', searchOutput='words')
+        if searchType == 'lemma':
+            self.lemmatize_word_query(esQuery)
         esQuery['aggs'] = {'agg_rank': {'terms': {'field': 'rank_true',
                                                   'order': {'_term': 'asc'},
                                                   'size': 10000}}}
