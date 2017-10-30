@@ -970,7 +970,7 @@ class SentenceViewer:
         for iHit in range(len(response['hits']['hits'])):
             if exclude is not None and int(response['hits']['hits'][iHit]['_id']) in exclude:
                 result['n_docs'] -= 1
-                result['n_words'] -= response['hits']['hits'][iHit]['_source']['n_words_0']
+                result['n_words'] -= response['hits']['hits'][iHit]['_source']['n_words']
             result['docs'].append(self.process_doc(response['hits']['hits'][iHit], exclude))
         result['size_percent'] = round(result['n_words'] * 100 / corpusSize, 3)
         return result

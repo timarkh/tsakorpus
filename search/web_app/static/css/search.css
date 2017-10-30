@@ -258,6 +258,10 @@
 	font-size: 18px;
 }
 
+.search_input::placeholder {
+	color: #a29292;
+}
+
 .search_input:focus {
 	border: solid 1px #894c1f;
 	box-shadow: 0 0 5px 1px #f2c9ab;
@@ -777,6 +781,12 @@ hr.separator {
 #h3_options {
 	margin-top: 10px;
 	margin-bottom: 15px;
+	font-size: 1.4em;
+}
+
+#corpus_title {
+	font-size: 1.3em;
+	color: #526e99;
 }
 
 .options_column {

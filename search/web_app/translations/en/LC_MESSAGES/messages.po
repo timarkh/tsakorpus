@@ -18,6 +18,103 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.5.1\n"
 
+# ********  Please fill in the following strings:  ********
+
+msgid "corpus_title"
+msgstr "(INSERT CORPUS TITLE IN messages.po)"
+
+# Language names for the dropdown menu in search panel (please add all missing languages that you have in the corpus):
+
+msgid "langname_udmurt"
+msgstr "Udmurt"
+
+msgid "langname_beserman"
+msgstr "Beserman"
+
+msgid "langname_komi"
+msgstr "Komi"
+
+msgid "langname_nganasan"
+msgstr "Nganasan"
+
+msgid "langname_buryat"
+msgstr "Buryat"
+
+msgid "langname_kalmyk"
+msgstr "Kalmyk"
+
+msgid "langname_greek"
+msgstr "Greek"
+
+msgid "langname_tsakonian"
+msgstr "Tsakonian"
+
+msgid "langname_albanian"
+msgstr "Albanian"
+
+msgid "langname_acrhi"
+msgstr "Archi"
+
+msgid "langname_tsakhur"
+msgstr "Tsakhur"
+
+msgid "langname_dargwa"
+msgstr "Dargwa"
+
+msgid "langname_adyghe"
+msgstr "Adyghe"
+
+msgid "langname_romani"
+msgstr "Romani"
+
+msgid "langname_english"
+msgstr "English"
+
+msgid "langname_russian"
+msgstr "Russian"
+
+msgid "langname_german"
+msgstr "German"
+
+msgid "langname_french"
+msgstr "French"
+
+msgid "langname_comments"
+msgstr "comments"
+
+msgid "langname_positive"
+msgstr "positive"
+
+msgid "langname_negative"
+msgstr "negative"
+
+
+
+# Transliteration names for the dropdown menu in search panel (please add all missing languages that you have in the corpus):
+
+msgid "translitname_original"
+msgstr "original"
+
+msgid "translitname_cyrillic"
+msgstr "cyrillic"
+
+msgid "translitname_latin"
+msgstr "latin"
+
+msgid "translitname_IPA"
+msgstr "IPA"
+
+msgid "translitname_UPA"
+msgstr "UPA"
+
+msgid "translitname_corpus"
+msgstr "corpus"
+
+msgid "translitname_dictionary"
+msgstr "dictionary"
+
+# ******** The rest is more or less universal:  ********
+
 #: templates/index.html:4
 msgid "Corpus search page"
 msgstr "Corpus search page"
@@ -73,6 +170,9 @@ msgstr "add word"
 msgid "more_fields"
 msgstr "more fields"
 
+msgid "less_fields"
+msgstr "less fields"
+
 #: templates/index.html:85
 msgid "Full-text search:"
 msgstr "Full-text search:"
@@ -106,8 +206,8 @@ msgid "by lemma (word queries)"
 msgstr "by lemma (word queries)"
 
 #: templates/index.html:96
-msgid "by frequency (word queries)"
-msgstr "by frequency (word queries)"
+msgid "by frequency"
+msgstr "by frequency"
 
 #: templates/index.html:97
 msgid "no sorting"
@@ -134,7 +234,7 @@ msgid "Search words"
 msgstr "Search words"
 
 msgid "Search lemmata"
-msgstr "Search lemmata"
+msgstr "/ lemmata"
 
 #: templates/index.html:126
 msgid "Select subcorpus"
@@ -149,12 +249,30 @@ msgid "Filter result:"
 msgstr "Filter result:"
 
 #: templates/result_docs.html:1
-msgid "document(s) with"
-msgstr "document(s) with"
+msgid "document with"
+msgstr "document with"
+
+msgid "documents_1 with"
+msgstr "documents with"
+
+msgid "documents_2-4 with"
+msgstr "documents with"
+
+msgid "documents with"
+msgstr "documents with"
 
 #: templates/result_docs.html:1
-msgid "word(s) found,"
-msgstr "word(s) found,"
+msgid "word found,"
+msgstr "word found,"
+
+msgid "words_1 found,"
+msgstr "words found,"
+
+msgid "words_2-4 found,"
+msgstr "words found,"
+
+msgid "words found,"
+msgstr "words found,"
 
 #: templates/result_docs.html:1
 msgid "of the entire corpus."
@@ -173,12 +291,33 @@ msgid "Search result:"
 msgstr "Search result:"
 
 #: templates/result_words.html:1
-msgid "different words in approximately"
-msgstr "different words in approximately"
+msgid "unique word"
+msgstr "unique word"
+
+msgid "different words_1"
+msgstr "different words"
+
+msgid "different words_2-4"
+msgstr "different words"
+
+msgid "different words"
+msgstr "different words"
+
+msgid "in approximately"
+msgstr "in approximately"
 
 #: templates/result_words.html:1
-msgid "document(s) found,"
-msgstr "document(s) found,"
+msgid "document found,"
+msgstr "document found,"
+
+msgid "documents_1 found,"
+msgstr "documents found,"
+
+msgid "documents_2-4 found,"
+msgstr "documents found,"
+
+msgid "documents found,"
+msgstr "documents found,"
 
 #: templates/result_words.html:1
 msgid "total frequency:"
@@ -292,3 +431,55 @@ msgstr "By frequency"
 
 msgid "Distribution by frequency rank"
 msgstr "Distribution by frequency rank"
+
+msgid "Back to search"
+msgstr "Back to search"
+
+msgid "Max seconds left: "
+msgstr "Max seconds left: "
+
+msgid "Help"
+msgstr "Help"
+
+msgid "Analyses: "
+msgstr "Analyses: "
+
+msgid "any number of analyses"
+msgstr "any number of analyses"
+
+msgid "only ambiguous"
+msgstr "only ambiguous"
+
+msgid "only non-ambiguous"
+msgstr "only non-ambiguous"
+
+msgid "only without analysis"
+msgstr "only without analysis"
+
+msgid "only with analysis"
+msgstr "only with analysis"
+
+msgid "Position in sentence: "
+msgstr "Position in sentence: "
+
+msgid " Distance to word #"
+msgstr " Distance to word #"
+
+msgid "from "
+msgstr "from "
+
+msgid "to "
+msgstr "to "
+
+msgid "add_distance"
+msgstr "add&nbsp;distance"
+
+msgid "remove_word"
+msgstr "remove&nbsp;word"
+
+msgid "Select combinations of tags"
+msgstr "Select combinations of tags"
+
+msgid "Select glosses"
+msgstr "Select glosses"
+

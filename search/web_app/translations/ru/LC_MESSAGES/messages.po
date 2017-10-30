@@ -19,6 +19,103 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.5.1\n"
 
+# ********  Please fill in the following strings:  ********
+
+msgid "corpus_title"
+msgstr "(ВВЕДИТЕ НАЗВАНИЕ КОРПУСА В messages.po)"
+
+# Language names for the dropdown menu in search panel (please add all missing languages that you have in the corpus):
+
+msgid "langname_udmurt"
+msgstr "удмуртский"
+
+msgid "langname_beserman"
+msgstr "бесермянский"
+
+msgid "langname_komi"
+msgstr "коми"
+
+msgid "langname_nganasan"
+msgstr "нганасанский"
+
+msgid "langname_buryat"
+msgstr "бурятский"
+
+msgid "langname_kalmyk"
+msgstr "калмыцкий"
+
+msgid "langname_greek"
+msgstr "греческий"
+
+msgid "langname_tsakonian"
+msgstr "цаконский"
+
+msgid "langname_albanian"
+msgstr "албанский"
+
+msgid "langname_acrhi"
+msgstr "арчинский"
+
+msgid "langname_tsakhur"
+msgstr "цахурский"
+
+msgid "langname_dargwa"
+msgstr "даргинский"
+
+msgid "langname_adyghe"
+msgstr "адыгейский"
+
+msgid "langname_romani"
+msgstr "цыганский"
+
+msgid "langname_english"
+msgstr "английский"
+
+msgid "langname_russian"
+msgstr "русский"
+
+msgid "langname_german"
+msgstr "немецкий"
+
+msgid "langname_french"
+msgstr "французский"
+
+msgid "langname_comments"
+msgstr "комментарии"
+
+msgid "langname_positive"
+msgstr "положительные"
+
+msgid "langname_negative"
+msgstr "отрицательные"
+
+
+
+# Transliteration names for the dropdown menu in search panel (please add all missing languages that you have in the corpus):
+
+msgid "translitname_original"
+msgstr "исходная"
+
+msgid "translitname_cyrillic"
+msgstr "кириллица"
+
+msgid "translitname_latin"
+msgstr "латиница"
+
+msgid "translitname_IPA"
+msgstr "МФА"
+
+msgid "translitname_UPA"
+msgstr "УФА"
+
+msgid "translitname_corpus"
+msgstr "корпусная"
+
+msgid "translitname_dictionary"
+msgstr "словарная"
+
+# ******** The rest is more or less universal:  ********
+
 #: templates/index.html:4
 msgid "Corpus search page"
 msgstr "Поиск в корпусе"
@@ -74,6 +171,9 @@ msgstr "добавить слово"
 msgid "more_fields"
 msgstr "показать все поля"
 
+msgid "less_fields"
+msgstr "убрать поля"
+
 #: templates/index.html:85
 msgid "Full-text search:"
 msgstr "Полнотекстовый поиск:"
@@ -107,8 +207,8 @@ msgid "by lemma (word queries)"
 msgstr "по лемме (поиск слов)"
 
 #: templates/index.html:96
-msgid "by frequency (word queries)"
-msgstr "по частотности (поиск слов)"
+msgid "by frequency"
+msgstr "по частотности"
 
 #: templates/index.html:97
 msgid "no sorting"
@@ -135,7 +235,7 @@ msgid "Search words"
 msgstr "Поиск слов"
 
 msgid "Search lemmata"
-msgstr "Поиск лексем"
+msgstr "/ лексем"
 
 #: templates/index.html:126
 msgid "Select subcorpus"
@@ -150,12 +250,30 @@ msgid "Filter result:"
 msgstr "Результаты отбора:"
 
 #: templates/result_docs.html:1
-msgid "document(s) with"
-msgstr "документ(а/ов) с"
+msgid "document with"
+msgstr "документ с"
+
+msgid "documents_1 with"
+msgstr "документ с"
+
+msgid "documents_2-4 with"
+msgstr "документа с"
+
+msgid "documents with"
+msgstr "документов с"
 
 #: templates/result_docs.html:1
-msgid "word(s) found,"
-msgstr "словами/словом,"
+msgid "word found,"
+msgstr "словом,"
+
+msgid "words_1 found,"
+msgstr "словом,"
+
+msgid "words_2-4 found,"
+msgstr "словами,"
+
+msgid "words found,"
+msgstr "словами,"
 
 #: templates/result_docs.html:1
 msgid "of the entire corpus."
@@ -174,11 +292,32 @@ msgid "Search result:"
 msgstr "Результат поиска: найдено"
 
 #: templates/result_words.html:1
-msgid "different words in approximately"
-msgstr "разных словоформ примерно в"
+msgid "unique word"
+msgstr "уникальная словоформа"
+
+msgid "different words_1"
+msgstr "уникальная словоформа"
+
+msgid "different words_2-4"
+msgstr "разных словоформы"
+
+msgid "different words"
+msgstr "разных словоформ"
+
+msgid "in approximately"
+msgstr "примерно в"
 
 #: templates/result_words.html:1
-msgid "document(s) found,"
+msgid "document found,"
+msgstr "документе,"
+
+msgid "documents_1 found,"
+msgstr "документе,"
+
+msgid "documents_2-4 found,"
+msgstr "документах,"
+
+msgid "documents found,"
 msgstr "документах,"
 
 #: templates/result_words.html:1
@@ -293,3 +432,54 @@ msgstr "По частотности"
 
 msgid "Distribution by frequency rank"
 msgstr "Распределение слов по частотным рангам"
+
+msgid "Back to search"
+msgstr "Вернуться к поиску"
+
+msgid "Max seconds left: "
+msgstr "Осталось секунд (максимум): "
+
+msgid "Help"
+msgstr "Справка"
+
+msgid "Analyses: "
+msgstr "Разборы: "
+
+msgid "any number of analyses"
+msgstr "любое количество"
+
+msgid "only ambiguous"
+msgstr "только с омонимией"
+
+msgid "only non-ambiguous"
+msgstr "только однозначные"
+
+msgid "only without analysis"
+msgstr "только без разбора"
+
+msgid "only with analysis"
+msgstr "только с разбором"
+
+msgid "Position in sentence: "
+msgstr "Позиция в предложении: "
+
+msgid " Distance to word #"
+msgstr " Расстояние до слова №"
+
+msgid "from "
+msgstr "от "
+
+msgid "to "
+msgstr "до "
+
+msgid "add_distance"
+msgstr "добавить&nbsp;расстояние"
+
+msgid "remove_word"
+msgstr "убрать&nbsp;слово"
+
+msgid "Select combinations of tags"
+msgstr "Выбор грамматических тэгов"
+
+msgid "Select glosses"
+msgstr "Выбор глосс"

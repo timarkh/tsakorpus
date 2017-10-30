@@ -1,7 +1,10 @@
 ﻿{% if data.timeout %}
 <p class="message">{{ _('The search was not finished due to the query timeout. You only see partial results.') }}</p>
 {% endif %}
-<p>{{ _('Search result:') }} {{ data.n_occurrences }} {{ _('different words in approximately') }} {{ data.n_docs }} {{ _('document(s) found,') }} {{ _('total frequency:') }} {{ data.total_freq }}.</p>
+<p>{{ _('Search result:') }}
+{{ data.n_occurrences }} {% if data.n_occurrences == 1 %}{{ _('unique word') }}{% elif data.n_occurrences % 10 == 1 and data.n_occurrences % 100 != 11 %}{{ _('different words_1') }}{% elif 2 <= data.n_occurrences % 10 <= 4 and not 12 <= data.n_occurrences % 100 <= 14 %}{{ _('different words_2-4') }}{% else %}{{ _('different words') }}{% endif %}
+{{ _('in approximately') }} {{ data.n_docs }} {% if data.n_docs == 1 %}{{ _('document found,') }}{% elif data.n_docs % 10 == 1 and data.n_docs % 100 != 11 %}{{ _('documents_1 found,') }}{% elif 2 <= data.n_docs % 10 <= 4 and not 12 <= data.n_docs % 100 <= 14 %}{{ _('documents_2-4 found,') }}{% else %}{{ _('documents found,') }}{% endif %}
+{{ _('total frequency:') }} {{ data.total_freq }}.</p>
 <div class="word_results">
 <table class="words_list_table">
 <thead><th>{{ _('word_th_word') }}</th><th>{{ _('word_th_lemma') }}</th><th>{{ _('word_th_frequency') }}</th><th>{{ _('word_th_freq. rank / quantile') }}</th><th>{{ _('word_th_# sentences') }}</th><th>{{ _('word_th_# documents') }}</th><th>{{ _('word_th_search in corpus') }}</th><th>{{ _('word_th_word stats') }}</th></thead>

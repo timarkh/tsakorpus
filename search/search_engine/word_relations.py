@@ -154,7 +154,7 @@ class WordRelations:
         Return the number of the pivotal term (1-based) and
         a dictionary "term_number -> [word_pairs_with_this_term]".
         """
-        nPivotalTerm = 0
+        nPivotalTerm = 1
         constraints = {}
         if distances is None or len(distances) <= 0:
             return nPivotalTerm, constraints

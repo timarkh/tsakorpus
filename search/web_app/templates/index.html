@@ -10,7 +10,19 @@
 <link rel="stylesheet" type="text/css" href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="static/css/search.css">
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<script type='text/javascript'>var max_request_time={{ max_request_time }};</script>
+<script type='text/javascript'>
+var max_request_time={{ max_request_time }};
+var moreFieldsCaption = "{{ _('more_fields') }}";
+var lessFieldsCaption = "{{ _('less_fields') }}";
+var addDistCaption = "{{ _('add_distance') }}";
+var removeWordCaption = "{{ _('remove_word') }}";
+var distToWordCaption = "{{ _(' Distance to word #') }}";
+var fromCaption = "{{ _('from ') }}";
+var toCaption = "{{ _('to ') }}";
+var selectGrammTagsCaption = "{{ _('Select combinations of tags') }}";
+var selectGlossCaption = "{{ _('Select glosses') }}";
+
+</script>
 <!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,400i" rel="stylesheet"> -->
 {% if media %}
 <link href="http://vjs.zencdn.net/5.19.2/video-js.css" rel="stylesheet">
@@ -20,7 +32,7 @@
 {% endif %}
 </head>
 <body>
-<p id="header">{{ _('Corpus name') }}: {{ corpus_name }}.
+<p id="header"><span id="corpus_title">{{ _('corpus_title') }}</span> {% if debug %}{{ _('Corpus name') }}: {{ corpus_name }}.{% endif %}
 {% if locales|length > 1 %}
 &nbsp;&nbsp;
 {% for l_code in locales %}
@@ -65,13 +77,13 @@
 								{% if languages|length > 1 %}
 									{{ _('Language:') }} <select name="lang1" id="lang1" class="search_input">
 									{% for lang in languages %}
-									<option value="{{ lang }}">{{ lang }}</option>
+									<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
 									{% endfor %}
 									</select>
 								{% else %}
 									<select name="lang1" id="lang1" style="visibility: hidden; height: 0px">
 									{% for lang in languages %}
-									<option value="{{ lang }}">{{ lang }}</option>
+									<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
 									{% endfor %}
 									</select>
 								{% endif %}
@@ -96,15 +108,17 @@
 						<div class="options_column">
 							{{ _('Results per page:') }} <input type="number" name="page_size" id="page_size" value="10" class="search_input distance_input"><br>
 							{{ _('Sorting:') }} <select name="sort" id="sort_select" class="search_input">
-								<option value="random">{{ _('random') }}</option>
+								<option value="random" selected>{{ _('random') }}</option>
 								<option value="wf">{{ _('by word (word queries)') }}</option>
 								<option value="lemma">{{ _('by lemma (word queries)') }}</option>
-								<option value="freq">{{ _('by frequency (word queries)') }}</option>
+								<option value="freq">{{ _('by frequency') }}</option>
+								{% if debug %}
 								<option value="">{{ _('no sorting') }}</option>
+								{% endif %}
 							</select><br>
 							{{ _('Language/tier:') }} <select name="lang" id="lang" class="search_input">
 							{% for lang in languages %}
-								<option value="{{ lang }}">{{ lang }}</option>
+								<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
 							{% endfor %}
 							{% if all_lang_search %}
 							<option value="all">all</option>
@@ -120,7 +134,7 @@
 						{% if transliterations %}
 							{{ _('Transliteration:') }} <select name="translit" id="translit" class="search_input">
 							{% for tr in transliterations %}
-							<option value="{{ tr }}">{{ tr }}</option>
+							<option value="{{ tr }}">{{ _('translitname_' + tr) }}</option>
 							{% endfor %}
 							</select>
 						{% endif %}
@@ -152,7 +166,7 @@
 			{% endif %}
 		</div>
 	</div>
-<div class="hide_query_button" align="center"><a href="#" rel="toggle-slide"><img src="static/img/arrow_up.png" class="img-swap" /><span id="hide_query_caption">Show query panel</span></a></div>
+<div class="hide_query_button" align="center"><a href="#" rel="toggle-slide"><img src="static/img/arrow_up.png" class="img-swap" /><span id="hide_query_caption">{{ _('Back to search') }}</span></a></div>
 </div>
 </div>
 
@@ -199,7 +213,7 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="help_dialogue_header">Help</h4>
+				<h4 class="modal-title" id="help_dialogue_header">{{ _('Help') }}</h4>
 			</div>
 			<div class="modal-body" id="help_dialogue_body">
 			<p>The help text should be loaded here.</p>

@@ -1,4 +1,7 @@
-﻿<p>{{ _('Filter result:') }} <span id="subcorpus_ndocs">{{ data.n_docs }}</span> {{ _('document(s) with') }} <span id="subcorpus_nwords">{{ data.n_words }}</span> {{ _('word(s) found,') }} <span id="subcorpus_size_percent">{{ data.size_percent }}%</span> {{ _('of the entire corpus.') }}</p>
+﻿<p>{{ _('Filter result:') }}
+<span id="subcorpus_ndocs">{{ data.n_docs }}</span> {% if data.n_docs == 1 %}{{ _('document with') }}{% elif data.n_docs % 10 == 1 and data.n_docs % 100 != 11 %}{{ _('documents_1 with') }}{% elif 2 <= data.n_docs % 10 <= 4 and not 12 <= data.n_docs % 100 <= 14 %}{{ _('documents_2-4 with') }}{% else %}{{ _('documents with') }}{% endif %}
+<span id="subcorpus_nwords">{{ data.n_words }}</span> {% if data.n_words == 1 %}{{ _('word found,') }}{% elif data.n_words % 10 == 1 and data.n_words % 100 != 11 %}{{ _('words_1 found,') }}{% elif 2 <= data.n_words % 10 <= 4 and not 12 <= data.n_words % 100 <= 14 %}{{ _('words_2-4 found,') }}{% else %}{{ _('words found,') }}{% endif %}
+<span id="subcorpus_size_percent">{{ data.size_percent }}%</span> {{ _('of the entire corpus.') }}</p>
 <div class="documents_list">
 	<table class="documents_list_table">
 		<thead>

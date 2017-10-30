@@ -191,6 +191,8 @@ function continue_progress_bar() {
 				$('.progress-bar').attr('aria-valuenow', max_request_time - secElapsed);
 				$('#progress_bar_seconds').html(max_request_time - secElapsed);
 				if (secElapsed == 2) {
+					hide_player();
+					hide_query_panel();
 					$('.progress').css('visibility', 'visible');
 				}
 				else if (secElapsed == 3) {
@@ -254,6 +256,8 @@ function get_sentences_page(page) {
 			url: "search_sent",
 			data: $("#search_main").serialize(),
 			type: "GET",
+			beforeSend: start_progress_bar,
+			complete: stop_progress_bar,
 			success: print_html,
 			error: function(errorThrown) {
 				alert( JSON.stringify(errorThrown) );
@@ -302,18 +306,6 @@ function assign_input_events() {
 }
 
 function assign_show_hide() {
-	$(".img-swap").click(function() {
-		if ($(this).attr("class") == "img-swap") {
-			this.src = this.src.replace("_up","_down");
-			$('#hide_query_caption').css('display', 'inline');
-		} else {
-			this.src = this.src.replace("_down","_up");
-			$('#hide_query_caption').css('display', 'none');
-		}
-		$(this).toggleClass("on");
-	});
-	$("#hide_query_caption").click(function () { $(".img-swap").click(); });
-	//$(".slide").mCustomScrollbar("disable");
 	$(".show-hide a").click(function(e){
 		e.preventDefault();
 		var $this=$(this),
@@ -324,6 +316,15 @@ function assign_show_hide() {
 		switch(rel){
 			case "toggle-slide":
 				if(!el.is(":animated")){
+					imgSwap = $('.img-swap');
+					if (imgSwap.attr("class") == "img-swap") {
+						imgSwap.attr('src', imgSwap.attr('src').replace("_up","_down"));
+						$('#hide_query_caption').css('display', 'inline');
+					} else {
+						imgSwap.attr('src', imgSwap.attr('src').replace("_down","_up"));
+						$('#hide_query_caption').css('display', 'none');
+					}
+					imgSwap.toggleClass("on");
 					wrapper.removeClass("transitions");
 					el.slideToggle(dur,function(){wrapper.addClass("transitions");});
 				}
@@ -357,8 +358,8 @@ function add_word_inputs(e) {
 	new_word_num += 1;
 	word_div_html = '<div class="word_search" id="wsearch_' + new_word_num + '">\n' + $('#first_word').html();
 	word_div_html = word_div_html.replace(/1/g, new_word_num)
-	word_div_html = word_div_html.replace('<span class="add_minus_stub">', '<span class="word_minus glyphicon glyphicon-minus-sign" data-nword="' + new_word_num + '"><span class="tooltip_prompt">remove&nbsp;word</span></span><br>');
-	word_div_html = word_div_html.replace('<span class="add_distance_stub">', '<span class="add_rel glyphicon glyphicon-resize-full" data-nword="' + new_word_num + '" data-nrels="0"><span class="tooltip_prompt">add&nbsp;distance</span></span><br>');
+	word_div_html = word_div_html.replace('<span class="add_minus_stub">', '<span class="word_minus glyphicon glyphicon-minus-sign" data-nword="' + new_word_num + '"><span class="tooltip_prompt">' + removeWordCaption + '</span></span><br>');
+	word_div_html = word_div_html.replace('<span class="add_distance_stub">', '<span class="add_rel glyphicon glyphicon-resize-full" data-nword="' + new_word_num + '" data-nrels="0"><span class="tooltip_prompt">' + addDistCaption + '</span></span><br>');
 	word_div_html += '</div>';
 	word_div = $.parseHTML(word_div_html);
 	$("div.words_search").append(word_div);
@@ -387,13 +388,13 @@ function expand_word_input(e) {
 		div_extra_fields.css('max-height', '200px');
 		div_extra_fields.css('height', 'initial');
 		div_extra_fields.css('visibility', 'visible');
-		$(e.target).find('.tooltip_prompt').html('less&nbsp;fields');
+		$(e.target).find('.tooltip_prompt').html(lessFieldsCaption);
 	}
 	else if (div_extra_fields.css('max-height') == '200px') {
 		div_extra_fields.css('max-height', '0px');
 		div_extra_fields.css('height', '0px');
 		div_extra_fields.css('visibility', 'hidden');
-		$(e.target).find('.tooltip_prompt').html('more&nbsp;fields');
+		$(e.target).find('.tooltip_prompt').html(moreFieldsCaption);
 	}
 	else {
 		return;
@@ -407,9 +408,9 @@ function add_word_relations(e) {
 	if (word_num <= 0) { return; }
 	var nrels = parseInt($(e.target).attr('data-nrels'));
 	$(e.target).attr('data-nrels', nrels + 1);
-	word_rel_html = '<div class="word_rel"> Distance to word #<input type="number" class="search_input distance_input" name="word_rel_' + word_num + '_' + nrels + '" value="' + (word_num - 1).toString() + '"><br>';
-	word_rel_html += 'from <input type="number" class="search_input" name="word_dist_from_' + word_num + '_' + nrels + '" value="1"><br>';
-	word_rel_html += 'to <input type="number" class="search_input" name="word_dist_to_' + word_num + '_' + nrels + '" value="1"> ';
+	word_rel_html = '<div class="word_rel">' + distToWordCaption + '<input type="number" class="search_input distance_input" name="word_rel_' + word_num + '_' + nrels + '" value="' + (word_num - 1).toString() + '"><br>';
+	word_rel_html += fromCaption + '<input type="number" class="search_input" name="word_dist_from_' + word_num + '_' + nrels + '" value="1"><br>';
+	word_rel_html += toCaption + '<input type="number" class="search_input" name="word_dist_to_' + word_num + '_' + nrels + '" value="1"> ';
 	word_rel_html += '</div>';
 	word_rel_div = $.parseHTML(word_rel_html);
 	$("#wsearch_" + word_num).find(".word_search_l").append(word_rel_div);
@@ -419,10 +420,10 @@ function choose_grammar(e) {
 	var field_type = $(e.target).attr('data-field');
 	var word_num = parseInt($(e.target).attr('data-nword'));
 	var field = field_type + word_num.toString();
-	var lang = $('#lang' + word_num.toString() + ' option:selected').text();
+	var lang = $('#lang' + word_num.toString() + ' option:selected').val();
 	$('#gram_selector').attr('data-field', field);
 	if (field_type == 'gr') {
-		$('#gram_sel_header').html('Select combinations of tags');
+		$('#gram_sel_header').html(selectGrammTagsCaption);
 		$.ajax({
 			url: "get_gramm_selector/" + lang,
 			type: "GET",
@@ -437,7 +438,7 @@ function choose_grammar(e) {
 		});
 	}
 	else if (field_type == 'gloss') {
-		$('#gram_sel_header').html('Select glosses');
+		$('#gram_sel_header').html(selectGlossCaption);
 		$.ajax({
 			url: "get_gloss_selector/" + lang,
 			type: "GET",
