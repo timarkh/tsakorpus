@@ -369,6 +369,7 @@ def search_page():
                            gloss_search_enabled=settings['gloss_search_enabled'],
                            debug=settings['debug'],
                            subcorpus_selection=settings['search_meta'],
+                           max_request_time=settings['query_timeout'] + 1,
                            locales=settings['interface_languages'])
 
 

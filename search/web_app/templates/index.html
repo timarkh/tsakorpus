@@ -10,6 +10,7 @@
 <link rel="stylesheet" type="text/css" href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="static/css/search.css">
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script type='text/javascript'>var max_request_time={{ max_request_time }};</script>
 <!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,400i" rel="stylesheet"> -->
 {% if media %}
 <link href="http://vjs.zencdn.net/5.19.2/video-js.css" rel="stylesheet">
@@ -167,7 +168,14 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 {% endif %}
 <div id="res_p">
 <p style="font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;">{{ _('(Place for results)') }}</p></div>
+<div class="progress" style="visibility: hidden">
+  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{ max_request_time }}"
+  aria-valuemin="0" aria-valuemax="{{ max_request_time }}" style="width:100%">
+    <span>{{ _('Max seconds left: ') }}<span id="progress_bar_seconds">{{ max_request_time }}</span></span>
+  </div>
 </div>
+</div>
+
 
 <!-- Hidden elements -->
 <div id="analysis"></div>

@@ -11,6 +11,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
+				$('.progress').css('visibility', 'hidden');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -25,6 +26,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
+				$('.progress').css('visibility', 'hidden');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -40,6 +42,7 @@ $(function() {
 			complete: stop_progress_bar,
 			success: print_html,
 			error: function(errorThrown) {
+				$('.progress').css('visibility', 'hidden');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -55,6 +58,7 @@ $(function() {
 			complete: stop_progress_bar,
 			success: print_html,
 			error: function(errorThrown) {
+				$('.progress').css('visibility', 'hidden');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -83,6 +87,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
+				$('.progress').css('visibility', 'hidden');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -97,6 +102,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
+				$('.progress').css('visibility', 'hidden');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -111,6 +117,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
+				$('.progress').css('visibility', 'hidden');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -125,6 +132,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
+				$('.progress').css('visibility', 'hidden');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -139,6 +147,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
+				$('.progress').css('visibility', 'hidden');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -153,6 +162,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
+				$('.progress').css('visibility', 'hidden');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -164,7 +174,9 @@ $(function() {
 });
 
 function start_progress_bar() {
-	$('#res_p').html('0');
+	progressHtml = '<img src="static/img/search_in_progress.gif" style="visibility: hidden;" id="progress_gif" /><br>'
+	progressHtml += '<p id="seconds_elapsed" style="visibility: hidden;">0</p>'
+	$('#res_p').html(progressHtml);
 	$('#res_p').addClass('in_progress');
 	continue_progress_bar();
 }
@@ -172,7 +184,19 @@ function start_progress_bar() {
 function continue_progress_bar() {
 	setTimeout(function () {
 		if ($('#res_p').hasClass('in_progress')) {
-			$('#res_p').html((parseInt($('#res_p').html().replace(/[^0-9]/g, '')) + 1) + ' seconds elapsed')
+			secElapsed = parseInt($('#seconds_elapsed').html().replace(/[^0-9]/g, '')) + 1;
+			if (secElapsed > 0) {
+				$('#seconds_elapsed').html(secElapsed);
+				$('.progress-bar').css('width', ((max_request_time - secElapsed) / max_request_time * 100) + '%');
+				$('.progress-bar').attr('aria-valuenow', max_request_time - secElapsed);
+				$('#progress_bar_seconds').html(max_request_time - secElapsed);
+				if (secElapsed == 2) {
+					$('.progress').css('visibility', 'visible');
+				}
+				else if (secElapsed == 3) {
+					$('#progress_gif').css('visibility', 'visible');
+				}
+			}
 			continue_progress_bar();
 		}
     }, 1000)

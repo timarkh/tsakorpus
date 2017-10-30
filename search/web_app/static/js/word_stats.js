@@ -3,11 +3,13 @@ $(function() {
 		$('#select_meta_word_stat').unbind('change');
 		$('#select_freq_stat_type').unbind('change');
 		$('#word_stats_ok').unbind('click');
+		$('#button_close_word_stats').unbind('click');
 		$('#load_word_meta_stats').unbind('click');
 		$('#load_word_freq_stats').unbind('click');
 		$('#select_meta_word_stat').change(load_word_stats);
 		$('#select_freq_stat_type').change(load_freq_stats);
 		$('#word_stats_ok').click(close_word_stats);
+		$('#button_close_word_stats').click(close_word_stats);
 		$('#load_word_meta_stats').click(load_word_stats);
 		$('#load_word_freq_stats').click(load_freq_stats);
 	}
@@ -53,6 +55,7 @@ $(function() {
 	
 	function close_word_stats() {
 		$('#word_stats').modal('toggle');
+		$('#w_id1').val('');
 	}
 	
 	function clear_word_stats_plots(results) {

@@ -3,6 +3,7 @@ var searchType = 'none';
 
 function print_json(results) {
 	//alert("success" + JSON.stringify(results));
+	$('.progress').css('visibility', 'hidden');
 	$('#analysis').css('display', 'none');
 	$('#w_id1').val('');
 	$("#res_p").html( "<p style=\"font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;\">Success!<hr>" + JSON.stringify(results, null, 2).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;") ) + "</p>";
@@ -10,6 +11,7 @@ function print_json(results) {
 
 function print_html(results) {
 	//alert("success" + JSON.stringify(results));
+	$('.progress').css('visibility', 'hidden');
 	$('#analysis').css('display', 'none');
 	$('#w_id1').val('');
 	$("#res_p").html(results);
@@ -73,10 +75,11 @@ function show_doc_meta(e) {
 
 function clear_search_form() {
 	$('input.search_input').each(function (index) {
-		if ($(this).parent().parent().attr('id') == 'display_options_tab') {
+		var grandparent = $(this).parent().parent();
+		if (grandparent.attr('id') && grandparent.attr('id') == 'display_options_tab') {
 			return;
 		}
-		if ($(this).attr('id').search(/[^0-9]1$/) < 0) {
+		if ($(this).attr('id') && $(this).attr('id').search(/[^0-9]1$/) < 0) {
 			return;
 		}
 		$(this).val('');
