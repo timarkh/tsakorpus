@@ -134,14 +134,15 @@ class Indexator:
             if wCleanTxt in self.tmpWordIDs[langID]:
                 wID = self.tmpWordIDs[langID][wCleanTxt]
             else:
-                wID = len(self.tmpWordIDs[langID])
+                wID = sum(len(self.tmpWordIDs[i]) for i in range(len(self.languages)))
                 self.tmpWordIDs[langID][wCleanTxt] = wID
             w['w_id'] = wID
             if len(lemma) > 0:
                 try:
                     lemmaID = self.tmpLemmaIDs[langID][lemma]
                 except KeyError:
-                    lemmaID = len(self.tmpLemmaIDs[langID]) + 1
+                    lemmaID = sum(len(self.tmpLemmaIDs[i])
+                                  for i in range(len(self.languages))) + 1
                     self.tmpLemmaIDs[langID][lemma] = lemmaID
                 self.word2lemma[langID][wID] = lemmaID
 
@@ -314,13 +315,13 @@ class Indexator:
                                                     quantiles)  # for the user
                 curAction = {'_index': self.name + '.words',
                              '_type': 'word',
-                             '_id': self.wID,
+                             '_id': wID,
                              '_source': wJson,
                              '_parent': lID}
                 yield curAction
 
                 for docID in wJson['dids']:
-                    wfreqJson = {'w_id': self.wID,
+                    wfreqJson = {'w_id': wID,
                                  'd_id': docID,
                                  'wf_order': wfOrder,
                                  'l_order': lOrder,
@@ -328,7 +329,7 @@ class Indexator:
                     curAction = {'_index': self.name + '.words',
                                  '_type': 'word_freq',
                                  '_source': wfreqJson,
-                                 '_parent': self.wID}
+                                 '_parent': wID}
                     yield curAction
                 iWord += 1
                 self.wID += 1
