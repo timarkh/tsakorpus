@@ -561,8 +561,8 @@ def get_word_freq_stats(searchType='word'):
     langID = 0
     if searchType not in ('word', 'lemma'):
         searchType = 'word'
-    if 'lang' in htmlQuery and htmlQuery['lang'] in settings['languages']:
-        langID = settings['languages'].index(htmlQuery['lang'])
+    if 'lang1' in htmlQuery and htmlQuery['lang1'] in settings['languages']:
+        langID = settings['languages'].index(htmlQuery['lang1'])
     esQuery = sc.qp.word_freqs_query(htmlQuery, searchType=searchType)
     # return jsonify(esQuery)
     if searchType == 'word':
@@ -602,8 +602,8 @@ def get_word_stats(metaField):
     change_display_options(htmlQuery)
     docIDs = subcorpus_ids(htmlQuery)
     langID = -1
-    if 'lang' in htmlQuery and htmlQuery['lang'] in settings['languages']:
-        langID = settings['languages'].index(htmlQuery['lang'])
+    if 'lang1' in htmlQuery and htmlQuery['lang1'] in settings['languages']:
+        langID = settings['languages'].index(htmlQuery['lang1'])
     buckets = get_buckets_for_metafield(metaField, langID=langID, docIDs=docIDs)
     newBuckets = []
 

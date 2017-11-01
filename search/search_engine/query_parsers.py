@@ -727,14 +727,14 @@ class InterfaceQueryParser:
         if len(htmlQuery) <= 0 or 'n_words' not in htmlQuery:
             return None, None, None, None
         query_from = (page - 1) * query_size
-        if 'lang' not in htmlQuery or htmlQuery['lang'] not in self.settings['languages']:
+        if 'lang1' not in htmlQuery or htmlQuery['lang1'] not in self.settings['languages']:
             if self.settings['all_language_search_enabled']:
                 lang = 'all'
                 langID = -1
             else:
                 return None, None, None, None
         else:
-            lang = htmlQuery['lang']
+            lang = htmlQuery['lang1']
             langID = self.settings['languages'].index(lang)
         if int(htmlQuery['n_words']) > 1:
             searchIndex = 'sentences'
@@ -772,7 +772,7 @@ class InterfaceQueryParser:
             pathPfx = ''
 
         if 'doc_ids' in htmlQuery:
-            prelimQuery['doc_ids'] = htmlQuery['doc_ids']
+            prelimQuery['doc_ids'] = [int(did) for did in htmlQuery['doc_ids']]
         if searchIndex == 'sentences' and 'para_ids' in htmlQuery:
             prelimQuery['para_ids'] = htmlQuery['para_ids']
 

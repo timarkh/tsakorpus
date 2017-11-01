@@ -290,10 +290,14 @@ function show_word_stats(e) {
 		$('#w_id1').val(wID);
 	}
 	else {
-		$('#word_stats_wf').html('the query');
+		$('#word_stats_wf').html(forTheQueryCaption);
 	}
 	$('#word_stats').modal('show');
-	$('#select_meta_word_stat').trigger('change');
+	if ($('#word_stats_by_meta').hasClass('active')) {
+		$('#select_meta_word_stat').trigger('change');
+	} else if ($('#word_stats_by_freq').hasClass('active')) {
+		$('#select_freq_stat_type').trigger('change');
+	}
 }
 
 function toggle_interlinear() {

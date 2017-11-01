@@ -66,6 +66,7 @@ class Indexator:
         self.sID = 0          # current sentence ID for each language
         self.dID = 0          # current document ID
         self.wID = 0          # current word ID
+        self.wordFreqID = 0
         self.numWords = 0     # number of words in current document
         self.numSents = 0     # number of sentences in current document
         self.numWordsLang = [0] * len(self.languages)    # number of words in each language in current document
@@ -346,8 +347,11 @@ class Indexator:
                                  'freq': self.wordDocFreqs[langID][(wID, docID)]}
                     curAction = {'_index': self.name + '.words',
                                  '_type': 'word_freq',
+                                 '_id': self.wordFreqID,
                                  '_source': wfreqJson,
-                                 '_parent': wID}
+                                 '_parent': wID,
+                                 '_routing': lID}
+                    self.wordFreqID += 1
                     yield curAction
                 iWord += 1
                 self.wID += 1

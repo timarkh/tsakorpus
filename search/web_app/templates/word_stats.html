@@ -22,11 +22,10 @@
 					</div>
 					<div id="word_stats_by_freq" class="tab-pane fade">
 						<h4>{{ _('Distribution by frequency rank') }}</h4>
-						<p>The plot below works as follows. On the <i>x</i> axis, you see frequency ranks, i.e. positions in the full list of all word forms / lemmata of the corpus, ordered by decreasing frequency. If multiple words/lemmata have the same frequency, they get the same rank equal to the average of their positions. For each frequency rank <i>r</i>, <strong>the plot shows the proportion of words/lemmata that conform to your query (each word counts only once) among all words with frequency rank less or equal to <i>r</i></strong> on the <i>y</i> axis. The rightmost point, therefore, shows the total proportion of such words/lemmata among all types (different words) in the corpus. In the case of lemmata, all lemmata that have at least one word form conforming to the query are counted.</p>
-						<p>The subcorpus constraints and all words in the query, except the first one, are not taken into account here.</p>
+						{{ _('Explanation for frequency distributions') }}
 						<select name="select_freq_stat_type" id="select_freq_stat_type" class="search_input">
-						<option value="word" selected>words</option>
-						<option value="lemma">lemmata</option>
+						<option value="word" selected>{{ _('words') }}</option>
+						<option value="lemma">{{ _('lemmata') }}</option>
 						</select>
 						<div id="word_freq_rank_stats_plot">{{ _('(please wait for the plot to load)') }}</div>
 					</div>

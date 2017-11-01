@@ -21,7 +21,7 @@ var fromCaption = "{{ _('from ') }}";
 var toCaption = "{{ _('to ') }}";
 var selectGrammTagsCaption = "{{ _('Select combinations of tags') }}";
 var selectGlossCaption = "{{ _('Select glosses') }}";
-
+var forTheQueryCaption = "{{ _('the query') }}";
 </script>
 <!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,400i" rel="stylesheet"> -->
 {% if media %}
@@ -75,13 +75,16 @@ var selectGlossCaption = "{{ _('Select glosses') }}";
 								<hr class="separator">
 								<div class="add_word_fields"></div>
 								{% if languages|length > 1 %}
-									{{ _('Language:') }} <select name="lang1" id="lang1" class="search_input">
+									{{ _('Language/tier:') }} <select name="lang1" id="lang1" class="search_input">
 									{% for lang in languages %}
 									<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
 									{% endfor %}
+									{% if all_lang_search %}
+									<option value="all">{{ _('langname_all') }}</option>
+									{% endif %}
 									</select>
 								{% else %}
-									<select name="lang1" id="lang1" style="visibility: hidden; height: 0px">
+									<select name="lang1" id="lang1" style="display: none; visibility: hidden; height: 0px">
 									{% for lang in languages %}
 									<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
 									{% endfor %}
@@ -115,7 +118,7 @@ var selectGlossCaption = "{{ _('Select glosses') }}";
 								{% if debug %}
 								<option value="">{{ _('no sorting') }}</option>
 								{% endif %}
-							</select><br>
+							</select><br><!--
 							{{ _('Language/tier:') }} <select name="lang" id="lang" class="search_input">
 							{% for lang in languages %}
 								<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
@@ -123,7 +126,7 @@ var selectGlossCaption = "{{ _('Select glosses') }}";
 							{% if all_lang_search %}
 							<option value="all">all</option>
 							{% endif %}
-							</select><br>
+							</select><br> -->
 							<input type="checkbox" name="distance_strict"> {{ _('Word distance requirements are strict') }}<br>
 						</div>
 						<div class="options_column">
@@ -148,8 +151,8 @@ var selectGlossCaption = "{{ _('Select glosses') }}";
 		<div class="search_buttons">
 			<div class="btn-group">
 			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Search sentences" id="search_sent">{{ _('Search sentences') }}</button>
-			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Search words" id="search_word">{{ _('Search words') }}</button>
-			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Search lemmata" id="search_lemma">{{ _('Search lemmata') }}</button>
+			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Search words" id="search_word" style="padding-right: 5px;">{{ _('Search words') }}</button>
+			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Search lemmata" id="search_lemma" style="padding-left: 5px;">{{ _('Search lemmata') }}</button>
 			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Words statistics" id="show_word_stat"><span class="stat_w glyphicon glyphicon-stats"> </span></button>
 			</div>
 			<button type="button" class="btn btn-default btn-info" aria-label="Left Align" value="Search documents" id="search_doc"><span class="subcorpus_selector_link">{{ _('Select subcorpus') }}</span></button>
