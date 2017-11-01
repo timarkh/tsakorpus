@@ -371,7 +371,7 @@ class Indexator:
         Index all words that have been collected at the previous stage
         in self.words (while the sentences were being indexed).
         """
-        bulk(self.es, self.iterate_words(), chunk_size=300)
+        bulk(self.es, self.iterate_words(), chunk_size=300, request_timeout=60)
 
     def add_parallel_sids(self, sentences, paraIDs):
         """
@@ -507,7 +507,7 @@ class Indexator:
                 filenames.append((fnameFull, os.path.getsize(fnameFull)))
         for fname, fsize in sorted(filenames, key=lambda p: -p[1]):
             # print(fname, fsize)
-            bulk(self.es, self.iterate_sentences(fname), chunk_size=300)
+            bulk(self.es, self.iterate_sentences(fname), chunk_size=200, request_timeout=60)
             self.index_doc(fname)
         self.index_words()
 
@@ -521,11 +521,15 @@ class Indexator:
                 pythonPath = p
                 break
         if len(pythonPath) <= 0:
-            print('Could not compile interface translations because Python path is undefined.')
-            return
-        pyBabelPath = os.path.join(pythonPath, 'Scripts', 'pybabel')
-        subprocess.run(pyBabelPath + ' compile -d translations', cwd='../search/web_app', check=True)
-        print('Interface translations compiled.')
+            pyBabelPath = 'pybabel'
+        else:
+            pyBabelPath = os.path.join(pythonPath, 'Scripts', 'pybabel')
+        try:
+            subprocess.run([pyBabelPath, 'compile',  '-d', 'translations'], cwd='../search/web_app', check=True)
+        except:
+            print('Could not compile translations with ' + pyBabelPath + ' .')
+        else:
+            print('Interface translations compiled.')
 
     def load_corpus(self):
         """
