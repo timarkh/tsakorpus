@@ -5,8 +5,12 @@ from elasticsearch.exceptions import RequestError
 import json
 import ijson
 import os
+import re
 import time
 import math
+import random
+import sys
+import subprocess
 from prepare_data import PrepareData
 from json_doc_reader import JSONDocReader
 
@@ -46,6 +50,9 @@ class Indexator:
         self.pd = PrepareData()
         self.es = Elasticsearch()
         self.es_ic = IndicesClient(self.es)
+        self.shuffled_ids = [i for i in range(1, 1000000)]
+        random.shuffle(self.shuffled_ids)
+        self.shuffled_ids.insert(0, 0)    # id=0 is special and should not change
         self.tmpWordIDs = [{} for i in range(len(self.languages))]    # word as JSON -> its integer ID
         self.tmpLemmaIDs = [{} for i in range(len(self.languages))]   # lemma as string -> its integer ID
         self.word2lemma = [{} for i in range(len(self.languages))]    # word's ID -> ID of its lemma (or -1, if none)
@@ -86,6 +93,17 @@ class Indexator:
                           body=self.wordMapping)
         self.es_ic.create(index=self.name + '.sentences',
                           body=self.sentMapping)
+
+    def randomize_id(self, realID):
+        """
+        Return a (relatively) randomized sentence ID. This randomization
+        is needed in context-aware word queries where the sentences
+        are iterated in the order determined by their IDs.
+        """
+        if realID < 0:
+            return realID
+        idStart, idEnd = realID // 1000000, realID % 1000000
+        return idStart * 1000000 + self.shuffled_ids[idEnd]
 
     def enhance_word(self, word):
         """
@@ -382,9 +400,9 @@ class Indexator:
             if 'words' in s:
                 self.process_sentence_words(s['words'], langID)
             if self.numSents > 0:
-                s['prev_id'] = self.sID - 1
+                s['prev_id'] = self.randomize_id(self.sID - 1)
             if not bLast and 'last' not in s:
-                s['next_id'] = self.sID + 1
+                s['next_id'] = self.randomize_id(self.sID + 1)
             s['doc_id'] = self.dID
             # self.es.index(index=self.name + '.sentences',
             #               doc_type='sentence',
@@ -392,7 +410,7 @@ class Indexator:
             #               body=s)
             curAction = {'_index': self.name + '.sentences',
                          '_type': 'sentence',
-                         '_id': self.sID,
+                         '_id': self.randomize_id(self.sID),
                          '_source': s}
             if len(self.languages) <= 1:
                 yield curAction
@@ -405,9 +423,9 @@ class Indexator:
                         pa['para_id'] = paraID
                         s['para_ids'].append(paraID)
                         try:
-                            paraIDs[langID][paraID].append(self.sID)
+                            paraIDs[langID][paraID].append(self.randomize_id(self.sID))
                         except KeyError:
-                            paraIDs[langID][paraID] = [self.sID]
+                            paraIDs[langID][paraID] = [self.randomize_id(self.sID)]
             if self.sID % 500 == 0:
                 print('Indexing sentence', self.sID, ',', self.totalNumWords, 'words so far.')
             self.numSents += 1
@@ -489,11 +507,28 @@ class Indexator:
             self.index_doc(fname)
         self.index_words()
 
+    def compile_translations(self):
+        """
+        Compile flask_babel translations in ../search/web_app.
+        """
+        pythonPath = ''
+        for p in sys.path:
+            if re.search('Python3[^/\\\\]*[/\\\\]?$', p) is not None:
+                pythonPath = p
+                break
+        if len(pythonPath) <= 0:
+            print('Could not compile interface translations because Python path is undefined.')
+            return
+        pyBabelPath = os.path.join(pythonPath, 'Scripts', 'pybabel')
+        subprocess.run(pyBabelPath + ' compile -d translations', cwd='../search/web_app', check=True)
+        print('Interface translations compiled.')
+
     def load_corpus(self):
         """
         Drop the current database, if any, and load the entire corpus.
         """
         t1 = time.time()
+        self.compile_translations()
         self.delete_indices()
         self.create_indices()
         self.index_dir()
