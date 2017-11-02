@@ -1,13 +1,17 @@
+var lastFreqData = null;
+
 $(function() {
 	function assign_word_stats_events() {
 		$('#select_meta_word_stat').unbind('change');
 		$('#select_freq_stat_type').unbind('change');
+		$('#select_x_axis_scale').unbind('change');
 		$('#word_stats_ok').unbind('click');
 		$('#button_close_word_stats').unbind('click');
 		$('#load_word_meta_stats').unbind('click');
 		$('#load_word_freq_stats').unbind('click');
 		$('#select_meta_word_stat').change(load_word_stats);
 		$('#select_freq_stat_type').change(load_freq_stats);
+		$('#select_x_axis_scale').change(function () {display_word_freq_stats_plot(lastFreqData);});
 		$('#word_stats_ok').click(close_word_stats);
 		$('#button_close_word_stats').click(close_word_stats);
 		$('#load_word_meta_stats').click(load_word_stats);
@@ -114,16 +118,20 @@ $(function() {
 	}
 	
 	function show_line_plot(results, maxHeight, margin, multiplier, yLabel) {
+		var xAxisScale = $('#select_x_axis_scale option:selected').val();
+		
 		var nResults = results.length;
-		var barWidth = 20;
-		var maxBars = 25;
-		var nBars = nResults;
-		if (nBars > maxBars) {
-			nBars = maxBars;
+		if (xAxisScale == 'logarithmic') {
+			function xTransform(v) { return parseInt(v.name) + 1; }
+			var x = d3.scaleLog()
+				.range([0, 350]);
 		}
-		var xDomain = d3.extent(results, function(v) { return parseInt(v.name); });
-	    var x = d3.scaleLinear()
-            .range([0, 350]);
+		else {
+			function xTransform(v) { return parseInt(v.name); }
+			var x = d3.scaleLinear()
+				.range([0, 350]);
+		}
+		var xDomain = d3.extent(results, xTransform);
 		var y = d3.scaleLinear()
 			.range([200, 0]);
 
@@ -154,7 +162,7 @@ $(function() {
 		    .call(yAxis);
 		
 		var valueline = d3.line()
-            .x(function(v) { return x(parseInt(v.name)); })
+            .x(function(v) { return x(xTransform(v)); })
             .y(function(v) { return y(v.n_words * multiplier); })
 			.curve(d3.curveBasis);
 			//.curve(d3.curveLinear);
@@ -166,7 +174,7 @@ $(function() {
             .data(results)
           .enter().append("circle")
             .attr("r", 3.5)
-            .attr("cx", function(v) { return x(parseInt(v.name)); })
+            .attr("cx", function(v) { return x(xTransform(v)); })
             .attr("cy", function(v) { return y(v.n_words * multiplier); });
 		chart.attr("height", 320 + margin.top + margin.bottom);
 	}
@@ -196,6 +204,10 @@ $(function() {
 	
 	function display_word_freq_stats_plot(results) {
 		clear_word_stats_plots();
+		if (results == null) {
+			return;
+		}
+		lastFreqData = results;
 		var plotObj = $('#word_freq_rank_stats_plot');
 		if (results.length <= 0) {
 			plotObj.html('<p>Nothing found.</p>');

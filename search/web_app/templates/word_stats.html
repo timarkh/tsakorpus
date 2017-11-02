@@ -24,8 +24,12 @@
 						<h4>{{ _('Distribution by frequency rank') }}</h4>
 						{{ _('Explanation for frequency distributions') }}
 						<select name="select_freq_stat_type" id="select_freq_stat_type" class="search_input">
-						<option value="word" selected>{{ _('words') }}</option>
-						<option value="lemma">{{ _('lemmata') }}</option>
+							<option value="word" selected>{{ _('words') }}</option>
+							<option value="lemma">{{ _('lemmata') }}</option>
+						</select>&nbsp;
+						{{ _('Scale of the x axis: ') }}<select name="select_x_axis_scale" id="select_x_axis_scale" class="search_input">
+							<option value="linear" selected>{{ _('linear') }}</option>
+							<option value="logarithmic">{{ _('logarithmic') }}</option>
 						</select>
 						<div id="word_freq_rank_stats_plot">{{ _('(please wait for the plot to load)') }}</div>
 					</div>
