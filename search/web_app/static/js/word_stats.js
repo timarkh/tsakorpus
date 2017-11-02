@@ -118,9 +118,12 @@ $(function() {
 	}
 	
 	function show_line_plot(results, maxHeight, margin, multiplier, yLabel) {
-		var xAxisScale = $('#select_x_axis_scale option:selected').val();
+		if (results == null || results.length <= 0) {
+			return;
+		}
+		var nResults = results[0].length;
 		
-		var nResults = results.length;
+		var xAxisScale = $('#select_x_axis_scale option:selected').val();
 		if (xAxisScale == 'logarithmic') {
 			function xTransform(v) { return parseInt(v.name) + 1; }
 			var x = d3.scaleLog()
@@ -131,7 +134,7 @@ $(function() {
 			var x = d3.scaleLinear()
 				.range([0, 350]);
 		}
-		var xDomain = d3.extent(results, xTransform);
+		var xDomain = d3.extent(results[0], xTransform);
 		var y = d3.scaleLinear()
 			.range([200, 0]);
 
@@ -161,21 +164,23 @@ $(function() {
 		    .attr("class", "y axis")
 		    .call(yAxis);
 		
-		var valueline = d3.line()
-            .x(function(v) { return x(xTransform(v)); })
-            .y(function(v) { return y(v.n_words * multiplier); })
-			.curve(d3.curveBasis);
-			//.curve(d3.curveLinear);
-		chart.append("path")
-            .data([results])
-            .attr("class", "plot_line")
-            .attr("d", valueline);
-		chart.selectAll("dot")
-            .data(results)
-          .enter().append("circle")
-            .attr("r", 3.5)
-            .attr("cx", function(v) { return x(xTransform(v)); })
-            .attr("cy", function(v) { return y(v.n_words * multiplier); });
+		for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {	
+			var valueline = d3.line()
+				.x(function(v) { return x(xTransform(v)); })
+				.y(function(v) { return y(v.n_words * multiplier); })
+				.curve(d3.curveBasis);
+				//.curve(d3.curveLinear);
+			chart.append("path")
+				.data([results[iQueryWord]])
+				.attr("class", "plot_line_w" + (iQueryWord + 1) + " plot_line")
+				.attr("d", valueline);
+			chart.selectAll("dot")
+				.data(results[iQueryWord])
+			  .enter().append("circle")
+				.attr("r", 3.5)
+				.attr("cx", function(v) { return x(xTransform(v)); })
+				.attr("cy", function(v) { return y(v.n_words * multiplier); });
+		}
 		chart.attr("height", 320 + margin.top + margin.bottom);
 	}
 	
@@ -194,7 +199,7 @@ $(function() {
 		var margin = {"top": 20, "right": 30, "bottom": 30, "left": 65};
 		plotObj.html('<svg class="word_meta_plot"></svg>');
 		if (metaField.startsWith('year')) {
-			show_line_plot(results, maxHeight, margin, 1, ' ipm');
+			show_line_plot([results], maxHeight, margin, 1, ' ipm');
 		}
 		else
 		{
@@ -209,11 +214,11 @@ $(function() {
 		}
 		lastFreqData = results;
 		var plotObj = $('#word_freq_rank_stats_plot');
-		if (results.length <= 0) {
+		if (results.length <= 0 || results[0].length <= 0) {
 			plotObj.html('<p>Nothing found.</p>');
 			return;
 		}
-		var maxHeight = d3.max(results, function(v) { return v.n_words; });
+		var maxHeight = d3.max(results[0], function(v) { return v.n_words; });
 		var margin = {"top": 20, "right": 30, "bottom": 30, "left": 65};
 		plotObj.html('<svg class="word_meta_plot"></svg>');
 		show_line_plot(results, maxHeight, margin, 100, '%');

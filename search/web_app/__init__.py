@@ -553,39 +553,55 @@ def get_word_freq_stats(searchType='word'):
     Return JSON with the distribution of a particular kind of words
     or lemmata by frequency rank. This function is used for visualisation.
     Currently, it can only return statistics for a context-insensitive
-    query for the whole corpus (the subcorpus constraints and all
-    non-first words are discarded from the query).
+    query for the whole corpus (the subcorpus constraints are
+    discarded from the query). Return a list which contains results
+    for each of the query words (the corresponding lines are plotted
+    in different colors). Maximum number of simultaneously queried words
+    is 10. All words should be in the same language; the language of the
+    first word is used.
     """
     htmlQuery = copy_request_args()
     change_display_options(htmlQuery)
     langID = 0
+    nWords = 1
+    if 'n_words' in htmlQuery and int(htmlQuery['n_words']) > 1:
+        nWords = int(htmlQuery['n_words'])
+        if nWords > 10:
+            nWords = 10
     if searchType not in ('word', 'lemma'):
         searchType = 'word'
     if 'lang1' in htmlQuery and htmlQuery['lang1'] in settings['languages']:
         langID = settings['languages'].index(htmlQuery['lang1'])
-    esQuery = sc.qp.word_freqs_query(htmlQuery, searchType=searchType)
-    # return jsonify(esQuery)
-    if searchType == 'word':
-        hits = sc.get_words(esQuery)
     else:
-        hits = sc.get_lemmata(esQuery)
-    # return jsonify(hits)
-    curFreqByRank = sentView.extract_cumulative_freq_by_rank(hits)
-    buckets = []
-    prevFreq = 0
-    if searchType == 'lemma':
-        freq_by_rank = lemma_freq_by_rank
-    else:
-        freq_by_rank = word_freq_by_rank
-    for freqRank in sorted(freq_by_rank[langID]):
-        bucket = {'name': freqRank, 'n_words': 0}
-        if freqRank in curFreqByRank:
-            bucket['n_words'] = curFreqByRank[freqRank] / freq_by_rank[langID][freqRank]
-            prevFreq = curFreqByRank[freqRank]
+        return jsonify([])
+    results = []
+    for iWord in range(1, nWords + 1):
+        htmlQuery['lang' + str(iWord)] = htmlQuery['lang1']
+        partHtmlQuery = sc.qp.swap_query_words(1, iWord, copy.deepcopy(htmlQuery))
+        esQuery = sc.qp.word_freqs_query(partHtmlQuery, searchType=searchType)
+        # return jsonify(esQuery)
+        if searchType == 'word':
+            hits = sc.get_words(esQuery)
         else:
-            bucket['n_words'] = prevFreq / freq_by_rank[langID][freqRank]
-        buckets.append(bucket)
-    return jsonify(buckets)
+            hits = sc.get_lemmata(esQuery)
+        # return jsonify(hits)
+        curFreqByRank = sentView.extract_cumulative_freq_by_rank(hits)
+        buckets = []
+        prevFreq = 0
+        if searchType == 'lemma':
+            freq_by_rank = lemma_freq_by_rank
+        else:
+            freq_by_rank = word_freq_by_rank
+        for freqRank in sorted(freq_by_rank[langID]):
+            bucket = {'name': freqRank, 'n_words': 0}
+            if freqRank in curFreqByRank:
+                bucket['n_words'] = curFreqByRank[freqRank] / freq_by_rank[langID][freqRank]
+                prevFreq = curFreqByRank[freqRank]
+            else:
+                bucket['n_words'] = prevFreq / freq_by_rank[langID][freqRank]
+            buckets.append(bucket)
+        results.append(buckets)
+    return jsonify(results)
 
 
 @app.route('/word_stats/<metaField>')

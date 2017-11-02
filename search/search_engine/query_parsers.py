@@ -874,6 +874,30 @@ class InterfaceQueryParser:
                 goodSentIDs.append(sent['_id'])
         return goodSentIDs
 
+    def swap_query_words(self, w1, w2, htmlQuery):
+        """
+        Swap query words with numbers w1 and w2 in the HTML query.
+        """
+        if w1 == w2:
+            return htmlQuery
+        newQuery = {}
+        for k, v in htmlQuery.items():
+            print(k, v)
+            mNum = self.rxFieldNum.search(k)
+            if mNum is None:
+                newQuery[k] = v
+                continue
+            curWordNum = int(mNum.group(2))
+            print(curWordNum)
+            fieldBase = mNum.group(1)
+            if curWordNum == w1:
+                newQuery[fieldBase + str(w2)] = v
+            elif curWordNum == w2:
+                newQuery[fieldBase + str(w1)] = v
+            else:
+                newQuery[k] = v
+        return newQuery
+
 
 if __name__ == '__main__':
     iqp = InterfaceQueryParser('../../conf')

@@ -64,6 +64,33 @@
 	background: #40b78f;
 }
 
+
+.plot_line_w1 {
+	stroke: #932d01;
+}
+.plot_line_w2 {
+	stroke: #380584;
+}
+.plot_line_w3 {
+	stroke: #074d70;
+}
+.plot_line_w4 {
+	stroke: #335b17;
+}
+.plot_line_w5 {
+	stroke: #969218;
+}
+.plot_line_w6 {
+	stroke: #8e0f79;
+}
+.plot_line_w7 {
+	stroke: #bc2326;
+}
+.plot_line_w8 {
+	stroke: #40b78f;
+}
+
+
 .circle {
     display: inline-block;
     width: 15px;
@@ -839,8 +866,11 @@ hr.separator {
 
 .plot_line {
   fill: none;
-  stroke: #c66d00;
   stroke-width: 2px;
+}
+
+.plot_line_basic {
+  stroke: #c66d00;
 }
 
 svg circle {
