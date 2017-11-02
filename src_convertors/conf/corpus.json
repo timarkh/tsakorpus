@@ -1,5 +1,5 @@
 {
-  "corpus_name": "tsakhur",
+  "corpus_name": "beserman_eaf",
   "corpus_dir": "corpus",
   "meta_filename": "meta.csv",
   "error_log": "error.log",
