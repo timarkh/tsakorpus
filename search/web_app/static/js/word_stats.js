@@ -3,6 +3,7 @@ var lastFreqData = null;
 $(function() {
 	function assign_word_stats_events() {
 		$('#select_meta_word_stat').unbind('change');
+		$('#select_meta_query_type').unbind('change');
 		$('#select_freq_stat_type').unbind('change');
 		$('#select_x_axis_scale').unbind('change');
 		$('#word_stats_ok').unbind('click');
@@ -10,6 +11,7 @@ $(function() {
 		$('#load_word_meta_stats').unbind('click');
 		$('#load_word_freq_stats').unbind('click');
 		$('#select_meta_word_stat').change(load_word_stats);
+		$('#select_meta_query_type').change(load_word_stats);
 		$('#select_freq_stat_type').change(load_freq_stats);
 		$('#select_x_axis_scale').change(function () {display_word_freq_stats_plot(lastFreqData);});
 		$('#word_stats_ok').click(close_word_stats);
@@ -24,9 +26,14 @@ $(function() {
 			clear_word_stats_plots();
 			return;
 		}
+		var queryType = $('#select_meta_query_type option:selected').attr('value');
+		if (queryType == '') {
+			clear_word_stats_plots();
+			return;
+		}
 		
 		$.ajax({
-			url: "word_stats/" + metaField,
+			url: "word_stats/" + queryType + '/' + metaField,
 			data: $("#search_main").serialize(),
 			dataType : "json",
 			type: "GET",
@@ -186,8 +193,11 @@ $(function() {
 	
 	function display_word_stats_plot(results) {
 		clear_word_stats_plots();
+		if (results == null) {
+			return;
+		}
 		var plotObj = $('#word_stats_plot');
-		if (results.length <= 0) {
+		if (results.length <= 0 || results[0].length <= 0) {
 			plotObj.html('<p>Nothing found.</p>');
 			return;
 		}
@@ -195,15 +205,15 @@ $(function() {
 		if (metaField == '') {
 			return;
 		}
-		var maxHeight = d3.max(results, function(v) { return v.n_words; });
+		var maxHeight = d3.max(results[0], function(v) { return v.n_words; });
 		var margin = {"top": 20, "right": 30, "bottom": 30, "left": 65};
 		plotObj.html('<svg class="word_meta_plot"></svg>');
 		if (metaField.startsWith('year')) {
-			show_line_plot([results], maxHeight, margin, 1, ' ipm');
+			show_line_plot(results, maxHeight, margin, 1, ' ipm');
 		}
 		else
 		{
-			show_bar_chart(results, maxHeight, margin);
+			show_bar_chart(results[0], maxHeight, margin);
 		}
 	}
 	

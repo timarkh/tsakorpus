@@ -896,6 +896,21 @@ class InterfaceQueryParser:
                 newQuery[k] = v
         return newQuery
 
+    def remove_non_first_words(self, htmlQuery):
+        """
+        Remove all words except the first one from the HTML query.
+        """
+        newQuery = {}
+        for k, v in htmlQuery.items():
+            mNum = self.rxFieldNum.search(k)
+            if mNum is None:
+                newQuery[k] = v
+                continue
+            curWordNum = int(mNum.group(2))
+            if curWordNum == 1:
+                newQuery[k] = v
+        return newQuery
+
 
 if __name__ == '__main__':
     iqp = InterfaceQueryParser('../../conf')
