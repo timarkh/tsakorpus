@@ -74,7 +74,9 @@ class SentenceViewer:
                 if nDifferences >= 1:
                     return None
                 nDifferences += 1
-                joinedGloss += glossParts1[iGloss] + '/' + glossParts2[iGloss]
+                newGlossPart = list(set(glossParts1[iGloss].split('/') + glossParts2[iGloss].split('/')))
+                newGlossPart.sort()
+                joinedGloss += '/'.join(newGlossPart)
         return joinedGloss
 
     def simplify_ana(self, analyses, matchingAnalyses):
@@ -105,7 +107,7 @@ class SentenceViewer:
                 differingField = self.differing_ana_field(analyses[i], analyses[j])
                 if (differingField is not None
                         and len(differingField) > 0
-                        and differingField.startswith('gr.')
+                        and differingField.startswith(('gr.', 'trans_'))
                         and type(analyses[i][differingField]) == str
                         and type(analyses[j][differingField]) == str):
                     if 'gloss' in analyses[i] or 'gloss' in analyses[j]:
@@ -113,9 +115,13 @@ class SentenceViewer:
                         if joinedGloss is None:
                             continue
                         analyses[i]['gloss'] = joinedGloss
-                    values = analyses[i][differingField].split('/') + analyses[j][differingField].split('/')
+                    if differingField.startswith('gr.'):
+                        separator = '/'
+                    else:
+                        separator = ' || '
+                    values = list(set(analyses[i][differingField].split(separator) + analyses[j][differingField].split(separator)))
                     values.sort()
-                    analyses[i][differingField] = '/'.join(values)
+                    analyses[i][differingField] = separator.join(values)
                     usedAnalyses.append(j)
             simpleAnalyses.append(analyses[i])
             if i in matchingAnalyses:

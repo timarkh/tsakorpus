@@ -664,7 +664,6 @@ def get_word_stats(searchType, metaField):
     else:
         nWordsProcess = nWords
     for iWord in range(1, nWordsProcess + 1):
-        print(iWord, searchType, searchIndex)
         curWordBuckets = []
         for bucket in buckets:
             if (bucket['name'] == '>>'
@@ -683,7 +682,6 @@ def get_word_stats(searchType, metaField):
             # elif type(curHtmlQuery[metaField]) == str:
             #     curHtmlQuery[metaField] += ',' + bucket['name']
             curHtmlQuery['doc_ids'] = subcorpus_ids(curHtmlQuery)
-            print(curHtmlQuery)
             query = sc.qp.html2es(curHtmlQuery,
                                   searchOutput=searchIndex,
                                   sortOrder='',

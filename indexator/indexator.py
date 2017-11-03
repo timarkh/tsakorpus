@@ -114,8 +114,8 @@ class Indexator:
             word['n_ana'] = 0
         else:
             word['n_ana'] = len(word['ana'])
-            if word['n_ana'] >= 255:
-                word['n_ana'] = 255
+            if word['n_ana'] >= 127:
+                word['n_ana'] = 127
 
     def process_sentence_words(self, words, langID):
         """

@@ -654,6 +654,10 @@ hr.separator {
 	cursor: pointer;
 }
 
+.documents_list_table td {
+	padding: 1px 5px;
+}
+
 
 .words_list_table {
 	border: solid 1px gray;

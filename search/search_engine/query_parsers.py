@@ -33,7 +33,7 @@ class InterfaceQueryParser:
         else:
             self.wordFields = []
         self.wr = WordRelations(settings_dir, rp=rp)
-        self.docMetaFields = ['author', 'title', 'year1', 'year2', 'genre']
+        self.docMetaFields = ['author', 'title', 'genre']
         if 'viewable_meta' in self.settings:
             self.docMetaFields += [f for f in self.settings['viewable_meta']
                                    if f not in self.docMetaFields and f != 'filename']
@@ -222,6 +222,19 @@ class InterfaceQueryParser:
             return {'bool': {'must_not': mustNotClause}}
         return {}
 
+    def make_range_query(self, listQuery, field):
+        """
+        Make a range elasticsearch query from a list with two integer values.
+        """
+        if type(listQuery) not in (list, tuple) or len(listQuery) != 2:
+            return {'match_all': {}}
+        query = {'range': {field: {}}}
+        if listQuery[0] is not None:
+            query['range'][field]['gte'] = listQuery[0]
+        if listQuery[1] is not None:
+            query['range'][field]['lte'] = listQuery[1]
+        return query
+
     def make_n_ana_query(self, strQuery, field):
         """
         Make a simple bool query for the n_ana field, recognizing one of
@@ -231,6 +244,8 @@ class InterfaceQueryParser:
             return {'match': {field: 1}}
         elif strQuery == 'none':
             return {'match': {field: 0}}
+        elif strQuery == 'analyzed':
+            return {'range': {field: {'gte': 1}}}
         elif strQuery == 'ambiguous':
             return {'range': {field: {'gte': 2}}}
         return {}
@@ -654,6 +669,14 @@ class InterfaceQueryParser:
         for field in self.docMetaFields:
             if field in htmlQuery and (type(htmlQuery[field]) == int or len(htmlQuery[field]) > 0):
                 queryParts.append(self.make_bool_query(htmlQuery[field], field, 'all', keyword_query=True))
+        if 'year' in self.docMetaFields:
+            yearFrom, yearTo = None, None
+            if 'year_from' in htmlQuery and (type(htmlQuery['year_from']) == int or len(htmlQuery['year_from']) > 0):
+                yearFrom = htmlQuery['year_from']
+            if 'year_to' in htmlQuery and (type(htmlQuery['year_to']) == int or len(htmlQuery['year_to']) > 0):
+                yearTo = htmlQuery['year_to']
+            if yearFrom is not None or yearTo is not None:
+                queryParts.append(self.make_range_query([yearFrom, yearTo], 'year'))
         if exclude is not None and len(exclude) > 0:
             queryParts.append({'bool': {'must_not': [{'terms': {'_id': list(exclude)}}]}})
         if len(queryParts) > 0:
