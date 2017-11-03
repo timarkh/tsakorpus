@@ -117,6 +117,19 @@ msgstr "корпусная"
 msgid "translitname_dictionary"
 msgstr "словарная"
 
+
+
+# Names of inpiut methods that define how string queries (for word, lemma etc.) will be transformed before the query is performed:
+
+msgid "inputmethod_normal"
+msgstr "обычный"
+
+msgid "inputmethod_strict"
+msgstr "точный"
+
+
+
+
 # ******** The rest is more or less universal:  ********
 
 #: templates/index.html:4
@@ -226,8 +239,11 @@ msgid "Word distance requirements are strict"
 msgstr "Расстояния между словами только как в запросе"
 
 #: templates/index.html:111
-msgid "Transliteration:"
-msgstr "Транслитерация:"
+msgid "Transliteration: "
+msgstr "Транслитерация: "
+
+msgid "Character input method: "
+msgstr "Способ ввода символов: "
 
 #: templates/index.html:124
 msgid "Search sentences"

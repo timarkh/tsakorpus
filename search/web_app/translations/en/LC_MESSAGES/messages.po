@@ -116,6 +116,19 @@ msgstr "corpus"
 msgid "translitname_dictionary"
 msgstr "dictionary"
 
+
+
+# Names of inpiut methods that define how string queries (for word, lemma etc.) will be transformed before the query is performed:
+
+msgid "inputmethod_normal"
+msgstr "normal"
+
+msgid "inputmethod_strict"
+msgstr "strict"
+
+
+
+
 # ******** The rest is more or less universal:  ********
 
 #: templates/index.html:4
@@ -225,8 +238,11 @@ msgid "Word distance requirements are strict"
 msgstr "Word distance requirements are strict"
 
 #: templates/index.html:111
-msgid "Transliteration:"
-msgstr "Transliteration:"
+msgid "Transliteration: "
+msgstr "Transliteration: "
+
+msgid "Character input method: "
+msgstr "Character input method: "
 
 #: templates/index.html:124
 msgid "Search sentences"

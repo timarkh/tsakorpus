@@ -134,10 +134,17 @@ var forTheQueryCaption = "{{ _('the query') }}";
 							<option value="standard">{{ _('view_standard') }}</option>
 							<option value="glossed">{{ _('view_glossed') }}</option>
 						</select><br>
-						{% if transliterations %}
-							{{ _('Transliteration:') }} <select name="translit" id="translit" class="search_input">
+						{% if transliterations and transliterations|length > 1 %}
+							{{ _('Transliteration: ') }}<select name="translit" id="translit" class="search_input">
 							{% for tr in transliterations %}
 							<option value="{{ tr }}">{{ _('translitname_' + tr) }}</option>
+							{% endfor %}
+							</select><br>
+						{% endif %}
+						{% if input_methods and input_methods|length > 1 %}
+							{{ _('Character input method: ') }}<select name="input_method" id="input_method" class="search_input">
+							{% for im in input_methods %}
+							<option value="{{ im }}">{{ _('inputmethod_' + im) }}</option>
 							{% endfor %}
 							</select>
 						{% endif %}

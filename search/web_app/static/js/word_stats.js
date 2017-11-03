@@ -205,7 +205,13 @@ $(function() {
 		if (metaField == '') {
 			return;
 		}
-		var maxHeight = d3.max(results[0], function(v) { return v.n_words; });
+		var maxHeight = 1
+		for (iRes = 0; iRes < results.length; iRes++) {
+			var curMaxHeight = d3.max(results[iRes], function(v) { return v.n_words; });
+			if (curMaxHeight > maxHeight) {
+				maxHeight = curMaxHeight;
+			}
+		}
 		var margin = {"top": 20, "right": 30, "bottom": 30, "left": 65};
 		plotObj.html('<svg class="word_meta_plot"></svg>');
 		if (metaField.startsWith('year')) {
@@ -228,7 +234,13 @@ $(function() {
 			plotObj.html('<p>Nothing found.</p>');
 			return;
 		}
-		var maxHeight = d3.max(results[0], function(v) { return v.n_words; });
+		var maxHeight = 0
+		for (iRes = 0; iRes < results.length; iRes++) {
+			var curMaxHeight = d3.max(results[iRes], function(v) { return v.n_words; });
+			if (curMaxHeight > maxHeight) {
+				maxHeight = curMaxHeight;
+			}
+		}
 		var margin = {"top": 20, "right": 30, "bottom": 30, "left": 65};
 		plotObj.html('<svg class="word_meta_plot"></svg>');
 		show_line_plot(results, maxHeight, margin, 100, '%');

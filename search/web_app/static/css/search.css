@@ -823,7 +823,7 @@ hr.separator {
 .options_column {
 	float: left;
 	text-align: right;
-	max-width: 350px;
+	max-width: 375px;
 	margin-right: 3px;
 	border: 1px dotted gray;
 	border-radius: 3px;

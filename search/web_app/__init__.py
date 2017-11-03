@@ -13,6 +13,7 @@ import xlsxwriter
 import time
 from search_engine.client import SearchClient
 from .response_processors import SentenceViewer
+from .transliteration import *
 
 
 SETTINGS_DIR = '../conf'
@@ -361,11 +362,16 @@ def search_page():
         transliterations = settings['transliterations']
     else:
         transliterations = None
+    if 'input_methods' in settings:
+        inputMethods = settings['input_methods']
+    else:
+        inputMethods = None
     return render_template('index.html',
                            corpus_name=corpus_name,
                            languages=settings['languages'],
                            all_lang_search=allLangSearch,
                            transliterations=transliterations,
+                           input_methods=inputMethods,
                            media=settings['media'],
                            gloss_search_enabled=settings['gloss_search_enabled'],
                            debug=settings['debug'],
@@ -704,6 +710,7 @@ def get_word_stats(searchType, metaField):
                         or 'agg_nwords' not in hits['aggregations']
                         or 'agg_ndocs' not in hits['aggregations']
                         or hits['aggregations']['agg_ndocs']['value'] is None
+                        or hits['aggregations']['agg_nwords']['sum'] is None
                         or (hits['aggregations']['agg_ndocs']['value'] <= 0
                             and not metaField.startswith('year'))):
                     continue
@@ -769,13 +776,29 @@ def copy_request_args():
     """
     Copy the reauest arguments from request.args to a
     normal modifiable dictionary. Return the dictionary.
+    If input method is specified, change the values using
+    the relevant transliteration function.
     """
     query = {}
     if request.args is None or len(request.args) <= 0:
         return query
+    input_translit_func = lambda f, t, l: t
+    if 'input_method' in request.args and len(request.args['input_method']) > 0:
+        translitFuncName = 'input_method_' + request.args['input_method']
+        localNames = globals()
+        if translitFuncName in localNames:
+            input_translit_func = localNames[translitFuncName]
     for field, value in request.args.items():
         if type(value) != list or len(value) > 1:
             query[field] = copy.deepcopy(value)
+            if type(value) == str:
+                mFieldNum = sc.qp.rxFieldNum.search(field)
+                if mFieldNum is None:
+                    continue
+                if 'lang' + mFieldNum.group(2) not in request.args:
+                    continue
+                lang = request.args['lang' + mFieldNum.group(2)]
+                query[field] = input_translit_func(mFieldNum.group(1), query[field], lang)
         else:
             query[field] = copy.deepcopy(value[0])
     if 'sent_ids' in query:

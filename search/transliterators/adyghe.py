@@ -38,3 +38,17 @@ def adyghe_translit_ipa(text):
     Transliterate Adyghe text from Cyrillic orthography to IPA.
     """
     return rxAdygheCyr2IPA.sub(lambda m: dictNgrams[m.group(0)], text)
+
+
+def adyghe_input_normal(field, text):
+    """
+    Prepare a string from one of the qury fields for subsequent
+    processing: replace common shortcuts with valid Adyghe characters.
+    """
+    if field not in ('wf', 'lex', 'lex2', 'trans_ru', 'trans_ru2'):
+        return text
+    text = re.sub('(?<=[а-яА-ЯёЁӏ])[I1]', 'ӏ', text)
+    text = re.sub('[I1](?=[а-яА-ЯёЁӏ])', 'ӏ', text)
+    if '*' not in text or re.search('[\\[\\]\\.()]', text) is not None:
+        text = text.replace('уэ', '(о|уэ)')
+    return text

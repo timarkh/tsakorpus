@@ -190,7 +190,7 @@ class InterfaceQueryParser:
                 strQuery = strQuery.replace(' ', '')
             else:
                 strQuery = strQuery.strip()
-                if '|' not in strQuery:
+                if '|' not in strQuery and '~' not in strQuery:
                     # Metadata query: metafields can contain commas and parentheses
                     return self.make_simple_term_query(strQuery, field, lang, keyword_query=keyword_query)
             end = len(strQuery)

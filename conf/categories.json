@@ -67,6 +67,7 @@
     "persn": "nType",
     "patrn": "nType",
     "mult": "numType",
+    "ord": "numType",
     "abbr": "abbr",
     "abs": "case",
     "obl": "case",
