@@ -882,13 +882,11 @@ class InterfaceQueryParser:
             return htmlQuery
         newQuery = {}
         for k, v in htmlQuery.items():
-            print(k, v)
             mNum = self.rxFieldNum.search(k)
             if mNum is None:
                 newQuery[k] = v
                 continue
             curWordNum = int(mNum.group(2))
-            print(curWordNum)
             fieldBase = mNum.group(1)
             if curWordNum == w1:
                 newQuery[fieldBase + str(w2)] = v

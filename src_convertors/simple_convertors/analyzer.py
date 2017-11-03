@@ -200,13 +200,21 @@ class DumbMorphParser:
         analyses = self.rxWordsRNC.findall(text)
         if lang not in self.analyses:
             self.analyses[lang] = {}
+        iAna = 1
+        print('Loading analyses...')
         for ana in analyses:
+            if iAna % 20000 == 0:
+                print('Loading analysis #' + str(iAna))
             word = ana[1].strip('$&^#%*·;·‒–—―•…‘’‚“‛”„‟"\'')
             if len(word) <= 0:
                 continue
-            ana = self.transform_ana_rnc(ana[0], lang=lang)
+            if iAna <= 50000:   # We assume the analyses are ordered by word frequency
+                ana = self.transform_ana_rnc(ana[0], lang=lang)
+            else:
+                ana = ana[0]    # Avoid huge memory consumption at the expense of time
             if word not in self.analyses[lang]:
                 self.analyses[lang][word] = ana
+            iAna += 1
         print('Analyses for', len(self.analyses[lang]), 'different words loaded.')
 
     def normalize(self, word):
@@ -221,7 +229,11 @@ class DumbMorphParser:
         if wf not in self.analyses[lang] and (wf.startswith('-') or wf.endswith('-')):
             wf = wf.strip('-')
         if wf in self.analyses[lang]:
-            analyses = copy.deepcopy(self.analyses[lang][wf])
+            ana = self.analyses[lang][wf]
+            if type(ana) == str and self.settings['parsed_wordlist_format'] == 'xml_rnc':
+                analyses = self.transform_ana_rnc(ana, lang=lang)
+            else:
+                analyses = copy.deepcopy(self.analyses[lang][wf])
         else:
             analyses = []
         return analyses
