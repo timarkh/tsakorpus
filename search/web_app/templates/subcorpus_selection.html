@@ -41,7 +41,7 @@
 						<h4>{{ _('Selected subcorpus composition') }}</h4>
 						<select name="select_meta_stat" id="select_meta_stat" class="search_input">
 						{% for stat_option in subcorpus_selection.stat_options %}
-							<option value="{{ stat_option }}">{{ stat_option }}</option>
+							<option value="{{ stat_option }}">{{ _('metafield_' + stat_option) }}</option>
 						{% endfor %}
 						</select>
 						<div id="subcorpus_stats_plot">{{ _('(please wait for the plot to load)') }}</div>

@@ -65,7 +65,7 @@ $(function() {
 	}
 	
 	function load_subcorpus_stats(e) {
-		var metaField = $('#select_meta_stat option:selected').text();
+		var metaField = $('#select_meta_stat option:selected').val();
 		if (metaField == '') {
 			clear_subcorpus_stats_plot();
 			return;

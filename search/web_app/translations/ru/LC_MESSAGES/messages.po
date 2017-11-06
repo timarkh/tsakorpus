@@ -129,6 +129,115 @@ msgstr "точный"
 
 
 
+# Names of the metadata fields you have in the corpus:
+
+msgid "metafield_genre"
+msgstr "жанр"
+
+msgid "metafield_year"
+msgstr "год"
+
+msgid "metafield_title"
+msgstr "заголовок"
+
+msgid "metafield_author"
+msgstr "автор"
+
+msgid "metafield_topic"
+msgstr "тема"
+
+msgid "metafield_sex"
+msgstr "пол"
+
+msgid "metafield_age"
+msgstr "возраст"
+
+msgid "metafield_origin"
+msgstr "место рождения"
+
+msgid "metafield_speaker"
+msgstr "говорящий"
+
+msgid "metafield_published"
+msgstr "опубликовано"
+
+msgid "metafield_issue"
+msgstr "выпуск"
+
+
+# Names of the metadata values you have in the corpus:
+
+msgid "metavalue_press"
+msgstr "пресса"
+
+msgid "metavalue_fiction"
+msgstr "художественные"
+
+msgid "metavalue_religion"
+msgstr "религиозные"
+
+msgid "metavalue_oral"
+msgstr "устные"
+
+msgid "metavalue_written"
+msgstr "письменные"
+
+msgid "metavalue_poetry"
+msgstr "поэзия"
+
+msgid "metavalue_novel"
+msgstr "роман"
+
+msgid "metavalue_story"
+msgstr "рассказ"
+
+msgid "metavalue_dialogue"
+msgstr "диалог"
+
+msgid "metavalue_monologue"
+msgstr "монолог"
+
+msgid "metavalue_interview"
+msgstr "интервью"
+
+msgid "metavalue_essay"
+msgstr "эссе"
+
+msgid "metavalue_male"
+msgstr "мужской"
+
+msgid "metavalue_female"
+msgstr "женский"
+
+msgid "metavalue_M"
+msgstr "М"
+
+msgid "metavalue_F"
+msgstr "Ж"
+
+msgid "metavalue_experiment"
+msgstr "эксперимент"
+
+
+# Names of additional word-level annotation fields:
+
+msgid "wordfield_trans_ru"
+msgstr "перевод (RU)"
+
+msgid "wordfield_trans_en"
+msgstr "перевод (EN)"
+
+msgid "wordfield_lex2"
+msgstr "лемма 2"
+
+msgid "wordfield_trans_ru2"
+msgstr "перевод 2 (RU)"
+
+msgid "wordfield_trans_en2"
+msgstr "перевод 2 (EN)"
+
+
+
 
 # ******** The rest is more or less universal:  ********
 

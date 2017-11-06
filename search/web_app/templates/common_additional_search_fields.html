@@ -1,3 +1,14 @@
+{% if word_fields %}
+	{% for field in word_fields %}
+		{{ _('wordfield_' + field) | capitalize }}: <input type="text" class="search_input" name="{{ field }}1" id="{{ field }}1"><br>
+	{% endfor %}
+{% endif %}
+{% if sentence_meta and sentence_meta|length > 0 %}
+<hr class="separator">
+	{% for field in sentence_meta %}
+		{{ _('metafield_' + field) | capitalize }}: <input type="text" class="search_input" name="sent_meta_{{ field }}1" id="sent_meta_{{ field }}1"><br>
+	{% endfor %}
+{% endif %}
 {{ _('Analyses: ') }}<select name="n_ana1" id="n_ana1" class="search_input">
 {% if ambiguous_analyses %}
 <option value="any" selected>{{ _('any number of analyses') }}</option>

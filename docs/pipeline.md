@@ -45,11 +45,18 @@ Loading a source JSON document may require significantly more memory than it tak
 
 Memory consumed by Elasticsearch does not depend on the size of the corpus, but normally it occupies 1.5-2 Gb of memory (unless you changed it in the Elasticsearch settings).
 
-Memory consumed by the indexator itself non-linearly depends on several parameters (number of tokens, number of sentences and number of documents), but for the sake of simplicity it can be thought of as depending on the number of tokens more or less linearly. The constant depends, of course, on the amount of annotation you have. In case of full morphological annotation, a ratio of 50-75 Mb per million tokens (for corpora containing 10-50 million tokens) can be expected.
+Memory consumed by the indexator itself non-linearly depends on several parameters (number of tokens, number of sentences and number of documents), but for the sake of simplicity it can be thought of as depending on the number of tokens more or less linearly. The constant depends, of course, on the amount of annotation you have. In case of full morphological annotation, a ratio of 60-80 Mb per million tokens (for corpora containing 10-50 million tokens) can be expected.
 
 The disk space required by the index depends primarily on the size of the corpus. Again, in case of full morphological annotation, you can expect 1 million tokens to take 0.5-0.7 Gb of disk space.
 
 The time needed to index a corpus may vary significantly depending on the amount of annotation and your hardware characteristics. Very roughly, you can expect 5-10 minutes per million tokens on an ordinary desktop computer.
+
+### Translation
+If you want your web interface to have several language options, you have to provide translations for all captions and messages. English and Russian translations for the main part of the interface is included in the distribution. If you do not intend to have other languages in the interface, you have to do the following:
+* Edit ``search/web_app/translations/%language_code%/LC_MESSAGES/messages.po`` for each of the two languages, adding there the title of the corpus and translations for all corpus-specific labels (such as metadata field names and values, transliteration option names, etc.). The changes take effect after compilation, which starts automatically whenever you index the corpus.
+* Edit ``search/web_app/templates/help_dialogue_%language_code%.html`` files if you want the help adapted to your corpus data (you may leave it as is if you prefer so).
+
+See more on translating labels in ``interface_languages.md``.
 
 ### Running tsakorpus
 You can use tsakorpus either locally or as a web service available from outside. In the first case, it is sufficient to run tsakorpus.wsgi as a Python file. This will start a flask web-server, after which the corpus will be accessible at <http://127.0.0.1:7342/search>.

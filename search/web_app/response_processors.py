@@ -301,13 +301,13 @@ class SentenceViewer:
                 result += meta['issue'] + ' '
             else:
                 result += '<span class="ch_date">' + meta['issue'] + '</span>'
-        if 'year1' in meta and 'year2' in meta:
-            dateDisplayed = str(meta['year1'])
-            if meta['year2'] != meta['year1']:
+        if 'year_from' in meta and 'year_to' in meta:
+            dateDisplayed = str(meta['year_from'])
+            if meta['year_to'] != meta['year_from']:
                 if format == 'csv':
-                    dateDisplayed += '-' + str(meta['year2'])
+                    dateDisplayed += '-' + str(meta['year_to'])
                 else:
-                    dateDisplayed += '&ndash;' + str(meta['year2'])
+                    dateDisplayed += '&ndash;' + str(meta['year_to'])
             if format == 'csv':
                 result += '[' + dateDisplayed + ']'
             else:
@@ -798,10 +798,10 @@ class SentenceViewer:
         doc = {'fields': [], 'excluded': (exclude is not None and int(dID) in exclude),
                'id': dID}
         dateDisplayed = '-'
-        if 'year1' in dSource:
-            dateDisplayed = str(dSource['year1'])
-            if 'year2' in dSource and dSource['year2'] != dSource['year1']:
-                dateDisplayed += '&ndash;' + str(dSource['year2'])
+        if 'year_from' in dSource:
+            dateDisplayed = str(dSource['year_from'])
+            if 'year_to' in dSource and dSource['year_to'] != dSource['year_from']:
+                dateDisplayed += '&ndash;' + str(dSource['year_to'])
         doc['date_displayed'] = dateDisplayed
         for field in self.sc.qp.docMetaFields:
             if field.endswith('_kw'):

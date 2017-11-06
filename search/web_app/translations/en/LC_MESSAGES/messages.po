@@ -128,6 +128,115 @@ msgstr "strict"
 
 
 
+# Names of the metadata fields you have in the corpus:
+
+msgid "metafield_genre"
+msgstr "genre"
+
+msgid "metafield_year"
+msgstr "year"
+
+msgid "metafield_title"
+msgstr "title"
+
+msgid "metafield_author"
+msgstr "author"
+
+msgid "metafield_topic"
+msgstr "topic"
+
+msgid "metafield_sex"
+msgstr "sex"
+
+msgid "metafield_age"
+msgstr "age"
+
+msgid "metafield_origin"
+msgstr "place of origin"
+
+msgid "metafield_speaker"
+msgstr "speaker"
+
+msgid "metafield_published"
+msgstr "published"
+
+msgid "metafield_issue"
+msgstr "issue"
+
+
+# Names of the metadata values you have in the corpus:
+
+msgid "metavalue_press"
+msgstr "press"
+
+msgid "metavalue_fiction"
+msgstr "fiction"
+
+msgid "metavalue_religion"
+msgstr "religion"
+
+msgid "metavalue_oral"
+msgstr "oral"
+
+msgid "metavalue_written"
+msgstr "written"
+
+msgid "metavalue_poetry"
+msgstr "poetry"
+
+msgid "metavalue_novel"
+msgstr "novel"
+
+msgid "metavalue_story"
+msgstr "story"
+
+msgid "metavalue_dialogue"
+msgstr "dialogue"
+
+msgid "metavalue_monologue"
+msgstr "monologue"
+
+msgid "metavalue_interview"
+msgstr "interview"
+
+msgid "metavalue_essay"
+msgstr "essay"
+
+msgid "metavalue_male"
+msgstr "male"
+
+msgid "metavalue_female"
+msgstr "female"
+
+msgid "metavalue_M"
+msgstr "M"
+
+msgid "metavalue_F"
+msgstr "F"
+
+msgid "metavalue_experiment"
+msgstr "experiment"
+
+
+# Names of additional word-level annotation fields:
+
+msgid "wordfield_trans_ru"
+msgstr "translation (RU)"
+
+msgid "wordfield_trans_en"
+msgstr "translation (EN)"
+
+msgid "wordfield_lex2"
+msgstr "2nd lemma"
+
+msgid "wordfield_trans_ru2"
+msgstr "2nd transl. (RU)"
+
+msgid "wordfield_trans_en2"
+msgstr "2nd transl. (EN)"
+
+
+
 
 # ******** The rest is more or less universal:  ********
 

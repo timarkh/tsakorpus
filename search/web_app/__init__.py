@@ -25,7 +25,6 @@ corpus_name = settings['corpus_name']
 if settings['max_docs_retrieve'] >= 10000:
     settings['max_docs_retrieve'] = 9999
 localizations = {}
-supportedLocales = ['ru', 'en']
 sc = SearchClient(SETTINGS_DIR, mode='test')
 sentView = SentenceViewer(SETTINGS_DIR, sc)
 sc.qp.rp = sentView
@@ -1295,16 +1294,15 @@ def get_word_fields():
     word-level annotation fields.
     """
     result = ''
+    wordFields = None
+    sentMeta = None
     if 'word_fields' in settings and len(settings['word_fields']) > 0:
-        result += '\n'.join(field + ': <input type="text" class="search_input" name="' + field +
-                            '1" id="' + field + '1"><br>'
-                            for field in settings['word_fields'])
-    if 'sentence_meta' in settings and len('sentence_meta') > 0:
-        result += '\n<hr class="separator">\n'
-        result += '\n'.join(field.capitalize() + ': <input type="text" class="search_input" name="sent_meta_' + field +
-                            '1" id="' + field + '1"><br>'
-                            for field in settings['sentence_meta'])
+        wordFields = settings['word_fields']
+    if 'sentence_meta' in settings and len(settings['sentence_meta']) > 0:
+        sentMeta = settings['sentence_meta']
     result += render_template('common_additional_search_fields.html',
+                              word_fields=wordFields,
+                              sentence_meta=sentMeta,
                               ambiguous_analyses=settings['ambiguous_analyses'])
     return result
 

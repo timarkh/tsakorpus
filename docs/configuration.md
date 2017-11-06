@@ -34,7 +34,11 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``languages`` -- list of names of the languages used in the corpus. The order of the languages determines how they are encoded in the index (the code of the language is its index in this list) and, in the case of parallel corpora, in which order they are displayed within one parallel context.
 
+* ``interface_languages`` -- dictionary with all available web interface languages. The keys are the codes of the languages, the values are their names.
+
 * ``transliterations`` -- list of supported transliterations. For each transliteration, there should be a function in search/web_app/transliteration.py named trans_%TRANSLITERATION_NAME%_baseline that takes the text and the name of the language as input and returns transliterated text.
+
+* ``input_methods`` -- list of supported input methods, aka user input transliterations. Each input method corresponds to a function that has to be applied to any value typed in any of the text fields of the search query form, such as Word or Lemma, before this value is passed to the search. The function are allowed to make a regular expression out of the value. For each input method, there should be a function in search/web_app/transliteration.py named input_method_%INPUT_METHOD_NAME% that takes the name of the query field, the text and the name of the language as input and returns transliterated text.
 
 * ``all_language_search_enabled`` -- boolean value that determines if the user may make language-inspecific queries. Relevant only in a corpus with multiple languages.
 
