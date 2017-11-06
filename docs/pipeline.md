@@ -58,6 +58,17 @@ If you want your web interface to have several language options, you have to pro
 
 See more on translating labels in ``interface_languages.md``.
 
+### Transliterations
+(If you are not going to have multiple input or output transliteration options, you may skip this section.)
+
+If you want the texts of your corpus to be available in several transliterations, you can write your own transliteration functions in Python and integrate them in the platform. It can be done as follows.
+
+In the ``search/web_app/transliterators`` directory, add your own Python 3.x files that contain transliteration functions. There are no limitations on what these functions look like or what resources they can use. Then, for each transliteration option, add a simple function in the ``search/web_app/transliteration.py`` file. The functions should be called ``trans_%TRANSLITERATION_NAME%_baseline``, they have to have two string arguments and return a string. The arguments are the text to be transliterated and the language of that text. The text can come either from the ``text`` field of the sentence or from any of the string word-level fields, such as ``wf`` or ``ana.lex``. The idea is that these simple functions will call actual transliteration functions imported from the ``search/web_app/transliterators`` directory. Finally, add available transliteration names to the ``transliterations`` array in ``corpus.json`` and add the translations of these names to the interface translation files (see ``translation.md``).
+
+The functions described above only transliterate the output, i.e. the search results. If you want to transliterate, or alter in any other way, the text that the user inputs in the query form, before the search is performed, you have to add "input methods" in a similar fashion. An input method is basically any function that transforms user input. For each input method, you have to add a function called ``input_method_%INPUT_METHOD_NAME%`` in ``search/web_app/transliteration.py``. These functions take as its parameters the name of the search field, text to be transliterated and the name of the language/tier the user is searching in, and return a transliterated string. Names of the input methods should be listed in the ``input_methods`` array in ``corpus.json`` and translated in the translation files.
+
+Whenever the platform cannot find a function for a transliteration or an input method, it just leaves the text to be transliterated unchanged.
+
 ### Running tsakorpus
 You can use tsakorpus either locally or as a web service available from outside. In the first case, it is sufficient to run tsakorpus.wsgi as a Python file. This will start a flask web-server, after which the corpus will be accessible at <http://127.0.0.1:7342/search>.
 

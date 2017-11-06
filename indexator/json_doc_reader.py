@@ -19,26 +19,26 @@ class JSONDocReader:
     @staticmethod
     def insert_meta_year(metadata):
         """
-        If there is no year field in metadata, but there are year1 and
-        year2 fields denoting a range whose values do not differ too much,
-        insert the year field. In the opposite case, insert year1 and year2 fields.
+        If there is no year field in metadata, but there are year_from and
+        year_to fields denoting a range whose values do not differ too much,
+        insert the year field. In the opposite case, insert year_from and year_to fields.
         """
-        for yearField in ['year', 'year1', 'year2']:
+        for yearField in ['year', 'year_from', 'year_to']:
             if yearField in metadata and type(metadata[yearField]) == str:
                 try:
                     metadata[yearField] = int(metadata[yearField])
                 except:
                     del metadata[yearField]
-        if 'year' not in metadata and 'year1' in metadata and 'year2' in metadata:
-            if metadata['year1'] == metadata['year2']:
-                metadata['year'] = metadata['year1']
-            elif 0 < int(metadata['year2']) - int(metadata['year1']) <= 2:
-                metadata['year'] = (metadata['year2'] + metadata['year1']) // 2
+        if 'year' not in metadata and 'year_from' in metadata and 'year_to' in metadata:
+            if metadata['year_from'] == metadata['year_to']:
+                metadata['year'] = metadata['year_from']
+            elif 0 < int(metadata['year_to']) - int(metadata['year_from']) <= 2:
+                metadata['year'] = (metadata['year_to'] + metadata['year_from']) // 2
         elif 'year' in metadata:
-            if 'year1' not in metadata:
-                metadata['year1'] = metadata['year']
-            if 'year2' not in metadata:
-                metadata['year2'] = metadata['year']
+            if 'year_from' not in metadata:
+                metadata['year_from'] = metadata['year']
+            if 'year_to' not in metadata:
+                metadata['year_to'] = metadata['year']
 
     def get_metadata(self, fname):
         """

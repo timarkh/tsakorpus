@@ -33,12 +33,12 @@
       ],
       [
         {"type": "input_text", "name": "genre", "placeholder": "Genre"},
-        {"type": "option", "name": "genre", "value": "press", "text": "press"},
-        {"type": "option", "name": "genre", "value": "fiction", "text": "fiction"},
-        {"type": "option", "name": "genre", "value": "religion", "text": "religion"},
-        {"type": "option", "name": "genre", "value": "wikipedia", "text": "Wikipedia"},
-        {"type": "option", "name": "genre", "value": "~oral", "text": "written"},
-        {"type": "option", "name": "genre", "value": "oral", "text": "oral"}
+        {"type": "option", "name": "genre", "value": "press", "text": "metavalue_press"},
+        {"type": "option", "name": "genre", "value": "fiction", "text": "metavalue_fiction"},
+        {"type": "option", "name": "genre", "value": "religion", "text": "metavalue_religion"},
+        {"type": "option", "name": "genre", "value": "wikipedia", "text": "metavalue_wikipedia"},
+        {"type": "option", "name": "genre", "value": "~oral", "text": "metavalue_written"},
+        {"type": "option", "name": "genre", "value": "oral", "text": "metavalue_oral"}
       ]
     ],
     "stat_options": [

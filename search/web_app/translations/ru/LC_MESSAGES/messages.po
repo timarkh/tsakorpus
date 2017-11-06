@@ -137,6 +137,12 @@ msgstr "жанр"
 msgid "metafield_year"
 msgstr "год"
 
+msgid "metafield_year_from"
+msgstr "год: от"
+
+msgid "metafield_year_to"
+msgstr "год: до"
+
 msgid "metafield_title"
 msgstr "заголовок"
 
@@ -172,6 +178,12 @@ msgstr "пресса"
 
 msgid "metavalue_fiction"
 msgstr "художественные"
+
+msgid "metavalue_nonfiction"
+msgstr "нехудожественные"
+
+msgid "metavalue_wikipedia"
+msgstr "Википедия"
 
 msgid "metavalue_religion"
 msgstr "религиозные"
@@ -560,6 +572,27 @@ msgstr "По частотности"
 
 msgid "Distribution by frequency rank"
 msgstr "Распределение слов по частотным рангам"
+
+msgid "Parameter: "
+msgstr "Параметр: "
+
+msgid "Query type: "
+msgstr "Тип запроса: "
+
+msgid "search the whole query"
+msgstr "искать запрос целиком"
+
+msgid "compare words in the query"
+msgstr "сравнить слова в запросе"
+
+msgid "Scale of the x axis: "
+msgstr "Шкала по оси x: "
+
+msgid "linear"
+msgstr "линейная"
+
+msgid "logarithmic"
+msgstr "логарифмическая"
 
 msgid "Back to search"
 msgstr "Вернуться к поиску"

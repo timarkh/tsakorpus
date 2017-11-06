@@ -136,6 +136,12 @@ msgstr "genre"
 msgid "metafield_year"
 msgstr "year"
 
+msgid "metafield_year_from"
+msgstr "year: from"
+
+msgid "metafield_year_to"
+msgstr "year: to"
+
 msgid "metafield_title"
 msgstr "title"
 
@@ -171,6 +177,12 @@ msgstr "press"
 
 msgid "metavalue_fiction"
 msgstr "fiction"
+
+msgid "metavalue_nonfiction"
+msgstr "non-fiction"
+
+msgid "metavalue_wikipedia"
+msgstr "Wikipedia"
 
 msgid "metavalue_religion"
 msgstr "religion"
@@ -559,6 +571,27 @@ msgstr "By frequency"
 
 msgid "Distribution by frequency rank"
 msgstr "Distribution by frequency rank"
+
+msgid "Parameter: "
+msgstr "Parameter: "
+
+msgid "Query type: "
+msgstr "Query type: "
+
+msgid "search the whole query"
+msgstr "search the whole query"
+
+msgid "compare words in the query"
+msgstr "compare words in the query"
+
+msgid "Scale of the x axis: "
+msgstr "Scale of the x axis: "
+
+msgid "linear"
+msgstr "linear"
+
+msgid "logarithmic"
+msgstr "logarithmic"
 
 msgid "Back to search"
 msgstr "Back to search"

@@ -18,16 +18,16 @@
 							<div class="subcorpus_column">
 							{% for option in col %}
 								{% if option.type == "input_text" %}
-									<input type="text" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input" form="search_main" placeholder="{{ option.placeholder|safe }}" title="{{ option.placeholder|safe }}">
+									<input type="text" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) | capitalize }}" title="{{ _('metafield_' + option.name) | capitalize }}">
 								{% elif option.type == "input_number" %}
-									<input type="number" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input" form="search_main" placeholder="{{ option.placeholder|safe }}" title="{{ option.placeholder|safe }}">
+									<input type="number" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) | capitalize }}" title="{{ _('metafield_' + option.name) | capitalize }}">
 								{% elif option.type == "option" %}
-									<div class="switchable_subcorpus_option" data-name="{{ option.name|safe }}" data-value="{{ option.value|safe }}">{{ option.text|safe }}
+									<div class="switchable_subcorpus_option" data-name="{{ option.name|safe }}" data-value="{{ option.value|safe }}">{{ _(option.text)|safe }}
 									</div>
 								{% elif option.type == "separator" %}
 									<hr class="separator subcorpus_separator">
 								{% elif option.type == "header" %}
-									<div class="subcorpus_header">{{ option.value|safe }}</div>
+									<div class="subcorpus_header">{{ _(option.value)|safe }}</div>
 								{% endif %}
 							{% endfor %}
 							</div>

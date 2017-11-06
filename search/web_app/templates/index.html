@@ -163,6 +163,10 @@ var forTheQueryCaption = "{{ _('the query') }}";
 			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Words statistics" id="show_word_stat"><span class="stat_w glyphicon glyphicon-stats"> </span></button>
 			</div>
 			<button type="button" class="btn btn-default btn-info" aria-label="Left Align" value="Search documents" id="search_doc"><span class="subcorpus_selector_link">{{ _('Select subcorpus') }}</span></button>
+			<div class="btn-group">
+			<button type="button" class="btn btn-default" aria-label="Left Align" value="Share this query" id="share_query"><span class="glyphicon glyphicon-send"> </span></button>
+			<button type="button" class="btn btn-default" aria-label="Left Align" value="Load external query" id="load_query"><span class="glyphicon glyphicon-download"> </span></button>
+			</div>
 			{% if debug %}
 				<br>
 				<button value="Search sentences (q)" id="search_sent_query" style="width:200px;">Search sentences (show query)</button>

@@ -168,6 +168,9 @@ $(function() {
 		});
 	});
 	
+	$('#share_query').click(share_query);
+	$('#load_query').click(function () {load_query('n_words=2&n_ana1=any&lang1=adyghe&gr2=s&n_ana2=any&lang2=adyghe&page_size=10&sort=random&viewing_mode=standard&translit=original&input_method=normal&');});
+	
 	load_additional_word_fields();
 	assign_input_events();
 	assign_show_hide();
@@ -526,4 +529,35 @@ function search_if_enter(e) {
 	if (e.keyCode == 13) {
        $('#search_sent').click();        
     }
+}
+
+function share_query() {
+	alert($("#search_main").serialize().replace(/[^=?&]+=(&|$)/g, ''));
+}
+
+function load_query(query) {
+	var pairs = query.split('&');
+	var dictFields = {};
+	$.each(pairs, function(i, pair){
+        var kv = pair.split("=");
+		var key = decodeURIComponent(kv[0]);
+        var value = decodeURIComponent(kv[1]);
+		dictFields[key] = value;
+	});
+	alert(JSON.stringify(dictFields));
+	if (!('n_words' in dictFields)) {
+		return;
+	}
+	$('input.search_input').val('');
+	var curNWords = $('#n_words').val();
+	if (curNWords < dictFields['n_words']) {
+		for (i = 0; i < dictFields['n_words'] - curNWords; i++) {
+			$('#first_word word_plus').click();
+		}
+	}
+	else if (curNWords < dictFields['n_words']) {
+		for (i = 0; i < curNWords - dictFields['n_words']; i++) {
+			$('#first_word word_minus').click();
+		}
+	}
 }

@@ -8,8 +8,8 @@
     "filename",
     "title",
     "author",
-    "year1",
-    "year2",
+    "year_from",
+    "year_to",
     "genre",
     "issue",
     "orth"

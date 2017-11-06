@@ -201,7 +201,7 @@ $(function() {
 			plotObj.html('<p>Nothing found.</p>');
 			return;
 		}
-		var metaField = $('#select_meta_word_stat option:selected').text();
+		var metaField = $('#select_meta_word_stat option:selected').val();
 		if (metaField == '') {
 			return;
 		}
