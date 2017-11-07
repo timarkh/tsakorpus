@@ -88,7 +88,7 @@ $(function() {
 	function display_subcorpus_stats_plot(results) {
 		var nResults = results.length;
 		if (nResults <= 0) {
-			$('#subcorpus_stats_plot').html('<p>Nothing found.</p>');
+			$('#subcorpus_stats_plot').html('<p>' + nothingFoundCaption + '</p>');
 			return;
 		}
 		

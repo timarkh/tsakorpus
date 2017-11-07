@@ -434,6 +434,10 @@
     visibility: visible;
 }
 
+.btn:hover .tooltip_prompt {
+    visibility: visible;
+}
+
 .word_stats_wf {
 	padding-left: 3px;
 	padding-right: 3px;
@@ -885,4 +889,20 @@ svg circle {
 .message {
 	color: #772814;
 	text-shadow: 2px 2px #fff787;
+}
+
+#query_to_share {
+	padding: 20px;
+	font-size: 1.3em;
+	font-family: "Courier New", Courier, monospace;
+	background-color: #e2fff0;
+	border-radius: 5px;
+	border: 2px #618975 solid;
+}
+#query_to_load {
+	padding: 20px;
+	font-size: 1.2em;
+	font-family: "Courier New", Courier, monospace;
+	width: 85%;
+	min-height: 250px;
 }

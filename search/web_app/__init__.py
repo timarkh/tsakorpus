@@ -214,6 +214,11 @@ def change_display_options(query):
         set_session_data('translit', query['translit'])
     else:
         set_session_data('translit', None)
+    if ('random_seed' in query
+            and re.search('^[1-9][0-9]*', query['random_seed']) is not None
+            and 0 < int(query['random_seed']) < 1000000):
+        print(query['random_seed'])
+        set_session_data('seed', int(query['random_seed']))
 
 
 def add_sent_data_for_session(sent, sentData):
@@ -366,6 +371,7 @@ def search_page():
     else:
         inputMethods = None
     return render_template('index.html',
+                           locale=get_locale(),
                            corpus_name=corpus_name,
                            languages=settings['languages'],
                            all_lang_search=allLangSearch,
@@ -376,7 +382,8 @@ def search_page():
                            debug=settings['debug'],
                            subcorpus_selection=settings['search_meta'],
                            max_request_time=settings['query_timeout'] + 1,
-                           locales=settings['interface_languages'])
+                           locales=settings['interface_languages'],
+                           random_seed=get_session_data('seed'))
 
 
 @app.route('/search_sent_query/<int:page>')
@@ -945,7 +952,8 @@ def remove_sensitive_data(hits):
     """
     Remove data that should not be shown to the user, i.e. the ids
     of the sentences (the user can use this information to download 
-    the whole corpus if the sentences are numbered consecutively).
+    the whole corpus if the sentences are numbered consecutively,
+    which is actually not the case, but still).
     Change the hits dictionary, do not return anything.
     """
     if type(hits) != dict or 'hits' not in hits or 'hits' not in hits['hits']:

@@ -198,7 +198,7 @@ $(function() {
 		}
 		var plotObj = $('#word_stats_plot');
 		if (results.length <= 0 || results[0].length <= 0) {
-			plotObj.html('<p>Nothing found.</p>');
+			plotObj.html('<p>' + nothingFoundCaption + '</p>');
 			return;
 		}
 		var metaField = $('#select_meta_word_stat option:selected').val();
@@ -231,7 +231,7 @@ $(function() {
 		lastFreqData = results;
 		var plotObj = $('#word_freq_rank_stats_plot');
 		if (results.length <= 0 || results[0].length <= 0) {
-			plotObj.html('<p>Nothing found.</p>');
+			plotObj.html('<p>' + nothingFoundCaption + '</p>');
 			return;
 		}
 		var maxHeight = 0

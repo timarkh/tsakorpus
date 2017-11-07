@@ -168,9 +168,6 @@ $(function() {
 		});
 	});
 	
-	$('#share_query').click(share_query);
-	$('#load_query').click(function () {load_query('n_words=2&n_ana1=any&lang1=adyghe&gr2=s&n_ana2=any&lang2=adyghe&page_size=10&sort=random&viewing_mode=standard&translit=original&input_method=normal&');});
-	
 	load_additional_word_fields();
 	assign_input_events();
 	assign_show_hide();
@@ -293,6 +290,9 @@ function assign_input_events() {
 	$("span.locale").unbind('click');
 	$(".search_input").unbind('on');
 	$("#viewing_mode").unbind('change');
+	$('#share_query').unbind('click');
+	$('#load_query').unbind('click');
+	$('#query_load_ok').unbind('click');
 	$("span.word_plus").click(add_word_inputs);
 	$("span.word_minus").click(del_word_inputs);
 	$("span.word_expand").click(expand_word_input);
@@ -306,6 +306,9 @@ function assign_input_events() {
 	$("span.locale").click(change_locale);
 	$(".search_input").on("keydown", search_if_enter);
 	$("#viewing_mode").change(toggle_interlinear);
+	$('#share_query').click(share_query);
+	$('#load_query').click(show_load_query);
+	$('#query_load_ok').click(load_query);
 }
 
 function assign_show_hide() {
@@ -411,9 +414,9 @@ function add_word_relations(e) {
 	if (word_num <= 0) { return; }
 	var nrels = parseInt($(e.target).attr('data-nrels'));
 	$(e.target).attr('data-nrels', nrels + 1);
-	word_rel_html = '<div class="word_rel">' + distToWordCaption + '<input type="number" class="search_input distance_input" name="word_rel_' + word_num + '_' + nrels + '" value="' + (word_num - 1).toString() + '"><br>';
-	word_rel_html += fromCaption + '<input type="number" class="search_input" name="word_dist_from_' + word_num + '_' + nrels + '" value="1"><br>';
-	word_rel_html += toCaption + '<input type="number" class="search_input" name="word_dist_to_' + word_num + '_' + nrels + '" value="1"> ';
+	word_rel_html = '<div class="word_rel">' + distToWordCaption + '<input type="number" class="search_input distance_input" name="word_rel_' + word_num + '_' + nrels + '" id="word_rel_' + word_num + '_' + nrels + '" value="' + (word_num - 1).toString() + '"><br>';
+	word_rel_html += fromCaption + '<input type="number" class="search_input" name="word_dist_from_' + word_num + '_' + nrels + '" id="word_dist_from_' + word_num + '_' + nrels + '" value="1"><br>';
+	word_rel_html += toCaption + '<input type="number" class="search_input" name="word_dist_to_' + word_num + '_' + nrels + '" id="word_dist_to_' + word_num + '_' + nrels + '" value="1"> ';
 	word_rel_html += '</div>';
 	word_rel_div = $.parseHTML(word_rel_html);
 	$("#wsearch_" + word_num).find(".word_search_l").append(word_rel_div);
@@ -532,32 +535,77 @@ function search_if_enter(e) {
 }
 
 function share_query() {
-	alert($("#search_main").serialize().replace(/[^=?&]+=(&|$)/g, ''));
+	var query = $("#search_main").serialize().replace(/[^=?&]+=(&|$)/g, '');
+	$('#query_to_share').html(query);
+	$('#query_share_dialogue').modal('toggle');
 }
 
-function load_query(query) {
+function show_load_query() {
+	$('#query_load_dialogue').modal('toggle');
+	$('#query_to_load').val('');
+}
+
+function clear_all_search_fields() {
+	$('input.search_input').val('');
+	$('#distance_strict').prop('checked', false);
+	$('#precise').prop('checked', false);
+}
+
+function load_query() {
+	var query = $('#query_to_load').val().trim();
+	$('#query_load_dialogue').modal('toggle');
+	if (query.length <= 0) { return; }
 	var pairs = query.split('&');
 	var dictFields = {};
+	var word_rels = [];
+	var neg_queries = [];
+	rxWordRel = /word_rel_([0-9]+)/g;
+	rxNegQuery = /negq([0-9]+)/g;
 	$.each(pairs, function(i, pair){
+		if (pair.length <= 2) { return; }
         var kv = pair.split("=");
 		var key = decodeURIComponent(kv[0]);
         var value = decodeURIComponent(kv[1]);
+		var negQueryMatch = rxNegQuery.exec(key);
+		if (negQueryMatch != null && negQueryMatch.length > 1 && value == 'on') {
+			neg_queries.push(negQueryMatch[1]);
+			return;
+		}
+		wordRelMatch = rxWordRel.exec(key);
+		if (wordRelMatch != null && wordRelMatch.length > 1 && $('#' + key).length <= 0) {
+			word_rels.push(wordRelMatch[1]);
+		}
 		dictFields[key] = value;
 	});
-	alert(JSON.stringify(dictFields));
 	if (!('n_words' in dictFields)) {
 		return;
 	}
-	$('input.search_input').val('');
+	clear_all_search_fields();
 	var curNWords = $('#n_words').val();
-	if (curNWords < dictFields['n_words']) {
-		for (i = 0; i < dictFields['n_words'] - curNWords; i++) {
-			$('#first_word word_plus').click();
+	if (curNWords < parseInt(dictFields['n_words'])) {
+		for (var i = 0; i < parseInt(dictFields['n_words']) - curNWords; i++) {
+			$('#first_word .word_plus').trigger('click');
 		}
 	}
-	else if (curNWords < dictFields['n_words']) {
-		for (i = 0; i < curNWords - dictFields['n_words']; i++) {
-			$('#first_word word_minus').click();
+	else if (curNWords > parseInt(dictFields['n_words'])) {
+		for (var i = 0; i < curNWords - parseInt(dictFields['n_words']); i++) {
+			$('#wsearch_' + (curNWords - i) + ' .word_minus').trigger('click');
 		}
 	}
+	$.each(word_rels, function (i, wordNum) {
+		$('#wsearch_' + wordNum + ' .add_rel').trigger('click');
+	});
+	$.each(neg_queries, function (i, wordNum) {
+		$('#wsearch_' + wordNum + ' .neg_query').trigger('click');
+	});
+	$.each(dictFields, function (field, value) {
+		if ($('#' + field).length > 0 && $('#' + field).attr('type') == 'checkbox') {
+			if (value == 'on') {
+				$('#' + field).prop('checked', true);
+			}
+			return;
+		}
+		$('#' + field).val(value);
+	});
+	
 }

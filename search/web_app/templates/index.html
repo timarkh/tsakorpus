@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="{{ locale }}">
 <head>
 <title>{{ _('Corpus search page') }}</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -22,6 +22,7 @@ var toCaption = "{{ _('to ') }}";
 var selectGrammTagsCaption = "{{ _('Select combinations of tags') }}";
 var selectGlossCaption = "{{ _('Select glosses') }}";
 var forTheQueryCaption = "{{ _('the query') }}";
+var nothingFoundCaption = "{{ _('Nothing found.') }}";
 </script>
 <!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,400i" rel="stylesheet"> -->
 {% if media %}
@@ -51,6 +52,7 @@ var forTheQueryCaption = "{{ _('the query') }}";
 	<div class="slide">
 		<form id="search_main">
 		<input type="hidden" name="n_words" id="n_words" value="1">
+		<input type="hidden" name="random_seed" id="random_seed" value={{ random_seed }}>
 		<div class="vertical_nav_tabs">
             <ul class="nav nav-tabs tabs-left vertical-text">
                 <li class="active" id="word_search_li"><a href="#word_search_tab" data-toggle="tab">{{ _('Query') }}</a></li>
@@ -102,7 +104,7 @@ var forTheQueryCaption = "{{ _('the query') }}";
 						</div>
 					</div>
 					<br>
-					{{ _('Full-text search:') }} <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise"> {{ _('Precise match') }}<br>
+					{{ _('Full-text search:') }} <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise" id="precise"> {{ _('Precise match') }}<br>
 				</div>
 		
 				<div class="tab-pane" id="display_options_tab">
@@ -110,7 +112,7 @@ var forTheQueryCaption = "{{ _('the query') }}";
 						<h3 id="h3_options">{{ _('Additional search and display options') }}</h3>
 						<div class="options_column">
 							{{ _('Results per page:') }} <input type="number" name="page_size" id="page_size" value="10" class="search_input distance_input"><br>
-							{{ _('Sorting:') }} <select name="sort" id="sort_select" class="search_input">
+							{{ _('Sorting:') }} <select name="sort" id="sort" class="search_input">
 								<option value="random" selected>{{ _('random') }}</option>
 								<option value="wf">{{ _('by word (word queries)') }}</option>
 								<option value="lemma">{{ _('by lemma (word queries)') }}</option>
@@ -127,7 +129,7 @@ var forTheQueryCaption = "{{ _('the query') }}";
 							<option value="all">all</option>
 							{% endif %}
 							</select><br> -->
-							<input type="checkbox" name="distance_strict"> {{ _('Word distance requirements are strict') }}<br>
+							<input type="checkbox" name="distance_strict" id="distance_strict"> {{ _('Word distance requirements are strict') }}<br>
 						</div>
 						<div class="options_column">
 						{{ _('Viewing mode:') }} <select name="viewing_mode" id="viewing_mode" class="search_input">
@@ -164,8 +166,8 @@ var forTheQueryCaption = "{{ _('the query') }}";
 			</div>
 			<button type="button" class="btn btn-default btn-info" aria-label="Left Align" value="Search documents" id="search_doc"><span class="subcorpus_selector_link">{{ _('Select subcorpus') }}</span></button>
 			<div class="btn-group">
-			<button type="button" class="btn btn-default" aria-label="Left Align" value="Share this query" id="share_query"><span class="glyphicon glyphicon-send"> </span></button>
-			<button type="button" class="btn btn-default" aria-label="Left Align" value="Load external query" id="load_query"><span class="glyphicon glyphicon-download"> </span></button>
+			<button type="button" class="btn btn-default" aria-label="Left Align" value="{{ _('Share this query') }}" id="share_query"><span class="glyphicon glyphicon-send"><span class="tooltip_prompt">{{ _('Share this query') }}</span></span></button>
+			<button type="button" class="btn btn-default" aria-label="Left Align" value="{{ _('Load external query') }}" id="load_query"><span class="glyphicon glyphicon-download"><span class="tooltip_prompt">{{ _('Load external query') }}</span></span></button>
 			</div>
 			{% if debug %}
 				<br>
@@ -236,6 +238,7 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 	</div>
 </div>
 
+{% include "query_share_load.html" %}
 <script src="https://d3js.org/d3.v4.min.js"></script>
 {% include "subcorpus_selection.html" %}
 {% include "word_stats.html" %}
