@@ -13,7 +13,7 @@ The configuration files are ``corpus.json`` and ``categories.json``. The latter 
 
 * ``meta_fields`` -- the list of metafield names. The values for the listed fields should appear in the metadata file in the same order (value for the first field in the second column, and so on).
 
-* ``meta_files_ext`` -- boolean value that determines whether the filenames in the metadata file have extensions.dʼ
+* ``meta_files_ext`` -- boolean value that determines whether the filenames in the metadata file have extensions.
 
 * ``meta_files_dir`` -- boolean value that determines whether the filenames in the metadata file have full paths starting from ``src_convertors/corpus/%corpus_name%/%ext%``. If it is set to false, it is assumed that the names of the source files are unique regardless of where they exist within the subtree.
 
@@ -21,7 +21,7 @@ The configuration files are ``corpus.json`` and ``categories.json``. The latter 
 
 * ``parsed_wordlist_filename`` -- the name of the file with the morphologically annotated word list (for the converters which accept such a file).
 
-* ``parsed_wordlist_format`` -- the format of the annotated word list (currently, only the "xml_rnc" option is available, which means a list of XML representated words in the format used in Russian National Corpus).
+* ``parsed_wordlist_format`` -- the format of the annotated word list (currently, only the "xml_rnc" option is available, which means a list of XML-represented words in the format used in Russian National Corpus).
 
 * ``speaker_meta_filename`` -- the name of the JSON file with metadata for individual speakers (for the ELAN convertor). The file should contain a dictionary where the keys are the codes of the speakers and the values are dictionaries with their metadata (fields and plain string/integer values).
 
@@ -48,5 +48,5 @@ There are several source convertors for different input formats (see ``pipeline.
 
 * Plain text questonnaire convertor: ``txt_questionnaires2json.py``.
 
-When you are ready with the configuration and the source files are stored in the relevant folder, all you have to do is to run the corresponding Python file and wait until it terminates.
+When you are ready with the configuration and the source files are stored in the relevant folder, all you have to do is to run the corresponding Python file and wait until it terminates. If your corpus consists of several parts stored in different formats, you may process them one by one with different source convertors and put the resulting JSONs in one place.
 
