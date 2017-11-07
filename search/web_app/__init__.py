@@ -217,7 +217,6 @@ def change_display_options(query):
     if ('random_seed' in query
             and re.search('^[1-9][0-9]*', query['random_seed']) is not None
             and 0 < int(query['random_seed']) < 1000000):
-        print(query['random_seed'])
         set_session_data('seed', int(query['random_seed']))
 
 
@@ -870,6 +869,7 @@ def find_sentences_json(page=0):
     if 'n_words' in query:
         nWords = int(query['n_words'])
 
+    docIDs = None
     if 'doc_ids' not in query and 'sent_ids' not in query:
         docIDs = subcorpus_ids(query)
         if docIDs is not None:
@@ -945,6 +945,8 @@ def find_sentences_json(page=0):
             and 'hits' in hits and 'hits' in hits['hits']):
         for hit in hits['hits']['hits']:
             hit['toggled_on'] = sc.qp.wr.check_sentence(hit, wordConstraints, nWords=nWords)
+    if docIDs is not None and len(docIDs) > 0:
+        hits['subcorpus_enabled'] = True
     return hits
 
 
@@ -1000,6 +1002,9 @@ def search_sent(page=-1):
     hitsProcessed['page_size'] = get_session_data('page_size')
     hitsProcessed['languages'] = settings['languages']
     hitsProcessed['media'] = settings['media']
+    hitsProcessed['subcorpus_enabled'] = False
+    if 'subcorpus_enabled' in hits:
+        hitsProcessed['subcorpus_enabled'] = True
     sync_page_data(hitsProcessed['page'], hitsProcessed)
 
     return render_template('result_sentences.html', data=hitsProcessed)

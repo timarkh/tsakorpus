@@ -1,5 +1,6 @@
 ﻿var curClickedObj = null;
 var searchType = 'none';
+var excludeDocs = [];
 
 function print_json(results) {
 	//alert("success" + JSON.stringify(results));

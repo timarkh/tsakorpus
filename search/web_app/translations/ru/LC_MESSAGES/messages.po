@@ -501,6 +501,9 @@ msgstr "Отмена"
 msgid "Word statistics header"
 msgstr "Статистика по словоформам"
 
+msgid "Word statistics"
+msgstr "Статистика по словоформам"
+
 msgid "Word statistics for "
 msgstr "Статистика для "
 
@@ -533,6 +536,9 @@ msgstr "Состав выбранного подкорпуса"
 
 msgid "Clear subcorpus"
 msgstr "Очистить подкорпус"
+
+msgid "You are searching in a subcorpus."
+msgstr "Вы ищете в подкорпусе."
 
 msgid "The search was not finished due to the query timeout. You only see partial results."
 msgstr "Поиск не был завершён, потому что истекло время ожидания. Показаны не все результаты."

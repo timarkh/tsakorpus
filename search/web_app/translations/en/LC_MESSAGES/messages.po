@@ -500,6 +500,9 @@ msgstr "Cancel"
 msgid "Word statistics header"
 msgstr "Word statistics"
 
+msgid "Word statistics"
+msgstr "Word statistics"
+
 msgid "Word statistics for "
 msgstr "Word statistics for "
 
@@ -532,6 +535,9 @@ msgstr "Selected subcorpus composition"
 
 msgid "Clear subcorpus"
 msgstr "Clear subcorpus"
+
+msgid "You are searching in a subcorpus."
+msgstr "You are searching in a subcorpus."
 
 msgid "The search was not finished due to the query timeout. You only see partial results."
 msgstr "The search was not finished due to the query timeout. You only see partial results."

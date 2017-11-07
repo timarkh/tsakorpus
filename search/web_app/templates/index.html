@@ -2,14 +2,15 @@
 <html lang="{{ locale }}">
 <head>
 <title>{{ _('Corpus search page') }}</title>
+<link rel="stylesheet" type="text/css" href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="static/css/search.css">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type='text/javascript' src='static/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
 <script type='text/javascript' src='static/js/result_parser.js'></script>
 <script type='text/javascript' src='static/js/json_loaders.js'></script>
-<link rel="stylesheet" type="text/css" href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="static/css/search.css">
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script type='text/javascript' src='static/js/query_share_load.js'></script>
 <script type='text/javascript'>
 var max_request_time={{ max_request_time }};
 var moreFieldsCaption = "{{ _('more_fields') }}";
@@ -94,11 +95,11 @@ var nothingFoundCaption = "{{ _('Nothing found.') }}";
 								{% endif %}
 							</div>
 							<div class="word_search_r">
-								<span class="neg_query glyphicon glyphicon-off" aria-hidden="true"><span class="tooltip_prompt">{{ _('negative_query') }}</span></span><br>
-								<span class="word_plus glyphicon glyphicon-plus-sign" aria-hidden="true"><span class="tooltip_prompt">{{ _('add_word') }}</span></span><br>
+								<span class="neg_query glyphicon glyphicon-off" aria-label="{{ _('negative_query') }}" aria-hidden="true"><span class="tooltip_prompt">{{ _('negative_query') }}</span></span><br>
+								<span class="word_plus glyphicon glyphicon-plus-sign" aria-label="{{ _('add_word') }}" aria-hidden="true"><span class="tooltip_prompt">{{ _('add_word') }}</span></span><br>
 								<span class="add_minus_stub"></span>
 								<span class="add_distance_stub"></span>
-								<span class="word_expand glyphicon glyphicon-chevron-down" aria-hidden="true"><span class="tooltip_prompt">{{ _('more_fields') }}</span></span><br>
+								<span class="word_expand glyphicon glyphicon-chevron-down" aria-label="{{ _('more_fields') }}" aria-hidden="true"><span class="tooltip_prompt">{{ _('more_fields') }}</span></span><br>
 								<input type="checkbox" class="hidden_input neg_query_checkbox" name="negq1" id="negq1" onclick="negative_query();">
 							</div>
 						</div>
@@ -120,15 +121,7 @@ var nothingFoundCaption = "{{ _('Nothing found.') }}";
 								{% if debug %}
 								<option value="">{{ _('no sorting') }}</option>
 								{% endif %}
-							</select><br><!--
-							{{ _('Language/tier:') }} <select name="lang" id="lang" class="search_input">
-							{% for lang in languages %}
-								<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
-							{% endfor %}
-							{% if all_lang_search %}
-							<option value="all">all</option>
-							{% endif %}
-							</select><br> -->
+							</select><br>
 							<input type="checkbox" name="distance_strict" id="distance_strict"> {{ _('Word distance requirements are strict') }}<br>
 						</div>
 						<div class="options_column">
@@ -159,15 +152,15 @@ var nothingFoundCaption = "{{ _('Nothing found.') }}";
 		<br>
 		<div class="search_buttons">
 			<div class="btn-group">
-			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Search sentences" id="search_sent">{{ _('Search sentences') }}</button>
-			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Search words" id="search_word" style="padding-right: 5px;">{{ _('Search words') }}</button>
-			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Search lemmata" id="search_lemma" style="padding-left: 5px;">{{ _('Search lemmata') }}</button>
-			<button type="button" class="btn btn-default btn-primary" aria-label="Left Align" value="Words statistics" id="show_word_stat"><span class="stat_w glyphicon glyphicon-stats"> </span></button>
+			<button type="button" class="btn btn-default btn-primary" aria-label="{{ _('Search sentences') }}" value="{{ _('Search sentences') }}" id="search_sent">{{ _('Search sentences') }}</button>
+			<button type="button" class="btn btn-default btn-primary" aria-label="{{ _('Search words') }}" value="{{ _('Search words') }}" id="search_word" style="padding-right: 5px;">{{ _('Search words') }}</button>
+			<button type="button" class="btn btn-default btn-primary" aria-label="{{ _('Search lemmata') }}" value="{{ _('Search lemmata') }}" id="search_lemma" style="padding-left: 5px;">{{ _('Search lemmata') }}</button>
+			<button type="button" class="btn btn-default btn-primary" aria-label="{{ _('Words statistics') }}" value="{{ _('Words statistics') }}" id="show_word_stat"><span class="stat_w glyphicon glyphicon-stats"> </span></button>
 			</div>
-			<button type="button" class="btn btn-default btn-info" aria-label="Left Align" value="Search documents" id="search_doc"><span class="subcorpus_selector_link">{{ _('Select subcorpus') }}</span></button>
+			<button type="button" class="btn btn-default btn-info" aria-label="{{ _('Select subcorpus') }}" value="{{ _('Select subcorpus') }}" id="search_doc"><span class="subcorpus_selector_link">{{ _('Select subcorpus') }}</span></button>
 			<div class="btn-group">
-			<button type="button" class="btn btn-default" aria-label="Left Align" value="{{ _('Share this query') }}" id="share_query"><span class="glyphicon glyphicon-send"><span class="tooltip_prompt">{{ _('Share this query') }}</span></span></button>
-			<button type="button" class="btn btn-default" aria-label="Left Align" value="{{ _('Load external query') }}" id="load_query"><span class="glyphicon glyphicon-download"><span class="tooltip_prompt">{{ _('Load external query') }}</span></span></button>
+			<button type="button" class="btn btn-default" aria-label="{{ _('Share this query') }}" value="{{ _('Share this query') }}" id="share_query"><span class="glyphicon glyphicon-send"><span class="tooltip_prompt">{{ _('Share this query') }}</span></span></button>
+			<button type="button" class="btn btn-default" aria-label="{{ _('Load external query') }}" value="{{ _('Load external query') }}" id="load_query"><span class="glyphicon glyphicon-download"><span class="tooltip_prompt">{{ _('Load external query') }}</span></span></button>
 			</div>
 			{% if debug %}
 				<br>
@@ -242,7 +235,7 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 <script src="https://d3js.org/d3.v4.min.js"></script>
 {% include "subcorpus_selection.html" %}
 {% include "word_stats.html" %}
-
+<script type='text/javascript' src='static/js/select_subcorpus.js'></script>
 </body>
 {% if media %}
 	<script>

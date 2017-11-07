@@ -1,4 +1,4 @@
-$(function() {
+
 	function assign_subcorpus_events() {
 		$('.switchable_subcorpus_option').unbind('click');
 		$('#subcorpus_selector_ok').unbind('click');
@@ -22,6 +22,16 @@ $(function() {
 		var docTR = $(e.currentTarget).parent().parent();
 		docTR.toggleClass('context_off');
 		docID = docTR.attr('id').substring(3);
+		exclude_doc(docID);
+	}
+	
+	function exclude_doc(docID) {
+		if ($.inArray(docID, excludeDocs) > -1) {
+			excludeDocs = jQuery.grep(excludeDocs, function (value) { return value != docID; });
+		}
+		else {
+			excludeDocs.push(docID);
+		}
 		$.ajax({
 			url: "toggle_doc/" + docID,
 			dataType : "json",
@@ -177,7 +187,7 @@ $(function() {
 	
 	function close_subcorpus_selector() {
 		$('.nav-tabs a[href="#select_subcorpus_parameters"]').tab('show');
-		$('#subcorpus_selector').modal('toggle');
+		$('#subcorpus_selector').modal('hide');
 	}
 	
 	function clear_subcorpus() {
@@ -187,6 +197,7 @@ $(function() {
 		$('.subcorpus_input').each(function (index) {
 			$(this).val('');
 		});
+		excludeDocs = [];
 		$.ajax({
 			url: "clear_subcorpus",
 			data: $("#search_main").serialize(),
@@ -199,4 +210,4 @@ $(function() {
 	}
 
 	assign_subcorpus_events();
-});
+
