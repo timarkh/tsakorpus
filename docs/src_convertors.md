@@ -5,7 +5,7 @@ This document describes how to run the srcipts that convert files in various inp
 If you want to convert your corpus named ``%corpus_name%`` with one of the source convertors, you have to create a directory ``src_convertors/corpus/%corpus_name%``. All source files have to have the same type and extension. The source files should be placed in ``src_convertors/corpus/%corpus_name%/%ext%``, where ``%ext`` is their extension. This directory can have any number of subdirectories of arbitrary depth. The configuration files are located in ``src_convertors/conf`` and ``src_convertors/corpus/%corpus_name%/conf``. Whenever the two configuration files have the same fields, the one located inside the corpus directory overrides the general one. After the files have been converted, the resulting JSON files will be located in ``src_convertors/corpus/%corpus_name%/json``. If you run disambiguation after that, the disambiguated JSON files will be located in ``src_convertors/corpus/%corpus_name%/json_disamb``. If you have a media-aligned corpus, the source media files have to be located next to the corresponding ELAN or Exmaralda files (and referenced there). The resulting media files (compressed and split into pieces) will appear in ``src_convertors/corpus/%corpus_name%/media``.
 
 ### Configuration files
-The configuration files are ``corpus.json`` and ``categories.json``. The latter describes which tags correspond to which grammatical categories and has the same format as ``categories.json`` in the main configuration directory (see ``configuration.md``). The ``corpus.json`` has slightly different set of fields compared to the homonymous file in the main configuration directory:
+The configuration files are ``corpus.json`` and ``categories.json``. The latter describes which tags correspond to which grammatical categories and has the same format as ``categories.json`` in the main configuration directory (see ``configuration.md``). The ``corpus.json`` has slightly different set of fields compared to the eponymous file in the main configuration directory:
 
 * ``corpus_name`` -- the name of the corpus. During source conversion, this parameter is only used to determine the path to the corpus files. This field should be present in the general configuration file (``src_convertors/conf/corpus.json``).
 
@@ -46,6 +46,8 @@ There are several source convertors for different input formats (see ``pipeline.
 
 * ELAN media-aligned files convertor: ``eaf2json.py``.
 
+* Fieldworks FLEX glossed texts convertor: ``xml_flex2json.py``.
+
 * Plain text questionnaire convertor: ``txt_questionnaires2json.py``.
 
 When you are ready with the configuration and the source files are stored in the relevant folder, all you have to do is to run the corresponding Python file and wait until it terminates. If your corpus consists of several parts stored in different formats, you may process them one by one with different source convertors and put the resulting JSONs in one place.
@@ -54,15 +56,15 @@ When you are ready with the configuration and the source files are stored in the
 Convertors that read raw text (from .txt, .eaf and so on) allow you to have a separate file with morphological (or any other word-level) annotation for all or some of the word forms. The only available option for now is xml_rnc. An annotated word list in this format is a plain text file where each line describes one unique word form. The lines should look as follows:
 
 ```
-<w><ana lex="..." gr="..." ...></ana>[<ana..../ana>]*wordform</w>
+<w><ana lex="..." gr="..." ...></ana>(<ana....></ana>)*wordform</w>
 ```
 
-Each word form starts with ``<w>`` and ends with ``</w>``. First, it has an analysis in the ``<ana>`` tag, or a concatenated list of possible analyses. The annotations is stored as attributes of the ``<ana>`` element. There are four reserved attribute names: ``lex`` for lemma, ``gr`` for comma-separated list of grammatical tags, ``parts`` for word segmentation into morphemes, and ``gloss`` for the glossing. All these fields are optional. If you have glossing, the number of morphemes should be equal to the number of glosses (hence, no hyphens in the stem are allowed). Apart from that, you can have any number of other attributes, e.g. ``trans_en`` for an English translation of the word. The actual word form must be located at the end, after the analyses.
+Each word form starts with ``<w>`` and ends with ``</w>``. At the beginning, it has an analysis in an ``<ana>`` tag, or a concatenated list of possible analyses. The annotations is stored as attributes of the ``<ana>`` element. There are four reserved attribute names: ``lex`` for lemma, ``gr`` for comma-separated list of grammatical tags, ``parts`` for word segmentation into morphemes, and ``gloss`` for the glossing. All these fields are optional. If you have glossing, the number of morphemes should be equal to the number of glosses (hence, no hyphens in the stem are allowed). Apart from that, you can have any number of other attributes, e.g. ``trans_en`` for an English translation of the word. The actual word form must be located at the end, after the analyses.
 
 ### Disambiguation
 If you choose to disambiguate your files using a Constraint Grammar file, they will be disambiguated after the primary conversion to JSON is complete. Your JSON files will be translated into CG format and stored in the ``cg`` directory, which will have language subdirectories. Multilanguage files will be split abd sentences in different languages will end up in different subdirectories. CG will process these files and put them to ``cg_disamb``. When this process is finished, the disambiguated files will be assembled, transformed back into JSON and stored in the ``json_disamb`` directory.
 
-Disambiguation requires that you have a [CG3 executable](https://visl.sdu.dk/cg3/chunked/installation.html) and its directory is in the system PATH variable.
+Disambiguation requires that you have a [CG3 executable](https://visl.sdu.dk/cg3/chunked/installation.html) and its directory be in the system PATH variable.
 
 ### ELAN files conversion (eaf2json)
 Currently, the convertor only supports ELAN files that may have translation/comment tiers, but do not have morphological annotation (such annotation can be added to the texts with the help of a parsed word list, see above). Since text in different tiers belongs to different speakers and languages, it is important that you carefully describe where is what. First, all tiers should have the "participant" attribute filled in with the code of the speaker. The codes should be explained in the speaker metadata file whose name is specified by the ``speaker_meta_filename`` parameter. Here is an example of how such a file could look like:
@@ -89,3 +91,25 @@ Second, tier types should be consistent throughout your corpus. If you have tran
 * ``tier_languages`` -- a dictionary where keys are the names of the tier types (listed in the above two arrays) and the values are the names of their languages.
 
 The source audio/video files will be split into small pieces with [ffmpeg](https://www.ffmpeg.org/). You have to have it installed, and its directory should be in the system PATH variable.
+
+### Fieldworks FLEX files conversion (flex2json)
+To convert your FLEX database, you first have to export it using the "Verifiable generic XML" option. When exporting, the "Interlinear texts" section should be active, the "Analyze" tab should be open, and all relevant annotation tiers should be switched on and visible.
+
+There are several problems with Fieldworks files. First, XMLs coming from different versions of Fieldworks look differently. Second, the exported XML does not have any connection to the dictionary (there should be one, but it does not work as of now), so any dictionary information not present in the interlinear will be lost. Third, Fieldworks does not have the lemma concept, so either you will have stems instead of lemmata, or you will have to somehow reconstruct lemmata from stems and grammatical information yourself. Fourth, all inflectional morphological information is stored in the glosses, so if some category is not overtly marked (which is common for e.g. singular, nominative/absolutive or imperative) and you do not have null morphemes, you will not be able to search for it unless you reconstruct it.
+
+Tsakorpus FLEX convertor addresses the first problem by using flexible data extraction that was tested on different kinds of XML. Nevertheless, I cannot guarantee that it will work with any FLEX XML. I do not have any solution for second and third problems. The fourth problem can be solved by writing a set of rules which will allow the convertor to reconstruct hidden categories.
+
+You can create several files with rules in the ``corpus/%corpus_name%/conf`` directory:
+
+* ``posRules.txt``. This is a tab-delimited file where each line consists of two columns: a part-of-speech tag used in FLEX and a tag you want to replace it with in the online version of your corpus. All tags that do not have a replacement will be left as is.
+
+* ``gramRules.txt``. This is a text file with rules that explain how to reconstruct grammatical tags from the glosses. Each rule has two part separated by `` -> ``. The right-hand part is the reconstructed tag or comma-separated set of tags, and the left-hand part is the condition under which it should be added to a word. The condition must describe a combination of glosses and part-of-speech tags. It can be simply a single gloss/tag (written as is), or a regexp that should have a match somewhere inside the glossing (written in double quotes), or a boolean expression which can use brackets, | for disjunction, & for conjunction, ~ for negation and expressions of two previous kinds. Here are several examples with comments:
+```
+1Pl -> 1,pl                   # if the word has a gloss 1Pl, add "1" and "pl" to the set of grammatical tags
+"Poss\.1(-Acc-Sg)?$" -> 1sg   # if the word has a gloss Poss.1, either followed by glosses Acc and Sg, or at the end of the word, add the tag 1sg
+[N]&~[Pl|Acc.Pl] -> sg        # if the word has a tag N and has neither Pl nor Acc.Pl gloss, add the tag sg.
+```
+
+If no such rules are present, each gloss will be transformed into an eponymous lowercase tag.
+
+

@@ -17,6 +17,8 @@ You can generate JSON files yourself, or use one of the several convertors that 
 
 * ELAN media-aligned files convertor (``eaf2json.py``). It processes a corpus of media-aligned files in ELAN format. The files can have translation of the segments into multiple languages or sentence-level comments, but are not expected to be morphologically analyzed. As in the case of the Plain text convertor, this convertor takes a separate XML wordlist with analyses for all or some of the tokens in the corpus, and a separate CSV file with metadata.
 
+* Fieldworks FLEX glossed texts convertor: ``xml_flex2json.py``. It processes an XML file with the corpus exported from FLEX. Additionally, it can use user-defined rules for adding grammatical tags (e.g. for categories that do not have overt marking and thus are absent from the glosses).
+
 * Plain text questonnaire convertor (``txt_questionnaires2json.py``). This is an ad hoc plain text convertor for Beserman Udmurt files that contain single usage examples from the dictionary together with their translations.
 
 Before you run a convertor, you have to adjust settings in the ``src_convertors/conf`` directory and put your source corpus files to the ``src_convertors/corpus/%corpus_name%`` directory. See src_convertors.md for further details.
