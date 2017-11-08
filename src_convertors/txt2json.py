@@ -98,6 +98,7 @@ class Txt2JSON:
                 if i >= len(metaValues):
                     break
                 if fieldName == 'filename':
+                    metaValues[i] = metaValues[i].replace('\\', '/')
                     if not self.corpusSettings['meta_files_case_sensitive']:
                         metaValues[i] = metaValues[i].lower()
                     self.meta[metaValues[i]] = curMetaDict
@@ -130,6 +131,8 @@ class Txt2JSON:
         curMeta = {'filename': fname}
         if not self.corpusSettings['meta_files_dir']:
             fname2check = self.rxStripDir.sub('', fname2check)
+        elif fname2check.startswith(os.path.join(self.corpusSettings['corpus_dir'], self.srcExt)):
+            fname2check = fname2check[len(os.path.join(self.corpusSettings['corpus_dir'], self.srcExt)) + 1:].replace('\\', '/')
         if not self.corpusSettings['meta_files_ext']:
             fname2check = self.rxStripExt.sub('', fname2check)
         if not self.corpusSettings['meta_files_case_sensitive']:

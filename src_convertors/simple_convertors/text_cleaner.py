@@ -21,6 +21,15 @@ class TextCleaner:
     rxNonstandardQuotesL = re.compile('[“]', flags=re.DOTALL)
     rxNonstandardQuotesR = re.compile('[”]', flags=re.DOTALL)
 
+    rxCyrISmall = re.compile('(?<=[Ѐ-ԧ])i|i(?=[Ѐ-ԧ])')
+    rxCyrIBig = re.compile('(?<=[Ѐ-ԧ])I|I(?=[Ѐ-ԧ])')
+    rxCyrAeSmall = re.compile('(?<=[Ѐ-ԧ])æ|æ(?=[Ѐ-ԧ])')
+    rxCyrAeBig = re.compile('(?<=[Ѐ-ԧ])Æ|Æ(?=[Ѐ-ԧ])')
+    rxCyrSchwaSmall = re.compile('(?<=[Ѐ-ԧ])[ǝə]|[ǝə](?=[Ѐ-ԧ])')
+    rxCyrSchwaBig = re.compile('(?<=[Ѐ-ԧ])Ə|Ə(?=[Ѐ-ԧ])')
+    rxCyrHSmall = re.compile('(?<=[Ѐ-ԧ])h|h(?=[Ѐ-ԧ])')
+    rxCyrHBig = re.compile('(?<=[Ѐ-ԧ])H|H(?=[Ѐ-ԧ])')
+
     def __init__(self, settings):
         self.settings = copy.deepcopy(settings)
 
@@ -61,8 +70,20 @@ class TextCleaner:
         return text
 
     def clean_other(self, text):
-        # for example, in Udmurt:
-        # text = text.replace('ü', 'ӥ')
+        if self.settings['languages'][0] == 'udmurt':
+            text = text.replace('ü', 'ӥ')
+        if self.settings['languages'][0] in ['ukrainian', 'kazakh', 'komi']:
+            text = self.rxCyrISmall.sub('і', text)
+            text = self.rxCyrIBig.sub('І', text)
+        if self.settings['languages'][0] in ['kazakh', 'tatar', 'bashkir', 'kalmyk']:
+            text = self.rxCyrHSmall.sub('һ', text)
+            text = self.rxCyrHBig.sub('Һ', text)
+        if self.settings['languages'][0] in ['kazakh', 'tatar', 'bashkir']:
+            text = self.rxCyrSchwaSmall.sub('ә', text)
+            text = self.rxCyrSchwaBig.sub('Ә', text)
+        if self.settings['languages'][0] in ['ossetic', 'iron', 'digor']:
+            text = self.rxCyrAeSmall.sub('ӕ', text)
+            text = self.rxCyrAeBig.sub('Ӕ', text)
         text = text.replace(u'…', u'...')
         text = text.replace(u'\\', u'/')
         return text
