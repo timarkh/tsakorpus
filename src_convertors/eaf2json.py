@@ -38,21 +38,6 @@ class Eaf2JSON(Txt2JSON):
         f.close()
         return speakerMeta
 
-    def get_meta(self, fname):
-        fname2check = fname
-        curMeta = {'filename': fname}
-        if not self.corpusSettings['meta_files_dir']:
-            fname2check = self.rxStripDir.sub('', fname2check)
-        if not self.corpusSettings['meta_files_ext']:
-            fname2check = self.rxStripExt.sub('', fname2check)
-        if not self.corpusSettings['meta_files_case_sensitive']:
-            fname2check = fname2check.lower()
-        if fname2check not in self.meta:
-            print('File not in meta:', fname)
-        else:
-            curMeta.update(self.meta[fname2check])
-        return curMeta
-
     def get_tlis(self, srcTree):
         """
         Retrieve and return all time labels from the XML tree.

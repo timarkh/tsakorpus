@@ -87,3 +87,5 @@ Second, tier types should be consistent throughout your corpus. If you have tran
 * ``aligned_tiers`` -- an array with the names of translation/comment tiers that have a main tier as their parent.
 
 * ``tier_languages`` -- a dictionary where keys are the names of the tier types (listed in the above two arrays) and the values are the names of their languages.
+
+The source audio/video files will be split into small pieces with [ffmpeg](https://www.ffmpeg.org/). You have to have it installed, and its directory should be in the system PATH variable.
