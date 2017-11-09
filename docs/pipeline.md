@@ -17,7 +17,7 @@ You can generate JSON files yourself, or use one of the several convertors that 
 
 * ELAN media-aligned files convertor (``eaf2json.py``). It processes a corpus of media-aligned files in ELAN format. The files can have translation of the segments into multiple languages or sentence-level comments, but are not expected to be morphologically analyzed. As in the case of the Plain text convertor, this convertor takes a separate XML wordlist with analyses for all or some of the tokens in the corpus, and a separate CSV file with metadata.
 
-* Fieldworks FLEX glossed texts convertor: ``xml_flex2json.py``. It processes an XML file with the corpus exported from FLEX. Additionally, it can use user-defined rules for adding grammatical tags (e.g. for categories that do not have overt marking and thus are absent from the glosses).
+* Fieldworks FLEX glossed texts convertor (``xml_flex2json.py``). It processes an XML file with the corpus exported from FLEX. Additionally, it can use user-defined rules for adding grammatical tags (e.g. for categories that do not have overt marking and thus are absent from the glosses).
 
 * Plain text questonnaire convertor (``txt_questionnaires2json.py``). This is an ad hoc plain text convertor for Beserman Udmurt files that contain single usage examples from the dictionary together with their translations.
 
@@ -32,7 +32,7 @@ The indexator creates following elasticsearch indexes:
 
 * ``%corpus_name%.sentences`` -- main index: all sentences of the corpus;
 * ``%corpus_name%.docs`` -- metadata for corpus documents;
-* ``%corpus_name%.words`` -- contains two types, ``word`` and ``word_freq``. The instances of the former are all word types with statistics (identical word forms with different annotations are considered different types). Each instance of the latter contains frequency statictics for each (word, document) tuple.
+* ``%corpus_name%.words`` -- contains three types, ``lemma``, ``word`` and ``word_freq``. The instances of the first two are all lemma / word types with statistics (identical word forms with different annotations are considered different types). Each instance of the latter contains frequency statictics for each (word, document) tuple.
 
 #### Memory and disk space consumption
 (If your corpus contains less than 1 million tokens or 100,000 sentences, you may safely skip this subsection.)
@@ -55,7 +55,9 @@ The time needed to index a corpus may vary significantly depending on the amount
 
 ### Translation
 If you want your web interface to have several language options, you have to provide translations for all captions and messages. English and Russian translations for the main part of the interface is included in the distribution. If you do not intend to have other languages in the interface, you have to do the following:
+
 * Edit ``search/web_app/translations/%language_code%/LC_MESSAGES/messages.po`` for each of the two languages, adding there the title of the corpus and translations for all corpus-specific labels (such as metadata field names and values, transliteration option names, etc.). The changes take effect after compilation, which starts automatically whenever you index the corpus.
+
 * Edit ``search/web_app/templates/help_dialogue_%language_code%.html`` files if you want the help adapted to your corpus data (you may leave it as is if you prefer so).
 
 See more on translating labels in ``interface_languages.md``.
