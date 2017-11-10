@@ -1056,8 +1056,9 @@ def get_sent_context(n):
                                                             lang=lang,
                                                             translit=get_session_data('translit'))
                 curCxLang[side] = expandedContext['languages'][lang]['text']
-                sentView.relativize_src_alignment(expandedContext, curSentData['src_alignment_files'])
-                context['src_alignment'].update(expandedContext['src_alignment'])
+                if settings['media']:
+                    sentView.relativize_src_alignment(expandedContext, curSentData['src_alignment_files'])
+                    context['src_alignment'].update(expandedContext['src_alignment'])
                 set_session_data('last_sent_num', lastSentNum)
             else:
                 curCxLang[side] = ''

@@ -505,6 +505,9 @@ class Indexator:
                     continue
                 fnameFull = os.path.join(root, fname)
                 filenames.append((fnameFull, os.path.getsize(fnameFull)))
+        if len(filenames) <= 0:
+            print('There are no files in this corpus.')
+            return
         for fname, fsize in sorted(filenames, key=lambda p: -p[1]):
             # print(fname, fsize)
             bulk(self.es, self.iterate_sentences(fname), chunk_size=200, request_timeout=60)
