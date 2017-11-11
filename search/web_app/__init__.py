@@ -866,8 +866,13 @@ def find_sentences_json(page=0):
     set_session_data('page', page)
 
     nWords = 1
+    negWords = []
     if 'n_words' in query:
         nWords = int(query['n_words'])
+        if nWords > 0:
+            for iQueryWord in range(1, nWords + 1):
+                if 'negq' + str(iQueryWord) in query and query['negq' + str(iQueryWord)] == 'on':
+                    negWords.append(iQueryWord)
 
     docIDs = None
     if 'doc_ids' not in query and 'sent_ids' not in query:
@@ -930,7 +935,7 @@ def find_sentences_json(page=0):
     hits = sc.get_sentences(esQuery)
     if nWords > 1 and 'hits' in hits and 'hits' in hits['hits']:
         for hit in hits['hits']['hits']:
-            sentView.filter_multi_word_highlight(hit, nWords=nWords)
+            sentView.filter_multi_word_highlight(hit, nWords=nWords, negWords=negWords)
     if 'aggregations' in hits and 'agg_nwords' in hits['aggregations']:
         if nOccurrences > 0:
             hits['aggregations']['agg_nwords']['sum'] = nOccurrences

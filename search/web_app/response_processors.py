@@ -659,29 +659,34 @@ class SentenceViewer:
                                wID=w['_id'],
                                wfSearch=wSource['wf'])
 
-    def filter_multi_word_highlight_iter(self, hit, nWords=1, keepOnlyFirst=False):
+    def filter_multi_word_highlight_iter(self, hit, nWords=1, negWords=None, keepOnlyFirst=False):
         """
         Remove those of the highlights that are empty or which do
         not constitute a full set of search terms. If keepOnlyFirst
         is True, remove highlights for all non-first query words.
+        negWords is a list of words whose query was negative: they will be
+        absent from the highlighting.
         Iterate over filtered inner hits.
         """
         if 'inner_hits' not in hit:
             return
+        if negWords is None:
+            negWords = []
         if keepOnlyFirst:
             for key, ih in hit['inner_hits'].items():
                 if (key in self.w1_labels
                     and all(hit['inner_hits']['w' + str(iWord + 1) + '_' + key[3:]]['hits']['total'] > 0
-                            for iWord in range(1, nWords))):
+                            for iWord in range(1, nWords)
+                            if iWord + 1 not in negWords)):
                     yield key, ih
         else:
             for key, ih in hit['inner_hits'].items():
                 if (all(hit['inner_hits'][self.rxHitWordNo.sub(str(iWord + 1), key, 1)]['hits']['total'] > 0
-                        for iWord in range(nWords))
+                        for iWord in range(nWords) if iWord + 1 not in negWords)
                         or '_' not in key):
                     yield key, ih
 
-    def filter_multi_word_highlight(self, hit, nWords=1, keepOnlyFirst=False):
+    def filter_multi_word_highlight(self, hit, nWords=1, negWords=None, keepOnlyFirst=False):
         """
         Non-iterative version of filter_multi_word_highlight_iter whic
         replaces hits['inner_hits'] dictionary.
@@ -689,6 +694,7 @@ class SentenceViewer:
         if 'inner_hits' not in hit or nWords <= 1:
             return
         hit['inner_hits'] = {key: ih for key, ih in self.filter_multi_word_highlight_iter(hit, nWords=nWords,
+                                                                                          negWords=negWords,
                                                                                           keepOnlyFirst=keepOnlyFirst)}
 
     def add_word_from_sentence(self, hitsProcessed, hit, nWords=1):

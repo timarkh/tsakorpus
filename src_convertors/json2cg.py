@@ -120,8 +120,13 @@ class JSON2CG:
         for language in docCG:
             language = re.sub('[/\\?.()*"\']', '', language)
             dirOutLang = os.path.join(dirOut, language)
-            if not os.path.exists(dirOutLang):
-                os.makedirs(dirOutLang)
+            mDir = re.search('^(.+)[/\\\\]', fname)
+            if mDir is not None:
+                dirOut = os.path.join(dirOutLang, mDir.group(1))
+            else:
+                dirOut = dirOutLang
+            if not os.path.exists(dirOut):
+                os.makedirs(dirOut)
             fnameOut = os.path.join(dirOutLang, re.sub('\\.json(?:\\.gz)?$', '.txt', fname))
             fOut = open(fnameOut, 'w', encoding='utf-8')
             fOut.write(docCG[language])
@@ -135,19 +140,23 @@ class JSON2CG:
         """
         iDoc = 0
         jsonDir = os.path.join(self.corpus_dir, 'json')
-        for fname in os.listdir(jsonDir):
-            fnameIn = os.path.join(jsonDir, fname)
-            if self.format == 'json':
-                fIn = open(fnameIn, 'r', encoding='utf-8-sig')
-            elif self.format == 'json-gzip':
-                fIn = gzip.open(fnameIn, 'rt', encoding='utf-8-sig')
-            else:
-                return
-            doc = json.load(fIn)
-            fIn.close()
-            docCG = self.translate2cg_document(doc)
-            self.write_cg(docCG, fname)
-            iDoc += 1
+        for root, dirs, files in os.walk(jsonDir):
+            for fname in files:
+                fnameRel = fname
+                if len(root) > len(jsonDir) + 1:
+                    fnameRel = os.path.join(root[len(jsonDir) + 1:], fname)
+                fnameIn = os.path.join(root, fname)
+                if self.format == 'json' and fname.endswith('.json'):
+                    fIn = open(fnameIn, 'r', encoding='utf-8-sig')
+                elif self.format == 'json-gzip' and fname.endswith('.json.gz'):
+                    fIn = gzip.open(fnameIn, 'rt', encoding='utf-8-sig')
+                else:
+                    continue
+                doc = json.load(fIn)
+                fIn.close()
+                docCG = self.translate2cg_document(doc)
+                self.write_cg(docCG, fnameRel)
+                iDoc += 1
         print('Translation to CG finished,', iDoc, 'documents translated.')
 
     def disambiguate_cg(self):
@@ -168,21 +177,28 @@ class JSON2CG:
                                                                 self.settings['cg_filename'][language]))
             else:
                 continue
-            for fname in os.listdir(langDirIn):
-                fullFnameIn = os.path.abspath(os.path.join(langDirIn, fname))
-                fullFnameOut = os.path.abspath(os.path.join(langDirOut, fname))
-                cgCmd = 'cg3 -g "' + fullGrammarFname + '" -I "' + fullFnameIn + '" -O "' + fullFnameOut + '"'
-                proc = subprocess.Popen('cg3 -g "' + fullGrammarFname + '"',
-                                        stdin=subprocess.PIPE,
-                                        stdout=subprocess.PIPE)
-                fIn = open(fullFnameIn, 'r', encoding='utf-8-sig')
-                text = fIn.read()
-                fIn.close()
-                text, err = proc.communicate(text.encode('utf-8'))
-                proc.wait()
-                fOut = open(fullFnameOut, 'w', encoding='utf-8')
-                fOut.write(text.decode('utf-8').replace('\r', '\n').replace('\n\n', '\n'))
-                fOut.close()
+            for root, dirs, files in os.walk(langDirIn):
+                for fname in files:
+                    fullFnameIn = os.path.abspath(os.path.join(root, fname))
+                    fullFnameOut = os.path.abspath(os.path.join(os.path.join(langDirOut, root[len(langDirIn) + 1:]), fname))
+                    if fullFnameIn == fullFnameOut:
+                        print('Something went wrong: fullFnameIn == fullFnameOut.')
+                        continue
+                    mDir = re.search('^(.+)[/\\\\]', fullFnameOut)
+                    if mDir is not None and not os.path.exists(mDir.group(1)):
+                        os.makedirs(mDir.group(1))
+                    cgCmd = 'cg3 -g "' + fullGrammarFname + '" -I "' + fullFnameIn + '" -O "' + fullFnameOut + '"'
+                    proc = subprocess.Popen('cg3 -g "' + fullGrammarFname + '"',
+                                            stdin=subprocess.PIPE,
+                                            stdout=subprocess.PIPE)
+                    fIn = open(fullFnameIn, 'r', encoding='utf-8-sig')
+                    text = fIn.read()
+                    fIn.close()
+                    text, err = proc.communicate(text.encode('utf-8'))
+                    proc.wait()
+                    fOut = open(fullFnameOut, 'w', encoding='utf-8')
+                    fOut.write(text.decode('utf-8').replace('\r', '\n').replace('\n\n', '\n'))
+                    fOut.close()
         print('CG disambiguation finished.')
 
     def disambiguate_sentence(self, s, sDisambCG):
@@ -272,45 +288,50 @@ class JSON2CG:
         jsonDirOut = os.path.join(self.corpus_dir, 'json_disamb')
         if not os.path.exists(jsonDirOut):
             os.makedirs(jsonDirOut)
-        for fname in os.listdir(jsonDirIn):
-            fnameJsonIn = os.path.join(jsonDirIn, fname)
-            fnameJsonOut = os.path.join(jsonDirOut, fname)
-            if fnameJsonIn == fnameJsonOut:   # this should not happen, but just in case
-                print('Something went wrong: input file name = output file name.')
-                continue
-            fnameCgIn = re.sub('\\.json(?:\\.gz)?$', '.txt', fname)
-            languageParts = {}      # {language: disambiguated text}
-            for language in self.settings['languages']:
-                language4dir = re.sub('[/\\?.()*"\']', '', language)
-                cgDirIn = os.path.join(self.corpus_dir, 'cg_disamb', language4dir)
-                fnameCgInLanguage = os.path.join(cgDirIn, fnameCgIn)
-                if not os.path.exists(fnameCgInLanguage):
+        for root, dirs, files in os.walk(jsonDirIn):
+            for fname in files:
+                fnameJsonIn = os.path.abspath(os.path.join(root, fname))
+                fnameJsonOut = os.path.abspath(os.path.join(os.path.join(jsonDirOut, root[len(jsonDirIn) + 1:]), fname))
+                if fnameJsonIn == fnameJsonOut:   # this should not happen, but just in case
+                    print('Something went wrong: input file name = output file name.')
                     continue
-                fCgInLanguage = open(fnameCgInLanguage, 'r', encoding='utf-8-sig')
-                languageParts[language] = fCgInLanguage.read()
-                fCgInLanguage.close()
-            if len(languageParts) <= 0:
-                copyfile(fnameJsonIn, fnameJsonOut)
-                continue
-            if self.format == 'json':
-                fJsonIn = open(fnameJsonIn, 'r', encoding='utf-8-sig')
-            elif self.format == 'json-gzip':
-                fJsonIn = gzip.open(fnameJsonIn, 'rt', encoding='utf-8-sig')
-            else:
-                return
-            docJSON = json.load(fJsonIn)
-            fJsonIn.close()
-            docJSONDisamb = self.disambiguate_json(docJSON, languageParts)
-            if self.format == 'json':
-                fJsonOut = open(fnameJsonOut, 'w', encoding='utf-8')
-            elif self.format == 'json-gzip':
-                fJsonOut = gzip.open(fnameJsonOut, 'w', encoding='utf-8')
-            else:
-                copyfile(fnameJsonIn, fnameJsonOut)
-                continue
-            json.dump(docJSONDisamb, fp=fJsonOut,
-                      ensure_ascii=False, indent=self.settings['json_indent'])
-            iDoc += 1
+                mDir = re.search('^(.+)[/\\\\]', fnameJsonOut)
+                if mDir is not None and not os.path.exists(mDir.group(1)):
+                    os.makedirs(mDir.group(1))
+                fnameCgIn = re.sub('\\.json(?:\\.gz)?$', '.txt', os.path.join(root, fname)[len(jsonDirIn) + 1:])
+                languageParts = {}      # {language: disambiguated text}
+                for language in self.settings['languages']:
+                    language4dir = re.sub('[/\\?.()*"\']', '', language)
+                    cgDirIn = os.path.join(self.corpus_dir, 'cg_disamb', language4dir)
+                    # print(fnameCgIn)
+                    fnameCgInLanguage = os.path.join(cgDirIn, fnameCgIn)
+                    if not os.path.exists(fnameCgInLanguage):
+                        continue
+                    fCgInLanguage = open(fnameCgInLanguage, 'r', encoding='utf-8-sig')
+                    languageParts[language] = fCgInLanguage.read()
+                    fCgInLanguage.close()
+                if len(languageParts) <= 0:
+                    copyfile(fnameJsonIn, fnameJsonOut)
+                    continue
+                if self.format == 'json' and fnameJsonIn.endswith('.json'):
+                    fJsonIn = open(fnameJsonIn, 'r', encoding='utf-8-sig')
+                elif self.format == 'json-gzip' and fnameJsonIn.endswith('.json.gz'):
+                    fJsonIn = gzip.open(fnameJsonIn, 'rt', encoding='utf-8-sig')
+                else:
+                    continue
+                docJSON = json.load(fJsonIn)
+                fJsonIn.close()
+                docJSONDisamb = self.disambiguate_json(docJSON, languageParts)
+                if self.format == 'json':
+                    fJsonOut = open(fnameJsonOut, 'w', encoding='utf-8')
+                elif self.format == 'json-gzip':
+                    fJsonOut = gzip.open(fnameJsonOut, 'wt', encoding='utf-8')
+                else:
+                    copyfile(fnameJsonIn, fnameJsonOut)
+                    continue
+                json.dump(docJSONDisamb, fp=fJsonOut,
+                          ensure_ascii=False, indent=self.settings['json_indent'])
+                iDoc += 1
         print('Disambiguation finished,', iDoc, 'documents disambiguated,',
               self.nWords, 'words total,', self.nAnalyzedWords, 'words analyzed,',
               (self.nonDisambAnalyses + 1) / (self.nAnalyzedWords + 1),

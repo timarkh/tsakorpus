@@ -1,5 +1,5 @@
 {
-  "corpus_name": "khinalug",
+  "corpus_name": "udmurt_test",
   "corpus_dir": "corpus",
   "meta_filename": "meta.csv",
   "error_log": "error.log",

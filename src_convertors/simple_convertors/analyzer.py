@@ -55,7 +55,7 @@ class DumbMorphParser:
         Load parsed word list from a file.
         """
         if lang == '':
-            if 'languages' in self.settings:
+            if 'languages' in self.settings and len(self.settings['languages']) > 0:
                 lang = self.settings['languages'][0]
             else:
                 lang = self.settings['corpus_name']
@@ -195,7 +195,10 @@ class DumbMorphParser:
         in Russian National Corpus.
         """
         if lang == '':
-            lang = self.settings['corpus_name']
+            if 'languages' in self.settings and len(self.settings['languages']) > 0:
+                lang = self.settings['languages'][0]
+            else:
+                lang = self.settings['corpus_name']
             # there can be several languages if the corpus is parallel
         analyses = self.rxWordsRNC.findall(text)
         if lang not in self.analyses:
@@ -290,7 +293,9 @@ class DumbMorphParser:
         Return statistics.
         """
         nTokens, nWords, nAnalyzed = 0, 0, 0
-        if lang == '':
+        if 'languages' in self.settings and len(self.settings['languages']) > 0:
+            lang = self.settings['languages'][0]
+        else:
             lang = self.settings['corpus_name']
         if 'words' not in s:
             return 0, 0, 0
@@ -317,7 +322,9 @@ class DumbMorphParser:
         Return statistics.
         """
         nTokens, nWords, nAnalyzed = 0, 0, 0
-        if lang == '':
+        if 'languages' in self.settings and len(self.settings['languages']) > 0:
+            lang = self.settings['languages'][0]
+        else:
             lang = self.settings['corpus_name']
         for s in sentences:
             nTokensCur, nWordsCur, nAnalyzedCur = self.analyze_sentence(s, lang)

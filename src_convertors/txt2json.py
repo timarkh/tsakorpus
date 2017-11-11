@@ -3,6 +3,7 @@ import re
 import json
 import gzip
 from simple_convertors.text_processor import TextProcessor
+from json2cg import JSON2CG
 
 
 class Txt2JSON:
@@ -195,9 +196,12 @@ class Txt2JSON:
                 nTokens += curTokens
                 nWords += curWords
                 nAnalyzed += curAnalyzed
-        print('Conversion finished.', nTokens, 'tokens total,', nWords, 'words total.')
+        print('Conversion to JSON finished.', nTokens, 'tokens total,', nWords, 'words total.')
         if nWords > 0:
             print(nAnalyzed, 'words parsed (' + str(nAnalyzed / nWords * 100) + '%).')
+        if 'cg_disambiguate' in self.corpusSettings and self.corpusSettings['cg_disambiguate']:
+            translator = JSON2CG()
+            translator.process_corpus()
 
 
 if __name__ == '__main__':
