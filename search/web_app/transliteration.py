@@ -2,11 +2,18 @@ import re
 from transliterators.adyghe import adyghe_translit_ipa, adyghe_input_normal
 from transliterators.khinalug import khinalug_input_normal
 from transliterators.beserman import beserman_translit_cyrillic
+from transliterators.udmurt import udmurt_translit_upa
 
 
 def trans_IPA_baseline(text, lang):
     if lang == 'adyghe':
         return adyghe_translit_ipa(text)
+    return text
+
+
+def trans_UPA_baseline(text, lang):
+    if lang == 'udmurt':
+        return udmurt_translit_upa(text)
     return text
 
 
