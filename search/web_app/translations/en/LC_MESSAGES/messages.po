@@ -154,6 +154,9 @@ msgstr "topic"
 msgid "metafield_sex"
 msgstr "sex"
 
+msgid "metafield_gender"
+msgstr "gender"
+
 msgid "metafield_age"
 msgstr "age"
 
@@ -166,8 +169,38 @@ msgstr "speaker"
 msgid "metafield_published"
 msgstr "published"
 
-msgid "metafield_issue"
-msgstr "issue"
+msgid "metafield_birthyear"
+msgstr "year of birth"
+
+msgid "metafield_birthplace"
+msgstr "place of birth"
+
+msgid "metafield_profession"
+msgstr "profession"
+
+msgid "metafield_occupation"
+msgstr "occupation"
+
+msgid "metafield_liveplace"
+msgstr "place of living"
+
+msgid "metafield_place"
+msgstr "place"
+
+msgid "metafield_subject"
+msgstr "subject"
+
+msgid "metafield_style"
+msgstr "style"
+
+msgid "metafield_length"
+msgstr "length"
+
+msgid "metafield_annotators"
+msgstr "annotators"
+
+msgid "metafield_language"
+msgstr "language"
 
 
 # Names of the metadata values you have in the corpus:

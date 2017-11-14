@@ -144,11 +144,15 @@ function src_align_span(item, i) {
 	if (!item.startsWith("src") || item == "src" || item.includes('highlighted')) return;
 	var alignmentInfo = srcAlignments[item];
 	var srcPlayer = videojs('src_player');
-	if (srcPlayer.src() != "media/" + alignmentInfo.src) {
+	var realSrc = alignmentInfo.src;
+	if (!realSrc.startsWith('http:') && !realSrc.startsWith('https:')) {
+		realSrc = "media/" + realSrc;
+	}
+	if (srcPlayer.src() != realSrc) {
 		if (alignmentInfo.mtype == 'audio') {
 			srcPlayer.currentType('audio/wav');
 		}
-		srcPlayer.src("media/" + alignmentInfo.src);
+		srcPlayer.src(realSrc);
 	}
 	objContext = curClickedObj.parent();
 	srcPlayer.currentTime(parseFloat(alignmentInfo.start));

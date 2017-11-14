@@ -3,6 +3,93 @@
   "english": {},
   "english_note": {},
   "azerbaijani": {},
+  "rus_live":
+  {
+    "1p": "pers",
+    "2p": "pers",
+    "3p": "pers",
+    
+    "A": "pos",
+    "APRO": "pos",
+    "ADV": "pos",
+    "ADVPRO": "pos",
+    "ANUM": "pos",
+    "CONJ": "pos",
+    "INIT": "pos",
+    "INTJ": "pos",
+    "NUM": "pos",
+    "PARENTH": "pos",
+    "PART": "pos",
+    "PR": "pos",
+    "PRAEDIC": "pos",
+    "PRAEDICPRO": "pos",
+    "S": "pos",
+    "SPRO": "pos",
+    "V": "pos",
+    
+    "bastard": "anno",
+    "distort": "anno",
+    "anom": "anno",
+    "norm": "anno",
+    "bastard": "anno",
+    
+    "famn": "nType",
+    "persn": "nType",
+    "patrn": "nType",
+    "zoon": "nType",
+    "topn": "nType",
+    "digit": "numType",
+    
+    "abbr": "abbr",
+    "0": "0",
+
+    "loc": "case",
+    "loc2": "case",
+    "nom": "case",
+    "gen": "case",
+    "gen2": "case",
+    "ins": "case",
+    "dat": "case",
+    "dat2": "case",
+    "acc": "case",
+    "acc2": "case",
+    "voc": "case",
+    "adnum": "case",
+    
+    "m": "gender",
+    "f": "gender",
+    "n": "gender",
+    "mf": "gender",
+
+    "tran": "vType",
+    "intr": "vType",
+
+    "pf": "aspect",
+    "ipf": "aspect",
+    
+    "praet": "tense",
+    "praes": "tense",
+    "fut": "tense",
+    "fut2": "tense",
+    
+    "pl": "number",
+    "sg": "number",
+    
+    "short": "adj_form",
+    "brev": "adj_form",
+    "plen": "adj_form",
+    "comp": "adj_form",
+    "comp2": "adj_form",
+
+    "partcp": "v_form",
+    "ger": "v_form",
+    "indic": "v_form",
+    "imper": "v_form",
+    "imper2": "v_form",
+    "act": "v_form",
+    "pass": "v_form",
+    "mid": "v_form"
+  },
   "adyghe":
   {
     "1": "pers",

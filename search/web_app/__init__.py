@@ -369,6 +369,10 @@ def search_page():
         inputMethods = settings['input_methods']
     else:
         inputMethods = None
+    if 'media_youtube' in settings and settings['media_youtube']:
+        mediaYoutube = True
+    else:
+        mediaYoutube = False
     return render_template('index.html',
                            locale=get_locale(),
                            corpus_name=corpus_name,
@@ -377,6 +381,7 @@ def search_page():
                            transliterations=transliterations,
                            input_methods=inputMethods,
                            media=settings['media'],
+                           youtube=mediaYoutube,
                            gloss_search_enabled=settings['gloss_search_enabled'],
                            debug=settings['debug'],
                            subcorpus_selection=settings['search_meta'],

@@ -391,12 +391,12 @@ function expand_word_input(e) {
 	var div_extra_fields = $(e.target).parent().parent().find('.add_word_fields');
 	div_extra_fields.finish();
 	if (div_extra_fields.css('max-height') == '0px') {
-		div_extra_fields.css('max-height', '200px');
+		div_extra_fields.css('max-height', '300px');
 		div_extra_fields.css('height', 'initial');
 		div_extra_fields.css('visibility', 'visible');
 		$(e.target).find('.tooltip_prompt').html(lessFieldsCaption);
 	}
-	else if (div_extra_fields.css('max-height') == '200px') {
+	else if (div_extra_fields.css('max-height') == '300px') {
 		div_extra_fields.css('max-height', '0px');
 		div_extra_fields.css('height', '0px');
 		div_extra_fields.css('visibility', 'hidden');
