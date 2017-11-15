@@ -1,5 +1,5 @@
 ## Input JSON format
-A corpus which can be indexed by tsakorpus is a collection of JSON or gzipped JSON files structured according to the rules described below. The corpus may contain any number of files scattered across a file system subtree starting with ``corpus/%your_corpus_name%``.
+A corpus which can be indexed by tsakorpus is a collection of JSON or gzipped JSON files structured according to the rules described below. The corpus may contain any number of files scattered across a file system subtree starting with ``corpus/%your_corpus_name%``. The files must be stored in UTF-8 without BOM.
 
 Each JSON file stores a dictionary representing one corpus document. Each dictionary should have the following keys:
 
@@ -20,6 +20,8 @@ The value of the ``meta`` key is a dictionary where keys are the names of the me
 
 * The value of ``filename`` is never included in the search results to avoid accidentally compromising the data of the author of the corpus.
 * The ``title`` and ``author`` fields are displayed as document identifiers next to each context in the search results.
+* The value of ``year`` should be integer.
+* If in your corpus you have texts for which the exact year of creation is unknown, or which contain parts written in different years, you may use fields ``year_from`` and ``year_to`` as lower and upper bounds for the year. If the difference between them is less than 2 and the document does not have the ``year`` field, it will be created and filled automatically.
 
 ### The sentence list
 The array with sentences is the main part of the document. Each sentence is a dictionary with the following keys:
@@ -78,7 +80,7 @@ Each analysis is a dictionary with the following keys and values:
 * ``lex`` -- lemma (dictionary form), a string.
 * any number of keys starting with ``gr.`` (such as ``gr.pos`` or ``gr.case``) -- strings or arrays of strings that contain values of grammatical or lexical categories expressed in the word. The name of the category, as well as the value, should be listed in the ``categories.json`` file for the language the sentence is written in, otherwise this information will not be searchable. Each category can have multiple values (this can happen e.g. in case compounding when a stem attaches several case markers).
 * ``gloss``, ``parts`` and ``gloss_index`` (only for corpora with glossing) -- strings representing the glosses for the word (``gloss``), segmentation of the word into morphemes (``parts``) and the combination of these two fields used during search (``gloss_index``). The ``gloss`` field should contain glossing according to the Leipzig glossing rules (the glosses can be arbitrary, but the format should be correct). The stem should be glossed as STEM instead of a short English translation, otherwise it would be impossible to make queries such as "find a genitive marker immediately following the stem". Glossing and segmentation into morphemes should not contain empty morphemes and glosses for them; all categories that are not overtly expressed in the word should be tagged using the ``gr.`` fields. The string ``gloss_index`` has the following format: GLOSS1{morpheme1}-GLOSS2{morpheme2}-... Each gloss is accompanied by the corresponding morpheme in curly brackets. All glosses are separated by hyphens; there should also be a hanging hyphen at the end of the string.
-* any number of other keys with string values, such as ``trans_en``. All fields used here have to be listed in the ``word_fields`` array in ``conf/corpus.json``.
+* any number of other keys with string values, such as ``trans_en``. All fields used here have to be listed in the ``word_fields`` array in ``conf/corpus.json``. You cannot have a field named ``gr``.
 
 ### Parallel alignment
 If all or some of the documents in your corpus have several parallel tiers, e.g. original text and its translations into other languages, the tiers have to be assigned different language IDs, starting from zero. These IDs should correspond to the names of the languages in the ``languages`` array in ``conf/corpus.conf`` file. The sentences of all tiers should be stored in one JSON file, but independently. The sentences in the file should be ordered by language ID. In order to indicate that a certain part of a sentence is aligned with a certain part of another sentence in another tier, these sentences should contain the following dictionary in their ``para_alignment`` arrays:
@@ -124,8 +126,7 @@ Here is an example of a sentence from the Beserman corpus. It contains both para
       "wtype": "punct",
 	  "off_start": 0,
       "off_end": 1,
-      "next_word": 1,
-      "sentence_index": 0
+      "next_word": 1
     },
     {
       "wf": "нрзб",
@@ -133,7 +134,7 @@ Here is an example of a sentence from the Beserman corpus. It contains both para
 	  "off_start": 1,
       "off_end": 5,
       "next_word": 2,
-      "sentence_index": 1
+      "sentence_index": 0
     },
     {
       "wf": "]",
@@ -141,7 +142,7 @@ Here is an example of a sentence from the Beserman corpus. It contains both para
 	  "off_start": 5,
       "off_end": 6,
       "next_word": 3,
-      "sentence_index": 2
+      "sentence_index": 1
     },
     {
       "wf": "tačʼe",
@@ -149,7 +150,7 @@ Here is an example of a sentence from the Beserman corpus. It contains both para
 	  "off_start": 7,
       "off_end": 12,
       "next_word": 4,
-      "sentence_index": 3,
+      "sentence_index": 2,
       "ana": [
         {
           "lex": "tačʼe",
@@ -169,7 +170,7 @@ Here is an example of a sentence from the Beserman corpus. It contains both para
 	  "off_start": 13,
       "off_end": 17,
       "next_word": 5,
-      "sentence_index": 4,
+      "sentence_index": 3,
       "ana": [
         {
           "lex": "ta",
