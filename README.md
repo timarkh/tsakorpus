@@ -22,5 +22,10 @@ The following resources are used by tsakorpus, but do not need to be installed:
 
 * [jQuery](https://jquery.com/) library
 * [video.js](http://videojs.com/) media player
+* [videojs-youtube](https://github.com/videojs/videojs-youtube) plugin
 * [bootstrap](http://getbootstrap.com/) toolkit
 * [D3.js](https://d3js.org/) visualization library
+
+## License
+
+The software is distributed under MIT license (see LICENSE.md).

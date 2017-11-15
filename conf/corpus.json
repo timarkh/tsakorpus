@@ -1,8 +1,8 @@
 {
-  "corpus_name": "adyge",
-  "input_format": "json-gzip",
-  "debug": false,
-  "media": false,
+  "corpus_name": "udmurt_kati",
+  "input_format": "json",
+  "debug": true,
+  "media": true,
   "media_length": 60,
   "max_context_expand": 4,
   "max_distance_filter": 200000,
@@ -11,16 +11,16 @@
   "query_timeout": 60,
   "viewable_meta": [
     "filename",
-    "author",
     "title",
-    "issue",
     "genre",
-    "year1",
-    "year2",
-    "year"
+    "year",
+    "speakers",
+    "linguists"
   ],
   "sentence_meta": [
-    "year"
+    "year",
+    "speaker",
+    "gender"
   ],
   "search_meta": {
     "columns": [
@@ -33,36 +33,36 @@
       ],
       [
         {"type": "input_text", "name": "genre", "placeholder": "Genre"},
-        {"type": "option", "name": "genre", "value": "press", "text": "metavalue_press"},
-        {"type": "option", "name": "genre", "value": "fiction", "text": "metavalue_fiction"},
-        {"type": "option", "name": "genre", "value": "religion", "text": "metavalue_religion"},
-        {"type": "option", "name": "genre", "value": "wikipedia", "text": "metavalue_wikipedia"},
-        {"type": "option", "name": "genre", "value": "~oral", "text": "metavalue_written"},
-        {"type": "option", "name": "genre", "value": "oral", "text": "metavalue_oral"}
+        {"type": "option", "name": "genre", "value": "interview", "text": "Interview"},
+        {"type": "option", "name": "genre", "value": "monologue", "text": "Monologue"},
+        {"type": "option", "name": "genre", "value": "experiment", "text": "Experiment"},
+        {"type": "option", "name": "genre", "value": "interview|monologue|experiment", "text": "Any"}
       ]
     ],
     "stat_options": [
       "genre",
-      "author",
+      "linguists",
+      "speakers",
       "title",
       "year"
     ]
   },
   "word_fields":
   [
-    "trans_ru",
-    "lex2",
-    "trans_ru2"
+    "trans_ru"
   ],
-  "languages": ["adyghe"],
-  "transliterations": ["original", "IPA"],
-  "input_methods": ["normal", "strict"],
+  "languages": ["udmurt", "comment"],
+  "transliterations": ["original", "cyrillic"],
+  "input_methods": ["normal"],
   "interface_languages": {"en": "English", "ru": "Russian"},
   "all_language_search_enabled": true,
   "gloss_search_enabled": true,
   "ambiguous_analyses": true,
   "lang_props":
   {
+    "comment": {
+      "gr_fields_order": []
+    },
     "adyghe":
     {
       "gloss_shortcuts": {
@@ -76,8 +76,17 @@
         "tense": "(pst|fut|aux)",
         "adj": "(два|три|четыре|пять|сто|большой|старый|новый)",
         "sfx": "(re|ill|el|cont)"
+      }
+    },
+    "albanian":
+    {
+      "gloss_shortcuts": {
       },
-      "gr_fields_order": ["abbr", "vType", "nType", "numType", "adjType", "proType", "stemType", "num_deriv", "v_form", "attributivizer", "tense", "person", "number", "case", "poss", "stem_alt"]
+      "gr_fields_order": ["tense", "mood", "person", "number", "case"],
+      "gloss_selection": {
+        "columns": [
+        ]
+      }
     },
     "nganasan":
     {
@@ -316,9 +325,19 @@
             {"type": "gramm", "value": "persn", "category": "nType", "tooltip": "Personal name"},
             {"type": "gramm", "value": "famn", "category": "nType", "tooltip": "Last name"},
             {"type": "gramm", "value": "patrn", "category": "nType", "tooltip": "Patronymic"},
+            {"type": "gramm", "value": "anim", "category": "nType", "tooltip": "Animate"},
+            {"type": "gramm", "value": "hum", "category": "nType", "tooltip": "Human"},
+            {"type": "gramm", "value": "supernat", "category": "nType", "tooltip": "Supernatural"},
+            {"type": "gramm", "value": "body", "category": "nType", "tooltip": "Body part"},
+            {"type": "gramm", "value": "transport", "category": "nType", "tooltip": "Transport"}
+          ],
+          [
+            {"type": "header", "value": "Pronoun types"},
             {"type": "gramm", "value": "dem", "category": "proType", "tooltip": "Demonstrative pronoun"},
             {"type": "gramm", "value": "pers", "category": "proType", "tooltip": "Personal pronoun"},
             {"type": "gramm", "value": "refl", "category": "proType", "tooltip": "Reflexive pronoun"},
+            {"type": "header", "value": "Loanwords"},
+            {"type": "gramm", "value": "rus", "category": "additional", "tooltip": "Russian borrowing"},
             {"type": "header", "value": "Number"},
             {"type": "gramm", "value": "sg", "category": "number", "tooltip": "Singular"},
             {"type": "gramm", "value": "pl", "category": "number", "tooltip": "Plural"}
