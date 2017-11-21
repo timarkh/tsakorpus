@@ -206,6 +206,9 @@ msgstr "разметчики"
 msgid "metafield_language"
 msgstr "язык"
 
+msgid "metafield_orth"
+msgstr "орфография"
+
 
 
 # Names of the metadata values you have in the corpus:

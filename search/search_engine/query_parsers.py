@@ -667,15 +667,22 @@ class InterfaceQueryParser:
         """
         queryParts = []
         for field in self.docMetaFields:
+            if field in ('year_from', 'year_to'):
+                continue
             if field in htmlQuery and (type(htmlQuery[field]) == int or len(htmlQuery[field]) > 0):
                 queryParts.append(self.make_bool_query(htmlQuery[field], field, 'all', keyword_query=True))
-        if 'year' in self.docMetaFields:
-            yearFrom, yearTo = None, None
-            if 'year_from' in htmlQuery and (type(htmlQuery['year_from']) == int or len(htmlQuery['year_from']) > 0):
-                yearFrom = htmlQuery['year_from']
-            if 'year_to' in htmlQuery and (type(htmlQuery['year_to']) == int or len(htmlQuery['year_to']) > 0):
-                yearTo = htmlQuery['year_to']
-            if yearFrom is not None or yearTo is not None:
+        yearFrom, yearTo = None, None
+        if 'year_from' in htmlQuery and (type(htmlQuery['year_from']) == int or len(htmlQuery['year_from']) > 0):
+            yearFrom = htmlQuery['year_from']
+        if 'year_to' in htmlQuery and (type(htmlQuery['year_to']) == int or len(htmlQuery['year_to']) > 0):
+            yearTo = htmlQuery['year_to']
+        if yearFrom is not None or yearTo is not None:
+            if 'year_from' in self.docMetaFields and 'year_to' in self.docMetaFields:
+                if yearFrom is not None:
+                    queryParts.append(self.make_range_query([yearFrom, None], 'year_from'))
+                if yearTo is not None:
+                    queryParts.append(self.make_range_query([None, yearTo], 'year_to'))
+            elif 'year' in self.docMetaFields:
                 queryParts.append(self.make_range_query([yearFrom, yearTo], 'year'))
         if exclude is not None and len(exclude) > 0:
             queryParts.append({'bool': {'must_not': [{'terms': {'_id': list(exclude)}}]}})
