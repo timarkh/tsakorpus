@@ -889,6 +889,11 @@ def find_sentences_json(page=0):
         query, paraIDs = para_ids(query)
         if paraIDs is not None:
             query['para_ids'] = paraIDs
+            nWords = query['n_words']
+            for iQueryWord in range(2, nWords + 1):
+                if 'lang' + str(iQueryWord) in query and query['lang' + str(iQueryWord)] != query['lang1']:
+                    print(negWords)
+                    negWords.append(iQueryWord)
 
     if (len(wordConstraints) > 0
             and get_session_data('distance_strict')
