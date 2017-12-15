@@ -13,6 +13,17 @@ class Tokenizer:
 
     def __init__(self, settings):
         self.settings = copy.deepcopy(settings)
+        self.tokenSplitRegexes = []
+        if 'split_tokens' in self.settings:
+            for strRx in self.settings['split_tokens']:
+                if not strRx.startswith('^'):
+                    strRx = '^' + strRx
+                if not strRx.endswith('$'):
+                    strRx += '$'
+            try:
+                self.tokenSplitRegexes.append(re.compile(strRx))
+            except:
+                print('Error when compiling a regex: ' + strRx)
 
     def join_tokens(self, tokenL, tokenR):
         """
@@ -36,7 +47,9 @@ class Tokenizer:
                 continue
             if (token['wtype'] == 'word'
                     and joinedTokens[-1]['wtype'] == 'word'
-                    and joinedTokens[-1]['off_end'] == token['off_start']):
+                    and joinedTokens[-1]['off_end'] == token['off_start']
+                    and (len(self.tokenSplitRegexes) <= 0
+                         or joinedTokens[-1]['wf'].endswith('-'))):
                 self.join_tokens(joinedTokens[-1], token)
             elif (i < len(tokens) - 1 and
                   token['wtype'] == 'punct' and
@@ -50,6 +63,30 @@ class Tokenizer:
                 joinedTokens.append(token)
         return joinedTokens
 
+    def add_token(self, tokens, token):
+        """
+        Add one new token to the token list, taking into account that
+        the settings may require splitting it into several parts.
+        """
+        if ('wtype' in token and token['wtype'] != 'word') or 'wf' not in token:
+            tokens.append(token)
+            return
+        for r in self.tokenSplitRegexes:
+            m = r.search(token['wf'])
+            if m is not None:
+                # print(token['wf'])
+                for iGroup in range(1, 1 + len(m.groups())):
+                    group = m.group(iGroup)
+                    offStart, offEnd = m.span(iGroup)
+                    if group is not None and len(group) > 0 and offStart >= 0 and offEnd >= 0:
+                        newToken = copy.deepcopy(token)
+                        newToken['off_end'] = newToken['off_start'] + offEnd
+                        newToken['off_start'] += offStart
+                        newToken['wf'] = group
+                        tokens.append(newToken)
+                return
+        tokens.append(token)
+
     def tokenize(self, text):
         tokens = []
         curToken = {}
@@ -58,19 +95,19 @@ class Tokenizer:
             if c == ' ':
                 if curToken != {}:
                     curToken['off_end'] = i
-                    tokens.append(curToken)
+                    self.add_token(tokens, curToken)
                     curToken = {}
                 continue
             if c == '\n':
                 if curToken != {}:
                     curToken['off_end'] = i
-                    tokens.append(curToken)
+                    self.add_token(tokens, curToken)
                     curToken = {}
                 curToken['wtype'] = 'punct'
                 curToken['off_start'] = i
                 curToken['off_end'] = i + 1
                 curToken['wf'] = '\\n'
-                tokens.append(curToken)
+                self.add_token(tokens, curToken)
                 curToken = {}
                 continue
             if curToken == {}:
@@ -85,7 +122,7 @@ class Tokenizer:
             if ((bPunc and curToken['wtype'] == 'word') or
                     (not bPunc and curToken['wtype'] == 'punct')):
                 curToken['off_end'] = i
-                tokens.append(curToken)
+                self.add_token(tokens, curToken)
                 curToken = {'off_start': i, 'wf': c}
                 if bPunc:
                     curToken['wtype'] = 'punct'
@@ -95,5 +132,5 @@ class Tokenizer:
             curToken['wf'] += c
         if curToken != {}:
             curToken['off_end'] = len(text)
-            tokens.append(curToken)
+            self.add_token(tokens, curToken)
         return self.join_hyphens(tokens)

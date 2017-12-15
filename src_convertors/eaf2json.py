@@ -128,7 +128,7 @@ class Eaf2JSON(Txt2JSON):
                 pID, tli1, tli2 = aID2pID[aID]
             else:
                 continue
-            text = segment.xpath('ANNOTATION_VALUE')[0].text
+            text = segment.xpath('ANNOTATION_VALUE')[0].text.strip()
             if text is None:
                 text = ''
             curSent = {'text': text, 'words': self.tp.tokenizer.tokenize(text), 'lang': langID,
@@ -138,15 +138,16 @@ class Eaf2JSON(Txt2JSON):
                     curSent['meta'][k] = v
             self.tp.splitter.add_next_word_id_sentence(curSent)
             self.tp.parser.analyze_sentence(curSent, lang=lang)
-            if not alignedTier and 'ANNOTATION_ID' in segment.attrib:
-                self.pID += 1
-                aID = segment.attrib['ANNOTATION_ID']
-                aID2pID[aID] = (self.pID, tli1, tli2)
-                paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
-                curSent['para_alignment'] = [paraAlignment]
-            elif alignedTier:
-                paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': pID}
-                curSent['para_alignment'] = [paraAlignment]
+            if len(self.corpusSettings['aligned_tiers']) > 0:
+                if not alignedTier and 'ANNOTATION_ID' in segment.attrib:
+                    self.pID += 1
+                    aID = segment.attrib['ANNOTATION_ID']
+                    aID2pID[aID] = (self.pID, tli1, tli2)
+                    paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
+                    curSent['para_alignment'] = [paraAlignment]
+                elif alignedTier:
+                    paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': pID}
+                    curSent['para_alignment'] = [paraAlignment]
             self.add_src_alignment(curSent, tli1, tli2, srcFile)
             yield curSent
 
@@ -159,9 +160,11 @@ class Eaf2JSON(Txt2JSON):
         mainTiers = srcTree.xpath(mainTierTypes)
         if len(mainTiers) <= 0:
             return
-        alignedTierTypes = '(' + ' | '.join('/ANNOTATION_DOCUMENT/TIER[@LINGUISTIC_TYPE_REF=\'' + x + '\']'
-                                            for x in self.corpusSettings['aligned_tiers']) + ')'
-        alignedTiers = srcTree.xpath(alignedTierTypes)
+        alignedTiers = []
+        if len(self.corpusSettings['aligned_tiers']) > 0:
+            alignedTierTypes = '(' + ' | '.join('/ANNOTATION_DOCUMENT/TIER[@LINGUISTIC_TYPE_REF=\'' + x + '\']'
+                                                for x in self.corpusSettings['aligned_tiers']) + ')'
+            alignedTiers = srcTree.xpath(alignedTierTypes)
         aID2pID = {}    # annotation ID -> (pID, tli1, tli2) correspondence
         for tier in mainTiers:
             for sent in self.process_tier(tier, aID2pID, srcFile, alignedTier=False):

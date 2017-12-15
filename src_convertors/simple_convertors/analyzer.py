@@ -254,7 +254,7 @@ class DumbMorphParser:
             if parts[iPart].startswith('-'):
                 partAnalyses.append(None)
                 continue
-            wfPart = parts[iPart]
+            wfPart = self.normalize(parts[iPart])
             if iPart > 0:
                 wfPart = '-' + wfPart
             if iPart < len(parts) - 1:
