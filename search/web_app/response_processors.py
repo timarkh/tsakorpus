@@ -531,6 +531,10 @@ class SentenceViewer:
                     chars[i] = '<span class="newline"></span>'
                 else:
                     chars[i] = '<br>'
+            elif chars[i] == '<' and format != 'csv':
+                chars[i] = '&lt;'
+            elif chars[i] == '>' and format != 'csv':
+                chars[i] = '&gt;'
             if (i not in offStarts and i not in offEnds
                     and i not in offParaStarts and i not in offParaEnds
                     and i not in offSrcStarts and i not in offSrcEnds):

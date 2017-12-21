@@ -14,14 +14,37 @@ class Tokenizer:
     def __init__(self, settings):
         self.settings = copy.deepcopy(settings)
         self.tokenSplitRegexes = []
-        if 'split_tokens' in self.settings:
-            for strRx in self.settings['split_tokens']:
-                if not strRx.startswith('^'):
-                    strRx = '^' + strRx
-                if not strRx.endswith('$'):
-                    strRx += '$'
+        self.specialTokenRegexes = []
+        self.add_split_token_regexes()
+        self.add_special_token_regexes()
+
+    def add_split_token_regexes(self):
+        """
+        Add regexes that break certain spaceless tokens into parts.
+        """
+        if 'split_tokens' not in self.settings:
+            return
+        for strRx in self.settings['split_tokens']:
+            if not strRx.startswith('^'):
+                strRx = '^' + strRx
+            if not strRx.endswith('$'):
+                strRx += '$'
+        try:
+            self.tokenSplitRegexes.append(re.compile(strRx))
+        except:
+            print('Error when compiling a regex: ' + strRx)
+
+    def add_special_token_regexes(self):
+        """
+        Add regexes that recognize certain special tokens,
+        such as email addresses or text-based smileys.
+        """
+        if 'special_tokens' not in self.settings:
+            return
+        for strRx in self.settings['special_tokens']:
             try:
-                self.tokenSplitRegexes.append(re.compile(strRx))
+                self.specialTokenRegexes.append({'regex': re.compile(strRx),
+                                                 'token': self.settings['special_tokens'][strRx]})
             except:
                 print('Error when compiling a regex: ' + strRx)
 
@@ -90,7 +113,9 @@ class Tokenizer:
     def tokenize(self, text):
         tokens = []
         curToken = {}
-        for i in range(len(text)):
+        i = -1
+        while i < len(text) - 1:
+            i += 1
             c = text[i]
             if c == ' ':
                 if curToken != {}:
@@ -109,6 +134,28 @@ class Tokenizer:
                 curToken['wf'] = '\\n'
                 self.add_token(tokens, curToken)
                 curToken = {}
+                continue
+            bSpecialTokenFound = False
+            for rx in self.specialTokenRegexes:
+                m = rx['regex'].match(text, pos=i)
+                if m is not None:
+                    if curToken != {}:
+                        curToken['off_end'] = i
+                        self.add_token(tokens, curToken)
+                    curToken = copy.deepcopy(rx['token'])
+                    if 'wtype' not in curToken:
+                        curToken['wtype'] = 'word'
+                    wf = m.group(0)
+                    if 'wf' not in curToken:
+                        curToken['wf'] = wf
+                    curToken['off_start'] = i
+                    curToken['off_end'] = i + len(wf)
+                    i += len(wf) - 1
+                    self.add_token(tokens, curToken)
+                    curToken = {}
+                    bSpecialTokenFound = True
+                    break
+            if bSpecialTokenFound:
                 continue
             if curToken == {}:
                 curToken['off_start'] = i
