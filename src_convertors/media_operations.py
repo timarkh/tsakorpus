@@ -121,6 +121,8 @@ class MediaCutter:
         in the settings. Write it to corpus/%corpus_name%/media.
         """
         outDir = os.path.abspath(os.path.join(self.settings['corpus_dir'], 'media'))
+        if not os.path.exists(outDir):
+            os.makedirs(outDir)
         fileLen = self.settings['media_length']
         segmentLen = int(math.floor(fileLen / 3))
         for startOffset in range(3):

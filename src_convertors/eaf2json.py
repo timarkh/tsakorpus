@@ -27,6 +27,7 @@ class Eaf2JSON(Txt2JSON):
         self.tlis = {}      # time labels
         self.pID = 0        # id of last aligned segment
         self.glosses = set()
+        self.participants = {}     # main tier ID -> participant ID
 
     def load_speaker_meta(self):
         speakerMeta = {}
@@ -100,22 +101,49 @@ class Eaf2JSON(Txt2JSON):
         If alignedTier is True, use the information from aID2pID for establishing
         time boundaries of the sentences and aligning it with the source tier. 
         """
-        if ('LINGUISTIC_TYPE_REF' not in tierNode.attrib or
-                tierNode.attrib['LINGUISTIC_TYPE_REF'] not in self.corpusSettings['tier_languages']):
+        lang = ''
+        # We have to find out what language the tier represents.
+        # First, check the tier type. If it is not associated with any language,
+        # check all tier ID regexes.
+        if 'TIER_ID' not in tierNode.attrib:
             return
-        lang = self.corpusSettings['tier_languages'][tierNode.attrib['LINGUISTIC_TYPE_REF']]
-        if lang not in self.corpusSettings['languages']:
+        if ('LINGUISTIC_TYPE_REF' in tierNode.attrib and
+                tierNode.attrib['LINGUISTIC_TYPE_REF'] in self.corpusSettings['tier_languages']):
+            lang = self.corpusSettings['tier_languages'][tierNode.attrib['LINGUISTIC_TYPE_REF']]
+        else:
+            for k, v in self.corpusSettings['tier_languages'].items():
+                if not k.startswith('^'):
+                    k = '^' + k
+                if not k.endswith('$'):
+                    k += '$'
+                try:
+                    rxTierID = re.compile(k)
+                    if rxTierID.search(tierNode.attrib['TIER_ID']) is not None:
+                        lang = v
+                        break
+                except:
+                    continue
+        if len(lang) <= 0 or lang not in self.corpusSettings['languages']:
             return
         langID = self.corpusSettings['languages'].index(lang)
+        
+        speaker = ''
+        if not alignedTier and 'PARTICIPANT' in tierNode.attrib:
+            speaker = tierNode.attrib['PARTICIPANT']
+            self.participants[tierNode.attrib['TIER_ID']] = speaker
+        elif alignedTier:
+            if ('PARENT_REF' in tierNode.attrib
+                    and tierNode.attrib['PARENT_REF'] in self.participants):
+                speaker = self.participants[tierNode.attrib['PARENT_REF']]
+            elif 'PARTICIPANT' in tierNode.attrib:
+                speaker = tierNode.attrib['PARTICIPANT']
+        
         if alignedTier:
             xpathExpr = 'ANNOTATION/REF_ANNOTATION'
         else:
             xpathExpr = 'ANNOTATION/ALIGNABLE_ANNOTATION'
-        speaker = ''
-        if 'PARTICIPANT' in tierNode.attrib:
-            speaker = tierNode.attrib['PARTICIPANT']
         segments = tierNode.xpath(xpathExpr)
-
+        
         for segment in segments:
             if not alignedTier:
                 if ('TIME_SLOT_REF1' not in segment.attrib or
@@ -128,8 +156,9 @@ class Eaf2JSON(Txt2JSON):
                 pID, tli1, tli2 = aID2pID[aID]
             else:
                 continue
-            text = segment.xpath('ANNOTATION_VALUE')[0].text.strip()
-            if text is None:
+            try:
+                text = segment.xpath('ANNOTATION_VALUE')[0].text.strip()
+            except AttributeError:
                 text = ''
             curSent = {'text': text, 'words': self.tp.tokenizer.tokenize(text), 'lang': langID,
                        'meta': {'speaker': speaker}}

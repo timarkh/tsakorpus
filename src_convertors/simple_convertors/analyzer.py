@@ -13,8 +13,8 @@ class DumbMorphParser:
 
     rxWordsRNC = re.compile('<w>(<ana.*?/(?:ana)?>)([^<>]+)</w>', flags=re.DOTALL)
     rxAnalysesRNC = re.compile('<ana *([^<>]+)(?:></ana>|/>)\\s*')
-    rxAnaFieldRNC = re.compile('([^ <>"=]+) *= *"([^<>"=]+)')
-    rxSplitGramTags = re.compile('[, /]')
+    rxAnaFieldRNC = re.compile('([^ <>"=]+) *= *"([^<>"]+)')
+    rxSplitGramTags = re.compile('[, /=]')
     rxHyphenParts = re.compile('[^\\-]+|-+')
     rxGlossParts = re.compile('[^ \\-=<>]+')
     rxGlossIndexPart = re.compile('^(.*)\\{(.*?)\\}')
@@ -97,6 +97,8 @@ class DumbMorphParser:
         """
         regexes = {}
         for lang in self.settings['languages']:
+            if lang not in self.categories:
+                self.categories[lang] = {}
             if 'glosses' in self.settings and lang in self.settings['glosses']:
                 sRegex = '|'.join(re.escape(g) for g in sorted(self.settings['glosses'][lang], key=len))
                 sRegex = '\\b(' + sRegex + ')\\b'
