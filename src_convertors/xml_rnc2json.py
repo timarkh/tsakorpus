@@ -85,7 +85,11 @@ class Xml_Rnc2JSON(Txt2JSON):
                 part = self.tp.cleaner.clean_text(part)
                 words = self.tp.tokenizer.tokenize(part)
                 paraAlignment = {'off_start': 0, 'off_end': len(part), 'para_id': self.pID}
-                yield {'words': words, 'text': part, 'para_alignment': [paraAlignment]}
+                curSent = {'words': words, 'text': part, 'para_alignment': [paraAlignment]}
+                if len(curSent['words']) > 0:
+                    self.tp.splitter.add_next_word_id_sentence(curSent)
+                    self.tp.parser.analyze_sentence(curSent, lang=lang)
+                yield curSent
             else:
                 yield self.process_se_tokens(self.rxSeWords.findall('>' + part.strip() + '<'), lang)
 
