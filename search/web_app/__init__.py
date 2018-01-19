@@ -1059,18 +1059,23 @@ def get_sent_context(n):
                     and len(curCxLang[side]['hits']['hits']) > 0):
                 lastSentNum = get_session_data('last_sent_num') + 1
                 curSent = curCxLang[side]['hits']['hits'][0]
-                if '_source' in curSent and ('lang' not in curSent['_source']
-                                             or curSent['_source']['lang'] != langID):
+                if '_source' in curSent and 'lang' not in curSent['_source']:
                     curCxLang[side] = ''
                     continue
+                langReal = lang
+                # lang is an identifier of the tier for parallel corpora, i.e.
+                # the language of the original unexpanded sentence.
+                # langReal is the real language of the expanded context.
+                if '_source' in curSent and curSent['_source']['lang'] != langID:
+                    langReal = settings['languages'][curSent['_source']['lang']]
                 if '_source' in curSent and side + '_id' in curSent['_source']:
                     neighboringIDs[lang][side] = curSent['_source'][side + '_id']
                 expandedContext = sentView.process_sentence(curSent,
                                                             numSent=lastSentNum,
                                                             getHeader=False,
-                                                            lang=lang,
+                                                            lang=langReal,
                                                             translit=get_session_data('translit'))
-                curCxLang[side] = expandedContext['languages'][lang]['text']
+                curCxLang[side] = expandedContext['languages'][langReal]['text']
                 if settings['media']:
                     sentView.relativize_src_alignment(expandedContext, curSentData['src_alignment_files'])
                     context['src_alignment'].update(expandedContext['src_alignment'])
