@@ -2,7 +2,7 @@
 This document describes how to run the srcipts that convert files in various input formats to the tsakorpus JSON. All of the convertors are located in the ``src_convertors`` directory.
 
 ### Paths
-If you want to convert your corpus named ``%corpus_name%`` with one of the source convertors, you have to create a directory ``src_convertors/corpus/%corpus_name%``. All source files have to have the same type and extension. The source files should be placed in ``src_convertors/corpus/%corpus_name%/%ext%``, where ``%ext`` is their extension. This directory can have any number of subdirectories of arbitrary depth. The configuration files are located in ``src_convertors/conf`` and ``src_convertors/corpus/%corpus_name%/conf``. Whenever the two configuration files have the same fields, the one located inside the corpus directory overrides the general one. After the files have been converted, the resulting JSON files will be located in ``src_convertors/corpus/%corpus_name%/json``. If you run disambiguation after that, the disambiguated JSON files will be located in ``src_convertors/corpus/%corpus_name%/json_disamb``. If you have a media-aligned corpus, the source media files have to be located next to the corresponding ELAN or Exmaralda files (and referenced there). The resulting media files (compressed and split into pieces) will appear in ``src_convertors/corpus/%corpus_name%/media``.
+If you want to convert your corpus named ``%corpus_name%`` with one of the source convertors, you have to create a directory ``src_convertors/corpus/%corpus_name%``. The configuration files are located in ``src_convertors/conf`` and ``src_convertors/corpus/%corpus_name%/conf``. Whenever the two configuration files have the same fields, the one located inside the corpus directory overrides the general one. All source files have to have the same type and extension. The source files should be placed in ``src_convertors/corpus/%corpus_name%/%ext%``, where ``%ext`` is their extension. If the extension is ``json``, you have to name this directory ``json_input`` to avoid name collision with the target directory. This directory can have any number of subdirectories of arbitrary depth. After the files have been converted, the resulting JSON files will be located in ``src_convertors/corpus/%corpus_name%/json``. If you run disambiguation after that, the disambiguated JSON files will be located in ``src_convertors/corpus/%corpus_name%/json_disamb``. If you have a media-aligned corpus, the source media files have to be located next to the corresponding ELAN or Exmaralda files (and referenced there). The resulting media files (compressed and split into pieces) will appear in ``src_convertors/corpus/%corpus_name%/media``.
 
 ### Configuration files
 The configuration files are ``corpus.json`` and ``categories.json``. The latter describes which tags correspond to which grammatical categories and has the same format as ``categories.json`` in the main configuration directory (see ``configuration.md``). The ``corpus.json`` has slightly different set of fields compared to the eponymous file in the main configuration directory:
@@ -19,7 +19,7 @@ The configuration files are ``corpus.json`` and ``categories.json``. The latter 
 
 * ``meta_files_case_sensitive`` -- boolean value that determines whether the filenames in the metadata file should be treated as case sensitive.
 
-* ``parsed_wordlist_filename`` -- the name of the file with the morphologically annotated word list (for the converters which accept such a file).
+* ``parsed_wordlist_filename`` -- the name of the file with the morphologically annotated word list (for the converters which accept such a file). If you have several lists for different languages, the value should be a dictionary where keys are the names of the languages and values are the names of the files.
 
 * ``parsed_wordlist_format`` -- the format of the annotated word list (currently, only the "xml_rnc" option is available, which means a list of XML-represented words in the format used in Russian National Corpus).
 
@@ -47,6 +47,8 @@ There are several source convertors for different input formats (see ``pipeline.
 * ELAN media-aligned files convertor: ``eaf2json.py``.
 
 * Fieldworks FLEX glossed texts convertor: ``xml_flex2json.py``.
+
+* Convertor for JSON files obtained by harvesting social networks with my scripts: ``social_networks2json.py``.
 
 * Plain text questionnaire convertor: ``txt_questionnaires2json.py``.
 

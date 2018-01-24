@@ -174,7 +174,10 @@ class Txt2JSON:
             return
         self.load_meta()
         nTokens, nWords, nAnalyzed = 0, 0, 0
-        srcDir = os.path.join(self.corpusSettings['corpus_dir'], self.srcExt)
+        if self.srcExt != 'json':
+            srcDir = os.path.join(self.corpusSettings['corpus_dir'], self.srcExt)
+        else:
+            srcDir = os.path.join(self.corpusSettings['corpus_dir'], 'json_input')
         targetDir = os.path.join(self.corpusSettings['corpus_dir'], 'json')
         for path, dirs, files in os.walk(srcDir):
             for filename in files:

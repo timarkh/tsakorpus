@@ -393,6 +393,7 @@ class Indexator:
 
     def iterate_sentences(self, fname):
         self.numSents = 0
+        prevLast = False
         sentences = []
         paraIDs = [{} for i in range(len(self.languages))]
         for s, bLast in self.iterSent.get_sentences(fname):
@@ -403,10 +404,14 @@ class Indexator:
                 s['lang'] = langID
             if 'words' in s:
                 self.process_sentence_words(s['words'], langID)
-            if self.numSents > 0:
+            if prevLast:
+                prevLast = False
+            elif self.numSents > 0:
                 s['prev_id'] = self.randomize_id(self.sID - 1)
             if not bLast and 'last' not in s:
                 s['next_id'] = self.randomize_id(self.sID + 1)
+            else:
+                prevLast = True
             s['doc_id'] = self.dID
             # self.es.index(index=self.name + '.sentences',
             #               doc_type='sentence',

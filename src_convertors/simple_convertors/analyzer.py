@@ -295,10 +295,11 @@ class DumbMorphParser:
         Return statistics.
         """
         nTokens, nWords, nAnalyzed = 0, 0, 0
-        if 'languages' in self.settings and len(self.settings['languages']) > 0:
-            lang = self.settings['languages'][0]
-        else:
-            lang = self.settings['corpus_name']
+        if lang == '':
+            if 'languages' in self.settings and len(self.settings['languages']) > 0:
+                lang = self.settings['languages'][0]
+            else:
+                lang = self.settings['corpus_name']
         if 'words' not in s:
             return 0, 0, 0
         iWord = -1
@@ -324,10 +325,11 @@ class DumbMorphParser:
         Return statistics.
         """
         nTokens, nWords, nAnalyzed = 0, 0, 0
-        if 'languages' in self.settings and len(self.settings['languages']) > 0:
-            lang = self.settings['languages'][0]
-        else:
-            lang = self.settings['corpus_name']
+        if lang == '':
+            if 'languages' in self.settings and len(self.settings['languages']) > 0:
+                lang = self.settings['languages'][0]
+            else:
+                lang = self.settings['corpus_name']
         for s in sentences:
             nTokensCur, nWordsCur, nAnalyzedCur = self.analyze_sentence(s, lang)
             nTokens += nTokensCur
