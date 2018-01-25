@@ -31,9 +31,9 @@ class SocialNetworks2JSON(Txt2JSON):
             authorMeta = defaultMeta
         for k in authorMeta:
             if k in self.allowedMetaKeys:
-                curMeta[k] = authorMeta[k]
+                curMeta[k + '_post'] = authorMeta[k]
         if type(year) == int:
-            curMeta['year'] = year
+            curMeta['year_post'] = year
         for s in postSentences:
             sProcessed = copy.deepcopy(s)
             sProcessed['meta'] = copy.deepcopy(curMeta)
@@ -42,6 +42,8 @@ class SocialNetworks2JSON(Txt2JSON):
             processedSentences[-1]['text'] += '\n'
         for s in processedSentences:
             s['words'] = self.tp.tokenizer.tokenize(s['text'])
+            for word in s['words']:
+                word['wf'] = self.tp.cleaner.clean_social_networks(word['wf'])
         return processedSentences
 
     def get_sentences(self, posts, defaultMeta=None):
@@ -52,7 +54,12 @@ class SocialNetworks2JSON(Txt2JSON):
             defaultMeta = {}
         for post in posts.values():
             curSentences = []
-            year = int(post['date'][:4])
+            if 'date' in post:
+                year = int(post['date'][:4])
+            else:
+                year = None
+            if 'author' not in post:
+                post['author'] = ''
             if 'repost_sentences' in post:
                 curSentences += self.get_post_sentences(post['repost_sentences'],
                                                         post['author'], defaultMeta, 'repost',

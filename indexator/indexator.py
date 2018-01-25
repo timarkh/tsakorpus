@@ -402,8 +402,10 @@ class Indexator:
             else:
                 langID = 0
                 s['lang'] = langID
+            s['n_words'] = 0
             if 'words' in s:
                 self.process_sentence_words(s['words'], langID)
+                s['n_words'] = sum(1 for w in s['words'] if 'wtype' in w and w['wtype'] == 'word')
             if prevLast:
                 prevLast = False
             elif self.numSents > 0:
@@ -413,6 +415,9 @@ class Indexator:
             else:
                 prevLast = True
             s['doc_id'] = self.dID
+            if 'meta' in s:
+                for metaField in [mf for mf in s['meta'].keys() if not mf.startswith('year')]:
+                    s['meta'][metaField + '_kw'] = s['meta'][metaField]
             # self.es.index(index=self.name + '.sentences',
             #               doc_type='sentence',
             #               id=self.sID,

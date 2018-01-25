@@ -116,8 +116,8 @@ class JSON2CG:
         Write a dictionary {language_name: CG text of the document} to the files,
         one for each language.
         """
-        dirOut = os.path.join(self.corpus_dir, 'cg')
         for language in docCG:
+            dirOut = os.path.join(self.corpus_dir, 'cg')
             language = re.sub('[/\\?.()*"\']', '', language)
             dirOutLang = os.path.join(dirOut, language)
             mDir = re.search('^(.+)[/\\\\]', fname)
@@ -146,16 +146,19 @@ class JSON2CG:
                 if len(root) > len(jsonDir) + 1:
                     fnameRel = os.path.join(root[len(jsonDir) + 1:], fname)
                 fnameIn = os.path.join(root, fname)
-                if self.format == 'json' and fname.endswith('.json'):
-                    fIn = open(fnameIn, 'r', encoding='utf-8-sig')
-                elif self.format == 'json-gzip' and fname.endswith('.json.gz'):
-                    fIn = gzip.open(fnameIn, 'rt', encoding='utf-8-sig')
-                else:
-                    continue
-                doc = json.load(fIn)
-                fIn.close()
-                docCG = self.translate2cg_document(doc)
-                self.write_cg(docCG, fnameRel)
+                try:
+                    if self.format == 'json' and fname.endswith('.json'):
+                        fIn = open(fnameIn, 'r', encoding='utf-8-sig')
+                    elif self.format == 'json-gzip' and fname.endswith('.json.gz'):
+                        fIn = gzip.open(fnameIn, 'rt', encoding='utf-8-sig')
+                    else:
+                        continue
+                    doc = json.load(fIn)
+                    fIn.close()
+                    docCG = self.translate2cg_document(doc)
+                    self.write_cg(docCG, fnameRel)
+                except MemoryError:
+                    print('Memory error when loading', fnameIn)
                 iDoc += 1
         print('Translation to CG finished,', iDoc, 'documents translated.')
 
@@ -313,24 +316,27 @@ class JSON2CG:
                 if len(languageParts) <= 0:
                     copyfile(fnameJsonIn, fnameJsonOut)
                     continue
-                if self.format == 'json' and fnameJsonIn.endswith('.json'):
-                    fJsonIn = open(fnameJsonIn, 'r', encoding='utf-8-sig')
-                elif self.format == 'json-gzip' and fnameJsonIn.endswith('.json.gz'):
-                    fJsonIn = gzip.open(fnameJsonIn, 'rt', encoding='utf-8-sig')
-                else:
-                    continue
-                docJSON = json.load(fJsonIn)
-                fJsonIn.close()
-                docJSONDisamb = self.disambiguate_json(docJSON, languageParts)
-                if self.format == 'json':
-                    fJsonOut = open(fnameJsonOut, 'w', encoding='utf-8')
-                elif self.format == 'json-gzip':
-                    fJsonOut = gzip.open(fnameJsonOut, 'wt', encoding='utf-8')
-                else:
-                    copyfile(fnameJsonIn, fnameJsonOut)
-                    continue
-                json.dump(docJSONDisamb, fp=fJsonOut,
-                          ensure_ascii=False, indent=self.settings['json_indent'])
+                try:
+                    if self.format == 'json' and fnameJsonIn.endswith('.json'):
+                        fJsonIn = open(fnameJsonIn, 'r', encoding='utf-8-sig')
+                    elif self.format == 'json-gzip' and fnameJsonIn.endswith('.json.gz'):
+                        fJsonIn = gzip.open(fnameJsonIn, 'rt', encoding='utf-8-sig')
+                    else:
+                        continue
+                    docJSON = json.load(fJsonIn)
+                    fJsonIn.close()
+                    docJSONDisamb = self.disambiguate_json(docJSON, languageParts)
+                    if self.format == 'json':
+                        fJsonOut = open(fnameJsonOut, 'w', encoding='utf-8')
+                    elif self.format == 'json-gzip':
+                        fJsonOut = gzip.open(fnameJsonOut, 'wt', encoding='utf-8')
+                    else:
+                        copyfile(fnameJsonIn, fnameJsonOut)
+                        continue
+                    json.dump(docJSONDisamb, fp=fJsonOut,
+                              ensure_ascii=False, indent=self.settings['json_indent'])
+                except MemoryError:
+                    print('Memory error when loading', fnameJsonIn)
                 iDoc += 1
         print('Disambiguation finished,', iDoc, 'documents disambiguated,',
               self.nWords, 'words total,', self.nAnalyzedWords, 'words analyzed,',
@@ -351,4 +357,5 @@ class JSON2CG:
 
 if __name__ == '__main__':
     translator = JSON2CG()
-    translator.process_corpus()
+    # translator.process_corpus()
+    translator.disambiguate_json_corpus()

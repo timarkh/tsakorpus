@@ -164,6 +164,7 @@ class PrepareData:
              'doc_id': {'type': 'integer'},
              'text': {'type': 'text'},
              'lang': {'type': 'byte'},
+             'n_words': {'type': 'short'},
              'src_alignment': {'type': 'nested',
                                'properties': {
                                    'mtype': {'type': 'keyword'},
@@ -198,6 +199,15 @@ class PrepareData:
                              'index': False},
              'words': {'type': 'nested',
                        'properties': word_mapping['mappings']['word']['properties']}}
+        sentMetaDict = {}
+        for meta in self.settings['sentence_meta']:
+            if meta.startswith('year'):
+                sentMetaDict[meta] = {'type': 'integer'}
+            else:
+                sentMetaDict[meta] = {'type': 'text'}
+                sentMetaDict[meta + '_kw'] = {'type': 'keyword'}
+        if len(sentMetaDict) > 0:
+            m['meta'] = {'properties': sentMetaDict}
         return {'mappings': {'sentence': {'properties': m}}, 'settings': self.wfAnalyzer}
 
     def generate_mappings(self):

@@ -30,6 +30,16 @@ class TextCleaner:
     rxCyrHSmall = re.compile('(?<=[Ѐ-ԧ])h|h(?=[Ѐ-ԧ])')
     rxCyrHBig = re.compile('(?<=[Ѐ-ԧ])H|H(?=[Ѐ-ԧ])')
 
+    dictDiacriticsUdm = {'и': 'ӥ', 'о': 'ӧ', 'ж': 'ӝ',
+                         'з': 'ӟ', 'ч': 'ӵ', 'И': 'Ӥ',
+                         'О': 'Ӧ', 'Ж': 'Ӝ', 'З': 'Ӟ', 'Ч': 'Ӵ'}
+    rxDiacriticsUdm = re.compile('([иожзчИОЖЗЧ])([:"])(?=[а-яА-ЯёЁ?!])')
+    rxUdmU2I = re.compile('(?<=[а-яА-Я])[ћbü]')
+    rxUdmO2O = re.compile('(?<=[а-яА-ЯӜӞӴӝӟӵ])[ќö]|[ќö](?=[а-яА-ЯӜӞӴӝӟӵ])')
+    rxUdmX2Ch = re.compile('(?<=[а-яА-ЯӜӞӴӝӟӵ])[џx]|[џx](?=[а-яА-ЯӜӞӴӝӟӵ])')
+    rxUdmDzh = re.compile('(?<=[а-яА-ЯӜӞӴӝӟӵ])љ|љ(?=[а-яА-ЯӜӞӴӝӟӵ])')
+    rxUdmZj = re.compile('(?<=[а-яА-ЯӜӞӴӝӟӵ])њ|њ(?=[а-яА-ЯӜӞӴӝӟӵ])')
+
     def __init__(self, settings):
         self.settings = copy.deepcopy(settings)
 
@@ -86,4 +96,23 @@ class TextCleaner:
             text = self.rxCyrAeBig.sub('Ӕ', text)
         text = text.replace(u'…', u'...')
         text = text.replace(u'\\', u'/')
+        return text
+
+    def clean_social_networks(self, text):
+        text = re.sub('(?<=\\w)ааа+', 'а', text)
+        text = re.sub('(?<=\\w)ооо+', 'о', text)
+        text = re.sub('(?<=\\w)еее+', 'е', text)
+        text = re.sub('(?<=\\w)ууу+', 'у', text)
+        text = re.sub('(?<=\\w)иии+', 'у', text)
+        text = re.sub('(?<=\\w)ыы+', 'ы', text)
+        text = re.sub('(?<=\\w)ээ+', 'э', text)
+        if self.settings['languages'][0] == 'udmurt':
+            text = self.rxDiacriticsUdm.sub(lambda m: self.dictDiacriticsUdm[m.group(1)], text)
+            text = self.rxUdmU2I.sub('ӥ', text)
+            text = self.rxUdmO2O.sub('ӧ', text)
+            text = self.rxUdmX2Ch.sub('ӵ', text)
+            text = self.rxUdmDzh.sub('ӝ', text)
+            text = self.rxUdmZj.sub('ӟ', text)
+            text = re.sub('(?<=\\w)ӧӧ+', 'ӧ', text)
+            text = re.sub('(?<=\\w)ӥӥ+', 'ӥ', text)
         return text

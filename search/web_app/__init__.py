@@ -489,7 +489,7 @@ def add_parallel(hits, htmlResponse):
                 htmlResponse['contexts'][iHit]['languages'][lang] = {'text': sentHTML}
 
 
-def get_buckets_for_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=300):
+def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=300):
     """
     Group all documents into buckets, each corresponding to one
     of the unique values for the fieldName metafield. Consider
@@ -548,6 +548,67 @@ def get_buckets_for_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=300)
     return buckets
 
 
+def get_buckets_for_sent_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=300):
+    """
+    Group all sentences into buckets, each corresponding to one
+    of the unique values for the fieldName metafield. Consider
+    only top maxBuckets field values (in terms of document count).
+    If langID is provided, count only data for a particular language.
+    Return a dictionary with the values and corresponding sentence/word
+    count.
+    """
+    if fieldName not in settings['search_meta']['stat_options'] or langID >= len(settings['languages']) > 1:
+        return {}
+    if langID >= 0:
+        innerQuery = {'match': {'lang': langID}}
+    else:
+        innerQuery = {'match_all': {}}
+    if docIDs is not None:
+        innerQuery = {'ids': {'type': 'doc', 'values': list(docIDs)}}
+    # if not fieldName.startswith('year'):
+    #     queryFieldName = fieldName + '_kw'
+    # else:
+    #     queryFieldName = fieldName
+    if not fieldName.startswith('meta.'):
+        queryFieldName = 'meta.' + fieldName
+    else:
+        queryFieldName = fieldName
+    if not queryFieldName.startswith('meta.year'):
+        queryFieldName += '_kw'
+    esQuery = {'query': innerQuery,
+               'size': 0,
+               'aggs': {'metafield':
+                            {'terms':
+                                 {'field': queryFieldName, 'size': maxBuckets},
+                             'aggs':
+                                 {'subagg_n_words': {'sum': {'field': 'n_words'}}}
+                             }
+                        }
+               }
+    hits = sc.get_sentences(esQuery)
+    if 'aggregations' not in hits or 'metafield' not in hits['aggregations']:
+        return {}
+    buckets = []
+    for bucket in hits['aggregations']['metafield']['buckets']:
+        bucketListItem = {'name': bucket['key'],
+                          'n_sents': bucket['doc_count'],
+                          'n_words': bucket['subagg_n_words']['value']}
+        buckets.append(bucketListItem)
+    if not fieldName.startswith('year'):
+        buckets.sort(key=lambda b: (-b['n_words'], -b['n_sents'], b['name']))
+    else:
+        buckets.sort(key=lambda b: b['name'])
+    if len(buckets) > 25 and not fieldName.startswith('year'):
+        bucketsFirst = buckets[:25]
+        lastBucket = {'name': '>>', 'n_sents': 0, 'n_words': 0}
+        for i in range(25, len(buckets)):
+            lastBucket['n_sents'] += buckets[i]['n_sents']
+            lastBucket['n_words'] += buckets[i]['n_words']
+        bucketsFirst.append(lastBucket)
+        buckets = bucketsFirst
+    return buckets
+
+
 @app.route('/doc_stats/<metaField>')
 def get_doc_stats(metaField):
     """
@@ -560,7 +621,7 @@ def get_doc_stats(metaField):
     query = copy_request_args()
     change_display_options(query)
     docIDs = subcorpus_ids(query)
-    buckets = get_buckets_for_metafield(metaField, langID=-1, docIDs=docIDs)
+    buckets = get_buckets_for_doc_metafield(metaField, langID=-1, docIDs=docIDs)
     return jsonify(buckets)
 
 
@@ -621,59 +682,26 @@ def get_word_freq_stats(searchType='word'):
     return jsonify(results)
 
 
-@app.route('/word_stats/<searchType>/<metaField>')
-def get_word_stats(searchType, metaField):
+def get_word_buckets(searchType, metaField, nWords, htmlQuery,
+                     queryWordConstraints, langID, searchIndex):
     """
-    Return JSON with basic statistics concerning the distribution
-    of a particular word form by values of one metafield. This function
-    can be used to visualise word distributions across genres etc.
-    If searchType == 'context', take into account the whole query.
-    If searchType == 'compare', treat the query as several sepearate
-    one-word queries. If, in this case, the data is to be displayed
-    on a bar plot, process only the first word of the query.
-    Otherwise, return a list which contains results for each
-    of the query words (the corresponding lines are plotted
-    in different colors). Maximum number of simultaneously queried words
-    is 10. All words should be in the same language; the language of the
-    first word is used.
+    Perform an actual DB search for a request about the distribution
+    of a word/context over the values of a document-level or a
+    sentence-level metafield. 
     """
-    if metaField not in settings['search_meta']['stat_options']:
-        return jsonify([])
-    if searchType not in ('compare', 'context'):
-        return jsonify([])
-
-    htmlQuery = copy_request_args()
-    change_display_options(htmlQuery)
-    docIDs = subcorpus_ids(htmlQuery)
-    langID = -1
-    if 'lang1' in htmlQuery and htmlQuery['lang1'] in settings['languages']:
-        langID = settings['languages'].index(htmlQuery['lang1'])
-    nWords = 1
-    if 'n_words' in htmlQuery and int(htmlQuery['n_words']) > 1:
-        nWords = int(htmlQuery['n_words'])
-        if searchType == 'compare':
-            if nWords > 10:
-                nWords = 10
-            if metaField not in linePlotMetafields:
-                nWords = 1
-    buckets = get_buckets_for_metafield(metaField, langID=langID, docIDs=docIDs)
-
-    searchIndex = 'words'
-    queryWordConstraints = None
-    if metaField not in linePlotMetafields:
+    bSentenceLevel = (metaField in settings['sentence_meta'])
+    if bSentenceLevel:
+        queryFieldName = 'sent_meta_' + metaField + '_kw1'
+    elif metaField not in linePlotMetafields:
         queryFieldName = metaField + '_kw'
     else:
         queryFieldName = metaField
-    if searchType == 'context' and nWords > 1:
-        searchIndex = 'sentences'
-        wordConstraints = sc.qp.wr.get_constraints(htmlQuery)
-        set_session_data('word_constraints', wordConstraints)
-        if (len(wordConstraints) > 0
-                and get_session_data('distance_strict')):
-            queryWordConstraints = wordConstraints
-    elif searchType == 'context' and 'sentence_index1' in htmlQuery and len(htmlQuery['sentence_index1']) > 0:
-        searchIndex = 'sentences'
+    docIDs = subcorpus_ids(htmlQuery)
 
+    if bSentenceLevel:
+        buckets = get_buckets_for_sent_metafield(metaField, langID=langID, docIDs=docIDs)
+    else:
+        buckets = get_buckets_for_doc_metafield(metaField, langID=langID, docIDs=docIDs)
     results = []
     if searchType == 'context':
         nWordsProcess = 1
@@ -697,7 +725,8 @@ def get_word_stats(searchType, metaField):
             curHtmlQuery[queryFieldName] = bucket['name']
             # elif type(curHtmlQuery[metaField]) == str:
             #     curHtmlQuery[metaField] += ',' + bucket['name']
-            curHtmlQuery['doc_ids'] = subcorpus_ids(curHtmlQuery)
+            if not bSentenceLevel:
+                curHtmlQuery['doc_ids'] = subcorpus_ids(curHtmlQuery)
             query = sc.qp.html2es(curHtmlQuery,
                                   searchOutput=searchIndex,
                                   sortOrder='',
@@ -706,30 +735,89 @@ def get_word_stats(searchType, metaField):
             if searchIndex == 'words' and newBucket['n_words'] > 0:
                 hits = sc.get_word_freqs(query)
                 if ('aggregations' not in hits
-                        or 'agg_freq' not in hits['aggregations']
-                        or 'agg_ndocs' not in hits['aggregations']
-                        or hits['aggregations']['agg_ndocs']['value'] is None
-                        or (hits['aggregations']['agg_ndocs']['value'] <= 0
-                            and not metaField.startswith('year'))):
+                    or 'agg_freq' not in hits['aggregations']
+                    or 'agg_ndocs' not in hits['aggregations']
+                    or hits['aggregations']['agg_ndocs']['value'] is None
+                    or (hits['aggregations']['agg_ndocs']['value'] <= 0
+                        and not metaField.startswith('year'))):
                     continue
                 newBucket['n_words'] = hits['aggregations']['agg_freq']['value'] / newBucket['n_words'] * 1000000
-                newBucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / newBucket['n_docs'] * 100
+                newBucket['n_sents'] = hits['aggregations']['agg_ndocs']['value'] / newBucket['n_docs'] * 100
             elif searchIndex == 'sentences' and newBucket['n_words'] > 0:
                 hits = sc.get_sentences(query)
                 if ('aggregations' not in hits
-                        or 'agg_nwords' not in hits['aggregations']
-                        or 'agg_ndocs' not in hits['aggregations']
-                        or hits['aggregations']['agg_ndocs']['value'] is None
-                        or hits['aggregations']['agg_nwords']['sum'] is None
-                        or (hits['aggregations']['agg_ndocs']['value'] <= 0
-                            and not metaField.startswith('year'))):
+                    or 'agg_nwords' not in hits['aggregations']
+                    or 'agg_ndocs' not in hits['aggregations']
+                    or hits['aggregations']['agg_ndocs']['value'] is None
+                    or hits['aggregations']['agg_nwords']['sum'] is None
+                    or (hits['aggregations']['agg_ndocs']['value'] <= 0
+                        and not metaField.startswith('year'))):
                     continue
                 newBucket['n_words'] = hits['aggregations']['agg_nwords']['sum'] / newBucket['n_words'] * 1000000
                 if nWords > 1:
                     newBucket['n_sents'] = hits['hits']['total']
-                newBucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / newBucket['n_docs'] * 100
+                if not bSentenceLevel:
+                    newBucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / newBucket['n_docs'] * 100
+                else:
+                    newBucket['n_sents'] = hits['hits']['total'] / newBucket['n_sents'] * 100
             curWordBuckets.append(newBucket)
         results.append(curWordBuckets)
+    return results
+
+
+@app.route('/word_stats/<searchType>/<metaField>')
+def get_word_stats(searchType, metaField):
+    """
+    Return JSON with basic statistics concerning the distribution
+    of a particular word form by values of one metafield. This function
+    can be used to visualise word distributions across genres etc.
+    If searchType == 'context', take into account the whole query.
+    If searchType == 'compare', treat the query as several sepearate
+    one-word queries. If, in this case, the data is to be displayed
+    on a bar plot, process only the first word of the query.
+    Otherwise, return a list which contains results for each
+    of the query words (the corresponding lines are plotted
+    in different colors). Maximum number of simultaneously queried words
+    is 10. All words should be in the same language; the language of the
+    first word is used.
+    If the metaField is a document-level field, first split
+    the documents into buckets according to its values and then search
+    inside each bucket. If it is a sentence-level field, do a single
+    search in the sentence index with bucketing.
+    """
+    if metaField not in settings['search_meta']['stat_options']:
+        return jsonify([])
+    if searchType not in ('compare', 'context'):
+        return jsonify([])
+
+    htmlQuery = copy_request_args()
+    change_display_options(htmlQuery)
+    langID = -1
+    if 'lang1' in htmlQuery and htmlQuery['lang1'] in settings['languages']:
+        langID = settings['languages'].index(htmlQuery['lang1'])
+    nWords = 1
+    if 'n_words' in htmlQuery and int(htmlQuery['n_words']) > 1:
+        nWords = int(htmlQuery['n_words'])
+        if searchType == 'compare':
+            if nWords > 10:
+                nWords = 10
+            if metaField not in linePlotMetafields:
+                nWords = 1
+
+    searchIndex = 'words'
+    queryWordConstraints = None
+    if (searchType == 'context' and nWords > 1) or metaField in settings['sentence_meta']:
+        searchIndex = 'sentences'
+        wordConstraints = sc.qp.wr.get_constraints(htmlQuery)
+        set_session_data('word_constraints', wordConstraints)
+        if (len(wordConstraints) > 0
+                and get_session_data('distance_strict')):
+            queryWordConstraints = wordConstraints
+    elif searchType == 'context' and 'sentence_index1' in htmlQuery and len(htmlQuery['sentence_index1']) > 0:
+        searchIndex = 'sentences'
+
+    results = get_word_buckets(searchType, metaField, nWords, htmlQuery,
+                               queryWordConstraints, langID, searchIndex)
     return jsonify(results)
 
 

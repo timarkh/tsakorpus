@@ -610,7 +610,10 @@ class InterfaceQueryParser:
             for k, v in queryDict.items():
                 if k.startswith('sent_meta_'):
                     k = 'meta.' + k[10:]
-                    boolQuery = self.make_bool_query(v, k, lang=lang)
+                    if k.endswith('_kw'):
+                        boolQuery = self.make_bool_query(v, k, lang=lang, keyword_query=True)
+                    else:
+                        boolQuery = self.make_bool_query(v, k, lang=lang)
                     if 'match_none' not in boolQuery:
                         queryFilter.append(boolQuery)
 
