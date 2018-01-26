@@ -92,6 +92,9 @@ msgstr "отрицательные"
 msgid "langname_all"
 msgstr "любой"
 
+msgid "langname_undefined"
+msgstr "неопределённый"
+
 
 
 # Transliteration names for the dropdown menu in search panel (please add all missing languages that you have in the corpus):
@@ -209,6 +212,26 @@ msgstr "язык"
 msgid "metafield_orth"
 msgstr "орфография"
 
+msgid "metafield_year_post"
+msgstr "год (пост)"
+
+msgid "metafield_sex_post"
+msgstr "пол (пост)"
+
+msgid "metafield_city_post"
+msgstr "место проживания (пост)"
+
+msgid "metafield_home_town_post"
+msgstr "место рождения (пост)"
+
+msgid "metafield_account_type_post"
+msgstr "вид аккаунта (пост)"
+
+msgid "metafield_byear_post"
+msgstr "год рождения (пост)"
+
+msgid "metafield_post_type"
+msgstr "тип поста"
 
 
 # Names of the metadata values you have in the corpus:

@@ -283,16 +283,18 @@ function assign_gram_popup() {
 		$('#analysis').css('left', $(document).innerWidth() - anaWidth - 30);
 		$('#analysis').css('top', $(document).innerHeight() - anaHeight - 30);
 		$('#analysis').show();
-        var prevEl = $(this).prev();
-        while (true) {
-            if (prevEl.hasClass('sentence_meta')) {
-                break;
-            }
-            prevEl = prevEl.prev();
-        }
-        if (prevEl.hasClass('sentence_meta')) {
-            $('.sentence_meta').hide();
-            prevEl.show();
+        if ($('.sentence_meta').length > 0) {
+			var prevEl = $(this).prev();
+			while (true) {
+				if (prevEl.hasClass('sentence_meta')) {
+					break;
+				}
+				prevEl = prevEl.prev();
+			}
+			if (prevEl.hasClass('sentence_meta')) {
+				$('.sentence_meta').hide();
+				prevEl.show();
+			}
         }
 	}, function () {
 		$('#analysis').hide();
