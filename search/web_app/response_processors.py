@@ -479,6 +479,33 @@ class SentenceViewer:
                 textTranslit += translit_func(span, lang)
         return textTranslit
 
+    def view_sentence_meta(self, sSource, format):
+        """
+        If there is a metadata dictionary in the sentence, transform it
+        to an HTML span or a text for CSV.
+        """
+        if 'meta' not in sSource or len(sSource['meta']) <= 0:
+            return ''
+        metaSpan = '<span class="sentence_meta">'
+        if format == 'csv':
+            metaSpan = '['
+        for k, v in sSource['meta'].items():
+            if k.endswith('_kw'):
+                continue
+            if format == 'csv':
+                metaSpan += (k + ': ' + str(v)).replace('<', '&lt;').replace('<', '&gt;')
+                metaSpan += '; '
+            else:
+                metaSpan += k + ': ' + str(v)
+                metaSpan += '<br>'
+        if format == 'csv':
+            metaSpan = metaSpan.strip('; ') + '] '
+        else:
+            if metaSpan.endswith('<br>'):
+                metaSpan = metaSpan[:-4]
+            metaSpan += '</span>'
+        return metaSpan
+
     def process_sentence(self, s, numSent=1, getHeader=False, lang='', translit=None, format='html'):
         """
         Process one sentence taken from response['hits']['hits'].
@@ -575,7 +602,8 @@ class SentenceViewer:
         relationsSatisfied = True
         if 'toggled_on' in s and not s['toggled_on']:
             relationsSatisfied = False
-        text = self.transliterate_baseline(''.join(chars), lang=lang, translit=translit)
+        text = self.view_sentence_meta(sSource, format) +\
+               self.transliterate_baseline(''.join(chars), lang=lang, translit=translit)
         return {'header': header, 'languages': {lang: {'text': text,
                                                        'highlighted_text': highlightedText}},
                 'toggled_on': relationsSatisfied,

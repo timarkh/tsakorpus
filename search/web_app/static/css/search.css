@@ -907,3 +907,20 @@ svg circle {
 	width: 85%;
 	min-height: 250px;
 }
+
+.sentence_meta {
+    display: none;
+    padding: 10px;
+    line-height: 1.2;
+    position: absolute;
+    background: #fff9db;
+    opacity: 0.85;
+    border-radius: 10px;
+    box-shadow: 0 0 5px silver;
+    font-size: 90%;
+	font-family: "Segoe UI", "Lucida Grande", sans-serif;
+    z-index: 100;
+	max-width: 500px;
+    top: 30px;
+    left: 70%;
+}

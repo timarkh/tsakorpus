@@ -844,7 +844,7 @@ class InterfaceQueryParser:
             if len(curPrelimQuery) > 0:
                 prelimQuery['words'].append((curPrelimQuery, negQuery))
             for k, v in htmlQuery.items():
-                if k.startswith('sent_meta_') and self.rxStars.search(v) is None:
+                if k.startswith('sent_meta_') and (type(v) != str or self.rxStars.search(v) is None):
                     mFieldNum = self.rxFieldNum.search(k)
                     if mFieldNum is not None:
                         prelimQuery[mFieldNum.group(1)] = v

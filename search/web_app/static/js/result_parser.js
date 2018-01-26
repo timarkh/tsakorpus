@@ -45,6 +45,7 @@ function assign_word_events() {
 	assign_para_highlight();
 	assign_src_alignment();
 	assign_gram_popup();
+	assign_sent_meta_popup();
 }
 
 function highlight_cur_word(e) {
@@ -209,9 +210,15 @@ function show_expanded_context(results) {
 	for (lang in results.languages) {
 		var resID = '#res' + n + '_' + lang;
 		$(resID).html(results.languages[lang].prev + ' ' + $(resID).html() + ' ' + results.languages[lang].next);
+/*
 		wordSpans = $(resID).find('span');
 		for (i = 1; i < wordSpans.length; i++) {
 			$(wordSpans[i]).html($(wordSpans[i]).html().replace(/<span class="newline"><\/span>/g, "<br>"));
+		}
+*/
+		newlineSpans = $(resID).find('span[class=\'newline\']');
+		for (i = 0; i < newlineSpans.length; i++) {
+			$(newlineSpans[i]).html('<br>');
 		}
 		// $(resID).html($(resID).html().replace(/<span class="newline"><\/span>/g, "<br>"));
 	}
@@ -249,6 +256,21 @@ function assign_src_alignment() {
 	});
 }
 
+function assign_sent_meta_popup() {
+    $("span.sent_lang").unbind('hover');
+	$("span.sent_lang").unbind('mousemove');
+    $('span.sent_lang').hover(function (e) {
+/*
+        var sentMeta = $(this).find('.sentence_meta');
+        if (sentMeta.html() != '') {
+			sentMeta.show();
+        }
+*/
+	}, function () {
+		$('.sentence_meta').hide();
+	});
+}
+
 function assign_gram_popup() {
 	var moveLeft = 20;
 	var moveDown = 10;
@@ -261,8 +283,20 @@ function assign_gram_popup() {
 		$('#analysis').css('left', $(document).innerWidth() - anaWidth - 30);
 		$('#analysis').css('top', $(document).innerHeight() - anaHeight - 30);
 		$('#analysis').show();
+        var prevEl = $(this).prev();
+        while (true) {
+            if (prevEl.hasClass('sentence_meta')) {
+                break;
+            }
+            prevEl = prevEl.prev();
+        }
+        if (prevEl.hasClass('sentence_meta')) {
+            $('.sentence_meta').hide();
+            prevEl.show();
+        }
 	}, function () {
 		$('#analysis').hide();
+        $('.sentence_meta').hide();
 	});
 	$('.word').mousemove(function (e) {
 		anaWidth = $('#analysis').width();

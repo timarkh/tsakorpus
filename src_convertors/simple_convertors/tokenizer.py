@@ -29,10 +29,10 @@ class Tokenizer:
                 strRx = '^' + strRx
             if not strRx.endswith('$'):
                 strRx += '$'
-        try:
-            self.tokenSplitRegexes.append(re.compile(strRx))
-        except:
-            print('Error when compiling a regex: ' + strRx)
+            try:
+                self.tokenSplitRegexes.append(re.compile(strRx))
+            except:
+                print('Error when compiling a regex: ' + strRx)
 
     def add_special_token_regexes(self):
         """

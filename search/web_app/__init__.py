@@ -533,7 +533,7 @@ def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=
                           'n_docs': bucket['doc_count'],
                           'n_words': bucket['subagg_n_words']['value']}
         buckets.append(bucketListItem)
-    if not fieldName.startswith('year'):
+    if not fieldName.startswith(('year', 'byear', 'birth_year')):
         buckets.sort(key=lambda b: (-b['n_words'], -b['n_docs'], b['name']))
     else:
         buckets.sort(key=lambda b: b['name'])
@@ -594,7 +594,7 @@ def get_buckets_for_sent_metafield(fieldName, langID=-1, docIDs=None, maxBuckets
                           'n_sents': bucket['doc_count'],
                           'n_words': bucket['subagg_n_words']['value']}
         buckets.append(bucketListItem)
-    if not fieldName.startswith('year'):
+    if not fieldName.startswith(('year', 'byear', 'birth_year')):
         buckets.sort(key=lambda b: (-b['n_words'], -b['n_sents'], b['name']))
     else:
         buckets.sort(key=lambda b: b['name'])
