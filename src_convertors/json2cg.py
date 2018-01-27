@@ -104,6 +104,8 @@ class JSON2CG:
                     print('Invalid language code in the document.')
                     return {l: '' for l in self.languages}
                 language = self.languages[langID]
+                if language not in self.settings['cg_filename']:
+                    continue
             if 'words' not in s:
                 docCG[language] += '"<SENT_BOUNDARY>"\n'
                 continue
@@ -117,6 +119,8 @@ class JSON2CG:
         one for each language.
         """
         for language in docCG:
+            if language not in self.settings['cg_filename']:
+                continue
             dirOut = os.path.join(self.corpus_dir, 'cg')
             language = re.sub('[/\\?.()*"\']', '', language)
             dirOutLang = os.path.join(dirOut, language)
@@ -304,6 +308,8 @@ class JSON2CG:
                 fnameCgIn = re.sub('\\.json(?:\\.gz)?$', '.txt', os.path.join(root, fname)[len(jsonDirIn) + 1:])
                 languageParts = {}      # {language: disambiguated text}
                 for language in self.settings['languages']:
+                    if language not in self.settings['cg_filename']:
+                        continue
                     language4dir = re.sub('[/\\?.()*"\']', '', language)
                     cgDirIn = os.path.join(self.corpus_dir, 'cg_disamb', language4dir)
                     # print(fnameCgIn)

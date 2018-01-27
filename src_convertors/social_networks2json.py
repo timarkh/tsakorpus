@@ -14,7 +14,7 @@ class SocialNetworks2JSON(Txt2JSON):
     for each language.
     """
 
-    allowedMetaKeys = {'account_type', 'sex', 'byear', 'home_town', 'city'}
+    allowedMetaKeys = {'account_type', 'sex', 'byear', 'home_town', 'city', 'author_id'}
 
     def __init__(self, settingsDir='conf'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
