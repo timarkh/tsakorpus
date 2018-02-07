@@ -881,6 +881,12 @@ hr.separator {
   stroke: #c66d00;
 }
 
+.conf_int {
+  fill: none;
+  stroke-width: 1px;
+  stroke: #222;
+}
+
 svg circle {
 	fill: white;
 	stroke: #aaa;

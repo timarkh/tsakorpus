@@ -121,6 +121,14 @@ $(function() {
 			.attr("width", x.bandwidth())
 		    .attr("y", function(v) { return y(v.n_words); })
 		    .attr("height", function(v) { return 200 - y(v.n_words); });
+		chart.selectAll(".conf_int")
+		    .data(results)
+		  .enter().append("line")
+		    .attr("class", "conf_int")
+		    .attr("x1", function(v) { return x(v.name) + barWidth / 2; })
+			.attr("x2", function(v) { return x(v.name) + barWidth / 2; })
+		    .attr("y1", function(v) { return y(v.n_words_conf_int[0]); })
+		    .attr("y2", function(v) { return y(v.n_words_conf_int[1]); });
 		chart.attr("height", 320 + margin.top + margin.bottom);
 	}
 	

@@ -682,6 +682,18 @@ def get_word_freq_stats(searchType='word'):
     return jsonify(results)
 
 
+def wilson_confidence_interval(p, n, multiplier, z=1.645):
+    """
+    Calculate the Wilson confidence interval for Binomial
+    distribution, given n trials with p success rate.
+    """
+    # z: 1.96 for 95%
+    # 1.645 for 90%
+    center = (p + z * z / (2 * n)) / (1 + z * z / (2 * n))
+    halfLength = (z / (1 + z * z / n)) * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
+    return (center - halfLength) * multiplier, (center + halfLength) * multiplier
+
+
 def get_word_buckets(searchType, metaField, nWords, htmlQuery,
                      queryWordConstraints, langID, searchIndex):
     """
@@ -741,7 +753,11 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
                     or (hits['aggregations']['agg_ndocs']['value'] <= 0
                         and not metaField.startswith('year'))):
                     continue
-                newBucket['n_words'] = hits['aggregations']['agg_freq']['value'] / newBucket['n_words'] * 1000000
+                successRate = hits['aggregations']['agg_freq']['value'] / newBucket['n_words']
+                newBucket['n_words_conf_int'] = wilson_confidence_interval(successRate,
+                                                                           newBucket['n_words'],
+                                                                           1000000)
+                newBucket['n_words'] = successRate * 1000000
                 newBucket['n_sents'] = hits['aggregations']['agg_ndocs']['value'] / newBucket['n_docs'] * 100
             elif searchIndex == 'sentences' and newBucket['n_words'] > 0:
                 hits = sc.get_sentences(query)
@@ -753,7 +769,11 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
                     or (hits['aggregations']['agg_ndocs']['value'] <= 0
                         and not metaField.startswith('year'))):
                     continue
-                newBucket['n_words'] = hits['aggregations']['agg_nwords']['sum'] / newBucket['n_words'] * 1000000
+                successRate = hits['aggregations']['agg_nwords']['sum'] / newBucket['n_words']
+                newBucket['n_words_conf_int'] = wilson_confidence_interval(successRate,
+                                                                           newBucket['n_words'],
+                                                                           1000000)
+                newBucket['n_words'] = successRate * 1000000
                 if nWords > 1:
                     newBucket['n_sents'] = hits['hits']['total']
                 if not bSentenceLevel:
