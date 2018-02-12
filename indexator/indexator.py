@@ -226,7 +226,10 @@ class Indexator:
             qIndex = math.ceil(q * len(freqsSorted))
             if qIndex >= len(freqsSorted):
                 qIndex = len(freqsSorted) - 1
-            quantiles[q] = freqsSorted[qIndex]
+            if qIndex >= 0:
+                quantiles[q] = freqsSorted[qIndex]
+            else:
+                quantiles[q] = 0
         return freqToRank, quantiles
 
     def quantile_label(self, freq, rank, quantiles):
