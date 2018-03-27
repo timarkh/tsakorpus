@@ -272,7 +272,7 @@ class Xml_Flex2JSON(Txt2JSON):
                         gloss = element.text
                         glossIndex = element.text + '{' + lastPart.strip('-=:.<>') + '}-'
                         if (morphType == 'stem'
-                                or (morphType == 'unknown' and element.text not in self.glossList))\
+                                or (morphType == 'unknown' and element.text not in self.glosses))\
                                 or (morphType in ('enclitic', 'proclitic') and len(mNode) == 1):
                             self.process_stem(lastPart, element.text, glossLang, anaJSON, curGlossList)
                         else:
@@ -310,8 +310,12 @@ class Xml_Flex2JSON(Txt2JSON):
             return
         wordJSON = {'wtype': 'word', 'wf': ''}
         wordPos = ''
+        hasMorphemes = (len(wordNode.xpath('morphemes')) > 0)
         for el in wordNode:
-            if el.tag not in ['item', 'morphemes']:
+            if el.tag not in ['item', 'morphemes'] or el.text is None:
+                continue
+            elif (hasMorphemes and el.tag == 'item'
+                    and 'type' in el.attrib and el.attrib['type'] == 'gls'):
                 continue
             elif 'type' in wordNode[0].attrib and wordNode[0].attrib['type'] == 'punctl':
                 yield {'wtype': 'punctl', 'wf': wordNode[0].text}
@@ -356,7 +360,7 @@ class Xml_Flex2JSON(Txt2JSON):
             if element.tag == 'item' and 'type' in element.attrib:
                 if element.attrib['type'] in ['ref', 'segnum']:
                     seNum = element.text
-                elif element.attrib['type'] in ['ft', 'lt', 'gls'] and\
+                elif element.attrib['type'] in ['ft', 'lt', 'lit', 'gls'] and\
                         'lang' in element.attrib and\
                         re.sub('-.*', '', element.attrib['lang']) in self.corpusSettings['language_codes']:
                     transLang = self.corpusSettings['language_codes'][re.sub('-.*', '', element.attrib['lang'])]
