@@ -67,6 +67,15 @@ msgstr "Adyghe"
 msgid "langname_romani"
 msgstr "Romani"
 
+msgid "langname_ossetic"
+msgstr "Ossetic"
+
+msgid "langname_ossetic_iron"
+msgstr "Iron Ossetic"
+
+msgid "langname_ossetic_digor"
+msgstr "Digor Ossetic"
+
 msgid "langname_english"
 msgstr "English"
 

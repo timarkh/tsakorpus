@@ -68,6 +68,15 @@ msgstr "адыгейский"
 msgid "langname_romani"
 msgstr "цыганский"
 
+msgid "langname_ossetic"
+msgstr "осетинский"
+
+msgid "langname_ossetic_iron"
+msgstr "иронский"
+
+msgid "langname_ossetic_digor"
+msgstr "дигорский"
+
 msgid "langname_english"
 msgstr "английский"
 
