@@ -116,7 +116,7 @@ class Xml_Rnc2JSON(Txt2JSON):
     def convert_file(self, fnameSrc, fnameTarget):
         curMeta = self.get_meta(fnameSrc)
         textJSON = {'meta': curMeta, 'sentences': []}
-        nTokens, nWords, nAnalyze = 0, 0, 0
+        nTokens, nWords, nAnalyzed = 0, 0, 0
         srcTree = etree.parse(fnameSrc)
         textJSON['sentences'] = [s for paraNode in srcTree.xpath('/html/body/para')
                                  for s in self.process_para_node(paraNode)]
@@ -124,10 +124,16 @@ class Xml_Rnc2JSON(Txt2JSON):
         for i in range(len(textJSON['sentences']) - 1):
             if textJSON['sentences'][i]['lang'] != textJSON['sentences'][i + 1]['lang']:
                 textJSON['sentences'][i]['last'] = True
+                for word in textJSON['sentences'][i]['words']:
+                    nTokens += 1
+                    if word['wtype'] == 'word':
+                        nWords += 1
+                        if 'ana' in word and len(word['ana']) > 0:
+                            nAnalyzed += 1
         self.tp.splitter.recalculate_offsets(textJSON['sentences'])
         self.tp.splitter.add_next_word_id(textJSON['sentences'])
         self.write_output(fnameTarget, textJSON)
-        return nTokens, nWords, nAnalyze
+        return nTokens, nWords, nAnalyzed
 
 
 if __name__ == '__main__':

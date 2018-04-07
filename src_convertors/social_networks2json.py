@@ -83,8 +83,8 @@ class SocialNetworks2JSON(Txt2JSON):
         if fnameSrc == fnameTarget:
             return 0, 0, 0
 
-        fIn = open(fnameSrc, 'rb')
-        data = json.load(fIn)
+        fIn = open(fnameSrc, 'r', encoding='utf-8-sig')
+        data = json.loads(fIn.read())
         fIn.close()
         if 'meta' not in data or 'posts' not in data:
             return 0, 0, 0
