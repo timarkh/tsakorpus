@@ -86,26 +86,29 @@ class Txt2JSON:
         self.meta = {}
         if len(self.corpusSettings['meta_filename']) <= 0:
             return
-        fMeta = open(os.path.join(self.corpusSettings['corpus_dir'],
-                                  self.corpusSettings['meta_filename']),
-                     'r', encoding='utf-8-sig')
-        for line in fMeta:
-            if len(line) <= 3:
-                continue
-            metaValues = line.split('\t')
-            curMetaDict = {}
-            for i in range(len(self.corpusSettings['meta_fields'])):
-                fieldName = self.corpusSettings['meta_fields'][i]
-                if i >= len(metaValues):
-                    break
-                if fieldName == 'filename':
-                    metaValues[i] = metaValues[i].replace('\\', '/')
-                    if not self.corpusSettings['meta_files_case_sensitive']:
-                        metaValues[i] = metaValues[i].lower()
-                    self.meta[metaValues[i]] = curMetaDict
-                else:
-                    curMetaDict[fieldName] = metaValues[i].strip()
-        fMeta.close()
+        try:
+            fMeta = open(os.path.join(self.corpusSettings['corpus_dir'],
+                                      self.corpusSettings['meta_filename']),
+                         'r', encoding='utf-8-sig')
+            for line in fMeta:
+                if len(line) <= 3:
+                    continue
+                metaValues = line.split('\t')
+                curMetaDict = {}
+                for i in range(len(self.corpusSettings['meta_fields'])):
+                    fieldName = self.corpusSettings['meta_fields'][i]
+                    if i >= len(metaValues):
+                        break
+                    if fieldName == 'filename':
+                        metaValues[i] = metaValues[i].replace('\\', '/')
+                        if not self.corpusSettings['meta_files_case_sensitive']:
+                            metaValues[i] = metaValues[i].lower()
+                        self.meta[metaValues[i]] = curMetaDict
+                    else:
+                        curMetaDict[fieldName] = metaValues[i].strip()
+            fMeta.close()
+        except FileNotFoundError:
+            print('Metadata file not found.')
 
     def write_output(self, fnameTarget, textJSON):
         """

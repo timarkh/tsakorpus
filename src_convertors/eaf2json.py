@@ -28,15 +28,19 @@ class Eaf2JSON(Txt2JSON):
         self.pID = 0        # id of last aligned segment
         self.glosses = set()
         self.participants = {}     # main tier ID -> participant ID
+        self.segmentTree = {}      # aID -> (contents, parent aID, tli1, tli2)
 
     def load_speaker_meta(self):
         speakerMeta = {}
         if 'speaker_meta_filename' not in self.corpusSettings:
             return speakerMeta
-        f = open(os.path.join(self.corpusSettings['corpus_dir'], self.corpusSettings['speaker_meta_filename']),
-                 'r', encoding='utf-8-sig')
-        speakerMeta = json.loads(f.read())
-        f.close()
+        try:
+            f = open(os.path.join(self.corpusSettings['corpus_dir'], self.corpusSettings['speaker_meta_filename']),
+                     'r', encoding='utf-8-sig')
+            speakerMeta = json.loads(f.read())
+            f.close()
+        except FileNotFoundError:
+            print('The speaker metadata file not found.')
         return speakerMeta
 
     def get_tlis(self, srcTree):
@@ -52,6 +56,47 @@ class Eaf2JSON(Txt2JSON):
             tlis[tli.attrib['TIME_SLOT_ID']] = {'n': iTli, 'time': timeValue}
             iTli += 1
         return tlis
+
+    def traverse_tree(self, srcTree, callback):
+        """
+        Iterate over all tiers in the XML tree and call the callback function
+        for each of them.
+        """
+        for tierNode in srcTree.xpath('/ANNOTATION_DOCUMENT/TIER'):
+            if 'TIER_ID' not in tierNode.attrib:
+                continue
+            callback(tierNode)
+
+    def cb_build_segment_tree(self, tierNode):
+        for segNode in tierNode.xpath('ANNOTATION/REF_ANNOTATION | ANNOTATION/ALIGNABLE_ANNOTATION'):
+            if 'ANNOTATION_ID' not in segNode.attrib:
+                continue
+            aID = segNode.attrib['ANNOTATION_ID']
+            try:
+                segContents = segNode.xpath('ANNOTATION_VALUE')[0].text.strip()
+            except AttributeError:
+                segContents = ''
+            try:
+                segParent = segNode.attrib['ANNOTATION_REF']
+            except KeyError:
+                segParent = None
+            tli1, tli2 = None, None
+            if 'TIME_SLOT_REF1' in segNode.attrib:
+                tli1 = segNode.attrib['TIME_SLOT_REF1']
+            elif segParent in self.segmentTree and self.segmentTree[segParent][2] is not None:
+                tli1 = self.segmentTree[segParent][2]
+            if 'TIME_SLOT_REF2' in segNode.attrib:
+                tli2 = segNode.attrib['TIME_SLOT_REF2']
+            elif segParent in self.segmentTree and self.segmentTree[segParent][3] is not None:
+                tli2 = self.segmentTree[segParent][3]
+            self.segmentTree[aID] = (segContents, segParent, tli1, tli2)
+
+    def build_segment_tree(self, srcTree):
+        """
+        Read the entire XML tree and save all segment data (contents, links to
+        the parents and timestamps, if any).
+        """
+        self.traverse_tree(srcTree, self.cb_build_segment_tree)
 
     def fragmentize_src_alignment(self, alignment):
         """
@@ -131,35 +176,31 @@ class Eaf2JSON(Txt2JSON):
         if not alignedTier and 'PARTICIPANT' in tierNode.attrib:
             speaker = tierNode.attrib['PARTICIPANT']
             self.participants[tierNode.attrib['TIER_ID']] = speaker
-        elif alignedTier:
+        else:
             if ('PARENT_REF' in tierNode.attrib
                     and tierNode.attrib['PARENT_REF'] in self.participants):
                 speaker = self.participants[tierNode.attrib['PARENT_REF']]
             elif 'PARTICIPANT' in tierNode.attrib:
                 speaker = tierNode.attrib['PARTICIPANT']
+
+        segments = tierNode.xpath('ANNOTATION/REF_ANNOTATION | ANNOTATION/ALIGNABLE_ANNOTATION')
         
-        if alignedTier:
-            xpathExpr = 'ANNOTATION/REF_ANNOTATION'
-        else:
-            xpathExpr = 'ANNOTATION/ALIGNABLE_ANNOTATION'
-        segments = tierNode.xpath(xpathExpr)
-        
-        for segment in segments:
+        for segNode in segments:
+            if ('ANNOTATION_ID' not in segNode.attrib
+                    or segNode.attrib['ANNOTATION_ID'] not in self.segmentTree):
+                continue
+            segData = self.segmentTree[segNode.attrib['ANNOTATION_ID']]
             if not alignedTier:
-                if ('TIME_SLOT_REF1' not in segment.attrib or
-                        'TIME_SLOT_REF2' not in segment.attrib):
+                if segData[2] is None or segData[3] is None:
                     continue
-                tli1 = segment.attrib['TIME_SLOT_REF1']
-                tli2 = segment.attrib['TIME_SLOT_REF2']
-            elif 'ANNOTATION_REF' in segment.attrib:
-                aID = segment.attrib['ANNOTATION_REF']
+                tli1 = segData[2]
+                tli2 = segData[3]
+            elif segData[1] is not None:
+                aID = segData[1]
                 pID, tli1, tli2 = aID2pID[aID]
             else:
                 continue
-            try:
-                text = segment.xpath('ANNOTATION_VALUE')[0].text.strip()
-            except AttributeError:
-                text = ''
+            text = segData[0]
             curSent = {'text': text, 'words': self.tp.tokenizer.tokenize(text), 'lang': langID,
                        'meta': {'speaker': speaker}}
             if speaker in self.speakerMeta:
@@ -168,13 +209,13 @@ class Eaf2JSON(Txt2JSON):
             self.tp.splitter.add_next_word_id_sentence(curSent)
             self.tp.parser.analyze_sentence(curSent, lang=lang)
             if len(self.corpusSettings['aligned_tiers']) > 0:
-                if not alignedTier and 'ANNOTATION_ID' in segment.attrib:
+                if not alignedTier:
                     self.pID += 1
-                    aID = segment.attrib['ANNOTATION_ID']
+                    aID = segNode.attrib['ANNOTATION_ID']
                     aID2pID[aID] = (self.pID, tli1, tli2)
                     paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
                     curSent['para_alignment'] = [paraAlignment]
-                elif alignedTier:
+                else:
                     paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': pID}
                     curSent['para_alignment'] = [paraAlignment]
             self.add_src_alignment(curSent, tli1, tli2, srcFile)
@@ -184,16 +225,50 @@ class Eaf2JSON(Txt2JSON):
         """
         Iterate over sentences in the XML tree.
         """
-        mainTierTypes = '(' + ' | '.join('/ANNOTATION_DOCUMENT/TIER[@LINGUISTIC_TYPE_REF=\'' + x + '\']'
-                                         for x in self.corpusSettings['main_tiers']) + ')'
-        mainTiers = srcTree.xpath(mainTierTypes)
+        # mainTierTypes = '(' + ' | '.join('/ANNOTATION_DOCUMENT/TIER[@LINGUISTIC_TYPE_REF=\'' + x + '\'] | ' +
+        #                                  '/ANNOTATION_DOCUMENT/TIER[@TIER_ID=\'' + x + '\']'
+        #                                  for x in self.corpusSettings['main_tiers']) + ')'
+        # mainTiers = srcTree.xpath(mainTierTypes)
+        mainTiers = []
+        alignedTiers = []
+        for tierNode in srcTree.xpath('/ANNOTATION_DOCUMENT/TIER'):
+            for tierRegex in self.corpusSettings['main_tiers']:
+                if not tierRegex.startswith('^'):
+                    tierRegex = '^' + tierRegex
+                if not tierRegex.endswith('$'):
+                    tierRegex += '$'
+                try:
+                    if re.search(tierRegex, tierNode.attrib['TIER_ID']) is not None:
+                        mainTiers.append(tierNode)
+                        break
+                    elif ('LINGUISTIC_TYPE_REF' in tierNode.attrib
+                            and re.search(tierRegex, tierNode.attrib['LINGUISTIC_TYPE_REF']) is not None):
+                        mainTiers.append(tierNode)
+                        break
+                except:
+                    pass
+            for tierRegex in self.corpusSettings['aligned_tiers']:
+                if not tierRegex.startswith('^'):
+                    tierRegex = '^' + tierRegex
+                if not tierRegex.endswith('$'):
+                    tierRegex += '$'
+                try:
+                    if re.search(tierRegex, tierNode.attrib['TIER_ID']) is not None:
+                        alignedTiers.append(tierNode)
+                        break
+                    elif ('LINGUISTIC_TYPE_REF' in tierNode.attrib
+                            and re.search(tierRegex, tierNode.attrib['LINGUISTIC_TYPE_REF']) is not None):
+                        alignedTiers.append(tierNode)
+                        break
+                except:
+                    pass
         if len(mainTiers) <= 0:
             return
-        alignedTiers = []
-        if len(self.corpusSettings['aligned_tiers']) > 0:
-            alignedTierTypes = '(' + ' | '.join('/ANNOTATION_DOCUMENT/TIER[@LINGUISTIC_TYPE_REF=\'' + x + '\']'
-                                                for x in self.corpusSettings['aligned_tiers']) + ')'
-            alignedTiers = srcTree.xpath(alignedTierTypes)
+        # if len(self.corpusSettings['aligned_tiers']) > 0:
+        #     alignedTierTypes = '(' + ' | '.join('/ANNOTATION_DOCUMENT/TIER[@LINGUISTIC_TYPE_REF=\'' + x + '\'] | ' +
+        #                                         '/ANNOTATION_DOCUMENT/TIER[@TIER_ID=\'' + x + '\']'
+        #                                         for x in self.corpusSettings['aligned_tiers']) + ')'
+        #     alignedTiers = srcTree.xpath(alignedTierTypes)
         aID2pID = {}    # annotation ID -> (pID, tli1, tli2) correspondence
         for tier in mainTiers:
             for sent in self.process_tier(tier, aID2pID, srcFile, alignedTier=False):
@@ -256,9 +331,10 @@ class Eaf2JSON(Txt2JSON):
     def convert_file(self, fnameSrc, fnameTarget):
         curMeta = self.get_meta(fnameSrc)
         textJSON = {'meta': curMeta, 'sentences': []}
-        nTokens, nWords, nAnalyze = 0, 0, 0
+        nTokens, nWords, nAnalyzed = 0, 0, 0
         srcTree = etree.parse(fnameSrc)
         self.tlis = self.get_tlis(srcTree)
+        self.build_segment_tree(srcTree)
         srcFileNode = srcTree.xpath('/ANNOTATION_DOCUMENT/HEADER/MEDIA_DESCRIPTOR')
         if len(srcFileNode) > 0 and 'RELATIVE_MEDIA_URL' in srcFileNode[0].attrib:
             srcFile = self.rxStripDir.sub('', html.unescape(srcFileNode[0].attrib['RELATIVE_MEDIA_URL']))
@@ -272,12 +348,18 @@ class Eaf2JSON(Txt2JSON):
             # del textJSON['sentences'][i]['src_alignment'][0]['true_off_start_src']
             if textJSON['sentences'][i]['lang'] != textJSON['sentences'][i + 1]['lang']:
                 textJSON['sentences'][i]['last'] = True
+            for word in textJSON['sentences'][i]['words']:
+                nTokens += 1
+                if word['wtype'] == 'word':
+                    nWords += 1
+                if 'ana' in word and len(word['ana']) > 0:
+                    nAnalyzed += 1
         self.tp.splitter.recalculate_offsets(textJSON['sentences'])
         self.tp.splitter.add_next_word_id(textJSON['sentences'])
         self.add_speaker_marks(textJSON['sentences'])
         self.add_sentence_meta(textJSON['sentences'], curMeta)
         self.write_output(fnameTarget, textJSON)
-        return nTokens, nWords, nAnalyze
+        return nTokens, nWords, nAnalyzed
 
     def process_corpus(self, cutMedia=True):
         """
