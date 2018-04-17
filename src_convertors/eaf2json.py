@@ -2,6 +2,7 @@ import os
 import re
 import html
 import json
+import itertools
 from lxml import etree
 from txt2json import Txt2JSON
 from media_operations import MediaCutter
@@ -18,6 +19,8 @@ class Eaf2JSON(Txt2JSON):
     """
 
     mediaExtensions = {'.wav', '.mp3', '.mp4', '.avi'}
+    rxSpaces = re.compile('[ \t]+')
+    rxLetters = re.compile('\w+')
 
     def __init__(self, settingsDir='conf'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
@@ -29,6 +32,7 @@ class Eaf2JSON(Txt2JSON):
         self.glosses = set()
         self.participants = {}     # main tier ID -> participant ID
         self.segmentTree = {}      # aID -> (contents, parent aID, tli1, tli2)
+        self.segmentChildren = {}  # (aID, child tier type) -> [child aID]
 
     def load_speaker_meta(self):
         speakerMeta = {}
@@ -68,6 +72,21 @@ class Eaf2JSON(Txt2JSON):
             callback(tierNode)
 
     def cb_build_segment_tree(self, tierNode):
+        tierType = ''  # analysis tiers: word/POS/gramm/gloss etc.
+        if 'analysis_tiers' in self.corpusSettings:
+            for k, v in self.corpusSettings['analysis_tiers'].items():
+                if not k.startswith('^'):
+                    k = '^' + k
+                if not k.endswith('$'):
+                    k += '$'
+                try:
+                    rxTierID = re.compile(k)
+                    if (rxTierID.search(tierNode.attrib['TIER_ID']) is not None
+                        or rxTierID.search(tierNode.attrib['LINGUISTIC_TYPE_REF']) is not None):
+                        tierType = v
+                        break
+                except:
+                    print('Except')
         for segNode in tierNode.xpath('ANNOTATION/REF_ANNOTATION | ANNOTATION/ALIGNABLE_ANNOTATION'):
             if 'ANNOTATION_ID' not in segNode.attrib:
                 continue
@@ -90,12 +109,21 @@ class Eaf2JSON(Txt2JSON):
             elif segParent in self.segmentTree and self.segmentTree[segParent][3] is not None:
                 tli2 = self.segmentTree[segParent][3]
             self.segmentTree[aID] = (segContents, segParent, tli1, tli2)
+            if segParent is None:
+                continue
+            if len(tierType) > 0:
+                try:
+                    self.segmentChildren[(segParent, tierType)].append(aID)
+                except KeyError:
+                    self.segmentChildren[(segParent, tierType)] = [aID]
 
     def build_segment_tree(self, srcTree):
         """
         Read the entire XML tree and save all segment data (contents, links to
         the parents and timestamps, if any).
         """
+        self.segmentTree = {}
+        self.segmentChildren = {}
         self.traverse_tree(srcTree, self.cb_build_segment_tree)
 
     def fragmentize_src_alignment(self, alignment):
@@ -137,6 +165,113 @@ class Eaf2JSON(Txt2JSON):
         for alignment in sentAlignments:
             self.fragmentize_src_alignment(alignment)
         sent['src_alignment'] = sentAlignments
+
+    def add_punc(self, text, startOffset):
+        """
+        Make one or several punctuation tokens out of the text.
+        """
+        tokens = []
+        curToken = {'wf': '', 'off_start': startOffset, 'off_end': startOffset, 'wtype': 'punc'}
+        for i in range(len(text)):
+            if self.rxSpaces.search(text[i]) is not None:
+                if len(curToken['wf']) > 0:
+                    curToken['off_end'] = startOffset + i
+                    tokens.append(curToken)
+                    curToken = {'wf': '', 'off_start': startOffset + i, 'off_end': startOffset + i, 'wtype': 'punc'}
+            else:
+                curToken['wf'] += text[i]
+        if len(curToken['wf']) > 0:
+            curToken['off_end'] = startOffset + len(text)
+            tokens.append(curToken)
+        return tokens
+
+    def retrieve_analyses(self, aID, lang=''):
+        """
+        Compile list of analyses retrieved from the relevant tiers of an analyzed
+        EAF file associated with the token identified by aID.
+        """
+        analyses = []
+        analysisTiers = []
+        for tierType in ['pos', 'gramm', 'lemma', 'parts', 'gloss']:
+            if (aID, tierType) not in self.segmentChildren:
+                continue
+            analysisTiers.append([])
+            for childID in self.segmentChildren[(aID, tierType)]:
+                if childID not in self.segmentTree:
+                    continue
+                contents = self.segmentTree[childID][0]
+                for ana in self.retrieve_analyses(childID, lang=lang):
+                    if tierType == 'lemma':
+                        ana['lex'] = contents
+                    elif tierType == 'parts':
+                        ana['parts'] = contents
+                    elif tierType == 'gloss':
+                        ana['gloss'] = contents
+                    elif tierType == 'pos' and len(contents) > 0:
+                        ana['gr.pos'] = contents
+                    elif tierType == 'gramm':
+                        grJSON = self.tp.parser.transform_gramm_str(contents, lang=lang)
+                        ana.update(grJSON)
+                    analysisTiers[-1].append(ana)
+            analysisTiers[-1] = [ana for ana in analysisTiers[-1] if len(ana) > 0]
+        if len(analysisTiers) <= 0:
+            return [{}]
+        for combination in itertools.product(*analysisTiers):
+            ana = {}
+            for partAna in combination:
+                ana.update(partAna)
+            if len(ana) > 0:
+                self.tp.parser.process_gloss_in_ana(ana)
+                analyses.append(ana)
+        if len(analyses) <= 0:
+            return [{}]
+        return analyses
+
+    def retrieve_words(self, text, wordIDs, lang=''):
+        """
+        Return a list of words with their analyses retrieved from the relevant
+        tiers of an analyzed EAF file. Try to align words with the text of the
+        entire sentence.
+        """
+        words = []
+        iSentPos = 0
+        iBufferStart = 0
+        sBuffer = ''
+        for iWord in range(len(wordIDs)):
+            iWordPos = 0
+            word = self.segmentTree[wordIDs[iWord]][0]
+            if len(sBuffer) <= 0:
+                iBufferStart = iSentPos
+            if len(word) <= 0:
+                continue
+            while iSentPos < len(text) and text[iSentPos].lower() != word[iWordPos].lower():
+                sBuffer += text[iSentPos]
+                iSentPos += 1
+            if len(sBuffer) > 0:
+                words += self.add_punc(sBuffer, iBufferStart)
+                sBuffer = ''
+                iBufferStart = iSentPos
+            if iSentPos == len(text):
+                print('Unexpected end of sentence:', text)
+                return words
+            token = {'wf': word, 'off_start': iSentPos, 'off_end': iSentPos + len(word), 'wtype': 'word'}
+            while iSentPos < len(text) and iWordPos < len(word):
+                if text[iSentPos].lower() == word[iWordPos].lower():
+                    iSentPos += 1
+                    iWordPos += 1
+                    continue
+                if self.rxLetters.search(word[iWordPos]) is None and self.rxLetters.search(text[iSentPos]) is not None:
+                    iWordPos += 1
+                    continue
+                iSentPos += 1
+            token['off_end'] = iSentPos
+            analyses = [ana for ana in self.retrieve_analyses(wordIDs[iWord], lang=lang) if len(ana) > 0]
+            if len(analyses) > 0:
+                token['ana'] = analyses
+            words.append(token)
+        if iSentPos < len(text):
+            words += self.add_punc(text[iSentPos:], iSentPos)
+        return words
 
     def process_tier(self, tierNode, aID2pID, srcFile, alignedTier=False):
         """
@@ -201,13 +336,21 @@ class Eaf2JSON(Txt2JSON):
             else:
                 continue
             text = segData[0]
-            curSent = {'text': text, 'words': self.tp.tokenizer.tokenize(text), 'lang': langID,
+            curSent = {'text': text, 'words': None, 'lang': langID,
                        'meta': {'speaker': speaker}}
             if speaker in self.speakerMeta:
                 for k, v in self.speakerMeta[speaker].items():
                     curSent['meta'][k] = v
-            self.tp.splitter.add_next_word_id_sentence(curSent)
-            self.tp.parser.analyze_sentence(curSent, lang=lang)
+            if (segNode.attrib['ANNOTATION_ID'], 'word') not in self.segmentChildren:
+                curSent['words'] = self.tp.tokenizer.tokenize(text)
+                self.tp.splitter.add_next_word_id_sentence(curSent)
+                self.tp.parser.analyze_sentence(curSent, lang=lang)
+            else:
+                curSent['words'] = self.retrieve_words(text,
+                                                       self.segmentChildren[(segNode.attrib['ANNOTATION_ID'],
+                                                                             'word')],
+                                                       lang=lang)
+                self.tp.splitter.add_next_word_id_sentence(curSent)
             if len(self.corpusSettings['aligned_tiers']) > 0:
                 if not alignedTier:
                     self.pID += 1
