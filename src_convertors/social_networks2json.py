@@ -68,7 +68,8 @@ class SocialNetworks2JSON(Txt2JSON):
                 curSentences += self.get_post_sentences(post['sentences'],
                                                         post['author'], defaultMeta, 'post',
                                                         year=year)
-            for comment in post['comments'].values():
+            for cID in sorted(post['comments']):
+                comment = post['comments'][cID]
                 if 'sentences' in comment:
                     year = int(comment['date'][:4])
                     curSentences += self.get_post_sentences(comment['sentences'],
