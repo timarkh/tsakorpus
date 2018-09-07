@@ -41,7 +41,7 @@ srcReplacements = {}
 
 def udmurt_translit_upa(text):
     """
-    Transliterate Beserman text from dictionary Latin script to the Cyrillics.
+    Transliterate Udmurt text from Cyrillic script to Latin UPA.
     """
     text = text.replace('жи', 'жӥ')
     text = text.replace('ӝи', 'ӝӥ')
@@ -84,4 +84,5 @@ def udmurt_translit_upa(text):
     res = res.replace('Šʼ', 'Ś')
     res = res.replace('Žʼ', 'Ź')
     res = res.replace('Čʼ', 'Ć')
+    res = res.replace('Nʼ', 'Ń')
     return res
