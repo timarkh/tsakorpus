@@ -35,6 +35,33 @@ msgstr "бесермянский"
 msgid "langname_komi"
 msgstr "коми"
 
+msgid "langname_komi_zyrian"
+msgstr "коми-зырянский"
+
+msgid "langname_komi_permyak"
+msgstr "коми-пермяцкий"
+
+msgid "langname_erzya"
+msgstr "эрзянский"
+
+msgid "langname_moksha"
+msgstr "мокшанский"
+
+msgid "langname_hill_mari"
+msgstr "горномарийский"
+
+msgid "langname_meadow_mari"
+msgstr "луговой марийский"
+
+msgid "langname_tatar"
+msgstr "татарский"
+
+msgid "langname_bashkir"
+msgstr "башкирский"
+
+msgid "langname_chuvash"
+msgstr "чувашский"
+
 msgid "langname_nganasan"
 msgstr "нганасанский"
 
@@ -158,6 +185,12 @@ msgstr "год: до"
 msgid "metafield_title"
 msgstr "заголовок"
 
+msgid "metafield_title_en"
+msgstr "заголовок (английский)"
+
+msgid "metafield_title_myv"
+msgstr "заголовок (эрзянский)"
+
 msgid "metafield_author"
 msgstr "автор"
 
@@ -188,6 +221,9 @@ msgstr "выпуск"
 msgid "metafield_birthyear"
 msgstr "год рождения"
 
+msgid "metafield_byear"
+msgstr "год рождения"
+
 msgid "metafield_birthplace"
 msgstr "место рождения"
 
@@ -199,6 +235,12 @@ msgstr "род занятий"
 
 msgid "metafield_liveplace"
 msgstr "место проживания"
+
+msgid "metafield_home_town"
+msgstr "место рождения"
+
+msgid "metafield_city"
+msgstr "город"
 
 msgid "metafield_place"
 msgstr "место"
@@ -241,6 +283,9 @@ msgstr "год рождения (пост)"
 
 msgid "metafield_post_type"
 msgstr "тип поста"
+
+msgid "metafield_account_type"
+msgstr "тип аккаунта"
 
 
 # Names of the metadata values you have in the corpus:

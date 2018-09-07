@@ -34,6 +34,33 @@ msgstr "Beserman"
 msgid "langname_komi"
 msgstr "Komi"
 
+msgid "langname_komi_zyrian"
+msgstr "Komi-Zyrian"
+
+msgid "langname_komi_permyak"
+msgstr "Komi-Permyak"
+
+msgid "langname_erzya"
+msgstr "Erzya"
+
+msgid "langname_moksha"
+msgstr "Moksha"
+
+msgid "langname_hill_mari"
+msgstr "Hill Mari"
+
+msgid "langname_meadow_mari"
+msgstr "Meadwo Mari"
+
+msgid "langname_tatar"
+msgstr "Tatar"
+
+msgid "langname_bashkir"
+msgstr "Bashkir"
+
+msgid "langname_chuvash"
+msgstr "Chuvash"
+
 msgid "langname_nganasan"
 msgstr "Nganasan"
 
@@ -157,6 +184,12 @@ msgstr "year: to"
 msgid "metafield_title"
 msgstr "title"
 
+msgid "metafield_title_en"
+msgstr "title in English"
+
+msgid "metafield_title_myv"
+msgstr "title in Erzya"
+
 msgid "metafield_author"
 msgstr "author"
 
@@ -181,7 +214,13 @@ msgstr "speaker"
 msgid "metafield_published"
 msgstr "published"
 
+msgid "metafield_issue"
+msgstr "issue"
+
 msgid "metafield_birthyear"
+msgstr "year of birth"
+
+msgid "metafield_byear"
 msgstr "year of birth"
 
 msgid "metafield_birthplace"
@@ -195,6 +234,12 @@ msgstr "occupation"
 
 msgid "metafield_liveplace"
 msgstr "place of living"
+
+msgid "metafield_home_town"
+msgstr "home town"
+
+msgid "metafield_city"
+msgstr "city"
 
 msgid "metafield_place"
 msgstr "place"
@@ -237,6 +282,9 @@ msgstr "Birth year (post-level)"
 
 msgid "metafield_post_type"
 msgstr "Post type"
+
+msgid "metafield_account_type"
+msgstr "Account type"
 
 
 # Names of the metadata values you have in the corpus:
