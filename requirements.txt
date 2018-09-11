@@ -1,0 +1,8 @@
+# Requirements file for python modules, to be used with pip (pip3 install -r requirements.txt).
+
+elasticsearch>=5.0.0,<6.0.0
+Flask
+Flask-Babel
+lxml
+ijson
+XlsxWriter
