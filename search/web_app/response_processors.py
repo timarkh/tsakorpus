@@ -506,19 +506,21 @@ class SentenceViewer:
             metaSpan += '</span>'
         return metaSpan
 
-    def process_sentence(self, s, numSent=1, getHeader=False, lang='', translit=None, format='html'):
+    def process_sentence(self, s, numSent=1, getHeader=False, lang='', langView='', translit=None, format='html'):
         """
         Process one sentence taken from response['hits']['hits'].
         If getHeader is True, retrieve the metadata from the database.
         Return dictionary {'header': document header HTML,
                            {'languages': {'<language_name>': {'text': sentence HTML}}}}.
         """
+        if len(langView) <= 0 and len(lang) > 0:
+            langView = lang
         if '_source' not in s:
-            return {'languages': {lang: {'text': '', 'highlighted_text': ''}}}
+            return {'languages': {langView: {'text': '', 'highlighted_text': ''}}}
         matchWordOffsets = self.retrieve_highlighted_words(s, numSent)
         sSource = s['_source']
         if 'text' not in sSource or len(sSource['text']) <= 0:
-            return {'languages': {lang: {'text': '', 'highlighted_text': ''}}}
+            return {'languages': {langView: {'text': '', 'highlighted_text': ''}}}
 
         header = {}
         if getHeader:
@@ -533,8 +535,8 @@ class SentenceViewer:
         else:
             highlightedText = sSource['text']
         if 'words' not in sSource:
-            return {'languages': {lang: {'text': highlightedText,
-                                         'highlighted_text': highlightedText}}}
+            return {'languages': {langView: {'text': highlightedText,
+                                             'highlighted_text': highlightedText}}}
         chars = list(sSource['text'])
         if format == 'csv':
             offParaStarts, offParaEnds = {}, {}
@@ -604,8 +606,8 @@ class SentenceViewer:
             relationsSatisfied = False
         text = self.view_sentence_meta(sSource, format) +\
                self.transliterate_baseline(''.join(chars), lang=lang, translit=translit)
-        return {'header': header, 'languages': {lang: {'text': text,
-                                                       'highlighted_text': highlightedText}},
+        return {'header': header, 'languages': {langView: {'text': text,
+                                                           'highlighted_text': highlightedText}},
                 'toggled_on': relationsSatisfied,
                 'src_alignment': fragmentInfo}
 
@@ -931,6 +933,8 @@ class SentenceViewer:
         result['message'] = ''
         result['n_sentences'] = response['hits']['total']
         result['contexts'] = []
+        result['languages'] = []
+        resultLanguages = set()
         srcAlignmentInfo = {}
         if 'aggregations' in response:
             if 'agg_ndocs' in response['aggregations']:
@@ -939,16 +943,23 @@ class SentenceViewer:
                 result['n_occurrences'] = int(math.floor(response['aggregations']['agg_nwords']['sum']))
         for iHit in range(len(response['hits']['hits'])):
             langID, lang = self.get_lang_from_hit(response['hits']['hits'][iHit])
+            langView = lang
+            if ('_source' in response['hits']['hits'][iHit]
+                    and 'transVar' in response['hits']['hits'][iHit]['_source']):
+                langView += '_' + str(response['hits']['hits'][iHit]['_source']['transVar'])
+            resultLanguages.add(langView)
             curContext = self.process_sentence(response['hits']['hits'][iHit],
                                                numSent=iHit,
                                                getHeader=True,
                                                lang=lang,
+                                               langView=langView,
                                                translit=translit)
             if 'src_alignment' in curContext:
                 srcAlignmentInfo.update(curContext['src_alignment'])
             result['contexts'].append(curContext)
         if len(srcAlignmentInfo) > 0:
             result['src_alignment'] = json.dumps(srcAlignmentInfo)
+        result['languages'] += [l for l in sorted(resultLanguages)]
         return result
 
     def process_word_json(self, response, docIDs, searchType='word', translit=None):

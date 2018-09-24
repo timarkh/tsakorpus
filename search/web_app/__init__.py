@@ -105,6 +105,19 @@ app.config.update(dict(
 ))
 
 
+def lang_sorting_key(l):
+    """
+    Function for sorting language names in the output according
+    to the general order provided by the settings.
+    """
+    if l in settings['languages']:
+        return settings['languages'].index(l), -1, ''
+    elif re.sub('_[0-9]+$', '', l) in settings['languages']:
+        return (settings['languages'].index(re.sub('_[0-9]+$', '', l)),
+                int(re.sub('^.*_', '', l)), '')
+    else:
+        return len(settings['languages']), 0, l
+
 def initialize_session():
     """
     Generate a unique session ID and initialize a dictionary with
@@ -251,19 +264,22 @@ def add_sent_data_for_session(sent, sentData):
             highlightedText = sentView.process_sentence_csv(sent, lang=settings['languages'][langID],
                                                             translit=get_session_data('translit'))
         lang = settings['languages'][langID]
-        if lang not in sentData['languages']:
-            sentData['languages'][lang] = {'id': sent['_id'],
-                                           'next_id': nextID,
-                                           'prev_id': prevID,
-                                           'highlighted_text': highlightedText}
+        langView = lang
+        if 'transVar' in sent['_source']:
+            langView += '_' + str(sent['_source']['transVar'])
+        if langView not in sentData['languages']:
+            sentData['languages'][langView] = {'id': sent['_id'],
+                                               'next_id': nextID,
+                                               'prev_id': prevID,
+                                               'highlighted_text': highlightedText}
         else:
-            if ('next_id' not in sentData['languages'][lang]
+            if ('next_id' not in sentData['languages'][langView]
                     or nextID == -1
-                    or nextID > sentData['languages'][lang]['next_id']):
-                sentData['languages'][lang]['next_id'] = nextID
-            if ('prev_id' not in sentData['languages'][lang]
-                    or prevID < sentData['languages'][lang]['prev_id']):
-                sentData['languages'][lang]['prev_id'] = prevID
+                    or nextID > sentData['languages'][langView]['next_id']):
+                sentData['languages'][langView]['next_id'] = nextID
+            if ('prev_id' not in sentData['languages'][langView]
+                    or prevID < sentData['languages'][langView]['prev_id']):
+                sentData['languages'][langView]['prev_id'] = prevID
         if 'src_alignment' in sent['_source']:
             for alignment in sent['_source']['src_alignment']:
                 if alignment['src'] not in sentData['src_alignment_files']:
@@ -468,9 +484,12 @@ def get_parallel_for_one_sent_html(sSource, numHit):
         add_sent_data_for_session(s, curSentIDs[numHit])
         langID = s['_source']['lang']
         lang = settings['languages'][langID]
-        sentHTML = sentView.process_sentence(s, numSent=numSent, getHeader=False, lang=lang,
-                                             translit=get_session_data('translit'))['languages'][lang]['text']
-        yield sentHTML, lang
+        langView = lang
+        if 'transVar' in s['_source']:
+            langView += '_' + str(s['_source']['transVar'])
+        sentHTML = sentView.process_sentence(s, numSent=numSent, getHeader=False, lang=lang, langView=langView,
+                                             translit=get_session_data('translit'))['languages'][langView]['text']
+        yield sentHTML, langView
 
 
 def add_parallel(hits, htmlResponse):
@@ -478,6 +497,7 @@ def add_parallel(hits, htmlResponse):
     Add HTML of fragments in other languages aligned with the current
     search results to the response.
     """
+    addLanguages = set()
     for iHit in range(len(hits)):
         if ('para_alignment' not in hits[iHit]['_source']
                 or len(hits[iHit]['_source']['para_alignment']) <= 0):
@@ -487,6 +507,15 @@ def add_parallel(hits, htmlResponse):
                 htmlResponse['contexts'][iHit]['languages'][lang]['text'] += ' ' + sentHTML
             except KeyError:
                 htmlResponse['contexts'][iHit]['languages'][lang] = {'text': sentHTML}
+                # Add new language names that could appear if there are several
+                # translation variants for the same language. In this case, they
+                # are named LANG_V, where LANG is the language name and V is the number
+                # of the version.
+                if lang not in addLanguages:
+                    addLanguages.add(lang)
+    if len(addLanguages) > 0 and 'languages' in htmlResponse:
+        addLanguages -= set(htmlResponse['languages'])
+        htmlResponse['languages'] += [l for l in sorted(addLanguages)]
 
 
 def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=300):
@@ -1119,11 +1148,12 @@ def search_sent(page=-1):
     add_sent_to_session(hits)
     hitsProcessed = sentView.process_sent_json(hits,
                                                translit=get_session_data('translit'))
+    # hitsProcessed['languages'] = settings['languages']
     if len(settings['languages']) > 1 and 'hits' in hits and 'hits' in hits['hits']:
         add_parallel(hits['hits']['hits'], hitsProcessed)
+    hitsProcessed['languages'].sort(key=lang_sorting_key)
     hitsProcessed['page'] = get_session_data('page')
     hitsProcessed['page_size'] = get_session_data('page_size')
-    hitsProcessed['languages'] = settings['languages']
     hitsProcessed['media'] = settings['media']
     hitsProcessed['subcorpus_enabled'] = False
     if 'subcorpus_enabled' in hits:
@@ -1155,7 +1185,11 @@ def get_sent_context(n):
                'src_alignment': {}}
     neighboringIDs = {lang: {'next': -1, 'prev': -1} for lang in curSentData['languages']}
     for lang in curSentData['languages']:
-        langID = settings['languages'].index(lang)
+        try:
+            langID = settings['languages'].index(lang)
+        except:
+            # Language + number of the translation version: chop off the number
+            langID = settings['languages'].index(re.sub('_[0-9]+$', '', lang))
         for side in ['next', 'prev']:
             curCxLang = context['languages'][lang]
             if side + '_id' in curSentData['languages'][lang]:
