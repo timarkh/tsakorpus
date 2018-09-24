@@ -76,7 +76,7 @@ class MediaCutter:
         splitCount = int(math.ceil((mediaLength - startOffset) / float(splitLength)))
         if splitCount == 1:
             print('Media length is less then the target split length.')
-            return
+            # return
 
         splitCmd = 'ffmpeg -y'  # + "' -vcodec copy "
         for n in range(0, splitCount):
