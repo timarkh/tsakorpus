@@ -6,10 +6,8 @@ from .word_relations import WordRelations
 
 
 class InterfaceQueryParser:
-    rxSimpleText = re.compile('^[^\\[\\]()*\\\\{}^$.?+~|]*$')
-    rxBooleanText = re.compile('^[^\\[\\]()\\\\{}^$.+|]*$')
     rxParentheses = re.compile('[()]')
-    rxStars = re.compile('^(\\**|(\\.\\*)*)$')
+    rxStars = re.compile('^(\\**|(\\.\\*)*|\\^(\\.\\*)+\\$)$')
     rxGlossQueryQuant = re.compile('^\\(([^()]+)\\)([*+?])$')
     rxGlossQuerySrc = re.compile('^([^{}]*)\\{([^{}]*)\\}$')
     rxFieldNum = re.compile('^([^0-9]+)([0-9]+)$')
@@ -28,6 +26,12 @@ class InterfaceQueryParser:
                  'r', encoding='utf-8-sig')
         self.settings = json.loads(f.read())
         f.close()
+
+        self.rxSimpleText = re.compile('^[^\\[\\]()*\\\\{}^$.?+~|]*$')
+        self.rxBooleanText = re.compile('^[^\\[\\]()\\\\{}^$.+|]*$')
+        if 'regex_simple_search' in self.settings:
+            self.rxSimpleText = re.compile(self.settings['regex_simple_search'])
+
         if 'word_fields' in self.settings:
             self.wordFields = self.settings['word_fields']
         else:
@@ -161,13 +165,17 @@ class InterfaceQueryParser:
                 text = text.lower()
             elif field == 'w_id':
                 field = '_id'   # search for word ID: _id in words index, but words.w_id in sentences index
-            if InterfaceQueryParser.rxStars.search(text) is not None:
+            if self.rxStars.search(text) is not None:
                 return {'match_all': {}}
-            elif InterfaceQueryParser.rxSimpleText.search(text) is not None:
+            elif self.rxSimpleText.search(text) is not None:
                 return {'match': {field: text}}
-            elif InterfaceQueryParser.rxBooleanText.search(text) is not None:
+            elif self.rxBooleanText.search(text) is not None:
                 return {'wildcard': {field: text}}
             else:
+                if text.startswith('^'):
+                    text = text[1:]
+                if text.endswith('$'):
+                    text = text[:-1]
                 return {'regexp': {field: text}}
         try:
             field += '.' + self.gramDict[lang][text]
@@ -251,9 +259,9 @@ class InterfaceQueryParser:
         return {}
 
     def parse_word_query(self, word, field, lang):
-        if InterfaceQueryParser.rxSimpleText.search(word) is not None:
+        if self.rxSimpleText.search(word) is not None:
             return {'term': {field: word}}
-        elif InterfaceQueryParser.rxBooleanText.search(word) is not None:
+        elif self.rxBooleanText.search(word) is not None:
             return self.make_bool_query(word, field, lang)
         else:
             return {'regexp': {field: word}}

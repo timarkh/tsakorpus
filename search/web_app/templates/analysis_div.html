@@ -2,8 +2,15 @@
 <span class="popup_lex">{{ ana.lex }}</span>
 {% endif %}
 {% if ana.pos|length > 0 %}
-<span class="popup_pos">{{ ana.pos }}</span> 
+<span class="popup_pos">{{ ana.pos }}
+{% elif ana.grdic|trim|length > 0 %}
+<span class="popup_pos">
 {% endif %}
+{% if ana.grdic|trim|length > 0 %}
+&nbsp;{{ ana.grdic | safe }}</span>
+{% elif ana.pos|length > 0 %}
+</span>
+{% endif %} 
 {% for item in ana.other_fields %}
 {% if item.key == "parts" %}
 <br><span class="popup_gloss"><span class="popup_value">{{ item.value }}</span></span>

@@ -58,17 +58,22 @@ Each word in the ``words`` array is a dictionary with the following keys and val
 * ``sentence_index`` -- an integer or an array of integers (again, for multiple tokenizations) indicating the 0-based position of the token in the sentence, not counting the leading and the tail punctuation marks (which do not have to have this field).
 * ``ana`` -- a list of possible annotation variants for this word. If the word has no annotation, this key may be omitted.
 
+Additionally, the word may have following fields which may be relevant for certain corpora:
+
+* ``wf_display`` -- a string with the token in HTML. It can be used if the displayed version of the token should look different from the one used for search. The displayed version is non-searchable and is displayed exactly as written, without HTML escaping that takes place otherwise. For example, if part of the token has to be in superscript, ``wf_display`` may include ``<sup>`` and ``</sup>`` tags. All HTML tags used should be closed in the same token. If you use transliteration, you should make sure the tags in ``wf_display`` are not transliterated. This field only determines what the token looks like in the popup, but not the baseline.
+
 Overall, a word dictionary looks like this:
 
 ```
 {
   "wf": "...",
+  "wf_display": "...",   # optional
   "wtype": "word|punct",
   "off_start": ...,
   "off_end": ...,
   "next_word": ...,
   "sentence_index": ...,
-  "ana": [...]
+  "ana": [...]           # optional
 }
 ```
 

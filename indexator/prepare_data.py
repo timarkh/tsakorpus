@@ -23,13 +23,19 @@ class PrepareData:
                  'r', encoding='utf-8')
         self.categories = json.loads(f.read())
         f.close()
+        wfAnalyzerPatter = '[.\n()\\[\\]/]'
+        if 'wf_analyzer_pattern' in self.settings:
+            wfAnalyzerPatter = self.settings['wf_analyzer_pattern']
+        wfLowercase = True
+        if 'wf_lowercase' in self.settings:
+            wfLowercase = self.settings['wf_lowercase']
         self.wfAnalyzer = {
             'analysis': {
                 'analyzer': {
                     'wf_analyzer': {
                         'type': 'pattern',
-                        'pattern': '[.\n()\\[\\]/]',
-                        'lowercase': True
+                        'pattern': wfAnalyzerPatter,
+                        'lowercase': wfLowercase
                     },
                     'gloss_analyzer': {
                         'type': 'pattern',
@@ -64,6 +70,7 @@ class PrepareData:
         m = {'wf': {'type': 'text',
                     'fielddata': True,
                     'analyzer': 'wf_analyzer'},
+             'wf_display': {'type': 'text', 'index': False},
              'wtype': {'type': 'keyword'},
              'lang': {'type': 'byte'},
              'sentence_index': {'type': 'short'},

@@ -36,7 +36,9 @@ class Indexator:
         self.iterSent = None
         if self.input_format in ['json', 'json-gzip']:
             self.iterSent = JSONDocReader(format=self.input_format)
-        self.goodWordFields = ['lex', 'wf', 'parts', 'gloss', 'gloss_index', 'n_ana', 'trans_en', 'trans_ru']
+        self.goodWordFields = ['lex', 'wf', 'wf_display',
+                               'parts', 'gloss', 'gloss_index', 'n_ana',
+                               'trans_en', 'trans_ru']
         self.AdditionalWordFields = []
         if 'word_fields' in self.settings:
             self.AdditionalWordFields = self.settings['word_fields']
@@ -255,7 +257,11 @@ class Indexator:
         curLemmata = set()
         for ana in word['ana']:
             if 'lex' in ana:
-                curLemmata.add(ana['lex'].lower())
+                if type(ana['lex']) == list:
+                    for l in ana['lex']:
+                        curLemmata.add(l.lower())
+                else:
+                    curLemmata.add(ana['lex'].lower())
         return '/'.join(l for l in sorted(curLemmata))
 
     def iterate_lemmata(self, langID, lemmaFreqs, lemmaDIDs):

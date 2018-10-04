@@ -287,6 +287,12 @@ msgstr "тип поста"
 msgid "metafield_account_type"
 msgstr "тип аккаунта"
 
+msgid "metafield_page"
+msgstr "страница"
+
+msgid "metafield_line"
+msgstr "строка"
+
 
 # Names of the metadata values you have in the corpus:
 
@@ -365,6 +371,14 @@ msgstr "перевод 2 (RU)"
 msgid "wordfield_trans_en2"
 msgstr "перевод 2 (EN)"
 
+msgid "wordfield_logogram"
+msgstr "логограмма"
+
+msgid "wordfield_transcription"
+msgstr "транскрипция"
+
+msgid "wordfield_segment"
+msgstr "сегмент"
 
 
 

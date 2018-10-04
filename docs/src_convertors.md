@@ -52,6 +52,8 @@ There are several source convertors for different input formats (see ``pipeline.
 
 * Plain text questionnaire convertor: ``txt_questionnaires2json.py``.
 
+* Convertor for a YAML-like format used by the Morphy annotator: ``morphy_yaml2json.py``.
+
 When you are ready with the configuration and the source files are stored in the relevant folder, all you have to do is to run the corresponding Python file and wait until it terminates. If your corpus consists of several parts stored in different formats, you may process them one by one with different source convertors and put the resulting JSONs in one place.
 
 ### Parsed word list

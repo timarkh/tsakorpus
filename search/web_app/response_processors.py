@@ -25,6 +25,10 @@ class SentenceViewer:
         f.close()
         self.name = self.settings['corpus_name']
         self.sentence_props = ['text']
+        self.dictionary_categories = {lang: set() for lang in self.settings['languages']}
+        for lang in self.settings['lang_props']:
+            if 'dictionary_categories' in self.settings['lang_props'][lang]:
+                self.dictionary_categories[lang] = set(self.settings['lang_props'][lang]['dictionary_categories'])
         self.sc = search_client
         self.w1_labels = set(['w1'] + ['w1_' + str(i) for i in range(self.settings['max_words_in_sentence'])])
 
@@ -131,10 +135,11 @@ class SentenceViewer:
             simpleAnalyses, simpleMatchingAnalyses = self.simplify_ana(simpleAnalyses, simpleMatchingAnalyses)
         return simpleAnalyses, simpleMatchingAnalyses
 
-    def build_gr_ana_part(self, grValues, lang):
+    def build_gr_ana_part(self, grValues, lang, gramdic=False):
         """
         Build a string with gramtags ordered according to the settings
         for the language specified by lang.
+        gramdic == True iff dictionary values (such as gender) are processed. 
         """
         def key_comp(p):
             if p[0] not in self.settings['lang_props'][lang]['gr_fields_order']:
@@ -146,28 +151,35 @@ class SentenceViewer:
             if len(grAnaPart) > 0:
                 grAnaPart += ', '
             grAnaPart += fv[1]
-        return render_template('grammar_popup.html', grAnaPart=grAnaPart).strip()
+        if not gramdic:
+            return render_template('grammar_popup.html', grAnaPart=grAnaPart).strip()
+        return render_template('gramdic_popup.html', grAnaPart=grAnaPart).strip()
 
     def build_ana_div(self, ana, lang, translit=None):
         """
         Build the contents of a div with one particular analysis.
         """
-        ana4template = {'lex': '', 'pos': '', 'gr': '', 'other_fields': []}
+        ana4template = {'lex': '', 'pos': '', 'grdic': '', 'gr': '', 'other_fields': []}
         if 'lex' in ana:
             ana4template['lex'] = self.transliterate_baseline(ana['lex'], lang=lang, translit=translit)
         if 'gr.pos' in ana:
             ana4template['pos'] = ana['gr.pos']
-        grValues = []
+        grValues = []     # inflectional categories
+        grdicValues = []  # dictionary categories such as nominal gender
         for field in sorted(ana):
             if field not in ['lex', 'gr.pos'] and field not in self.invisibleAnaFields:
                 value = ana[field]
                 if type(value) == list:
                     value = ', '.join(value)
                 if field.startswith('gr.'):
-                    grValues.append((field[3:], value))
+                    if lang in self.dictionary_categories and field[3:] in self.dictionary_categories[lang]:
+                        grdicValues.append((field[3:], value))
+                    else:
+                        grValues.append((field[3:], value))
                 else:
                     ana4template['other_fields'].append({'key': field, 'value': value})
-        ana4template['gr'] = self.build_gr_ana_part(grValues, lang)
+        ana4template['grdic'] = self.build_gr_ana_part(grdicValues, lang, gramdic=True)
+        ana4template['gr'] = self.build_gr_ana_part(grValues, lang, gramdic=False)
         return render_template('analysis_div.html', ana=ana4template).strip()
 
     def build_ana_popup(self, word, lang, matchingAnalyses=None, translit=None):
@@ -177,7 +189,9 @@ class SentenceViewer:
         if matchingAnalyses is None:
             matchingAnalyses = []
         data4template = {'wf': '', 'analyses': []}
-        if 'wf' in word:
+        if 'wf_display' in word:
+            data4template['wf_display'] = self.transliterate_baseline(word['wf_display'], lang=lang, translit=translit)
+        elif 'wf' in word:
             data4template['wf'] = self.transliterate_baseline(word['wf'], lang=lang, translit=translit)
         if 'ana' in word:
             simplifiedAnas, simpleMatchingAnalyses = self.simplify_ana(word['ana'], matchingAnalyses)

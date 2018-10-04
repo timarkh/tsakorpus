@@ -286,6 +286,12 @@ msgstr "Post type"
 msgid "metafield_account_type"
 msgstr "Account type"
 
+msgid "metafield_page"
+msgstr "Page"
+
+msgid "metafield_line"
+msgstr "Line"
+
 
 # Names of the metadata values you have in the corpus:
 
@@ -364,7 +370,14 @@ msgstr "2nd transl. (RU)"
 msgid "wordfield_trans_en2"
 msgstr "2nd transl. (EN)"
 
+msgid "wordfield_logogram"
+msgstr "logogram"
 
+msgid "wordfield_transcription"
+msgstr "transcription"
+
+msgid "wordfield_segment"
+msgstr "segment"
 
 
 # ******** The rest is more or less universal:  ********

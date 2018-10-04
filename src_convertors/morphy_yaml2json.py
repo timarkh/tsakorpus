@@ -1,5 +1,7 @@
 import os
 import re
+import copy
+import html
 import json
 from lxml import etree
 from txt2json import Txt2JSON
@@ -15,9 +17,15 @@ class Morphy_YAML2JSON(Txt2JSON):
     rxObjectHeaders = re.compile('^-(word|part|line|punc|page|fragment|document|year):\\s+(.*?)\\s*$', flags=re.DOTALL)
     rxAllHeaders = re.compile('^ *(-?)([^:]+):\\s+(.*?)\\s*$', flags=re.DOTALL)
     rxSpaces = re.compile('^ *$')
+    rxSuperscripts = re.compile('\\{\\{([0i_^])\\}\\}')
+    dictSuperscripts = {'_': 'sub', '^': 'sup', 'i': 'i'}
+    wordFields = {'wf', 'wtype', 'Superscripts'}  # keys that should stay in the word dictionary,
+                                                  # rather than go to the analyses
 
     def __init__(self, settingsDir='conf'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
+        self.rxPuncSpaceBefore = re.compile(self.corpusSettings['punc_space_before'])
+        self.rxPuncSpaceAfter = re.compile(self.corpusSettings['punc_space_after'])
         self.srcExt = 'yaml'
         self.pID = 0        # id of last aligned segment
 
@@ -60,43 +68,89 @@ class Morphy_YAML2JSON(Txt2JSON):
         sCurPage = ''
         sCurWord = ''
         sCurType = ''
+        sCurLine = ''
         iCurLine = 0
+        bTextStarted = False
         for line in yamlFile:
             if line.startswith('#'):
                 continue
             if line[0] == '-':  # a part or a fragment, for instance
                 # yield the current object, flush the data, and continue recording (with curWord empty)
-                if len(curObject) > 0:
-                    yield {'page': sCurPage, 'line': iCurLine,
+                if bTextStarted:
+                    yield {'page': sCurPage, 'line': sCurLine,
                            'word': sCurWord, 'type': sCurType, 'object': self.yaml2dict(curObject)}
                 sCurWord = ''
                 sCurType = ''
+                sCurLine = ''
                 curObject = []
+                bTextStarted = True
             m = self.rxObjectHeaders.search(line)
             if m is not None:
                 if m.group(1) in ['word', 'punc', 'fragment', 'part', 'year']:
                     sCurWord = m.group(2)
                     sCurType = m.group(1)
                 elif m.group(1) == 'line':
-                    iCurLine += 1
                     sCurType = 'line'
                     sCurWord = m.group(2)
+                    iCurLine += 1
+                    if len(sCurWord) > 0:
+                        sCurLine = sCurWord
+                    else:
+                        sCurLine = str(iCurLine)
                 elif m.group(1) == 'page':
                     sCurType = 'page'
                     sNewPage = re.sub(':.*', '', m.group(2))
                     if sNewPage != sCurPage:
                         sCurPage = sNewPage
                         iCurLine = 0
+                        sCurLine = ''
                 elif m.group(1) == 'document':
                     sCurType = 'document'
                     sCurPage = m.group(2)
                     iCurLine = 0
+                    sCurLine = ''
             elif line[0] == ' ':
                 curObject.append(line)
-        if len(curObject) > 0:
-            yield {'page': sCurPage, 'line': iCurLine,
+        if bTextStarted:
+            yield {'page': sCurPage, 'line': sCurLine,
                    'word': sCurWord, 'type': sCurType, 'object': self.yaml2dict(curObject)}
         yamlFile.close()
+
+    def process_superscripts(self, text):
+        """
+        Turn the value of the "Superscripts" field into an HTML string with
+        text styles.
+        {{i}}...{{0}} -> <i>...</i>
+        {{^}}...{{0}} -> <sup>...</sup>
+        {{_}}...{{0}} -> <sub>...</sub>
+        """
+        newValue = ''
+        styleStack = []
+        iChar = 0
+        text = html.escape(text)
+        while iChar < len(text):
+            if text[iChar] != '{' or iChar > len(text) - 5:
+                newValue += text[iChar]
+                iChar += 1
+            else:
+                m = self.rxSuperscripts.search(text[iChar:])
+                if m is None:
+                    newValue += text[iChar]
+                    iChar += 1
+                    continue
+                iChar += 5
+                if m.group(1) == '0':
+                    if len(styleStack) <= 0:
+                        continue
+                    newValue += '</' + styleStack[-1] + '>'
+                    styleStack.pop()
+                else:
+                    styleStack.append(self.dictSuperscripts[m.group(1)])
+                    newValue += '<' + styleStack[-1] + '>'
+        for s in styleStack[::-1]:
+            # Potentially unclosed styles
+            newValue += '</' + s + '>'
+        return newValue
 
     def make_word(self, obj):
         """
@@ -104,13 +158,87 @@ class Morphy_YAML2JSON(Txt2JSON):
         into a word or a punctuation mark in the output format.
         """
         wordJson = {'wtype': obj['type'], 'wf': obj['word']}
+        commonAna = {}
         for k, v in obj['object'].items():
+            newKey = k
+            if k in self.corpusSettings['replace_fields']:
+                newKey = self.corpusSettings['replace_fields'][k]
+            elif k == 'Superscripts' and len(v) == 1:
+                newKey = 'wf_display'
+                v[0] = self.process_superscripts(v[0])
+            if k in self.corpusSettings['exclude_fields']:
+                continue
             if all(type(value) != dict for value in v):
                 if len(v) == 1:
-                    wordJson[k] = v[0]
+                    curValue = v[0]
                 elif len(v) > 1:
-                    wordJson[k] = v
+                    curValue = copy.deepcopy(v)
+                if k in self.wordFields:
+                    # Move all analysis fields to individual analyses
+                    wordJson[newKey] = curValue
+                else:
+                    commonAna[newKey] = curValue
+            elif k == 'ana' and all(type(value) == dict for value in v):
+                analyses = []
+                for ana in v:
+                    curAna = {}
+                    gramm = ''
+                    for anaKey in ana:
+                        newKey = anaKey
+                        if anaKey in self.corpusSettings['replace_fields']:
+                            newKey = self.corpusSettings['replace_fields'][anaKey]
+                        if anaKey in self.corpusSettings['exclude_fields']:
+                            continue
+                        elif anaKey in ['grdic', 'gramm']:
+                            if len(gramm) > 0 and len(ana[anaKey]) > 0:
+                                gramm += ','
+                            gramm += ','.join(ana[anaKey])
+                            continue
+                        elif len(ana[anaKey]) == 1:
+                            curAna[newKey] = ana[anaKey][0]
+                        elif len(ana[anaKey]) > 1:
+                            curAna[newKey] = copy.deepcopy(ana[anaKey])
+                    if len(curAna) > 0:
+                        grammJSON = self.tp.parser.transform_gramm_str(gramm, lang=self.corpusSettings['languages'][0])
+                        curAna.update(grammJSON)
+                        analyses.append(curAna)
+                if len(analyses) > 0:
+                    wordJson[k] = analyses
+            if len(commonAna) > 0:
+                if 'ana' in wordJson and len(wordJson['ana']) > 0:
+                    for ana in wordJson['ana']:
+                        ana.update(commonAna)
+                else:
+                    wordJson['ana'] = [commonAna]
         return wordJson
+
+    def concatenate_words(self, s):
+        """
+        Take a sentence dictionary that contains a list of word objects
+        and concatenate the tokens into a text. Add the 'text' key to
+        the sentence and offsets to the words.
+        """
+        s['text'] = ''
+        for iWord in range(len(s['words'])):
+            word = s['words'][iWord]
+            if (word['wtype'] == 'punc'
+                and self.rxPuncSpaceBefore.search(word['wf']) is not None
+                and len(s['text']) > 0
+                and s['text'][-1] != ' '):
+                    s['text'] += ' '
+            word['off_start'] = len(s['text'])
+            word['off_end'] = len(s['text']) + len(word['wf'])
+            s['text'] += word['wf']
+            if (word['wtype'] == 'punc'
+                and self.rxPuncSpaceAfter.search(word['wf']) is not None
+                and len(s['text']) > 0
+                and s['text'][-1] != ' '):
+                    s['text'] += ' '
+            elif (word['wtype'] == 'word'
+                  and iWord < len(s['words']) - 1
+                  and s['words'][iWord + 1]['wtype'] == 'word'):
+                    s['text'] += ' '
+        s['text'] = s['text'].rstrip(' ')
 
     def get_documents(self, fIn, metadata):
         """
@@ -122,34 +250,49 @@ class Morphy_YAML2JSON(Txt2JSON):
         curSent = {'words': []}
         for obj in self.yaml_iterator(fIn):
             if obj['type'] == 'document':
+                if len(curSent['words']) > 0:
+                    self.concatenate_words(curSent)
+                    textJSON['sentences'].append(curSent)
+                    curSent = {'words': []}
                 if len(textJSON['sentences']) > 0:
                     yield textJSON
                 textJSON = {'meta': metadata, 'sentences': []}
+                textJSON['meta']['title'] = obj['page']
                 for metafield in obj['object']:
-                    textJSON['meta']['title'] = obj['page']
-                    textJSON['meta'][metafield] = obj['object'][metafield]
-                    if len(textJSON['meta'][metafield]) == 1:
+                    newKey = metafield
+                    if metafield in self.corpusSettings['replace_fields']:
+                        newKey = self.corpusSettings['replace_fields'][metafield]
+                    textJSON['meta'][newKey] = obj['object'][metafield]
+                    if len(textJSON['meta'][newKey]) == 1:
                         # It is a list by default
-                        textJSON['meta'][metafield] = textJSON['meta'][metafield][0]
+                        textJSON['meta'][newKey] = textJSON['meta'][newKey][0]
             elif obj['type'] == 'line':
                 if len(curSent['words']) > 0:
                     curSent['words'].append({'wtype': 'punc', 'wf': '\n'})
+                    self.concatenate_words(curSent)
                     textJSON['sentences'].append(curSent)
-                curSent = {'words': [{'wtype': 'punc',
-                                      'wf': '[' + obj['word'].strip('[]') + ']'}],
-                           'meta': {'line': obj['curLine'], 'page': obj['curPage']}}
+                curSent = {'words': [],
+                           'meta': {'line': obj['line'], 'page': obj['page']}}
+                if len(obj['word'].strip('[] ')) > 0:
+                    curSent['words'].append({'wtype': 'punc',
+                                             'wf': '[' + obj['word'].strip('[]') + ']'})
             elif obj['type'] == 'page':
                 if len(curSent['words']) > 0:
                     curSent['words'].append({'wtype': 'punc', 'wf': '\n'})
+                    self.concatenate_words(curSent)
                     textJSON['sentences'].append(curSent)
-                curSent = {'words': [{'wtype': 'punc',
-                                      'wf': '[' + obj['word'].strip('[]') + ']'}],
-                           'meta': {'page': obj['curPage']}}
-                textJSON['sentences'].append(curSent)
+                if len(obj['word'].strip('[] ')) > 0:
+                    curSent = {'words': [],
+                               'meta': {'page': obj['page']}}
+                    curSent['words'].append({'wtype': 'punc',
+                                             'wf': '[' + obj['word'].strip('[]') + ']'})
+                    self.concatenate_words(curSent)
+                    textJSON['sentences'].append(curSent)
                 curSent = {'words': []}
             elif obj['type'] in ['word', 'punc']:
                 curSent['words'].append(self.make_word(obj))
         if len(curSent['words']) > 0:
+            self.concatenate_words(curSent)
             textJSON['sentences'].append(curSent)
         if len(textJSON['sentences']) > 0:
             yield textJSON
@@ -162,6 +305,7 @@ class Morphy_YAML2JSON(Txt2JSON):
         iDocument = 0
         for textJSON in self.get_documents(fIn, curMeta):
             curFnameTarget = self.rxStripExt.sub('_' + str(iDocument) + '.json', fnameTarget)
+            iDocument += 1
             if curFnameTarget == fnameSrc or curFnameTarget == fnameTarget:
                 continue
             textJSON['sentences'][len(textJSON['sentences']) - 1]['last'] = True

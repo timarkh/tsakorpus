@@ -50,10 +50,18 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``lang_props`` -- a dictionary where keys are the names of the languages and values are dictionaries with language-specific properties (see below).
 
+* ``wf_analyzer_pattern`` (optional) -- a string with a regex to be used by the elasticsearch's analyzer to split tokens. By default, it equals ``[.\n()\[\]/]``. It is used in indexation only. The idea is that if a token in your corpus contains e.g. a slash, it should be possible to find it by searching both parts, before the slash and after it.
+
+* ``wf_lowercase`` (optional) -- boolean value that determines if all tokens should be stored in lowercase. Defaults to true. It is used in indexation only. If set to false, the wordform search will be case sensitive.
+
+* ``regex_simple_search`` (optional) -- a string with a regex which is applied to all strings of a query to determine how they should be dealt with. By default, a text query is treated as containing wildcards if it only contains regular characters and a star, as a regex if it contains any special regex characters other than a star, and as simple text otherwise. If ``regex_simple_search`` matches the query, it will be processed as simple text. You would want to change this parameter if you have tokens with stars, dots, parentheses etc. that you need to search.
+
 #### The ``lang_props`` dictionary
 For each language in the corpus, the ``lang_props`` dictionary should contain a dicrionary whose keys are the names of the parameters. The following parameters are available:
 
-* ``gr_fields_order`` -- list with the name of grammatical categories which defines in which order their values should be displayed in word analyses (since they are stored in a nested object, they are unordered in the database).
+* ``dictionary_categories`` (optional) -- list with the names of dictionary (lexical) grammatical categories (without the ``gr.`` prefix), such as nominal gender. Values of these categories will appear on the same line with the part of speech in grammatical popups, separate from the other (inflectional) categories. 
+
+* ``gr_fields_order`` -- list with the names of grammatical categories (without the ``gr.`` prefix) which defines in which order their values should be displayed in word analyses (since they are stored in a nested object, they are unordered in the database).
 
 * ``gloss_shortcuts`` -- dictionary where keys are shortcuts for gloss search and values are the regexes they should translate into when searching. The shortcuts can, for example, be umbrella tags like "case" that should be replaced by a disjunction of actual case tags like "(nom|gen|dat)". These transformations are applied to the contents of the gloss search input before further processing.
 
