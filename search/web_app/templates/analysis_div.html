@@ -11,6 +11,9 @@
 {% elif ana.pos|length > 0 %}
 </span>
 {% endif %} 
+{% for item in ana.lex_fields %}
+<br><span class="popup_field"><span class="popup_key">{{ item.key }}: </span><span class="popup_value">{{ item.value }}</span></span>
+{% endfor %} 
 {% for item in ana.other_fields %}
 {% if item.key == "parts" %}
 <br><span class="popup_gloss"><span class="popup_value">{{ item.value }}</span></span>

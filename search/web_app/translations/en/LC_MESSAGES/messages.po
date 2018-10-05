@@ -600,6 +600,9 @@ msgstr "word"
 msgid "word_th_lemma"
 msgstr "lemma"
 
+msgid "word_th_transcription"
+msgstr "transcription"
+
 #: templates/result_words.html:4
 msgid "word_th_frequency"
 msgstr "freq"

@@ -1,6 +1,6 @@
 <div class="popup_word">
 {% if data.wf %}
-<span class="popup_wf">{{ data.wf }}</span>
+<span class="popup_wf">{{ data.wf | replace("&lt;", "&amp;lt;") | replace("&gt;", "&amp;gt;")  }}</span>
 {% elif data.wf_display %}
 <span class="popup_wf">{{ data.wf_display|safe }}</span>
 {% endif %}

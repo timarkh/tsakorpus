@@ -602,6 +602,9 @@ msgstr "слово"
 msgid "word_th_lemma"
 msgstr "лемма"
 
+msgid "word_th_transcription"
+msgstr "транскр."
+
 #: templates/result_words.html:4
 msgid "word_th_frequency"
 msgstr "частотность"

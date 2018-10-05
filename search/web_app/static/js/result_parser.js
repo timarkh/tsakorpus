@@ -274,9 +274,9 @@ function assign_sent_meta_popup() {
 function assign_gram_popup() {
 	var moveLeft = 20;
 	var moveDown = 10;
-	$("span.word").unbind('hover');
-	$("span.word").unbind('mousemove');
-	$('.word').hover(function (e) {
+	$("span.word, span.word_in_table").unbind('hover');
+	$("span.word, span.word_in_table").unbind('mousemove');
+	$('.word, .word_in_table').hover(function (e) {
 		$('#analysis').replaceWith('<div id="analysis">' + $("<textarea/>").html(($(this).attr("data-ana"))).text() + '</div>');
 		anaWidth = $('#analysis').width();
 		anaHeight = $('#analysis').height();
@@ -300,7 +300,7 @@ function assign_gram_popup() {
 		$('#analysis').hide();
         $('.sentence_meta').hide();
 	});
-	$('.word').mousemove(function (e) {
+	$('.word, .word_in_table').mousemove(function (e) {
 		anaWidth = $('#analysis').width();
 		anaHeight = $('#analysis').height();
 		if (e.pageX + moveLeft + anaWidth + 30 < $(document).innerWidth()) {
@@ -347,7 +347,7 @@ function toggle_interlinear() {
 	}
 	if ($('#viewing_mode option:selected').attr('value') == 'glossed')
 	{
-		$('span.word').each(function (index) {
+		$('span.word, span.word_in_table').each(function (index) {
 			if ($(this).find('.ana_interlinear').length > 0) {
 				return;
 			}

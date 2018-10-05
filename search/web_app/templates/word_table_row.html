@@ -1,6 +1,13 @@
-﻿<tr>
-	<td><span class="word" data-ana="{{ ana_popup }}">{{ wf }}</span></td>
+<tr>
+{% if wf_display %}
+	<td><span class="word_in_table" data-ana="{{ ana_popup }}">{{ wf_display | safe }}</span></td>
+{% else %}
+	<td><span class="word_in_table" data-ana="{{ ana_popup | replace("&amp;amp;lt;", "&amp;lt;") | replace("&amp;amp;gt;", "&amp;gt;") }}">{{ wf }}</span></td>
+{% endif %}
 	<td>{{ lemma }}</td>
+{% for item in other_fields %}
+    <td>{{ item }}</td>
+{% endfor %}
 	<td>{{ freq }}</td>
 	<td>{{ rank | safe }}</td>
 	<td>{{ nSents }}</td>

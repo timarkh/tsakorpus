@@ -34,6 +34,10 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``word_fields`` -- list with names of the word-level analysis fields that should be available in word-level search queries. These include all fields that can occur inside the ``ana`` nested objects, except ``lex``, ``parts``, ``gloss`` and the grammatical fields that start with ``gr.``.
 
+* ``word_table_fields`` (optional) -- list with names of the word-level analysis fields that should be displayed in the table with Word search results, along with the wordform and lemma, which appear automatically.
+
+* ``keep_lemma_order`` (true/false; optional) -- determines whether the order of multiple analyses should be kept when a string with the lemmata is concatenated for displaying. Defaults to false. For example, if a word has 3 analyses with the lemmara B, A and B, ``false`` means that the output string of lemmata will look like A/B, and ``true``, B/A/B. The latter may be needed if multiple analyses actually refer to different parts of a graphic word, e.g. host and clitics if they are represented as a single token.
+
 * ``languages`` -- list of names of the languages used in the corpus. The order of the languages determines how they are encoded in the index (the code of the language is its index in this list) and, in the case of parallel corpora, in which order they are displayed within one parallel context.
 
 * ``interface_languages`` -- dictionary with all available web interface languages. The keys are the codes of the languages, the values are their names.
@@ -50,7 +54,7 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``lang_props`` -- a dictionary where keys are the names of the languages and values are dictionaries with language-specific properties (see below).
 
-* ``wf_analyzer_pattern`` (optional) -- a string with a regex to be used by the elasticsearch's analyzer to split tokens. By default, it equals ``[.\n()\[\]/]``. It is used in indexation only. The idea is that if a token in your corpus contains e.g. a slash, it should be possible to find it by searching both parts, before the slash and after it.
+* ``wf_analyzer_pattern`` (optional) -- a string with a regex to be used by the elasticsearch's analyzer to split word forms and lemmata into simple tokens for storage and search purposes. By default, it equals ``[.\n()\[\]/]``. It is used in indexation only. The idea is that if a token in your corpus contains e.g. a slash, it should be possible to find it by searching both parts, the one before the slash and the one after it.
 
 * ``wf_lowercase`` (optional) -- boolean value that determines if all tokens should be stored in lowercase. Defaults to true. It is used in indexation only. If set to false, the wordform search will be case sensitive.
 
@@ -59,9 +63,15 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 #### The ``lang_props`` dictionary
 For each language in the corpus, the ``lang_props`` dictionary should contain a dicrionary whose keys are the names of the parameters. The following parameters are available:
 
-* ``dictionary_categories`` (optional) -- list with the names of dictionary (lexical) grammatical categories (without the ``gr.`` prefix), such as nominal gender. Values of these categories will appear on the same line with the part of speech in grammatical popups, separate from the other (inflectional) categories. 
+* ``dictionary_categories`` (optional) -- list with the names of dictionary (lexical) grammatical categories (without the ``gr.`` prefix), such as nominal gender. Values of these categories will appear on the same line with the part of speech in grammatical popups, separate from the other (inflectional) categories.
+
+* ``lexical_fields`` (optional) -- list with the names of non-grammatical analysis fields that should appear in analysis popups between the lines with dictionary categories and (inflectional) grammatical categories. Defaults to empty list. All fields that do not belong to this list are displayed below the grammatical line.
+
+* ``exclude_fields`` (optional) -- list with the names of non-grammatical analysis fields that should not be displayed in analysis popups. Defaults to empty list.
 
 * ``gr_fields_order`` -- list with the names of grammatical categories (without the ``gr.`` prefix) which defines in which order their values should be displayed in word analyses (since they are stored in a nested object, they are unordered in the database).
+
+* ``other_fields_order`` (optional) -- list with the names of non-grammatical analysis fields which defines in which order their values should be displayed in word analyses. If the field is missing, the fields are sorted alphabetically. If present, this field must contain all field names that exist in the corpus.
 
 * ``gloss_shortcuts`` -- dictionary where keys are shortcuts for gloss search and values are the regexes they should translate into when searching. The shortcuts can, for example, be umbrella tags like "case" that should be replaced by a disjunction of actual case tags like "(nom|gen|dat)". These transformations are applied to the contents of the gloss search input before further processing.
 

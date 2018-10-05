@@ -1179,7 +1179,7 @@ def get_sent_context(n):
     if sentData is None or n >= len(sentData) or 'languages' not in sentData[n]:
         return jsonify({})
     curSentData = sentData[n]
-    if curSentData['times_expanded'] >= settings['max_context_expand']:
+    if curSentData['times_expanded'] >= settings['max_context_expand'] >= 0:
         return jsonify({})
     context = {'n': n, 'languages': {lang: {} for lang in curSentData['languages']},
                'src_alignment': {}}
@@ -1419,7 +1419,11 @@ def search_word(searchType='word'):
 
     hitsProcessed['media'] = settings['media']
     set_session_data('progress', 100)
-    return render_template('result_words.html', data=hitsProcessed)
+    otherWordTableFields = []
+    if 'word_table_fields' in settings and searchType == 'word':
+        otherWordTableFields = settings['word_table_fields']
+    return render_template('result_words.html', data=hitsProcessed,
+                           word_table_fields=otherWordTableFields)
 
 
 @app.route('/search_doc_query')

@@ -1,5 +1,5 @@
 import json
-import re
+import html
 import os
 import math
 from flask import render_template
@@ -159,7 +159,7 @@ class SentenceViewer:
         """
         Build the contents of a div with one particular analysis.
         """
-        ana4template = {'lex': '', 'pos': '', 'grdic': '', 'gr': '', 'other_fields': []}
+        ana4template = {'lex': '', 'pos': '', 'grdic': '', 'lex_fields': [], 'gr': '', 'other_fields': []}
         if 'lex' in ana:
             ana4template['lex'] = self.transliterate_baseline(ana['lex'], lang=lang, translit=translit)
         if 'gr.pos' in ana:
@@ -176,10 +176,27 @@ class SentenceViewer:
                         grdicValues.append((field[3:], value))
                     else:
                         grValues.append((field[3:], value))
+                elif ('exclude_fields' in self.settings['lang_props'][lang]
+                      and field in self.settings['lang_props'][lang]['exclude_fields']):
+                    continue
+                elif ('lexical_fields' in self.settings['lang_props'][lang]
+                      and field in self.settings['lang_props'][lang]['lexical_fields']):
+                    # Lexical fields are displayed between the lemma+pos and the gr lines
+                    ana4template['lex_fields'].append({'key': field, 'value': value})
                 else:
+                    # Other fields are displayed below the gr line
                     ana4template['other_fields'].append({'key': field, 'value': value})
         ana4template['grdic'] = self.build_gr_ana_part(grdicValues, lang, gramdic=True)
         ana4template['gr'] = self.build_gr_ana_part(grValues, lang, gramdic=False)
+        if 'other_fields_order' in self.settings['lang_props'][lang]:
+            ana4template['lex_fields'].sort(key=lambda x: (self.settings['lang_props'][lang]['other_fields_order'].index(x['key']),
+                                                           x['key']))
+            ana4template['other_fields'].sort(key=lambda x: (self.settings['lang_props'][lang]['other_fields_order'].index(x['key']),
+                                                             x['key']))
+        else:
+            # Order analysis fields alphabetically
+            ana4template['lex_fields'].sort(key=lambda x: x['key'])
+            ana4template['other_fields'].sort(key=lambda x: x['key'])
         return render_template('analysis_div.html', ana=ana4template).strip()
 
     def build_ana_popup(self, word, lang, matchingAnalyses=None, translit=None):
@@ -192,7 +209,7 @@ class SentenceViewer:
         if 'wf_display' in word:
             data4template['wf_display'] = self.transliterate_baseline(word['wf_display'], lang=lang, translit=translit)
         elif 'wf' in word:
-            data4template['wf'] = self.transliterate_baseline(word['wf'], lang=lang, translit=translit)
+            data4template['wf'] = html.escape(self.transliterate_baseline(word['wf'], lang=lang, translit=translit))
         if 'ana' in word:
             simplifiedAnas, simpleMatchingAnalyses = self.simplify_ana(word['ana'], matchingAnalyses)
             for iAna in range(len(simplifiedAnas)):
@@ -660,13 +677,19 @@ class SentenceViewer:
         freq = str(wSource['freq'])
         rank = str(wSource['rank'])
         nDocs = str(wSource['n_docs'])
+        otherFields = []
         if searchType == 'word':
             nSents = str(wSource['n_sents'])
             wf = self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit)
+            wfDisplay = ''
+            if 'wf_display' in wSource:
+                wfDisplay = self.transliterate_baseline(wSource['wf_display'], lang=lang, translit=translit)
             lemma = self.get_lemma(wSource)
+            otherFields = self.get_word_table_fields(wSource)
         else:
             nSents = 0
-            wf = ''
+            wf = wfDisplay = ''
+            otherFields = []
             lemma = self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit)
         wID = -1
         if 'w_id' in w:
@@ -676,7 +699,9 @@ class SentenceViewer:
         return render_template('word_table_row.html',
                                ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
                                wf=wf,
+                               wf_display=wfDisplay,
                                lemma=lemma,
+                               other_fields=otherFields,
                                freq=freq,
                                rank=rank,
                                nSents=nSents,
@@ -779,19 +804,63 @@ class SentenceViewer:
             hitsProcessed['n_sentences'] += 1
             hitsProcessed['doc_ids'].add(hit['_source']['doc_id'])
 
-    @staticmethod
-    def get_lemma(word):
+    def get_lemma(self, word):
         """
         Join all lemmata in the JSON representation of a word with
         an analysis and return them as a string.
         """
         if 'ana' not in word:
             return ''
-        curLemmata = set()
+        if 'keep_lemma_order' not in self.settings or not self.settings['keep_lemma_order']:
+            curLemmata = set()
+            for ana in word['ana']:
+                if 'lex' in ana:
+                    if type(ana['lex']) == list:
+                        for l in ana['lex']:
+                            curLemmata.add(l.lower())
+                    else:
+                        curLemmata.add(ana['lex'].lower())
+            return '/'.join(l for l in sorted(curLemmata))
+        curLemmata = []
         for ana in word['ana']:
             if 'lex' in ana:
-                curLemmata.add(ana['lex'])
-        return '/'.join(l for l in sorted(curLemmata))
+                if type(ana['lex']) == list:
+                    for l in ana['lex']:
+                        curLemmata.append(l.lower())
+                else:
+                    curLemmata.append(ana['lex'].lower())
+        return '/'.join(curLemmata)
+
+    def get_word_table_fields(self, word):
+        """
+        Return a list with values of fields that have to be displayed
+        in a word search hits table, along with wordform and lemma.
+        """
+        if 'word_table_fields' not in self.settings:
+            return []
+        wordTableValues = []
+        for field in self.settings['word_table_fields']:
+            if field in ['lex', 'wf']:
+                continue
+            curValues = set()
+            for k, v in word.items():
+                if k == field:
+                    if type(v) == list:
+                        for value in v:
+                            curValues.add(value)
+                    elif type(v) == str:
+                        curValues.add(v)
+            if 'ana' in word:
+                for ana in word['ana']:
+                    for k, v in ana.items():
+                        if k == field:
+                            if type(v) == list:
+                                for value in v:
+                                    curValues.add(value)
+                            elif type(v) == str:
+                                curValues.add(v)
+            wordTableValues.append('/'.join(v for v in sorted(curValues)))
+        return wordTableValues
 
     def process_words_collected_from_sentences(self, hitsProcessed, sortOrder='freq', pageSize=10):
         """

@@ -39,9 +39,11 @@ class Indexator:
         self.goodWordFields = ['lex', 'wf', 'wf_display',
                                'parts', 'gloss', 'gloss_index', 'n_ana',
                                'trans_en', 'trans_ru']
-        self.AdditionalWordFields = []
+        self.AdditionalWordFields = set()
         if 'word_fields' in self.settings:
-            self.AdditionalWordFields = self.settings['word_fields']
+            self.AdditionalWordFields |= set(self.settings['word_fields'])
+        if 'word_table_fields' in self.settings:
+            self.AdditionalWordFields |= set(self.settings['word_table_fields'])
         f = open(os.path.join(self.SETTINGS_DIR, 'categories.json'),
                  'r', encoding='utf-8')
         categories = json.loads(f.read())
@@ -136,10 +138,11 @@ class Indexator:
             wClean = {'lang': langID}
             lemma = ''
             for field in w:
-                if field in self.goodWordFields:
+                if field in self.goodWordFields or field in self.AdditionalWordFields:
                     wClean[field] = w[field]
                     if field == 'wf':
-                        wClean[field] = wClean[field].lower()
+                        if 'wf_lowercase' not in self.settings or self.settings['wf_lowercase']:
+                            wClean[field] = wClean[field].lower()
                         self.wfs.add(wClean[field])
             if 'ana' in w:
                 lemma = self.get_lemma(w)
@@ -148,7 +151,7 @@ class Indexator:
                 for ana in w['ana']:
                     cleanAna = {}
                     for anaField in ana:
-                        if anaField in self.goodWordFields:
+                        if anaField in self.goodWordFields or anaField in self.AdditionalWordFields:
                             cleanAna[anaField] = ana[anaField]
                     wClean['ana'].append(cleanAna)
             wCleanTxt = json.dumps(wClean, ensure_ascii=False, sort_keys=True)
@@ -254,15 +257,25 @@ class Indexator:
         """
         if 'ana' not in word:
             return ''
-        curLemmata = set()
+        if 'keep_lemma_order' not in self.settings or not self.settings['keep_lemma_order']:
+            curLemmata = set()
+            for ana in word['ana']:
+                if 'lex' in ana:
+                    if type(ana['lex']) == list:
+                        for l in ana['lex']:
+                            curLemmata.add(l.lower())
+                    else:
+                        curLemmata.add(ana['lex'].lower())
+            return '/'.join(l for l in sorted(curLemmata))
+        curLemmata = []
         for ana in word['ana']:
             if 'lex' in ana:
                 if type(ana['lex']) == list:
                     for l in ana['lex']:
-                        curLemmata.add(l.lower())
+                        curLemmata.append(l.lower())
                 else:
-                    curLemmata.add(ana['lex'].lower())
-        return '/'.join(l for l in sorted(curLemmata))
+                    curLemmata.append(ana['lex'].lower())
+        return '/'.join(curLemmata)
 
     def iterate_lemmata(self, langID, lemmaFreqs, lemmaDIDs):
         """

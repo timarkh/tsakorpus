@@ -248,6 +248,10 @@
 	display: inline-grid;
 }
 
+.word_in_table {
+    white-space: nowrap;
+}
+
 .ana_interlinear {
 	font-size: 0.7em;
 	line-height: 1.2em;
