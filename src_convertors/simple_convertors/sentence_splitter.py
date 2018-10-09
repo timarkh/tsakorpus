@@ -98,8 +98,9 @@ class Splitter:
                     leadingPunct += 1
                 else:
                     wordsStarted = True
-            words[i]['next_word'] = i + 1
-            if wordsStarted and not (all(words[j]['wtype'] == 'punct' for j in range(i, len(words)))):
+            if words[i]['wtype'] not in ['style_span']:
+                words[i]['next_word'] = i + 1
+            if wordsStarted and not (all(words[j]['wtype'] != 'word' for j in range(i, len(words)))):
                 words[i]['sentence_index'] = i - leadingPunct
 
     def add_next_word_id(self, sentences):

@@ -244,6 +244,9 @@ msgstr "city"
 msgid "metafield_place"
 msgstr "place"
 
+msgid "metafield_region"
+msgstr "region"
+
 msgid "metafield_subject"
 msgstr "subject"
 

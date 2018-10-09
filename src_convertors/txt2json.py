@@ -41,6 +41,9 @@ class Txt2JSON:
         self.tp = TextProcessor(settings=self.corpusSettings,
                                 categories=self.categories,
                                 errorLog=self.errorLog)
+        self.excludeByMetaRules = []
+        if 'exclude_by_meta' in self.corpusSettings:
+            self.excludeByMetaRules = self.corpusSettings['exclude_by_meta']
         self.srcExt = 'txt'
 
     def load_settings(self):
@@ -147,6 +150,17 @@ class Txt2JSON:
             curMeta.update(self.meta[fname2check])
         return curMeta
 
+    def exclude_text(self, meta):
+        """
+        Check if the file should be excluded from output based on the
+        metadata rules specified in "exclude_by_meta" in corpus.json.
+        """
+        for rule in self.excludeByMetaRules:
+            if all(k in meta and meta[k] == rule[k] for k in rule):
+                print(rule, meta)
+                return True
+        return False
+
     def convert_file(self, fnameSrc, fnameTarget):
         """
         Take one text file fnameSrc, turn it into a parsed JSON file
@@ -158,6 +172,8 @@ class Txt2JSON:
             return 0, 0, 0
 
         curMeta = self.get_meta(fnameSrc)
+        if self.exclude_text(curMeta):
+            return 0, 0, 0
         textJSON = {'meta': curMeta, 'sentences': []}
         fSrc = open(fnameSrc, 'r', encoding='utf-8')
         text = fSrc.read()

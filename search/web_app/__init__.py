@@ -1422,8 +1422,12 @@ def search_word(searchType='word'):
     otherWordTableFields = []
     if 'word_table_fields' in settings and searchType == 'word':
         otherWordTableFields = settings['word_table_fields']
+    displayFreqRank = True
+    if 'display_freq_rank' in settings and not settings['display_freq_rank']:
+        displayFreqRank = False
     return render_template('result_words.html', data=hitsProcessed,
-                           word_table_fields=otherWordTableFields)
+                           word_table_fields=otherWordTableFields,
+                           display_freq_rank=displayFreqRank)
 
 
 @app.route('/search_doc_query')

@@ -29,6 +29,9 @@ class SentenceViewer:
         for lang in self.settings['lang_props']:
             if 'dictionary_categories' in self.settings['lang_props'][lang]:
                 self.dictionary_categories[lang] = set(self.settings['lang_props'][lang]['dictionary_categories'])
+        self.authorMeta = 'author'
+        if 'author_metafield' in self.settings:
+            self.authorMeta = self.settings['author_metafield']
         self.sc = search_client
         self.w1_labels = set(['w1'] + ['w1_' + str(i) for i in range(self.settings['max_words_in_sentence'])])
 
@@ -240,7 +243,10 @@ class SentenceViewer:
         # result = result.replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
         return result
 
-    def build_span(self, sentSrc, curWords, lang, matchWordOffsets, translit=None):
+    def build_span(self, sentSrc, curWords, curStyles, lang, matchWordOffsets, translit=None):
+        """
+        Build a string with a starting span for a word in the baseline.
+        """
         curClass = ''
         if any(wn.startswith('w') for wn in curWords):
             curClass += ' word '
@@ -267,6 +273,8 @@ class SentenceViewer:
         spanStart = '<span class="' + curClass + \
                     ' '.join(wn + highlightClass(wn)
                              for wn in curWords) + '" data-ana="' + dataAna + '">'
+        for style in curStyles:
+            spanStart += '<span class="' + style + '">'
         return spanStart
 
     def add_highlighted_offsets(self, offStarts, offEnds, text):
@@ -322,11 +330,11 @@ class SentenceViewer:
                 result += '"???" '
             else:
                 result += '<span class="ch_title">-</span>'
-        if 'author' in meta:
+        if self.authorMeta in meta:
             if format == 'csv':
-                result += '(' + meta['author'] + ') '
+                result += '(' + meta[self.authorMeta] + ') '
             else:
-                result += '<span class="ch_author">' + meta['author'] + '</span>'
+                result += '<span class="ch_author">' + meta[self.authorMeta] + '</span>'
         if 'issue' in meta and len(meta['issue']) > 0:
             if format == 'csv':
                 result += meta['issue'] + ' '
@@ -448,6 +456,32 @@ class SentenceViewer:
             except KeyError:
                 offEnds[offEnd] = {srcID}
         return offStarts, offEnds, fragmentInfo
+
+    def get_style_offsets(self, sSource):
+        """
+        Find spans of text that should be displayed in a non-default style,
+        e.g. in italics or in superscript.
+        Return two dicts, one with start offsets and the other with end offsets.
+        The keys are offsets and the values are the string class names that define the style.
+        """
+        offStarts, offEnds = {}, {}
+        if 'style_spans' not in sSource:
+            return offStarts, offEnds
+        for iSpan in range(len(sSource['style_spans'])):
+            try:
+                offStart, offEnd = sSource['style_spans'][iSpan]['off_start'], sSource['style_spans'][iSpan]['off_end']
+            except KeyError:
+                continue
+            className = 'style_' + sSource['style_spans'][iSpan]['span_class']
+            try:
+                offStarts[offStart].add(className)
+            except KeyError:
+                offStarts[offStart] = {className}
+            try:
+                offEnds[offEnd].add(className)
+            except KeyError:
+                offEnds[offEnd] = {className}
+        return offStarts, offEnds
 
     def relativize_src_alignment(self, expandedContext, srcFiles):
         """
@@ -572,15 +606,18 @@ class SentenceViewer:
         if format == 'csv':
             offParaStarts, offParaEnds = {}, {}
             offSrcStarts, offSrcEnds, fragmentInfo = {}, {}, {}
+            offStyleStarts, offStyleEnds = {}, {}
             offStarts, offEnds = self.get_word_offsets(sSource, numSent,
                                                        matchOffsets=matchWordOffsets)
         else:
             offParaStarts, offParaEnds = self.get_para_offsets(sSource)
             offSrcStarts, offSrcEnds, fragmentInfo = self.get_src_offsets(sSource)
+            offStyleStarts, offStyleEnds = self.get_style_offsets(sSource)
             offStarts, offEnds = self.get_word_offsets(sSource, numSent)
             self.add_highlighted_offsets(offStarts, offEnds, highlightedText)
 
         curWords = set()
+        curStyles = set()
         for i in range(len(chars)):
             if chars[i] == '\n':
                 if format == 'csv':
@@ -595,18 +632,39 @@ class SentenceViewer:
                 chars[i] = '&lt;'
             elif chars[i] == '>' and format != 'csv':
                 chars[i] = '&gt;'
+
+            # Add style tags (italics, superscript, etc.)
+            styleSpanEndAddition = ''
+            if len(curStyles) > 0 and i in offStyleEnds:
+                styleSpanEndAddition = '</span>' * len(offStyleEnds[i])
+                curStyles -= offStyleEnds[i]
+            if i in offStyleStarts:
+                nonUsedStyles = []
+                for style in offStyleStarts[i]:
+                    if style not in curStyles:
+                        nonUsedStyles.append(style)
+                        curStyles.add(style)
             if (i not in offStarts and i not in offEnds
                     and i not in offParaStarts and i not in offParaEnds
                     and i not in offSrcStarts and i not in offSrcEnds):
+                if i in offStyleStarts:
+                    for style in nonUsedStyles:
+                        chars[i] = '<span class="' + style + '">' + chars[i]
+                chars[i] = styleSpanEndAddition + chars[i]
                 continue
+
+            # Add word and alignment tags
             addition = ''
             if len(curWords) > 0:
                 if format == 'csv':
                     addition = '}}'
                 else:
                     addition = '</span>'
+                    addition += '</span>' * len(curStyles)
                 if i in offEnds:
                     curWords -= offEnds[i]
+                if i in offStyleEnds:
+                    curWords -= offStyleEnds[i]
                 if i in offParaEnds:
                     curWords -= offParaEnds[i]
                 if i in offSrcEnds:
@@ -625,8 +683,8 @@ class SentenceViewer:
                 if format == 'csv':
                     addition = '{{'
                 else:
-                    addition += self.build_span(sSource, curWords, lang, matchWordOffsets, translit=translit)
-            chars[i] = addition + chars[i]
+                    addition += self.build_span(sSource, curWords, curStyles, lang, matchWordOffsets, translit=translit)
+            chars[i] = styleSpanEndAddition + addition + chars[i]
         if len(curWords) > 0:
             if format == 'csv':
                 chars[-1] += '}}'
@@ -696,6 +754,9 @@ class SentenceViewer:
             wID = w['w_id']
         else:
             wID = w['_id']
+        displayFreqRank = True
+        if 'display_freq_rank' in self.settings and not self.settings['display_freq_rank']:
+            displayFreqRank = False
         return render_template('word_table_row.html',
                                ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
                                wf=wf,
@@ -703,6 +764,7 @@ class SentenceViewer:
                                lemma=lemma,
                                other_fields=otherFields,
                                freq=freq,
+                               display_freq_rank=displayFreqRank,
                                rank=rank,
                                nSents=nSents,
                                nDocs=nDocs,

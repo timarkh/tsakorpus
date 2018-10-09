@@ -19,6 +19,8 @@ The configuration files are ``corpus.json`` and ``categories.json``. The latter 
 
 * ``meta_files_case_sensitive`` -- boolean value that determines whether the filenames in the metadata file should be treated as case sensitive.
 
+* ``exclude_by_meta`` (optional) -- list of dictionaries, each of which contains a rule that determines what input documents should be skipped based on its metadata. The document is skipped if it conforms to at least one rule. A document conforms to the rule if its metadata contains all the key-value pairs present in the rule, while possibly containing other keys. Defaults to empty list.
+
 * ``parsed_wordlist_filename`` -- the name of the file with the morphologically annotated word list (for the converters which accept such a file). If you have several lists for different languages, the value should be a dictionary where keys are the names of the languages and values are the names of the files.
 
 * ``parsed_wordlist_format`` -- the format of the annotated word list (currently, only the "xml_rnc" option is available, which means a list of XML-represented words in the format used in Russian National Corpus).

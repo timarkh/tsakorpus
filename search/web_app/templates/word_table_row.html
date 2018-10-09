@@ -9,7 +9,9 @@
     <td>{{ item }}</td>
 {% endfor %}
 	<td>{{ freq }}</td>
+{% if display_freq_rank %}
 	<td>{{ rank | safe }}</td>
+{% endif %}
 	<td>{{ nSents }}</td>
 	<td>{{ nDocs }}</td>
 	<td><span class="search_w glyphicon glyphicon-search" data-wid="{{ wID }}" title="Search in corpus"> </span></td>

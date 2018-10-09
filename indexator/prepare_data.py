@@ -204,6 +204,15 @@ class PrepareData:
                                     'sent_ids': {'type': 'integer',
                                                  'index': False}
                                 }},
+             'style_spans': {'type': 'nested',
+                             'properties': {
+                                 'off_start': {'type': 'short',
+                                               'index': False},
+                                 'off_end': {'type': 'short',
+                                             'index': False},
+                                 'span_class': {'type': 'keyword',
+                                                'index': False}
+                             }},
              'segment_ids': {'type': 'integer',
                              'index': False},
              'words': {'type': 'nested',

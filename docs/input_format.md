@@ -32,6 +32,7 @@ The array with sentences is the main part of the document. Each sentence is a di
 * ``meta`` -- a dictionary with sentence-level metafields. Sentence-level metafields may include, for example, speaker data for multi-tier (dialogue) files or year in a document that includes data from different years. All metafields listed in the ``sentence_meta`` array in ``conf/corpus.json`` must be present in this dictionary. The values should be strings.
 * ``para_alignment`` (only in parallel corpora, i.e. corpora with several languages where all or some of the sentences in one language are aligned to sentences in another language) -- a list with dictionaries, each representing an alignment of some part of the sentence with a part of another sentence in the corpus.
 * ``src_alignment`` (only for media-aligned corpora) -- a list with dictionaries, each representing an alignment of some part of the sentence with a segment of a video or sound file.
+* ``style_spans`` (optional) -- a list with dictionaries, each representing a segment of the sentence text that should be displayed in a non-default style, e.g. in italics or in superscript.
 
 The order of the sentences is important. The sentences should be grouped by language, and within each language they should be ordered exactly as they are ordered in the document. When the sentence collection is indexed, each sentence is assigned the keys ``_id``, ``prev_id`` and ``next_id``, the latter two being filled in based on the mutual position of the sentences in the JSON file.
 
@@ -44,7 +45,8 @@ The elements of the ``sentences`` array therefore look like this:
   "lang": ...,
   "meta": {...},
   "para_alignment": [...],
-  "src_alignment": [...]
+  "src_alignment": [...],
+  "style_spans": [...]
 }
 ```
 
@@ -117,6 +119,20 @@ If all or some of the documents in your corpus were aligned with sound or video,
 ```
 
 The ``off_start_src`` and ``off_end_src`` parameters are numbers (float) that determine the relevant segment in the media file in seconds. The ``off_start_sent`` and ``off_end_sent`` parameters are integers that determine the aligned span in the sentence in characters. The ``mtype`` is a string that says if the media is a sound file or a video file. The ``src_id`` parameter is a string uniquely (at the document level) identifying an aligned segment. The ``src`` parameter is the name and the relative path to the media file. All media files have to be located in the ``search/media/%corpus_name%`` directory. Just as with ``para_alignment``, it is possible to have several aligned segments in a sentence or several sentences in an aligned segment.
+
+
+### Style spans
+The baseline of the sentence may contain segments that should be displayed in a style other than the default, e.g. in italics or in superscript. Each dictionary in the ``style_spans`` list represents one such segment. It looks like this:
+
+```
+{
+  "off_start": ...,
+  "off_end": ...,
+  "span_class": "..."
+}
+```
+
+The ``off_start`` and ``off_end`` parameters are integers that determine the relevant segment in the sentence in characters. The ``span_class`` parameter is a string that determines the style. When displayed in a search hit, the relevant segment is put inside a ``<span>`` element with the ``class`` attribute set to ``style_[SPAN_CLASS]``. For example, if ``span_class`` equals ``i``, the actual span tag will look like ``<span class="style_i">``. The classes should be defined in ``search/web_app/static/css/search.css``. Predefined classes are ``style_i``, ``style_b``, ``style_sup`` and ``style_sub``.
 
 
 ### Sentence example

@@ -32,6 +32,8 @@ The following parameters (dictionary keys) are recognized in corpus.json:
  * ``search_meta.columns`` -- array with column-by column description of what options should appear on the "Specify parameters" tab;
  * ``search_meta.stat_options`` -- array with the names of the metafields that should be available for plotting statistics on the "Subcorpus statistics" tab.
 
+* ``author_metafield`` (optional) -- string which defines the second-important metafield which will be displayed next to the title in headers of hit results. Defaults to ``author``.
+
 * ``word_fields`` -- list with names of the word-level analysis fields that should be available in word-level search queries. These include all fields that can occur inside the ``ana`` nested objects, except ``lex``, ``parts``, ``gloss`` and the grammatical fields that start with ``gr.``.
 
 * ``word_table_fields`` (optional) -- list with names of the word-level analysis fields that should be displayed in the table with Word search results, along with the wordform and lemma, which appear automatically.
@@ -52,13 +54,19 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``ambiguous_analyses`` -- boolean value that has to be set to true if there are tokens in the corpus which have multiple (ambiguous) analyses. In this case, the user can select if they want to search only among unambiguously analyzed words.
 
-* ``lang_props`` -- a dictionary where keys are the names of the languages and values are dictionaries with language-specific properties (see below).
+* ``lang_props`` -- dictionary where keys are the names of the languages and values are dictionaries with language-specific properties (see below).
 
-* ``wf_analyzer_pattern`` (optional) -- a string with a regex to be used by the elasticsearch's analyzer to split word forms and lemmata into simple tokens for storage and search purposes. By default, it equals ``[.\n()\[\]/]``. It is used in indexation only. The idea is that if a token in your corpus contains e.g. a slash, it should be possible to find it by searching both parts, the one before the slash and the one after it.
+* ``wf_analyzer_pattern`` (optional) -- string with a regex to be used by the elasticsearch's analyzer to split word forms and lemmata into simple tokens for storage and search purposes. By default, it equals ``[.\n()\[\]/]``. It is used in indexation only. The idea is that if a token in your corpus contains e.g. a slash, it should be possible to find it by searching both parts, the one before the slash and the one after it.
 
 * ``wf_lowercase`` (optional) -- boolean value that determines if all tokens should be stored in lowercase. Defaults to true. It is used in indexation only. If set to false, the wordform search will be case sensitive.
 
-* ``regex_simple_search`` (optional) -- a string with a regex which is applied to all strings of a query to determine how they should be dealt with. By default, a text query is treated as containing wildcards if it only contains regular characters and a star, as a regex if it contains any special regex characters other than a star, and as simple text otherwise. If ``regex_simple_search`` matches the query, it will be processed as simple text. You would want to change this parameter if you have tokens with stars, dots, parentheses etc. that you need to search.
+* ``regex_simple_search`` (optional) -- string with a regex which is applied to all strings of a query to determine how they should be dealt with. By default, a text query is treated as containing wildcards if it only contains regular characters and a star, as a regex if it contains any special regex characters other than a star, and as simple text otherwise. If ``regex_simple_search`` matches the query, it will be processed as simple text. You would want to change this parameter if you have tokens with stars, dots, parentheses etc. that you need to search.
+
+* ``search_remove_whitespaces`` (optional) -- boolean value that determines if all whitespaces should be deleted from the search textbox before making a non-keyword query, such as word or lemma query. Defaults to true. The whitespaces are trimmed at the ends of the textboxes regardless of this parameter.
+
+* ``detect_lemma_queries`` (optional) -- boolean value that determines if the search engine should recognize word queries which only look for one particular lemma (possibly with additional constraints) and lift the cap on the number of hits displayed. (The cap is actually increased to ``InterfaceQueryParser.maxQuerySize``, see ``search/search_engine/query_parser.py``.) Defaults to false.
+
+* ``display_freq_rank`` (optional) -- boolean value that determines if the quantile / frequency rank column should be displayed for word/lemma query hits. Defaults to true.
 
 #### The ``lang_props`` dictionary
 For each language in the corpus, the ``lang_props`` dictionary should contain a dicrionary whose keys are the names of the parameters. The following parameters are available:

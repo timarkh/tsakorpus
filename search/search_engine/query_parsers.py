@@ -12,6 +12,7 @@ class InterfaceQueryParser:
     rxGlossQuerySrc = re.compile('^([^{}]*)\\{([^{}]*)\\}$')
     rxFieldNum = re.compile('^([^0-9]+)([0-9]+)$')
     rxNumber = re.compile('^(?:0|[1-9][0-9]*)$')
+    maxQuerySize = 500  # maximum number of hits to be requested
 
     dictOperators = {',': 'must',
                      '&': 'must',
@@ -27,7 +28,7 @@ class InterfaceQueryParser:
         self.settings = json.loads(f.read())
         f.close()
 
-        self.rxSimpleText = re.compile('^[^\\[\\]()*\\\\{}^$.?+~|]*$')
+        self.rxSimpleText = re.compile('^[^\\[\\]()*\\\\{}^$.?+~|,&]*$')
         self.rxBooleanText = re.compile('^[^\\[\\]()\\\\{}^$.+|]*$')
         if 'regex_simple_search' in self.settings:
             self.rxSimpleText = re.compile(self.settings['regex_simple_search'])
@@ -195,13 +196,19 @@ class InterfaceQueryParser:
             if type(strQuery) == int:
                 return self.make_simple_term_query(strQuery, field, lang, keyword_query=True)
             if not keyword_query:
-                strQuery = strQuery.replace(' ', '')
+                if ('search_remove_whitespaces' not in self.settings
+                    or self.settings['search_remove_whitespaces']):
+                        strQuery = strQuery.replace(' ', '')
             else:
                 strQuery = strQuery.strip()
                 if '|' not in strQuery and '~' not in strQuery:
                     # Metadata query: metafields can contain commas and parentheses
                     return self.make_simple_term_query(strQuery, field, lang, keyword_query=keyword_query)
             end = len(strQuery)
+            if end == 0:
+                return {'match_none': {}}
+            if not (field == 'ana.gr' or field.endswith('.ana.gr')) and self.rxSimpleText.search(strQuery) is not None:
+                return self.make_simple_term_query(strQuery, field, lang)
             if strQuery.count('(') != strQuery.count(')'):
                 return {'match_none': {}}
         if len(strQuery) <= 0 or start >= end:
@@ -816,6 +823,17 @@ class InterfaceQueryParser:
             prelimQuery['doc_ids'] = [int(did) for did in htmlQuery['doc_ids']]
         if searchIndex == 'sentences' and 'para_ids' in htmlQuery:
             prelimQuery['para_ids'] = htmlQuery['para_ids']
+
+        if 'detect_lemma_queries' in self.settings and self.settings['detect_lemma_queries']:
+            # Check if this is a query which means "Find all forms
+            # of a particular lemma (possibly with additional constraints".
+            # If it is, remove the cap on the number of forms found.
+            if (searchOutput == 'words'
+                and int(htmlQuery['n_words']) == 1
+                and 'lex1' in htmlQuery
+                and len(htmlQuery['lex1']) > 0
+                and self.rxSimpleText.search(htmlQuery['lex1']) is not None):
+                    query_size = self.maxQuerySize
 
         for iWord in range(int(htmlQuery['n_words'])):
             curPrelimQuery = {}

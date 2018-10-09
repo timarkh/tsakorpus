@@ -245,7 +245,7 @@
 }
 
 .word {
-	display: inline-grid;
+	display: inline-table;
 }
 
 .word_in_table {
@@ -933,4 +933,22 @@ svg circle {
 	max-width: 500px;
     top: 30px;
     left: 70%;
+}
+
+.style_i {
+	font-style: italic;
+}
+
+.style_b {
+	font-weight: bold;
+}
+
+.style_sup {
+	vertical-align: super;
+	font-size: smaller;
+}
+
+.style_sub {
+	vertical-align: sub;
+	font-size: smaller;
 }

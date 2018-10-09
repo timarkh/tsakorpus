@@ -123,10 +123,14 @@ class Morphy_YAML2JSON(Txt2JSON):
         {{i}}...{{0}} -> <i>...</i>
         {{^}}...{{0}} -> <sup>...</sup>
         {{_}}...{{0}} -> <sub>...</sub>
+        Return the HTML string and a list of tuples (start offset, end offset, HTML tag).
         """
         newValue = ''
         styleStack = []
         iChar = 0
+        iMinusOffset = 0
+        offsetStack = []
+        offsets = []
         text = html.escape(text)
         while iChar < len(text):
             if text[iChar] != '{' or iChar > len(text) - 5:
@@ -139,18 +143,24 @@ class Morphy_YAML2JSON(Txt2JSON):
                     iChar += 1
                     continue
                 iChar += 5
+                iMinusOffset += 5
                 if m.group(1) == '0':
                     if len(styleStack) <= 0:
                         continue
                     newValue += '</' + styleStack[-1] + '>'
                     styleStack.pop()
+                    offsets[offsetStack[-1]][1] = iChar - iMinusOffset
+                    offsetStack.pop()
                 else:
                     styleStack.append(self.dictSuperscripts[m.group(1)])
                     newValue += '<' + styleStack[-1] + '>'
+                    offsets.append([iChar - iMinusOffset, iChar - iMinusOffset, styleStack[-1]])
+                    offsetStack.append(len(offsets) - 1)
         for s in styleStack[::-1]:
             # Potentially unclosed styles
             newValue += '</' + s + '>'
-        return newValue
+        offsets = [offset for offset in offsets if offset[1] > offset[0]]
+        return newValue, offsets
 
     def make_word(self, obj):
         """
@@ -159,13 +169,14 @@ class Morphy_YAML2JSON(Txt2JSON):
         """
         wordJson = {'wtype': obj['type'], 'wf': obj['word']}
         commonAna = {}
+        styleOffsets = []
         for k, v in obj['object'].items():
             newKey = k
             if k in self.corpusSettings['replace_fields']:
                 newKey = self.corpusSettings['replace_fields'][k]
             elif k == 'Superscripts' and len(v) == 1:
                 newKey = 'wf_display'
-                v[0] = self.process_superscripts(v[0])
+                v[0], styleOffsets = self.process_superscripts(v[0])
             if k in self.corpusSettings['exclude_fields']:
                 continue
             if all(type(value) != dict for value in v):
@@ -210,15 +221,17 @@ class Morphy_YAML2JSON(Txt2JSON):
                         ana.update(commonAna)
                 else:
                     wordJson['ana'] = [commonAna]
-        return wordJson
+        return wordJson, styleOffsets
 
-    def concatenate_words(self, s):
+    def concatenate_words(self, s, styleOffsets):
         """
         Take a sentence dictionary that contains a list of word objects
         and concatenate the tokens into a text. Add the 'text' key to
-        the sentence and offsets to the words.
+        the sentence and offsets to the words. Add style offsets as
+        style_span items to the 'words' list.
         """
         s['text'] = ''
+        styleSpans = []
         for iWord in range(len(s['words'])):
             word = s['words'][iWord]
             if (word['wtype'] == 'punc'
@@ -226,9 +239,15 @@ class Morphy_YAML2JSON(Txt2JSON):
                 and len(s['text']) > 0
                 and s['text'][-1] != ' '):
                     s['text'] += ' '
-            word['off_start'] = len(s['text'])
-            word['off_end'] = len(s['text']) + len(word['wf'])
-            s['text'] += word['wf']
+            if word['wtype'] != 'style_span':
+                word['off_start'] = len(s['text'])
+                word['off_end'] = len(s['text']) + len(word['wf'])
+                s['text'] += word['wf']
+                if iWord < len(styleOffsets):
+                    for offset in styleOffsets[iWord]:
+                        styleSpans.append({'span_class': offset[2],
+                                           'off_start': word['off_start'] + offset[0],
+                                           'off_end': word['off_start'] + offset[1]})
             if (word['wtype'] == 'punc'
                 and self.rxPuncSpaceAfter.search(word['wf']) is not None
                 and len(s['text']) > 0
@@ -239,6 +258,8 @@ class Morphy_YAML2JSON(Txt2JSON):
                   and s['words'][iWord + 1]['wtype'] == 'word'):
                     s['text'] += ' '
         s['text'] = s['text'].rstrip(' ')
+        if len(styleSpans) > 0:
+            s['style_spans'] = styleSpans
 
     def get_documents(self, fIn, metadata):
         """
@@ -248,13 +269,15 @@ class Morphy_YAML2JSON(Txt2JSON):
         """
         textJSON = {'meta': metadata, 'sentences': []}
         curSent = {'words': []}
+        styleOffsets = []   # for each word, a list of tuples (start, end, style tag)
         for obj in self.yaml_iterator(fIn):
             if obj['type'] == 'document':
                 if len(curSent['words']) > 0:
-                    self.concatenate_words(curSent)
+                    self.concatenate_words(curSent, styleOffsets)
+                    styleOffsets = []
                     textJSON['sentences'].append(curSent)
                     curSent = {'words': []}
-                if len(textJSON['sentences']) > 0:
+                if len(textJSON['sentences']) > 0 and not self.exclude_text(textJSON['meta']):
                     yield textJSON
                 textJSON = {'meta': metadata, 'sentences': []}
                 textJSON['meta']['title'] = obj['page']
@@ -269,32 +292,38 @@ class Morphy_YAML2JSON(Txt2JSON):
             elif obj['type'] == 'line':
                 if len(curSent['words']) > 0:
                     curSent['words'].append({'wtype': 'punc', 'wf': '\n'})
-                    self.concatenate_words(curSent)
+                    self.concatenate_words(curSent, styleOffsets)
+                    styleOffsets = []
                     textJSON['sentences'].append(curSent)
                 curSent = {'words': [],
                            'meta': {'line': obj['line'], 'page': obj['page']}}
                 if len(obj['word'].strip('[] ')) > 0:
                     curSent['words'].append({'wtype': 'punc',
                                              'wf': '[' + obj['word'].strip('[]') + ']'})
+                    styleOffsets.append([])
             elif obj['type'] == 'page':
                 if len(curSent['words']) > 0:
                     curSent['words'].append({'wtype': 'punc', 'wf': '\n'})
-                    self.concatenate_words(curSent)
+                    self.concatenate_words(curSent, styleOffsets)
+                    styleOffsets = []
                     textJSON['sentences'].append(curSent)
                 if len(obj['word'].strip('[] ')) > 0:
                     curSent = {'words': [],
                                'meta': {'page': obj['page']}}
                     curSent['words'].append({'wtype': 'punc',
                                              'wf': '[' + obj['word'].strip('[]') + ']'})
-                    self.concatenate_words(curSent)
+                    self.concatenate_words(curSent, [])
                     textJSON['sentences'].append(curSent)
                 curSent = {'words': []}
+                styleOffsets = []
             elif obj['type'] in ['word', 'punc']:
-                curSent['words'].append(self.make_word(obj))
+                curWord, curStyleOffsets = self.make_word(obj)
+                styleOffsets.append(curStyleOffsets)
+                curSent['words'].append(curWord)
         if len(curSent['words']) > 0:
-            self.concatenate_words(curSent)
+            self.concatenate_words(curSent, styleOffsets)
             textJSON['sentences'].append(curSent)
-        if len(textJSON['sentences']) > 0:
+        if len(textJSON['sentences']) > 0 and not self.exclude_text(textJSON['meta']):
             yield textJSON
         return
 

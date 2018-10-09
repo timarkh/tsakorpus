@@ -11,7 +11,11 @@
 {% for item in word_table_fields %}
 <th>{{ _('word_th_' + item) }}</th>
 {% endfor %}
-<th>{{ _('word_th_frequency') }}</th><th>{{ _('word_th_freq. rank / quantile') }}</th><th>{{ _('word_th_# sentences') }}</th><th>{{ _('word_th_# documents') }}</th><th>{{ _('word_th_search in corpus') }}</th><th>{{ _('word_th_word stats') }}</th></thead>
+<th>{{ _('word_th_frequency') }}</th>
+{% if display_freq_rank %}
+<th>{{ _('word_th_freq. rank / quantile') }}</th>
+{% endif %}
+<th>{{ _('word_th_# sentences') }}</th><th>{{ _('word_th_# documents') }}</th><th>{{ _('word_th_search in corpus') }}</th><th>{{ _('word_th_word stats') }}</th></thead>
 <tbody>
 {% for w in data.words %}
 {{ w | safe }}
