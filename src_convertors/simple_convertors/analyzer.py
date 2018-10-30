@@ -78,6 +78,8 @@ class DumbMorphParser:
         grJSON = {}
         grTags = self.rxSplitGramTags.split(grStr)
         for tag in grTags:
+            if len(tag.strip()) <= 0:
+                continue
             if tag not in self.categories[lang]:
                 print('No category for a gramtag:', tag, ', language:', lang)
                 continue
