@@ -37,6 +37,26 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         self.morph2wordID = {}   # morph ID -> (word ID, position in the word)
         self.pID = 0         # id of last aligned segment
         self.glosses = set()
+        self.posRules = {}
+        self.load_pos_rules(os.path.join(self.corpusSettings['corpus_dir'], 'conf/posRules.txt'))
+
+    def load_pos_rules(self, fname):
+        """
+        Load mapping of the POS tags used in the source files to your corpus POS tags.
+        """
+        if len(fname) <= 0 or not os.path.isfile(fname):
+            return
+        rules = {}
+        f = open(fname, 'r', encoding='utf-8-sig')
+        for line in f:
+            line = line.strip('\r\n')
+            if len(line) > 0:
+                rule = [i.strip() for i in line.split('\t')]
+                if len(rule) != 2:
+                    continue
+                rules[rule[0]] = rule[1]
+        f.close()
+        self.posRules = rules
 
     def load_speaker_meta(self, srcTree):
         speakerMeta = {}
@@ -91,21 +111,20 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             iTli += 1
         return tlis
 
-    def get_sentence_boundaries(self, refTier):
+    def add_pos_ana(self, ana, pos):
         """
-        Go over the reference tier (as XML node). For each event
-        in the tier, extract start and end attributes. Return a list
-        with (start time label, end time label) tuples.
+        Add the part of speech tag to single JSON analysis, taking into
+        account the correspondences between source file tags and the target
+        corpus tags. Change the analysis, do not return anything.
         """
-        boundaries = []
-        for event in refTier:
-            if 'start' not in event.attrib or 'end' not in event.attrib:
-                continue
-            sentStart, sentEnd = event.attrib['start'], event.attrib['end']
-            if sentStart not in self.tlis or sentEnd not in self.tlis:
-                continue
-            boundaries.append((sentStart, sentEnd))
-        return boundaries
+        if pos in self.posRules:
+            pos = self.posRules[pos]
+        if 'gr.pos' not in ana:
+            ana['gr.pos'] = pos
+        elif type(ana['gr.pos']) == str and ana['gr.pos'] != pos:
+            ana['gr.pos'] = [ana['gr.pos'], pos]
+        elif pos not in ana['gr.pos']:
+            ana['gr.pos'].append(pos)
 
     def collect_annotation(self, annoTree):
         """
@@ -142,16 +161,14 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                         wordAnno[wordID][tierID] = wSpan.text
                     else:
                         wordAnno[wordID][tierID] = ''
-                elif tierID in ['mc']:
-                    # Morheme-based annotations
+                elif tierID not in ['mb', 'mp', 'ge', 'gr']:
+                    # Word-based annotations: one flat span for each word
                     if tierID not in wordAnno[wordID]:
                         wordAnno[wordID][tierID] = ''
                     if len(wordAnno[wordID][tierID]) > 0:
                         wordAnno[wordID][tierID] += '-'
                     if wSpan.text is not None:
                         wordAnno[wordID][tierID] += wSpan.text
-                    else:
-                        wordAnno[wordID][tierID] += '∅'
                 else:
                     # Multiple morphemes inside one span in e.g. the mb tier
                     wordAnno[wordID][tierID] = ''
@@ -183,11 +200,9 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         the event is used as the value.
         """
         for tierName in curWordAnno:
-            if tierName in ['tx', 'mb', 'mp', 'gr', 'ge']:
+            if tierName in ['tx', 'mb', 'mp', 'gr', 'ge', 'ps']:
                 continue
-            if tierName == 'ps':
-                ana['gr.pos'] = curWordAnno[tierName]
-            else:
+            elif len(curWordAnno[tierName]) > 0:
                 ana[tierName] = curWordAnno[tierName]
 
     def process_words(self, annoTree):
@@ -206,6 +221,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             if 'ge' in curWordAnno:
                 ana['gloss'] = curWordAnno['ge']
                 self.glosses |= set(g for g in ana['gloss'].split('-') if g.upper() == g)
+            if 'ps' in curWordAnno:
+                self.add_pos_ana(ana, curWordAnno['ps'])
             self.tp.parser.process_gloss_in_ana(ana)
             if 'gloss_index' in ana:
                 stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index'],
@@ -331,22 +348,26 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 iSentPos += 1
             word['off_end'] = iSentPos
 
-    def add_full_text(self, anno, curSentences):
+    def add_full_text(self, anno, curSentences, tierName='ts'):
         """
-        Add full texts of the sentences from the ts tier. Find relevant
-        sentences based on the time anchors.
+        Add full texts of the sentences from the tier requested
+        (ts stands for the main text tier). Find relevant sentences
+        based on the time anchors.
         Do not return anything.
         """
         timeSpans2text = {}     # (from, to) -> sentence text
         for spanGr in anno.xpath('tei:spanGrp',
                                  namespaces=self.namespaces):
-            if 'type' in spanGr.attrib and spanGr.attrib['type'] == 'ts':
+            if 'type' in spanGr.attrib and spanGr.attrib['type'] == tierName:
                 for span in spanGr.xpath('tei:span',
                                          namespaces=self.namespaces):
                     if 'from' not in span.attrib or 'to' not in span.attrib:
                         continue
+                    spanText = span.text
+                    if spanText is None:
+                        spanText = ''
                     timeSpans2text[(self.tlis[span.attrib['from']]['time'],
-                                    self.tlis[span.attrib['to']]['time'])] = span.text.strip()
+                                    self.tlis[span.attrib['to']]['time'])] = spanText.strip()
         for s in curSentences:
             if 'src_alignment' not in s:
                 continue
@@ -384,6 +405,17 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 print(s)
                 print('No source text for sentence with time offsets', offStart, offEnd)
 
+    def add_para_ids(self, sentences):
+        """
+        Add a new parallel alignment ID to each of the sentences.
+        Do not return anything.
+        """
+        for s in sentences:
+            self.pID += 1
+            s['para_alignment'] = {'off_start': 0,
+                                   'off_end': len(s['text']),
+                                   'para_id': self.pID}
+
     def get_sentences(self, srcTree, srcFile):
         """
         Iterate over sentences in the XML tree.
@@ -392,9 +424,9 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                                     namespaces=self.namespaces)
         if len(annotations) <= 0:
             return
-        prevSentIndex = -1
         for anno in annotations:
             curSentences = []
+            paraSentences = {}  # tier name -> parallel sentences (translations, alternative transcriptions, etc.)
             sentMeta = {}
             if 'start' not in anno.attrib or 'end' not in anno.attrib:
                 self.log_message('No start or end attribute in annotationBlock '
@@ -428,31 +460,39 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 self.add_src_alignment(curSent, [curAnchor, endAnchor], srcFile)
             self.add_full_text(anno, curSentences)
             self.process_words(anno)
+            self.add_para_ids(curSentences)
+            for tierName in self.corpusSettings['tier_languages']:
+                lang = self.corpusSettings['tier_languages'][tierName]
+                langID = self.corpusSettings['languages'].index(lang)
+                if langID == 0:
+                    continue
+                paraSentences[tierName] = []
+                for sent in curSentences:
+                    paraSent = {'words': [],
+                                'text': '',
+                                'lang': langID,
+                                'src_alignment': copy.deepcopy(sent['src_alignment']),
+                                'para_alignment': copy.deepcopy(sent['para_alignment'])}
+                    paraSentences[tierName].append(paraSent)
+                self.add_full_text(anno, paraSentences[tierName], tierName)
             for sent in curSentences:
                 if len(sent['text']) <= 0:
                     print('Zero length sentence:', sent)
                     continue
                 self.align_words_and_baseline(sent)
                 yield sent
-                continue
-                # TODO: Finalize the parallel part
-                curSentIndex = self.find_sentence_index(sentBoundaries, word['tli_start'])
-                if curSentIndex != prevSentIndex and len(curSent['text']) > 0:
-                    paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
-                    curSent['para_alignment'] = [paraAlignment]
-                    self.add_src_alignment(curSent, sentBoundaries[prevSentIndex], srcFile)
-                    yield curSent
-                    curSent = {'text': '', 'words': [], 'lang': 0}
-                    for paraSent in self.get_parallel_sentences(srcTree, sentBoundaries[curSentIndex],
-                                                                srcFile):
-                        yield paraSent
-                prevSentIndex = curSentIndex
-
-                if len(curSent['text']) > 0:
-                    paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
-                    curSent['para_alignment'] = [paraAlignment]
-                    self.add_src_alignment(curSent, sentBoundaries[curSentIndex], srcFile)
-                    yield curSent
+            for tierName in paraSentences:
+                for paraSent in paraSentences[tierName]:
+                    if len(paraSent['text']) <= 0:
+                        paraSent['words'] = [{'wf': '—',
+                                              'wtype': 'punc',
+                                              'off_start': 0,
+                                              'off_end': 1}]
+                        paraSent['text'] = '—'
+                    else:
+                        paraSent['words'] = self.tp.tokenizer.tokenize(paraSent['text'])
+                    paraSent['para_alignment']['off_end'] = len(paraSent['text'])
+                    yield paraSent
 
     def convert_file(self, fnameSrc, fnameTarget):
         """

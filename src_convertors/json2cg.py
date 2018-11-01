@@ -363,5 +363,5 @@ class JSON2CG:
 
 if __name__ == '__main__':
     translator = JSON2CG()
-    # translator.process_corpus()
-    translator.disambiguate_json_corpus()
+    translator.process_corpus()
+    # translator.disambiguate_json_corpus()
