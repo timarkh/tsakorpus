@@ -19,6 +19,9 @@ class PrepareData:
         self.wordFields = []
         if 'word_fields' in self.settings:
             self.wordFields = self.settings['word_fields']
+        self.kwFields = []
+        if 'kw_word_fields' in self.settings:
+            self.kwFields = self.settings['kw_word_fields']
         f = open(os.path.join(self.SETTINGS_DIR, 'categories.json'),
                  'r', encoding='utf-8')
         self.categories = json.loads(f.read())
@@ -91,8 +94,11 @@ class PrepareData:
              'l_order': {'type': 'integer'}     # position of the lemma in sorted list of lemmata
              }
         for field in self.wordFields:
-            if self.rxBadField.search(field) is None:
+            if self.rxBadField.search(field) is None and field not in self.kwFields:
                 m['ana']['properties'][field] = {'type': 'text'}
+        for field in self.kwFields:
+            if self.rxBadField.search(field) is None:
+                m['ana']['properties'][field] = {'type': 'keyword'}
         for field in set(v for lang in self.categories.values()
                          for v in lang.values()):
             if self.rxBadField.search(field) is None:

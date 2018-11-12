@@ -296,6 +296,21 @@ msgid "metafield_line"
 msgstr "Line"
 
 
+# Metafields specific for the Russian National Corpus
+
+msgid "grgenre_fi"
+msgstr "Genre"
+
+msgid "grtype"
+msgstr "Type of text"
+
+msgid "grsphere"
+msgstr "Sphere"
+
+
+
+
+
 # Names of the metadata values you have in the corpus:
 
 msgid "metavalue_press"

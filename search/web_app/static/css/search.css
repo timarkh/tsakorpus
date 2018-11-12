@@ -952,3 +952,16 @@ svg circle {
 	vertical-align: sub;
 	font-size: smaller;
 }
+
+.style_txt_h1 {
+	font-size: 150%;
+	font-weight: bold;
+}
+
+.style_txt_h2 {
+	font-size: 125%;
+}
+
+.style_txt_h3 {
+	font-size: 110%;
+}

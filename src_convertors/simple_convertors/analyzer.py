@@ -25,6 +25,14 @@ class DumbMorphParser:
         self.rxAllGlosses = self.prepare_gloss_regex()
         self.analyses = {}
         self.errorLog = errorLog
+        if 'multivalued_ana_features' in self.settings:
+            self.settings['multivalued_ana_features'] = set(self.settings['multivalued_ana_features'])
+        else:
+            self.settings['multivalued_ana_features'] = set()
+        if 'gramtags_exclude' in self.settings:
+            self.settings['gramtags_exclude'] = set(self.settings['gramtags_exclude'])
+        else:
+            self.settings['gramtags_exclude'] = set()
         if ('parsed_wordlist_filename' in self.settings
                 and len(self.settings['parsed_wordlist_filename']) > 0):
             if type(self.settings['parsed_wordlist_filename']) == str:
@@ -79,6 +87,8 @@ class DumbMorphParser:
         grTags = self.rxSplitGramTags.split(grStr)
         for tag in grTags:
             if len(tag.strip()) <= 0:
+                continue
+            if tag in self.settings['gramtags_exclude']:
                 continue
             if tag not in self.categories[lang]:
                 print('No category for a gramtag:', tag, ', language:', lang)
@@ -187,6 +197,8 @@ class DumbMorphParser:
             for k, v in fields:
                 if k == 'gr':
                     anaJSON.update(self.transform_gramm_str(v, lang=lang))
+                elif k in self.settings['multivalued_ana_features']:
+                    anaJSON[k] = [tag.strip() for tag in v.split()]
                 else:
                     anaJSON[k] = v
             self.process_gloss_in_ana(anaJSON)

@@ -7,23 +7,34 @@ from txt2json import Txt2JSON
 
 class Xml_Rnc2JSON(Txt2JSON):
     """
-    Contains methods to make JSONs ready for indexing from aligned
-    parallel xml files in the format of Russian National Corpus
-    and a csv with metadata.
+    Contains methods to make JSONs ready for indexing from
+    XML files in the format of Russian National Corpus, which
+    can either have all metadata in headers inside each file,
+    or come with a metadata CSV. The texts can be either annotated
+    according to the RNC format or unannotated. In the latter case,
+    an additional file with annotated tokens may be used to add
+    token-level annotation, e.g. morphology.
+    Currently, simple XML files ("main corpus") and XML files
+    with aligned parallel texts are supported. Type of corpus
+    is determined by the value of the "corpus_type" parameter
+    in corpus.json (main/parallel).
     """
 
-    rxSeTags = re.compile('<se [^<>]*> *| *</se>')
+    rxSeTags = re.compile('<se(?: [^<>]*)?> *| *</se>')
     rxSeParts = re.compile(' +~~~ +')
     rxSeWords = re.compile('<w>.*?</w>|(?<=>)[^<>]*(?=<)')
     rxWTags = re.compile('</?w(?: [^<>]*)?>')
     rxSpaces = re.compile('^ *$')
+    dictSpanClasses = {'h1': 'txt_h1', 'h2': 'txt_h2', 'h3': 'txt_h3',
+                       'h4': 'txt_h4', 'h5': 'txt_h5', 'h6': 'txt_h6',
+                       'i': 'i', 'b': 'b', 'em': 'em'}
 
     def __init__(self, settingsDir='conf'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
         self.srcExt = 'xml'
         self.pID = 0        # id of last aligned segment
 
-    def process_se_tokens(self, tokens, lang):
+    def process_se_tokens(self, tokens, lang, p_class=None):
         """
         Return a JSON sentence made of tokens, each of which is
         either a word (string that contains <w>) or punctuation
@@ -68,30 +79,73 @@ class Xml_Rnc2JSON(Txt2JSON):
                 tokenJSON['off_end'] = len(seText)
                 tokenJSON['wtype'] = 'word'
             words.append(tokenJSON)
-        paraAlignment = {'off_start': 0, 'off_end': len(seText), 'para_id': self.pID}
-        sentence = {'words': words, 'text': seText, 'para_alignment': [paraAlignment]}
+        sentence = {'words': words, 'text': seText}
+        if 'corpus_type' in self.corpusSettings and self.corpusSettings['corpus_type'] == 'parallel':
+            paraAlignment = {'off_start': 0, 'off_end': len(seText), 'para_id': self.pID}
+            sentence['para_alignment'] = [paraAlignment]
+        self.add_class(sentence, p_class)
         return sentence
 
-    def process_se_node(self, se, lang):
+    def add_class(self, sentence, span_class):
+        """
+        Add style-related class that can appear as an attribute
+        in paragraph nodes.
+        Modify the sentence, do not return anything.
+        """
+        if span_class is None or 'text' not in sentence or len(sentence['text']) <= 0:
+            return
+        sentence['style_spans'] = [{'off_start': 0,
+                                    'off_end': len(sentence['text']),
+                                    'span_class': span_class}]
+
+    def process_se_node(self, se, lang, p_class=None):
         """
         Extract data from the <se> (sentence) node that contains
         one ore more sentences in one language. The input is an
         XML string, not an element.
         """
-        bProcessXML = ('<w>' in se)
+        bProcessXML = (('analyze_text' in self.corpusSettings and not self.corpusSettings['analyze_text'])
+                       or '<w>' in se)
+        # bProcessXML means that token-level annotation (e.g. morphology)
+        # has already been done.
         seParts = self.rxSeParts.split(se)
         for part in seParts:
             if not bProcessXML:
                 part = self.tp.cleaner.clean_text(part)
                 words = self.tp.tokenizer.tokenize(part)
-                paraAlignment = {'off_start': 0, 'off_end': len(part), 'para_id': self.pID}
-                curSent = {'words': words, 'text': part, 'para_alignment': [paraAlignment]}
+                curSent = {'words': words, 'text': part}
+                if 'corpus_type' in self.corpusSettings and self.corpusSettings['corpus_type'] == 'parallel':
+                    paraAlignment = {'off_start': 0, 'off_end': len(part), 'para_id': self.pID}
+                    curSent['para_alignment'] = [paraAlignment]
                 if len(curSent['words']) > 0:
+                    self.add_class(curSent, p_class)
                     self.tp.splitter.add_next_word_id_sentence(curSent)
                     self.tp.parser.analyze_sentence(curSent, lang=lang)
                 yield curSent
             else:
-                yield self.process_se_tokens(self.rxSeWords.findall('>' + part.strip() + '<'), lang)
+                yield self.process_se_tokens(self.rxSeWords.findall('>' + part.strip() + '<'),
+                                             lang, p_class=p_class)
+
+    def process_p_node(self, pNode):
+        """
+        Extract data from a <p> node that contains a single paragraph of text
+        written in the main (and probably only) language of the corpus.
+        """
+        pClass = None
+        if 'class' in pNode.attrib:
+            if pNode.attrib['class'] in self.dictSpanClasses:
+                pClass = self.dictSpanClasses[pNode.attrib['class']]
+        for se in pNode.xpath('se'):
+            lang = self.corpusSettings['languages'][0]
+            seStr = etree.tostring(se, encoding='unicode')
+            seStr = self.rxSeTags.sub('', seStr)
+            if self.rxSpaces.search(seStr) is not None:
+                continue
+            for seJSON in self.process_se_node(seStr, lang, p_class=pClass):
+                if seJSON is None or 'words' in seJSON and len(seJSON['words']) <= 0:
+                    continue
+                seJSON['lang'] = 0
+                yield seJSON
 
     def process_para_node(self, paraNode):
         """
@@ -99,6 +153,10 @@ class Xml_Rnc2JSON(Txt2JSON):
         fragments in several languages.
         """
         self.pID += 1
+        pClass = None
+        if 'class' in paraNode.attrib:
+            if paraNode.attrib['class'] in self.dictSpanClasses:
+                pClass = paraNode.attrib['class']
         for se in paraNode.xpath('se'):
             if se.get('lang') in self.corpusSettings['language_codes']:
                 lang = self.corpusSettings['language_codes'][se.attrib['lang']]
@@ -107,29 +165,68 @@ class Xml_Rnc2JSON(Txt2JSON):
                 seStr = self.rxSeTags.sub('', seStr)
                 if self.rxSpaces.search(seStr) is not None:
                     continue
-                for seJSON in self.process_se_node(seStr, lang):
+                for seJSON in self.process_se_node(seStr, lang, p_class=pClass):
                     if seJSON is None or 'words' in seJSON and len(seJSON['words']) <= 0:
                         continue
                     seJSON['lang'] = langCode
                     yield seJSON
 
+    def get_meta_from_header(self, srcTree, fname):
+        """
+        Retrieve the metadata from the header of the XML document.
+        Return it as a dictionary.
+        """
+        meta = {'filename': fname}
+        for metaNode in srcTree.xpath('/html/head/meta'):
+            if 'name' not in metaNode.attrib or 'content' not in metaNode.attrib:
+                continue
+            metaName = metaNode.attrib['name']
+            # Hard-coded hacks for Russian National Corpus (not needed elsewhere):
+            if metaName == 'header':
+                meta['title'] = metaNode.attrib['content']
+            if metaName == 'grauthor':
+                meta['author'] = metaNode.attrib['content']
+            elif metaName == 'grcreated':
+                meta['year_from'] = meta['year_to'] = metaNode.attrib['content']
+            elif metaName in self.corpusSettings['meta_fields']:
+                meta[metaName] = metaNode.attrib['content']
+        return meta
+
     def convert_file(self, fnameSrc, fnameTarget):
-        curMeta = self.get_meta(fnameSrc)
-        textJSON = {'meta': curMeta, 'sentences': []}
+        textJSON = {'meta': {}, 'sentences': []}
         nTokens, nWords, nAnalyzed = 0, 0, 0
         srcTree = etree.parse(fnameSrc)
-        textJSON['sentences'] = [s for paraNode in srcTree.xpath('/html/body/para')
-                                 for s in self.process_para_node(paraNode)]
-        textJSON['sentences'].sort(key=lambda s: s['lang'])
+        if 'meta_in_header' not in self.corpusSettings or not self.corpusSettings['meta_in_header']:
+            textJSON['meta'] = self.get_meta(fnameSrc)
+        else:
+            textJSON['meta'] = self.get_meta_from_header(srcTree, fnameSrc)
+        if 'corpus_type' in self.corpusSettings and self.corpusSettings['corpus_type'] == 'parallel':
+            textJSON['sentences'] = [s for paraNode in srcTree.xpath('/html/body/para')
+                                     for s in self.process_para_node(paraNode)]
+            textJSON['sentences'].sort(key=lambda s: s['lang'])
+        else:
+            textJSON['sentences'] = []
+            for pNode in srcTree.xpath('/html/body/p'):
+                curSentences = [s for s in self.process_p_node(pNode)]
+                if len(curSentences) > 0:
+                    # Add a newline to the end of each paragraph
+                    curSentences[-1]['text'] += '\n'
+                    curSentences[-1]['words'].append({'wtype': 'punc',
+                                                      'wf': '\n',
+                                                      'off_start': len(curSentences[-1]['text']) - 1,
+                                                      'off_end': len(curSentences[-1]['text'])})
+                    textJSON['sentences'] += curSentences
+            if len(textJSON['sentences']) > 0:
+                textJSON['sentences'][-1]['last'] = True
         for i in range(len(textJSON['sentences']) - 1):
             if textJSON['sentences'][i]['lang'] != textJSON['sentences'][i + 1]['lang']:
                 textJSON['sentences'][i]['last'] = True
-                for word in textJSON['sentences'][i]['words']:
-                    nTokens += 1
-                    if word['wtype'] == 'word':
-                        nWords += 1
-                        if 'ana' in word and len(word['ana']) > 0:
-                            nAnalyzed += 1
+            for word in textJSON['sentences'][i]['words']:
+                nTokens += 1
+                if word['wtype'] == 'word':
+                    nWords += 1
+                    if 'ana' in word and len(word['ana']) > 0:
+                        nAnalyzed += 1
         self.tp.splitter.recalculate_offsets(textJSON['sentences'])
         self.tp.splitter.add_next_word_id(textJSON['sentences'])
         self.write_output(fnameTarget, textJSON)
