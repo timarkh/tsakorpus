@@ -171,6 +171,8 @@ class Morphy_YAML2JSON(Txt2JSON):
         each made from a single segment represented by an analysis.
         """
         wordJson = {'wtype': obj['type'], 'wf': obj['word']}
+        if wordJson['wtype'] == 'punc':
+            wordJson['wtype'] = 'punct'
         commonAna = {}
         styleOffsets = []
         transcr = ''
@@ -271,7 +273,7 @@ class Morphy_YAML2JSON(Txt2JSON):
         styleSpans = []
         for iWord in range(len(s['words'])):
             word = s['words'][iWord]
-            if (word['wtype'] == 'punc'
+            if (word['wtype'] == 'punct'
                 and self.rxPuncSpaceBefore.search(word['wf']) is not None
                 and len(s['text']) > 0
                 and s['text'][-1] != ' '):
@@ -285,7 +287,7 @@ class Morphy_YAML2JSON(Txt2JSON):
                         styleSpans.append({'span_class': offset[2],
                                            'off_start': word['off_start'] + offset[0],
                                            'off_end': word['off_start'] + offset[1]})
-            if (word['wtype'] == 'punc'
+            if (word['wtype'] == 'punct'
                 and self.rxPuncSpaceAfter.search(word['wf']) is not None
                 and len(s['text']) > 0
                 and s['text'][-1] != ' '):
@@ -329,26 +331,26 @@ class Morphy_YAML2JSON(Txt2JSON):
                         textJSON['meta'][newKey] = textJSON['meta'][newKey][0]
             elif obj['type'] == 'line':
                 if len(curSent['words']) > 0:
-                    curSent['words'].append({'wtype': 'punc', 'wf': '\n'})
+                    curSent['words'].append({'wtype': 'punct', 'wf': '\n'})
                     self.concatenate_words(curSent, styleOffsets)
                     styleOffsets = []
                     textJSON['sentences'].append(curSent)
                 curSent = {'words': [],
                            'meta': {'line': obj['line'], 'page': obj['page']}}
                 if len(obj['word'].strip('[] ')) > 0:
-                    curSent['words'].append({'wtype': 'punc',
+                    curSent['words'].append({'wtype': 'punct',
                                              'wf': '[' + obj['word'].strip('[]') + ']'})
                     styleOffsets.append([])
             elif obj['type'] == 'page':
                 if len(curSent['words']) > 0:
-                    curSent['words'].append({'wtype': 'punc', 'wf': '\n'})
+                    curSent['words'].append({'wtype': 'punct', 'wf': '\n'})
                     self.concatenate_words(curSent, styleOffsets)
                     styleOffsets = []
                     textJSON['sentences'].append(curSent)
                 if len(obj['word'].strip('[] ')) > 0:
                     curSent = {'words': [],
                                'meta': {'page': obj['page']}}
-                    curSent['words'].append({'wtype': 'punc',
+                    curSent['words'].append({'wtype': 'punct',
                                              'wf': '[' + obj['word'].strip('[]') + ']'})
                     self.concatenate_words(curSent, [])
                     textJSON['sentences'].append(curSent)
@@ -401,8 +403,8 @@ class Morphy_YAML2JSON(Txt2JSON):
                         textJSON['meta'][newKey] = textJSON['meta'][newKey][0]
             elif obj['type'] == 'line':
                 if len(curSentTranslit['words']) > 0:
-                    curSentTranslit['words'].append({'wtype': 'punc', 'wf': '\n'})
-                    curSentTranscr['words'].append({'wtype': 'punc', 'wf': '\n'})
+                    curSentTranslit['words'].append({'wtype': 'punct', 'wf': '\n'})
+                    curSentTranscr['words'].append({'wtype': 'punct', 'wf': '\n'})
                     self.concatenate_words(curSentTranslit, styleOffsets)
                     self.concatenate_words(curSentTranscr, [])
                     styleOffsets = []
@@ -417,15 +419,15 @@ class Morphy_YAML2JSON(Txt2JSON):
                                   'lang': 0,
                                   'para_alignment': []}
                 if len(obj['word'].strip('[] ')) > 0:
-                    curSentTranslit['words'].append({'wtype': 'punc',
+                    curSentTranslit['words'].append({'wtype': 'punct',
                                                      'wf': '[' + obj['word'].strip('[]') + ']'})
                     styleOffsets.append([])
-                    curSentTranscr['words'].append({'wtype': 'punc',
+                    curSentTranscr['words'].append({'wtype': 'punct',
                                                     'wf': '[' + obj['word'].strip('[]') + ']'})
             elif obj['type'] == 'page':
                 if len(curSentTranslit['words']) > 0:
-                    curSentTranslit['words'].append({'wtype': 'punc', 'wf': '\n'})
-                    curSentTranscr['words'].append({'wtype': 'punc', 'wf': '\n'})
+                    curSentTranslit['words'].append({'wtype': 'punct', 'wf': '\n'})
+                    curSentTranscr['words'].append({'wtype': 'punct', 'wf': '\n'})
                     self.concatenate_words(curSentTranslit, styleOffsets)
                     self.concatenate_words(curSentTranscr, [])
                     styleOffsets = []
@@ -445,9 +447,9 @@ class Morphy_YAML2JSON(Txt2JSON):
                                       'para_alignment': [{'para_id': self.pID,
                                                           'start_offset': 0,
                                                           'end_offset': len(obj['word'].strip('[]')) + 2}]}
-                    curSentTranslit['words'].append({'wtype': 'punc',
+                    curSentTranslit['words'].append({'wtype': 'punct',
                                                      'wf': '[' + obj['word'].strip('[]') + ']'})
-                    curSentTranscr['words'].append({'wtype': 'punc',
+                    curSentTranscr['words'].append({'wtype': 'punct',
                                                     'wf': '[' + obj['word'].strip('[]') + ']'})
                     self.concatenate_words(curSentTranslit, [])
                     self.concatenate_words(curSentTranscr, [])

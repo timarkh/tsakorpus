@@ -38,7 +38,10 @@ for lang in settings['languages']:
     word_freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_word_freq_by_rank(lang)))
     # number of lemmata for each frequency rank
     lemma_freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_lemma_freq_by_rank(lang)))
-linePlotMetafields = ['year']   # metadata fields whose statistics can be displayed on a line plot
+if 'line_plot_meta' in settings:
+    linePlotMetafields = settings['line_plot_meta']
+else:
+    linePlotMetafields = ['year']   # metadata fields whose statistics can be displayed on a line plot
 
 
 def jsonp(func):

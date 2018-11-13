@@ -22,9 +22,12 @@ class Xml_Rnc2JSON(Txt2JSON):
 
     rxSeTags = re.compile('<se(?: [^<>]*)?> *| *</se>')
     rxSeParts = re.compile(' +~~~ +')
-    rxSeWords = re.compile('<w>.*?</w>|(?<=>)[^<>]*(?=<)')
+    rxSeWords = re.compile('<w>.*?</w>|(?<=>)[^<>]*(?=<)', flags=re.DOTALL)
     rxWTags = re.compile('</?w(?: [^<>]*)?>')
-    rxSpaces = re.compile('^ *$')
+    rxSpaces = re.compile('^ *\Z', flags=re.DOTALL)
+    rxNewlines = re.compile('^ *\n+\Z', flags=re.DOTALL)
+    rxDate = re.compile('^([12][0-9]{3})\\.[0-9]{2}\\.[0-9]{2}$')
+    rxYear = re.compile('^[12][0-9]{3}')
     dictSpanClasses = {'h1': 'txt_h1', 'h2': 'txt_h2', 'h3': 'txt_h3',
                        'h4': 'txt_h4', 'h5': 'txt_h5', 'h6': 'txt_h6',
                        'i': 'i', 'b': 'b', 'em': 'em'}
@@ -42,10 +45,15 @@ class Xml_Rnc2JSON(Txt2JSON):
         """
         words = []
         seText = ''
-        for token in tokens:
+        for iToken in range(len(tokens)):
+            token = tokens[iToken]
             if self.rxSpaces.search(token) is not None:
                 seText += token
                 continue
+            elif self.rxNewlines.search(token) is not None:
+                if iToken < len(tokens) - 1:
+                    seText += ' '
+                continue    # there may be newlines between words
             tokenJSON = {}
             if not token.startswith('<w>'):
                 tokenStripped = token.lstrip(' ')
@@ -54,7 +62,7 @@ class Xml_Rnc2JSON(Txt2JSON):
                 spacesR = len(token) - spacesL - len(tokenStripped)
                 tokenJSON['wf'] = tokenStripped
                 tokenJSON['off_start'] = len(seText) + spacesL
-                seText += token
+                seText += token.replace('\n', '')
                 tokenJSON['off_end'] = len(seText) - spacesR
                 tokenJSON['wtype'] = 'punct'
             elif '<ana' not in token:
@@ -72,8 +80,13 @@ class Xml_Rnc2JSON(Txt2JSON):
                 word = mAna.group(2).strip('"\'')
                 if len(word) <= 0:
                     continue
+                if 'clean_words_rnc' in self.corpusSettings and self.corpusSettings['clean_words_rnc']:
+                    word = self.tp.cleaner.clean_text(word)
+                    wordClean, word = self.tp.cleaner.clean_token_rnc(word)
+                else:
+                    wordClean = word
                 tokenJSON['ana'] = self.tp.parser.transform_ana_rnc(mAna.group(1), lang=lang)
-                tokenJSON['wf'] = word
+                tokenJSON['wf'] = wordClean
                 tokenJSON['off_start'] = len(seText)
                 seText += word
                 tokenJSON['off_end'] = len(seText)
@@ -181,15 +194,48 @@ class Xml_Rnc2JSON(Txt2JSON):
             if 'name' not in metaNode.attrib or 'content' not in metaNode.attrib:
                 continue
             metaName = metaNode.attrib['name']
+            metaValue = metaNode.attrib['content'].strip()
             # Hard-coded hacks for Russian National Corpus (not needed elsewhere):
             if metaName == 'header':
-                meta['title'] = metaNode.attrib['content']
-            if metaName == 'grauthor':
-                meta['author'] = metaNode.attrib['content']
-            elif metaName == 'grcreated':
-                meta['year_from'] = meta['year_to'] = metaNode.attrib['content']
-            elif metaName in self.corpusSettings['meta_fields']:
-                meta[metaName] = metaNode.attrib['content']
+                meta['title'] = metaValue
+            if metaName == 'created':
+                metaName = 'year_from'
+            elif metaName == 'publ_year':
+                metaName = 'year_publ'
+                mYear = self.rxYear.search(metaValue)
+                if mYear is None:
+                    continue
+                else:
+                    metaValue = metaValue[:4]
+            elif metaName == 'birthday':
+                metaName = 'year_birth'
+                mYear = self.rxYear.search(metaValue)
+                if mYear is None:
+                    continue
+                else:
+                    metaValue = metaValue[:4]
+            if metaName in self.corpusSettings['meta_fields']:
+                if metaName not in meta:
+                    meta[metaName] = metaValue
+                elif type(meta[metaName]) == str:
+                    meta[metaName] = [meta[metaName], metaValue]
+                else:
+                    meta[metaName].append(metaValue)
+        if 'year_from' in meta:
+            if type(meta['year_from']) == str:
+                mDate = self.rxDate.search(meta['year_from'])
+                if mDate is not None:
+                    meta['issue'] = meta['year_from']
+                    meta['year_to'] = meta['year_from'] = mDate.group(1)
+                else:
+                    meta['year_to'] = meta['year_from']
+            else:
+                try:
+                    meta['year_to'] = max(int(y) for y in meta['year_from'])
+                    meta['year_from'] = min(int(y) for y in meta['year_from'])
+                except:
+                    del meta['year_from']
+                    del meta['year_to']
         return meta
 
     def convert_file(self, fnameSrc, fnameTarget):

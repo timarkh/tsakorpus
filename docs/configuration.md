@@ -32,6 +32,8 @@ The following parameters (dictionary keys) are recognized in corpus.json:
  * ``search_meta.columns`` -- array with column-by column description of what options should appear on the "Specify parameters" tab;
  * ``search_meta.stat_options`` -- array with the names of the metafields that should be available for plotting statistics on the "Subcorpus statistics" tab.
 
+* ``line_plot_meta`` (optional) -- list with names of the document-level metainformation fields whose values are numerical and should be presented in statistics by a line plot rather than by a histogram. Defaults to ["year"].
+
 * ``author_metafield`` (optional) -- string which defines the second-important metafield which will be displayed next to the title in headers of hit results. Defaults to ``author``.
 
 * ``word_fields`` -- list with names of the word-level analysis fields that should be available in word-level search queries. These include all fields that can occur inside the ``ana`` nested objects, except ``lex``, ``parts``, ``gloss`` and the grammatical fields that start with ``gr.``.

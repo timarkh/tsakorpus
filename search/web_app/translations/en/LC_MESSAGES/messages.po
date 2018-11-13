@@ -115,6 +115,15 @@ msgstr "German"
 msgid "langname_french"
 msgstr "French"
 
+msgid "langname_armenian"
+msgstr "Armenian"
+
+msgid "langname_armenian_translit"
+msgstr "Armenian (translit.)"
+
+msgid "langname_belarusian"
+msgstr "Belarusian"
+
 msgid "langname_comments"
 msgstr "comments"
 
@@ -180,6 +189,12 @@ msgstr "year: from"
 
 msgid "metafield_year_to"
 msgstr "year: to"
+
+msgid "metafield_year_birth"
+msgstr "year of birth"
+
+msgid "metafield_year_publ"
+msgstr "publication year"
 
 msgid "metafield_title"
 msgstr "title"
@@ -295,19 +310,29 @@ msgstr "Page"
 msgid "metafield_line"
 msgstr "Line"
 
+msgid "metafield_type"
+msgstr "Type"
 
-# Metafields specific for the Russian National Corpus
-
-msgid "grgenre_fi"
-msgstr "Genre"
-
-msgid "grtype"
-msgstr "Type of text"
-
-msgid "grsphere"
+msgid "metafield_sphere"
 msgstr "Sphere"
 
+msgid "metafield_chronotop"
+msgstr "Chronotope"
 
+msgid "metafield_genre_fi"
+msgstr "Genre of fiction"
+
+msgid "metafield_publication"
+msgstr "Publication"
+
+msgid "metafield_medium"
+msgstr "Medium"
+
+msgid "metafield_country"
+msgstr "Country"
+
+msgid "metafield_tagging"
+msgstr "Tagging"
 
 
 

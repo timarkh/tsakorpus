@@ -116,6 +116,15 @@ msgstr "немецкий"
 msgid "langname_french"
 msgstr "французский"
 
+msgid "langname_armenian"
+msgstr "армянский"
+
+msgid "langname_armenian_translit"
+msgstr "армянский (транслит.)"
+
+msgid "langname_belarusian"
+msgstr "белорусский"
+
 msgid "langname_comments"
 msgstr "комментарии"
 
@@ -181,6 +190,12 @@ msgstr "год: от"
 
 msgid "metafield_year_to"
 msgstr "год: до"
+
+msgid "metafield_year_birth"
+msgstr "год рождения автора"
+
+msgid "metafield_year_publ"
+msgstr "год публикации"
 
 msgid "metafield_title"
 msgstr "заголовок"
@@ -296,20 +311,29 @@ msgstr "страница"
 msgid "metafield_line"
 msgstr "строка"
 
-
-# Metafields specific for the Russian National Corpus
-
-msgid "grgenre_fi"
-msgstr "жанр"
-
-msgid "grtype"
+msgid "metafield_type"
 msgstr "тип"
 
-msgid "grsphere"
-msgstr "сфера"
+msgid "metafield_sphere"
+msgstr "сфера функционирования"
 
+msgid "metafield_chronotop"
+msgstr "время и место действия"
 
+msgid "metafield_genre_fi"
+msgstr "жанр худ. литературы"
 
+msgid "metafield_publication"
+msgstr "издание"
+
+msgid "metafield_medium"
+msgstr "тип носителя"
+
+msgid "metafield_country"
+msgstr "страна"
+
+msgid "metafield_tagging"
+msgstr "разметка"
 
 
 # Names of the metadata values you have in the corpus:

@@ -40,14 +40,14 @@ class TextCleaner:
     rxUdmDzh = re.compile('(?<=[а-яА-ЯӜӞӴӝӟӵ])љ|љ(?=[а-яА-ЯӜӞӴӝӟӵ])')
     rxUdmZj = re.compile('(?<=[а-яА-ЯӜӞӴӝӟӵ])њ|њ(?=[а-яА-ЯӜӞӴӝӟӵ])')
 
+    rxRNCStress = re.compile('`(\\w)')
+
     def __init__(self, settings):
         self.settings = copy.deepcopy(settings)
 
     def clean_text(self, text):
         """
         Main method that calls separate step-by-step procedures.
-        :param text: 
-        :return: 
         """
         text = self.convert_html(text)
         text = self.clean_spaces(text)
@@ -69,7 +69,7 @@ class TextCleaner:
 
     def separate_words(self, text):
         # punctuation inside a word
-        text = self.rxPuncWords.sub(u'\\1 \\2', text)  # adds a space between punctuation and next letter
+        text = self.rxPuncWords.sub('\\1 \\2', text)  # adds a space between punctuation and next letter
         return text
 
     def convert_quotes(self, text):
@@ -116,3 +116,14 @@ class TextCleaner:
             text = re.sub('(?<=\\w)ӧӧ+', 'ӧ', text)
             text = re.sub('(?<=\\w)ӥӥ+', 'ӥ', text)
         return text
+
+    def clean_token_rnc(self, text):
+        """
+        Clean a token from things specific to the Russian National Corpus,
+        such as stress marks.
+        Return two versions of the token: one for the search, the other
+        for the baseline.
+        """
+        wordClean = self.rxRNCStress.sub('\\1', text)
+        wordText = self.rxRNCStress.sub('\\1́', text)
+        return wordClean, wordText

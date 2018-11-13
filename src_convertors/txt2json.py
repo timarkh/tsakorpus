@@ -2,6 +2,7 @@ import os
 import re
 import json
 import gzip
+import time
 from simple_convertors.text_processor import TextProcessor
 from json2cg import JSON2CG
 
@@ -191,6 +192,7 @@ class Txt2JSON:
         """
         if self.corpusSettings is None or len(self.corpusSettings) <= 0:
             return
+        tStart = time.time()
         self.load_meta()
         nTokens, nWords, nAnalyzed = 0, 0, 0
         if self.srcExt != 'json':
@@ -218,7 +220,8 @@ class Txt2JSON:
                 nTokens += curTokens
                 nWords += curWords
                 nAnalyzed += curAnalyzed
-        print('Conversion to JSON finished.', nTokens, 'tokens total,', nWords, 'words total.')
+        tEnd = time.time()
+        print('Conversion to JSON finished in', tEnd - tStart, 's.', nTokens, 'tokens total,', nWords, 'words total.')
         if nWords > 0:
             print(nAnalyzed, 'words parsed (' + str(nAnalyzed / nWords * 100) + '%).')
         if 'cg_disambiguate' in self.corpusSettings and self.corpusSettings['cg_disambiguate']:
