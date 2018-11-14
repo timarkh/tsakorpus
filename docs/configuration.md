@@ -24,19 +24,21 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``max_words_in_sentence``. When building a multi-word query with specific distances or distance ranges between the search terms, tsakorpus has to produce a huge query of the kind "(word1 is blah-blah-blah and its index in the sentence is 0, word2 is blah-blah and its index in the sentence is 1 or 2) or (word1 is blah-blah-blah and its index in the sentence is 1, word2 is blah-blah and its index in the sentence is 2 or 3) or ...". The reason for that is that there is no way to impose distance constraints when looking inside a list in Elasticsearch, as the lists are interpreted as mere sacks with values. The integer ``max_words_in_sentence`` defines which sentence positions should be enumerated in multi-word queries. This is not an actual upper bound on the sentence length (there is none), but the tails of longer sentences will not be available for some multi-word queries.
 
-* ``viewable_meta`` -- list with names of the document-level metainformation fields that should be shown in search results.
+* ``viewable_meta`` -- list with names of the document-level metadata fields that should be shown in search results.
 
-* ``sentence_meta`` -- list with names of the sentence-level metainformation fields that should be available in word-level search queries.
+* ``sentence_meta`` -- list with names of the sentence-level metadata fields that should be available in word-level search queries.
 
 * ``search_meta`` -- dictionary with the description of what should appear on different tabs of the "Select subcorpus" dialogue:
  * ``search_meta.columns`` -- array with column-by column description of what options should appear on the "Specify parameters" tab;
  * ``search_meta.stat_options`` -- array with the names of the metafields that should be available for plotting statistics on the "Subcorpus statistics" tab.
 
-* ``line_plot_meta`` (optional) -- list with names of the document-level metainformation fields whose values are numerical and should be presented in statistics by a line plot rather than by a histogram. Defaults to ["year"].
+* ``line_plot_meta`` (optional) -- list with names of the metadata fields whose values are numerical and should be presented in statistics by a line plot rather than by a histogram. Defaults to ["year"].
 
-* ``author_metafield`` (optional) -- string which defines the second-important metafield which will be displayed next to the title in headers of hit results. Defaults to ``author``.
+* ``author_metafield`` (optional) -- string which defines the second-important metadata field whose value will be displayed next to the title in headers of hit results. Defaults to ``author``.
 
 * ``word_fields`` -- list with names of the word-level analysis fields that should be available in word-level search queries. These include all fields that can occur inside the ``ana`` nested objects, except ``lex``, ``parts``, ``gloss`` and the grammatical fields that start with ``gr.``.
+
+* ``kw_word_fields`` (optional) -- list with names of the word-level analysis fields that should be treated as keywords rather than text, except ``lex``, ``parts``, ``gloss`` and the grammatical fields that start with ``gr.``. Full-text search in these fields will be impossible. Defaults to empty list.
 
 * ``word_table_fields`` (optional) -- list with names of the word-level analysis fields that should be displayed in the table with Word search results, along with the wordform and lemma, which appear automatically.
 

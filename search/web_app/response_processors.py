@@ -321,6 +321,8 @@ class SentenceViewer:
             return result + '</span>'
         meta = meta['_source']
         if 'title' in meta:
+            if type(meta['title']) == list:
+                meta['title'] = '; '.join(meta['title'])
             if format == 'csv':
                 result += '"' + meta['title'] + '" '
             else:
@@ -331,6 +333,8 @@ class SentenceViewer:
             else:
                 result += '<span class="ch_title">-</span>'
         if self.authorMeta in meta:
+            if type(meta[self.authorMeta]) == list:
+                meta[self.authorMeta] = '; '.join(meta[self.authorMeta])
             if format == 'csv':
                 result += '(' + meta[self.authorMeta] + ') '
             else:

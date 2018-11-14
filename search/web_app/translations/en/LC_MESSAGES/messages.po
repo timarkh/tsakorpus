@@ -124,6 +124,39 @@ msgstr "Armenian (translit.)"
 msgid "langname_belarusian"
 msgstr "Belarusian"
 
+msgid "langname_ukrainian"
+msgstr "Ukrainian"
+
+msgid "langname_latvian"
+msgstr "Latvian"
+
+msgid "langname_lithuanian"
+msgstr "Lithuanian"
+
+msgid "langname_estonian"
+msgstr "Estonian"
+
+msgid "langname_finnish"
+msgstr "Finnish"
+
+msgid "langname_italian"
+msgstr "Italian"
+
+msgid "langname_spanish"
+msgstr "Spanish"
+
+msgid "langname_bulgarian"
+msgstr "Bulgarian"
+
+msgid "langname_swedish"
+msgstr "Swedish"
+
+msgid "langname_polish"
+msgstr "Polish"
+
+msgid "langname_chinese"
+msgstr "Chinese"
+
 msgid "langname_comments"
 msgstr "comments"
 
@@ -333,6 +366,18 @@ msgstr "Country"
 
 msgid "metafield_tagging"
 msgstr "Tagging"
+
+msgid "metafield_translator"
+msgstr "Translator"
+
+msgid "metafield_lang"
+msgstr "Original language"
+
+msgid "metafield_lang_trans"
+msgstr "Language of translation"
+
+msgid "metafield_date_trans"
+msgstr "Date of translation"
 
 
 

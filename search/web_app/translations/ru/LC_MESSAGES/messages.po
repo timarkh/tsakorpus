@@ -125,6 +125,39 @@ msgstr "армянский (транслит.)"
 msgid "langname_belarusian"
 msgstr "белорусский"
 
+msgid "langname_ukrainian"
+msgstr "украинский"
+
+msgid "langname_latvian"
+msgstr "латышский"
+
+msgid "langname_lithuanian"
+msgstr "литовский"
+
+msgid "langname_estonian"
+msgstr "эстонский"
+
+msgid "langname_finnish"
+msgstr "финский"
+
+msgid "langname_italian"
+msgstr "итальянский"
+
+msgid "langname_spanish"
+msgstr "испанский"
+
+msgid "langname_bulgarian"
+msgstr "болгарский"
+
+msgid "langname_swedish"
+msgstr "шведский"
+
+msgid "langname_polish"
+msgstr "польский"
+
+msgid "langname_chinese"
+msgstr "китайский"
+
 msgid "langname_comments"
 msgstr "комментарии"
 
@@ -334,6 +367,18 @@ msgstr "страна"
 
 msgid "metafield_tagging"
 msgstr "разметка"
+
+msgid "metafield_translator"
+msgstr "переводчик"
+
+msgid "metafield_lang"
+msgstr "язык оригинала"
+
+msgid "metafield_lang_trans"
+msgstr "язык перевода"
+
+msgid "metafield_date_trans"
+msgstr "дата перевода"
 
 
 # Names of the metadata values you have in the corpus:

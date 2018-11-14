@@ -247,7 +247,7 @@ class Xml_Rnc2JSON(Txt2JSON):
         else:
             textJSON['meta'] = self.get_meta_from_header(srcTree, fnameSrc)
         if 'corpus_type' in self.corpusSettings and self.corpusSettings['corpus_type'] == 'parallel':
-            textJSON['sentences'] = [s for paraNode in srcTree.xpath('/html/body/para')
+            textJSON['sentences'] = [s for paraNode in srcTree.xpath('/html/body/para|/html/body/p/para')
                                      for s in self.process_para_node(paraNode)]
             textJSON['sentences'].sort(key=lambda s: s['lang'])
         else:
@@ -275,6 +275,7 @@ class Xml_Rnc2JSON(Txt2JSON):
                         nAnalyzed += 1
         self.tp.splitter.recalculate_offsets(textJSON['sentences'])
         self.tp.splitter.add_next_word_id(textJSON['sentences'])
+        self.tp.splitter.add_contextual_flags(textJSON['sentences'])
         self.write_output(fnameTarget, textJSON)
         return nTokens, nWords, nAnalyzed
 

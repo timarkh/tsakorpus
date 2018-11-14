@@ -9,6 +9,16 @@ class Splitter:
     It is assumed that splitting is language dependent.
     """
 
+    dictRxPunctClasses = {'comma': re.compile('[,，、]'),
+                          'parenth': re.compile('[\\(\\)（）]'),
+                          'fullstop': re.compile('[.։。]'),
+                          'quest_mark': re.compile('[?;？]'),
+                          'excl_point': re.compile('[!！]'),
+                          'colon': re.compile('[:：]'),
+                          'quote': re.compile('["«»‘’“”„‟『』《》]'),
+                          'semicolon': re.compile('[;；]'),
+                          'dash': re.compile('[‒–—―-]')}
+
     def __init__(self, settings):
         self.settings = copy.deepcopy(settings)
         try:
@@ -110,6 +120,55 @@ class Splitter:
         """
         for s in sentences:
             self.add_next_word_id_sentence(s)
+
+    def add_contextual_flags_sentence(self, s):
+        """
+        Insert additional information about the context of the words in
+        a sentence. This includes repetition of lemmata, grammatical
+        categories, bordering a punctuation mark, etc.
+        Put the information as tags in the "flags" list of the word
+        objects. Do not return anything.
+        """
+        if len(s['words']) <= 0:
+            return
+        words = s['words']
+        for i in range(len(words)):
+            if words[i]['wtype'] != 'word':
+                continue
+            flags = set()
+            if i < len(words) - 1:
+                if words[i + 1]['wtype'] == 'punct' and len(words[i + 1]['wf']) > 0:
+                    for punctClass in self.dictRxPunctClasses:
+                        if self.dictRxPunctClasses[punctClass].search(words[i + 1]['wf'][-1]) is not None:
+                            flags.add('b:' + punctClass)
+                            flags.add('b:punct')
+            if i > 0:
+                if words[i - 1]['wtype'] == 'punct' and len(words[i - 1]['wf']) > 0:
+                    for punctClass in self.dictRxPunctClasses:
+                        if self.dictRxPunctClasses[punctClass].search(words[i - 1]['wf'][-1]) is not None:
+                            flags.add('a:' + punctClass)
+                            flags.add('a:punct')
+                if 'ana' in words[i]:
+                    for ana in words[i]['ana']:
+                        flagsAna = set()
+                        if 'ana' in words[i - 1]:
+                            for k, v in ana.items():
+                                if not k.startswith('gr.') and k != 'lex':
+                                    continue
+                                if any(k in anaPrev and anaPrev[k] == v
+                                       for anaPrev in words[i - 1]['ana']):
+                                    flagsAna.add('rep:' + k)
+                        if len(flags) > 0 or len(flagsAna) > 0:
+                            if 'flags' not in ana:
+                                ana['flags'] = []
+                            ana['flags'] += [flag for flag in sorted(flags | flagsAna)]
+
+    def add_contextual_flags(self, sentences):
+        """
+        Insert contextual flags in each sentence.
+        """
+        for s in sentences:
+            self.add_contextual_flags_sentence(s)
 
     def split(self, tokens, text):
         """

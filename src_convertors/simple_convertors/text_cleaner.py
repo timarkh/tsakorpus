@@ -41,6 +41,7 @@ class TextCleaner:
     rxUdmZj = re.compile('(?<=[а-яА-ЯӜӞӴӝӟӵ])њ|њ(?=[а-яА-ЯӜӞӴӝӟӵ])')
 
     rxRNCStress = re.compile('`(\\w)')
+    rxModifierStress = re.compile('(\\w)́')
 
     def __init__(self, settings):
         self.settings = copy.deepcopy(settings)
@@ -125,5 +126,6 @@ class TextCleaner:
         for the baseline.
         """
         wordClean = self.rxRNCStress.sub('\\1', text)
+        wordClean = self.rxModifierStress.sub('\\1', wordClean)
         wordText = self.rxRNCStress.sub('\\1́', text)
         return wordClean, wordText

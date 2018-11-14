@@ -25,6 +25,8 @@ The configuration files are ``corpus.json`` and ``categories.json``. The latter 
 
 * ``parsed_wordlist_format`` -- the format of the annotated word list (currently, only the "xml_rnc" option is available, which means a list of XML-represented words in the format used in Russian National Corpus).
 
+* ``gramtags_exclude`` (optional) -- list of strings that determines which gramtags should be excluded from the analyses. Defaults to empty list.
+
 * ``speaker_meta_filename`` -- the name of the JSON file with metadata for individual speakers (for the ELAN convertor). The file should contain a dictionary where the keys are the codes of the speakers and the values are dictionaries with their metadata (fields and plain string/integer values).
 
 * ``languages`` -- an array with the names of the languages which exist in the corpus.
@@ -42,7 +44,7 @@ There are several source convertors for different input formats (see ``pipeline.
 
 * Plain text convertor: ``txt2json.py``.
 
-* Morphologically annotated parallel XML convertor: ``xml_rnc2json.py``.
+* Convertor of morphologically annotated XML (possibly parallel) in one of the formats used by Russian National Corpus: ``xml_rnc2json.py``.
 
 * Exmaralda media-aligned files convertor: ``exmaralda_hamburg2json.py``.
 
@@ -71,6 +73,25 @@ Each word form starts with ``<w>`` and ends with ``</w>``. At the beginning, it 
 If you choose to disambiguate your files using a Constraint Grammar file, they will be disambiguated after the primary conversion to JSON is complete. Your JSON files will be translated into CG format and stored in the ``cg`` directory, which will have language subdirectories. Multilanguage files will be split abd sentences in different languages will end up in different subdirectories. CG will process these files and put them to ``cg_disamb``. When this process is finished, the disambiguated files will be assembled, transformed back into JSON and stored in the ``json_disamb`` directory.
 
 Disambiguation requires that you have a [CG3 executable](https://visl.sdu.dk/cg3/chunked/installation.html) and its directory be in the system PATH variable.
+
+### RNC XML convertor
+The RNC XML convertor understands XML files with morphologically annotated text in the format of Russian National Corpus. Currently, files with simple annotated texts ("Main subcorpus" and similar subcorpora) and parallel texts are supported. All data is contained in an ``<html>`` node, which has ``<head>`` and ``<body>`` daughters. ``<head>`` may contain metadata, which alternatively can be stored in a separate CSV table. Each metadata field is stored as ``<meta name="..." content="..."/>``.
+
+In the case of simple annotated files, ``<body>`` contains paragraphs (``<p>``, possibly with a class attribute), which, in turn, contain sentences (``<se>``). Sentences contain words (``<w>``, see "Parsed word list" above), while punctuation is placed between the word nodes. If there are newlines between the words, they are ignored.
+
+In parallel corpora, ``<body>`` contains translation units (``<para>``), which contain aligned setences. Each sentence has to have a ``lang`` attribute. The sentences are structures in the same way as in the case of simple texts. There may also be a ``<p>`` layer between ``<body>`` and ``<para>``.
+
+Additional settings available for this convertor are the following:
+
+``corpus_type`` -- string that says whether the corpus is parallel (``parallel``) or not (``main``). Defaults to ``main``.
+
+``meta_in_header`` -- Boolean value that determines if the metadata should be searched in the XML header. If it is found, it undergoes certain name changes to comply with the tsakorpus requirements, see ``get_meta_from_header`` function in ``xml_rnc2json.py``.
+
+``multivalued_ana_features`` -- list of strings that determines which analysis attributes have to be trated as carrying multiple values separated by a whitespace.
+
+``language_codes`` -- dictionary that contains correspondences between the attribute values used to identify the language and the language names as specified in the ``languages`` list.
+
+``clean_words_rnc`` -- Boolean value that determines if the tokens should undergo additional RNC-style cleaning (such as removal of the stress marks).
 
 ### ELAN files conversion (eaf2json)
 Currently, the convertor only supports ELAN files that may have translation/comment tiers, but do not have morphological annotation (such annotation can be added to the texts with the help of a parsed word list, see above). Since text in different tiers belongs to different speakers and languages, it is important that you carefully describe where is what. First, all tiers should have the "participant" attribute filled in with the code of the speaker. The codes should be explained in the speaker metadata file whose name is specified by the ``speaker_meta_filename`` parameter. Here is an example of how such a file could look like:
