@@ -11,7 +11,7 @@ You can generate JSON files yourself, or use one of the several convertors that 
 
 * Plain text convertor (``txt2json.py``). It processes an unannotated corpus as a collection of plain UTF8-encoded text files. Apart from the source files, you can provide a separate XML wordlist with (non-disambiguated) analyses for all or some of the tokens in the corpus, and a separate CSV file with metadata for the corpus documents.
 
-* Morphologically annotated parallel XML convertor (``xml_rnc2json.py``). It processes a (possibly annotated) parallel corpus in the (quite simple) XML format used in Russian National Corpus.
+* Morphologically annotated XML convertor (``xml_rnc2json.py``). It processes a (possibly annotated) corpus in one of (quite simple) XML formats used in Russian National Corpus. Currently, basic format ("main subcorpus") and parallel format are supported.
 
 * ELAN media-aligned files convertor (``eaf2json.py``). It processes a corpus of media-aligned files in ELAN format. The files can have translation of the segments into multiple languages or sentence-level comments, but are not expected to be morphologically analyzed. As in the case of the Plain text convertor, this convertor takes a separate XML wordlist with analyses for all or some of the tokens in the corpus, and a separate CSV file with metadata.
 
@@ -47,7 +47,7 @@ During the indexation phase, there are following primary causes of memory consum
 
 Loading a source JSON document may require significantly more memory than it takes to store it on a hard drive. Consequently, loading large documents (> 100 Mb, which can happen in the case of e.g. long novels with heavy annotation) may lead to memory errors. If a memory error occurs, the file will still be indexed, but a much slower iterative JSON parser (ijson) will be used to process it.
 
-Memory consumed by Elasticsearch does not depend on the size of the corpus, but normally it occupies 1.5-2 Gb of memory (unless you changed it in the Elasticsearch settings).
+Memory consumed by Elasticsearch does not depend on the size of the corpus. Under default settings, it occupies 1.5-2 Gb of memory, but you should probably increase that amount in the Elasticsearch settings if you have a large corpus.
 
 Memory consumed by the indexator itself non-linearly depends on several parameters (number of tokens, number of sentences and number of documents), but for the sake of simplicity it can be thought of as depending on the number of tokens more or less linearly. The constant depends, of course, on the amount of annotation you have. In case of full morphological annotation, a ratio of 60-80 Mb per million tokens (for corpora containing 10-50 million tokens) can be expected.
 
@@ -78,7 +78,7 @@ Whenever the platform cannot find a function for a transliteration or an input m
 ### Running tsakorpus
 You can use tsakorpus either locally or as a web service available from outside. In the first case, it is sufficient to run tsakorpus.wsgi as a Python file. This will start a flask web-server, after which the corpus will be accessible at <http://127.0.0.1:7342/search>.
 
-In the case of the web service, it is recommended to configure your apache server for working with your corpus (supposing you have a Linux server). You have to install and enable mod_wsgi for Python3. (Note that you cannot have mod_wsgi for both Python2 and Python3 on the same server, at least not that easy.) Then you have to specify the URL under which your corpus is going to be available and the path to the corpus files in an apache .conf file (normally by creating a new .conf file in the apache ``sites-available`` directory). The directory where your corpus is stored should have relevant read and execute permissions. Here is a sample configuration that you should put to the .conf file:
+In the case of the web service, it is recommended to configure your apache/nginx server for working with your corpus (supposing you have a Linux server). If you work with apache, you have to install and enable mod_wsgi for Python3. (Note that you cannot have mod_wsgi for both Python2 and Python3 on the same server, at least not that easy.) Then you have to specify the URL under which your corpus is going to be available and the path to the corpus files in an apache .conf file (normally by creating a new .conf file in the apache ``sites-available`` directory). The directory where your corpus is stored should have relevant read and execute permissions. Here is a sample configuration that you should put to the .conf file:
 
 ```
 WSGIDaemonProcess %some_unique_process_name% user=%you% group=www-data home=%path_to_corpus_directory%/search

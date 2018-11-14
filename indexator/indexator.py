@@ -44,6 +44,8 @@ class Indexator:
             self.AdditionalWordFields |= set(self.settings['word_fields'])
         if 'word_table_fields' in self.settings:
             self.AdditionalWordFields |= set(self.settings['word_table_fields'])
+        if 'accidental_word_fields' in self.settings:
+            self.AdditionalWordFields -= set(self.settings['accidental_word_fields'])
         f = open(os.path.join(self.SETTINGS_DIR, 'categories.json'),
                  'r', encoding='utf-8')
         categories = json.loads(f.read())
