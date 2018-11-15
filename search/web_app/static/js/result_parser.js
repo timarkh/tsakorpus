@@ -351,6 +351,7 @@ function toggle_interlinear() {
 			if ($(this).find('.ana_interlinear').length > 0) {
 				return;
 			}
+			$(this).css("display", "inline-table");
 			var data_ana = $(this).attr('data-ana');
 			if (data_ana == null || data_ana.length <= 0) {
 				return;
@@ -366,6 +367,10 @@ function toggle_interlinear() {
 		});
 	}
 	else {
+		$('span.word, span.word_in_table').each(function (index) {
+			$(this).css("display", "inline-block");
+			$(this).html($(this).html().replace(/<br>/, ''));
+		});
 		$('.ana_interlinear').remove();
 	}
 }

@@ -245,7 +245,7 @@
 }
 
 .word {
-	display: inline-table;
+	display: inline-block;
 }
 
 .word_in_table {
