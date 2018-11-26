@@ -17,6 +17,7 @@
 	<span class="ch_container">{{ c.header | safe }}</span>
 	<div class="cx_main">
 	<div class="cx_toggle_div"><input type="checkbox" class="cx_toggle_chk" {% if c.toggled_on %} checked{% endif %}></div>
+	<span class="get_glossed_copy" data-nsent="{{ loop.index - 1 }}"><span class="glyph_copy glyphicon glyphicon-copy" aria-hidden="true"></span></span>
 	<span class="sentence" id='res{{ loop.index - 1 }}'>
 	{% for lang in data.languages %}
 		{% if lang in c.languages %}

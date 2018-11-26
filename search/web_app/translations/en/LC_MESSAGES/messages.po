@@ -50,7 +50,7 @@ msgid "langname_hill_mari"
 msgstr "Hill Mari"
 
 msgid "langname_meadow_mari"
-msgstr "Meadwo Mari"
+msgstr "Meadow Mari"
 
 msgid "langname_tatar"
 msgstr "Tatar"
@@ -199,7 +199,7 @@ msgstr "dictionary"
 
 
 
-# Names of inpiut methods that define how string queries (for word, lemma etc.) will be transformed before the query is performed:
+# Names of input methods that define how string queries (for word, lemma etc.) will be transformed before the query is performed:
 
 msgid "inputmethod_normal"
 msgstr "normal"
@@ -501,13 +501,28 @@ msgstr "Word:"
 msgid "Lemma:"
 msgstr "Lemma:"
 
+msgid "Lemma"
+msgstr "Lemma"
+
 #: templates/index.html:54
 msgid "Grammar:"
 msgstr "Grammar:"
 
+msgid "Grammar"
+msgstr "Grammar"
+
 #: templates/index.html:56
 msgid "Gloss:"
 msgstr "Gloss:"
+
+msgid "Gloss"
+msgstr "Gloss"
+
+msgid "Additional fields"
+msgstr "Additional fields"
+
+msgid "Annotation layers in glossed mode:"
+msgstr "Annotation layers in glossed mode:"
 
 #: templates/index.html:61
 msgid "Language:"

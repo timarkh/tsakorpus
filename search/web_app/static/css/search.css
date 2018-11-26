@@ -116,9 +116,26 @@
 	margin: auto;
 }
 
+.get_glossed_copy {
+	margin: auto;
+	padding-right: 3px;
+}
+
 .glyph_expand {
 	width: 25px;
 	font-size: 26px;
+	color: #48724d;
+	cursor: pointer;
+	margin: auto;
+	margin-left: 10px;
+	margin-right: 5px;
+	text-align: center;
+	display: inline-grid;
+}
+
+.glyph_copy {
+	width: 20px;
+	font-size: 20px;
 	color: #48724d;
 	cursor: pointer;
 	margin: auto;
@@ -274,6 +291,18 @@
 .search_input {
 	color: black;
 	width: 160px;
+	margin-bottom: 1px;
+	margin-left: 1px;
+	padding-left: 3px;
+	border-radius: 2px;
+	border: solid 1px #707070;
+	box-shadow: none;
+	transition: box-shadow 0.3s, border 0.3s;
+}
+
+.search_input_num {
+	color: black;
+	width: 70px;
 	margin-bottom: 1px;
 	margin-left: 1px;
 	padding-left: 3px;
@@ -529,7 +558,6 @@ hr.separator {
 }
 
 .popup_field {
-	display: inline-block;
 }
 
 .popup_value {
@@ -838,6 +866,16 @@ hr.separator {
 	padding: 10px 15px;
 }
 
+.options_column_leftalign {
+	float: left;
+	text-align: left;
+	max-width: 375px;
+	margin-right: 3px;
+	border: 1px dotted gray;
+	border-radius: 3px;
+	padding: 10px 15px;
+}
+
 #txt {
 	width: 250px;
 	margin-right: 20px;
@@ -963,4 +1001,8 @@ svg circle {
 
 .style_txt_h3 {
 	font-size: 110%;
+}
+
+.glossed_copy_textarea {
+	display: none;
 }

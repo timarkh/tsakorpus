@@ -225,7 +225,8 @@ class PrepareData:
                        'properties': word_mapping['mappings']['word']['properties']}}
         sentMetaDict = {}
         for meta in self.settings['sentence_meta']:
-            if meta.startswith('year'):
+            if meta.startswith('year') or ('integer_meta_fields' in self.settings
+                                           and meta in self.settings['integer_meta_fields']):
                 sentMetaDict[meta] = {'type': 'integer'}
             else:
                 sentMetaDict[meta] = {'type': 'text'}

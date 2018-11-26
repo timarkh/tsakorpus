@@ -221,6 +221,23 @@ function load_expanded_context(n_sent) {
 	});
 }
 
+function load_glossed_sentence(n_sent) {
+	var glossedText = '';
+	$.ajax({
+		async: false,
+		url: "get_glossed_sentence/" + n_sent,
+		type: "GET",
+		success: function(result) {
+			$('#glossed_copy_textarea').val(result);
+		},
+//		success: print_json,
+		error: function(errorThrown) {
+			alert( JSON.stringify(errorThrown) );
+		}
+	});
+	return glossedText;
+}
+
 function load_additional_word_fields() {
 	$.ajax({
 		url: "get_word_fields",
@@ -293,6 +310,7 @@ function assign_input_events() {
 	$('#share_query').unbind('click');
 	$('#load_query').unbind('click');
 	$('#query_load_ok').unbind('click');
+	$('.toggle_glossed_layer').unbind('click');
 	$("span.word_plus").click(add_word_inputs);
 	$("span.word_minus").click(del_word_inputs);
 	$("span.word_expand").click(expand_word_input);
@@ -309,6 +327,7 @@ function assign_input_events() {
 	$('#share_query').click(share_query);
 	$('#load_query').click(show_load_query);
 	$('#query_load_ok').click(load_query);
+	$('.toggle_glossed_layer').click(toggle_glossed_layer);
 }
 
 function assign_show_hide() {
@@ -534,3 +553,14 @@ function search_if_enter(e) {
     }
 }
 
+function toggle_glossed_layer(e) {
+	classToToggle = ".popup_" + $(this).attr('data');
+	alert(classToToggle);
+	if ($(this).is(':checked')) {
+		alert($(classToToggle));
+		$(classToToggle).css("display", "");
+	}
+	else {
+		$(classToToggle).css("display", "none");
+	}
+}

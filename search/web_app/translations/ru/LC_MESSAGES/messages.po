@@ -502,13 +502,28 @@ msgstr "Слово:"
 msgid "Lemma:"
 msgstr "Лемма:"
 
+msgid "Lemma"
+msgstr "Лемма"
+
 #: templates/index.html:54
 msgid "Grammar:"
 msgstr "Грамматика:"
 
+msgid "Grammar"
+msgstr "Грамматика"
+
 #: templates/index.html:56
 msgid "Gloss:"
 msgstr "Глоссы:"
+
+msgid "Gloss"
+msgstr "Глоссы"
+
+msgid "Additional fields"
+msgstr "Дополнительные поля"
+
+msgid "Annotation layers in glossed mode:"
+msgstr "Слои разметки в глоссированной выдаче:"
 
 #: templates/index.html:61
 msgid "Language:"

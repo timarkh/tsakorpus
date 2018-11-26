@@ -15,6 +15,7 @@ class SentenceViewer:
     rxWordNo = re.compile('^w[0-9]+_([0-9]+)$')
     rxHitWordNo = re.compile('(?<=^w)[0-9]+')
     rxTextSpans = re.compile('</?span.*?>|[^<>]+', flags=re.DOTALL)
+    rxTabs = re.compile('^\t*$')
     invisibleAnaFields = {'gloss_index'}
 
     def __init__(self, settings_dir, search_client):
@@ -575,7 +576,7 @@ class SentenceViewer:
             metaSpan += '</span>'
         return metaSpan
 
-    def process_sentence(self, s, numSent=1, getHeader=False, lang='', langView='', translit=None, format='html'):
+    def process_sentence(self, s, numSent=1, getHeader=True, lang='', langView='', translit=None, format='html'):
         """
         Process one sentence taken from response['hits']['hits'].
         If getHeader is True, retrieve the metadata from the database.
@@ -703,6 +704,71 @@ class SentenceViewer:
                                                            'highlighted_text': highlightedText}},
                 'toggled_on': relationsSatisfied,
                 'src_alignment': fragmentInfo}
+
+    def get_glossed_sentence(self, s, getHeader=False, lang='', translit=None):
+        """
+        Process one sentence taken from response['hits']['hits'].
+        If getHeader is True, retrieve the metadata from the database.
+        Return tab-delimited text version of the sentence that could be inserted
+        either as a simple text example or as a glossed example in a
+        linguistic paper.
+        """
+        def key_comp(p):
+            if p[0] not in self.settings['lang_props'][lang]['gr_fields_order']:
+                return len(self.settings['lang_props'][lang]['gr_fields_order'])
+            return self.settings['lang_props'][lang]['gr_fields_order'].index(p[0])
+
+        def get_ana_gramm(ana):
+            grAnaPart = ''
+            grValues = [(k[3:], v) for k, v in ana.items() if k.startswith('gr.')]
+            for fv in sorted(grValues, key=key_comp):
+                if len(grAnaPart) > 0:
+                    grAnaPart += ', '
+                grAnaPart += fv[1]
+            return grAnaPart
+
+        if 'text' not in s or len(s['text']) <= 0:
+            return {''}
+
+        header = ''
+        if getHeader:
+            header = '[' + self.process_sentence_header(s, 'csv') + ']'
+        if 'words' not in s:
+            return {s['text'] + header}
+        text = self.transliterate_baseline(s['text'].replace('\n', '\\n '), lang=lang, translit=translit) + header + '\n'
+        tokens = ''
+        parts = ''
+        gloss = ''
+        gramm = ''
+        lemmata = ''
+        wordsStarted = False
+        for iWord in range(len(s['words'])):
+            w = s['words'][iWord]
+            if wordsStarted and w['wtype'] == 'word':
+                tokens += '\t'
+                parts += '\t'
+                gloss += '\t'
+                gramm += '\t'
+                lemmata += '\t'
+            tokens += w['wf']
+            if w['wtype'] == 'word':
+                wordsStarted = True
+                analyses = []
+                if 'ana' in w:
+                    analyses = self.simplify_ana(w['ana'], [])[0]
+                parts += ' || '.join(ana['parts'] for ana in analyses if 'parts' in ana)
+                gloss += ' || '.join(ana['gloss'] for ana in analyses if 'gloss' in ana)
+                gramm += ' || '.join(get_ana_gramm(ana) for ana in analyses)
+                lemmata += ' || '.join(ana['lex'] for ana in analyses if 'lex' in ana)
+        if self.rxTabs.search(parts) is not None:
+            parts = ''
+        if self.rxTabs.search(gloss) is not None:
+            gloss = ''
+        if self.rxTabs.search(gramm) is not None:
+            gramm = ''
+        if self.rxTabs.search(lemmata) is not None:
+            lemmata = ''
+        return text + tokens + '\n' + parts + '\n' + gloss + '\n' + lemmata + '\n' + gramm + '\n'
 
     def count_word_subcorpus_stats(self, w, docIDs):
         """

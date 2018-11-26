@@ -243,6 +243,16 @@ class InterfaceQueryParser:
         """
         if type(listQuery) not in (list, tuple) or len(listQuery) != 2:
             return {'match_all': {}}
+        if listQuery[0] is not None and type(listQuery[0]) == str:
+            try:
+                listQuery[0] = int(listQuery[0])
+            except:
+                listQuery[0] = None
+        if listQuery[1] is not None and type(listQuery[1]) == str:
+            try:
+                listQuery[1] = int(listQuery[1])
+            except:
+                listQuery[1] = None
         query = {'range': {field: {}}}
         if listQuery[0] is not None:
             query['range'][field]['gte'] = listQuery[0]
@@ -627,6 +637,14 @@ class InterfaceQueryParser:
                     k = 'meta.' + k[10:]
                     if k.endswith('_kw'):
                         boolQuery = self.make_bool_query(v, k, lang=lang, keyword_query=True)
+                    elif (k.endswith('_TO')
+                          and 'integer_meta_fields' in self.settings
+                          and k[5:len(k)-3] in self.settings['integer_meta_fields']):
+                        boolQuery = self.make_range_query([None, v], k[:-3])
+                    elif (k.endswith('_FR')
+                          and 'integer_meta_fields' in self.settings
+                          and k[5:len(k)-3] in self.settings['integer_meta_fields']):
+                        boolQuery = self.make_range_query([v, None], k[:-3])
                     else:
                         boolQuery = self.make_bool_query(v, k, lang=lang)
                     if 'match_none' not in boolQuery:

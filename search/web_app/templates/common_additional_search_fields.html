@@ -6,12 +6,16 @@
 {% if sentence_meta and sentence_meta|length > 0 %}
 <hr class="separator">
 	{% for field in sentence_meta %}
+		{% if int_meta_fields and field in int_meta_fields %}
+		{{ _('metafield_' + field) | capitalize }}: <input type="number" class="search_input_num" name="sent_meta_{{ field }}_FR1" id="sent_meta_{{ field }}1">&ndash;<input type="number" class="search_input_num" name="sent_meta_{{ field }}_TO1" id="sent_meta_{{ field }}1"><br>
+		{% else %}
 		{{ _('metafield_' + field) | capitalize }}: <input type="text" class="search_input" name="sent_meta_{{ field }}1" id="sent_meta_{{ field }}1"><br>
+		{% endif %}
 	{% endfor %}
 {% endif %}
 {{ _('Analyses: ') }}<select name="n_ana1" id="n_ana1" class="search_input">
-{% if ambiguous_analyses %}
 <option value="any" selected>{{ _('any number of analyses') }}</option>
+{% if ambiguous_analyses %}
 <option value="ambiguous">{{ _('only ambiguous') }}</option>
 <option value="nonambiguous">{{ _('only non-ambiguous') }}</option>
 <option value="analyzed">{{ _('only with analysis') }}</option>

@@ -12,20 +12,20 @@
 </span>
 {% endif %} 
 {% for item in ana.lex_fields %}
-<br><span class="popup_field"><span class="popup_key">{{ item.key }}: </span><span class="popup_value">{{ item.value }}</span></span>
+<br><div class="popup_field popup_field_{{ item.key }}"><span class="popup_key">{{ item.key }}: </span><span class="popup_value">{{ item.value }}</span></div>
 {% endfor %} 
 {% for item in ana.other_fields %}
 {% if item.key == "parts" %}
-<br><span class="popup_gloss"><span class="popup_value">{{ item.value }}</span></span>
+<br><div class="popup_gloss"><span class="popup_value">{{ item.value }}</span></div>
 {% endif %}
 {% endfor %}
 {% for item in ana.other_fields %}
 {% if item.key == "gloss" %}
-<br><span class="popup_gloss"><span class="popup_key"></span><span class="popup_value">{{ item.value }}</span></span>
+<br><div class="popup_gloss"><span class="popup_key"></span><span class="popup_value">{{ item.value }}</span></div>
 {% endif %}
 {% endfor %}
-{% if ana.gr|trim|length > 2 %}<br>{{ ana.gr | safe }}{% endif %}
+{% if ana.gr|trim|length > 2 %}<div class="popup_gramm">{{ ana.gr | safe }}</div>{% endif %}
 {% for item in ana.other_fields %}
-{% if item.key != "parts" and item.key != "gloss" %}<br><span class="popup_field"><span class="popup_key">{{ item.key }}: </span><span class="popup_value">{{ item.value }}</span></span>
+{% if item.key != "parts" and item.key != "gloss" %}<div class="popup_field popup_field_ana_other popup_field_{{ item.key }}"><span class="popup_key">{{ item.key }}: </span><span class="popup_value">{{ item.value }}</span></div>
 {% endif %}
 {% endfor %}
