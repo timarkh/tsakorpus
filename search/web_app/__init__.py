@@ -1033,7 +1033,7 @@ def find_sentences_json(page=0):
             nWords = query['n_words']
             for iQueryWord in range(2, nWords + 1):
                 if 'lang' + str(iQueryWord) in query and query['lang' + str(iQueryWord)] != query['lang1']:
-                    print(negWords)
+                    # print(negWords)
                     negWords.append(iQueryWord)
 
     if (len(wordConstraints) > 0
@@ -1647,10 +1647,8 @@ def get_glossed_sentence(n):
             lang = settings['languages'][langID]
         if langID != 0:
             continue  # for now
-        print(curSentData['languages'][langView])
         result = sentView.get_glossed_sentence(curSentData['languages'][langView]['source'], lang=lang)
         if type(result) == str:
-            print(result)
             return result
         return ''
     return ''

@@ -63,10 +63,15 @@ function expand_context(e) {
 
 function copy_glossed_sentence(e) {
 	var n_sent = $(e.currentTarget).attr('data-nsent');
-	glossedText = load_glossed_sentence(n_sent);
+	var hiddenTextArea = document.createElement("textarea");
+	hiddenTextArea.id = "glossed_copy_textarea";
+	hiddenTextArea.style.boxShadow = 'none';
+	document.body.appendChild(hiddenTextArea);
+	load_glossed_sentence(n_sent);
 	$('#glossed_copy_textarea').focus();
 	$('#glossed_copy_textarea').select();
 	var successful = document.execCommand('copy');
+	document.body.removeChild(hiddenTextArea);
 }
 
 function context_toggle(e) {

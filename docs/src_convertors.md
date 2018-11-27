@@ -61,7 +61,7 @@ There are several source convertors for different input formats (see ``pipeline.
 When you are ready with the configuration and the source files are stored in the relevant folder, all you have to do is to run the corresponding Python file and wait until it terminates. If your corpus consists of several parts stored in different formats, you may process them one by one with different source convertors and put the resulting JSONs in one place.
 
 ### Parsed word list
-Convertors that read raw text (from .txt, .eaf and so on) allow you to have a separate file with morphological (or any other word-level) annotation for all or some of the word forms. The only available option for now is xml_rnc. An annotated word list in this format is a plain text file where each line describes one unique word form. The lines should look as follows:
+Convertors that read raw text (from .txt, .eaf and so on) allow you to have a separate file with morphological (or any other word-level) annotation for all or some of the word forms. The only available option for now is xml_rnc. An annotated word list in this format is a plain text file where each line is a valid XML that describes one unique word form. The lines should look as follows:
 
 ```
 <w><ana lex="..." gr="..." ...></ana>(<ana....></ana>)*wordform</w>
@@ -87,7 +87,7 @@ Additional settings available for this convertor are the following:
 
 ``meta_in_header`` -- Boolean value that determines if the metadata should be searched in the XML header. If it is found, it undergoes certain name changes to comply with the tsakorpus requirements, see ``get_meta_from_header`` function in ``xml_rnc2json.py``.
 
-``multivalued_ana_features`` -- list of strings that determines which analysis attributes have to be trated as carrying multiple values separated by a whitespace.
+``multivalued_ana_features`` -- list of strings that determines which analysis attributes have to be treated as carrying multiple values separated by a whitespace.
 
 ``language_codes`` -- dictionary that contains correspondences between the attribute values used to identify the language and the language names as specified in the ``languages`` list.
 

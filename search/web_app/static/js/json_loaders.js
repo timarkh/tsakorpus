@@ -555,9 +555,7 @@ function search_if_enter(e) {
 
 function toggle_glossed_layer(e) {
 	classToToggle = ".popup_" + $(this).attr('data');
-	alert(classToToggle);
 	if ($(this).is(':checked')) {
-		alert($(classToToggle));
 		$(classToToggle).css("display", "");
 	}
 	else {

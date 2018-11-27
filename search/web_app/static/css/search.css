@@ -118,6 +118,7 @@
 
 .get_glossed_copy {
 	margin: auto;
+	margin-left: -7px;
 	padding-right: 3px;
 }
 
@@ -136,10 +137,10 @@
 .glyph_copy {
 	width: 20px;
 	font-size: 20px;
-	color: #48724d;
+	color: #1667aa;
 	cursor: pointer;
 	margin: auto;
-	margin-left: 10px;
+	margin-left: 5px;
 	margin-right: 5px;
 	text-align: center;
 	display: inline-grid;
@@ -1003,6 +1004,14 @@ svg circle {
 	font-size: 110%;
 }
 
-.glossed_copy_textarea {
-	display: none;
+#glossed_copy_textarea {
+	top: 0;
+	left: 0;
+	position: fixed;
+	width: 1em;
+	height: 1em;
+	padding: 0;
+	border: none;
+	outline: none;
+	background: transparent;
 }

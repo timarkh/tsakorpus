@@ -576,7 +576,7 @@ class SentenceViewer:
             metaSpan += '</span>'
         return metaSpan
 
-    def process_sentence(self, s, numSent=1, getHeader=True, lang='', langView='', translit=None, format='html'):
+    def process_sentence(self, s, numSent=1, getHeader=False, lang='', langView='', translit=None, format='html'):
         """
         Process one sentence taken from response['hits']['hits'].
         If getHeader is True, retrieve the metadata from the database.
@@ -705,7 +705,7 @@ class SentenceViewer:
                 'toggled_on': relationsSatisfied,
                 'src_alignment': fragmentInfo}
 
-    def get_glossed_sentence(self, s, getHeader=False, lang='', translit=None):
+    def get_glossed_sentence(self, s, getHeader=True, lang='', translit=None):
         """
         Process one sentence taken from response['hits']['hits'].
         If getHeader is True, retrieve the metadata from the database.
@@ -732,10 +732,11 @@ class SentenceViewer:
 
         header = ''
         if getHeader:
-            header = '[' + self.process_sentence_header(s, 'csv') + ']'
+            header = ' [' + self.process_sentence_header(s, 'csv') + ']'
         if 'words' not in s:
             return {s['text'] + header}
-        text = self.transliterate_baseline(s['text'].replace('\n', '\\n '), lang=lang, translit=translit) + header + '\n'
+        text = self.transliterate_baseline(s['text'].strip(' \t\n').replace('\n', '\\n '),
+                                           lang=lang, translit=translit) + header + '\n'
         tokens = ''
         parts = ''
         gloss = ''

@@ -21,7 +21,7 @@
 {% endfor %}
 {% for item in ana.other_fields %}
 {% if item.key == "gloss" %}
-<br><div class="popup_gloss"><span class="popup_key"></span><span class="popup_value">{{ item.value }}</span></div>
+<div class="popup_gloss"><span class="popup_key"></span><span class="popup_value">{{ item.value }}</span></div>
 {% endif %}
 {% endfor %}
 {% if ana.gr|trim|length > 2 %}<div class="popup_gramm">{{ ana.gr | safe }}</div>{% endif %}
