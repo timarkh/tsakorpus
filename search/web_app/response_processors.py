@@ -724,7 +724,10 @@ class SentenceViewer:
             for fv in sorted(grValues, key=key_comp):
                 if len(grAnaPart) > 0:
                     grAnaPart += ', '
-                grAnaPart += fv[1]
+                if type(fv[1]) == str:
+                    grAnaPart += fv[1]
+                else:
+                    grAnaPart += ', '.join(grTag for grTag in sorted(fv[1]))
             return grAnaPart
 
         if 'text' not in s or len(s['text']) <= 0:
