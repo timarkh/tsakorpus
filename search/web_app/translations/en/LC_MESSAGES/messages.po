@@ -157,6 +157,12 @@ msgstr "Polish"
 msgid "langname_chinese"
 msgstr "Chinese"
 
+msgid "langname_selkup"
+msgstr "Selkup"
+
+msgid "langname_kamas"
+msgstr "Kamas"
+
 msgid "langname_comments"
 msgstr "comments"
 

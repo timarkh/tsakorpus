@@ -158,6 +158,12 @@ msgstr "польский"
 msgid "langname_chinese"
 msgstr "китайский"
 
+msgid "langname_selkup"
+msgstr "селькупский"
+
+msgid "langname_kamas"
+msgstr "камасинский"
+
 msgid "langname_comments"
 msgstr "комментарии"
 

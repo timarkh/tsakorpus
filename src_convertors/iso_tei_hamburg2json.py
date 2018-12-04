@@ -36,6 +36,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         self.wordsByID = {}  # word ID -> word object
         self.morph2wordID = {}   # morph ID -> (word ID, position in the word)
         self.pID = 0         # id of last aligned segment
+        self.seg2pID = {}    # ids of <seg> tags -> parallel IDs of corresponding sentences
         self.glosses = set()
         self.posRules = {}
         self.load_pos_rules(os.path.join(self.corpusSettings['corpus_dir'], 'conf/posRules.txt'))
@@ -145,7 +146,9 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 if wSpan.attrib['from'] != wSpan.attrib['to']:
                     continue
                 spanID = wSpan.attrib['from']
-                if spanID.startswith('w'):
+                if spanID.startswith('seg'):
+                    continue
+                elif spanID.startswith('w'):
                     wordID = spanID
                 elif spanID.startswith('m'):
                     wordID = self.morph2wordID[spanID][0]
@@ -263,6 +266,9 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                      'mtype': 'audio',
                      'src_id': sentBoundaries[0] + '_' + sentBoundaries[1],
                      'src': srcFile}
+        if (self.rxFloat.search(alignment['off_start_src']) is None
+                or self.rxFloat.search(alignment['off_end_src']) is None):
+            return
         self.fragmentize_src_alignment(alignment)
         sent['src_alignment'] = [alignment]
 
@@ -333,6 +339,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                    and sent['text'][iSentPos].lower() != wf[iWordPos].lower()):
                 iSentPos += 1
             if iSentPos == len(sent['text']):
+                word['off_start'] = len(sent['text']) - 1
+                word['off_end'] = len(sent['text']) - 1
                 print('Unexpected end of sentence:', sent['text'])
                 return
             word['off_start'] = iSentPos
@@ -355,7 +363,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         based on the time anchors.
         Do not return anything.
         """
-        timeSpans2text = {}     # (from, to) -> sentence text
+        seg2text = {}     # (from, to) -> sentence text
         for spanGr in anno.xpath('tei:spanGrp',
                                  namespaces=self.namespaces):
             if 'type' in spanGr.attrib and spanGr.attrib['type'] == tierName:
@@ -363,58 +371,42 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                                          namespaces=self.namespaces):
                     if 'from' not in span.attrib or 'to' not in span.attrib:
                         continue
+                    if span.attrib['from'] != span.attrib['to']:
+                        self.log_message('"from" attribute != "to" attribute: '
+                                         + span.attrib['from'] + '; ' + span.attrib['to'])
+                    if span.attrib['from'] not in self.seg2pID:
+                        self.log_message('Wrong "from" attribute: '
+                                         + span.attrib['from'])
+                    if span.attrib['to'] not in self.seg2pID:
+                        self.log_message('Wrong "to" attribute: '
+                                         + span.attrib['to'])
                     spanText = span.text
                     if spanText is None:
                         spanText = ''
-                    timeSpans2text[(self.tlis[span.attrib['from']]['time'],
-                                    self.tlis[span.attrib['to']]['time'])] = spanText.strip()
+                    seg2text[(self.seg2pID[span.attrib['from']],
+                              self.seg2pID[span.attrib['to']])] = spanText.strip()
         for s in curSentences:
-            if 'src_alignment' not in s:
+            if 'para_alignment' not in s or len(s['para_alignment']) <= 0:
                 continue
-            offStart = -1
-            offEnd = 0
-            for sa in s['src_alignment']:
-                # a loop in case sentence is aligned to the source in several parts
-                if self.rxFloat.search(sa['off_start_src']) is not None:
-                    if offStart < 0 or float(sa['off_start_src']) < offStart:
-                        offStart = float(sa['off_start_src'])
-                if self.rxFloat.search(sa['off_end_src']) is not None:
-                    if float(sa['off_end_src']) > offEnd:
-                        offEnd = float(sa['off_end_src'])
-            if offEnd > 0:
-                if offStart < 0:
-                    offStart = 0.0
-            elif offStart <= 0:
-                # No time alignment: use anchors instead
-                for sa in s['src_alignment']:
-                    if offStart < 0 or int(self.rxNonDigit.sub('', sa['off_start_src'])) < offStart:
-                        offStart = int(self.rxNonDigit.sub('', sa['off_start_src']))
-                    if int(self.rxNonDigit.sub('', sa['off_end_src'])) > offEnd:
-                        offEnd = int(self.rxNonDigit.sub('', sa['off_end_src']))
-                if offStart > 0:
-                    offStart = 'T' + str(offStart)
-                if offEnd > 0:
-                    offEnd = 'T' + str(offEnd)
-            offStart = self.rxTrailingZeroes.sub('', str(offStart))
-            offEnd = self.rxTrailingZeroes.sub('', str(offEnd))
-            if (offStart, offEnd) in timeSpans2text:
-                s['text'] = timeSpans2text[(offStart, offEnd)]
+            paraID = (s['para_alignment'][0]['para_id'], s['para_alignment'][0]['para_id'])
+            if paraID in seg2text:
+                s['text'] = seg2text[paraID]
             else:
-                print(timeSpans2text)
-                print(offStart, offEnd)
+                print(seg2text)
+                print(paraID)
                 print(s)
-                print('No source text for sentence with time offsets', offStart, offEnd)
 
-    def add_para_ids(self, sentences):
+    def add_para_offsets(self, sentences):
         """
-        Add a new parallel alignment ID to each of the sentences.
+        Add character offsets to the parallel alignments of each of the sentences.
         Do not return anything.
         """
         for s in sentences:
-            self.pID += 1
-            s['para_alignment'] = {'off_start': 0,
-                                   'off_end': len(s['text']),
-                                   'para_id': self.pID}
+            if 'para_alignment' not in s:
+                continue
+            for para in s['para_alignment']:
+                para['off_start'] = 0
+                para['off_end'] = len(s['text'])
 
     def get_sentences(self, srcTree, srcFile):
         """
@@ -445,13 +437,16 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                             self.add_src_alignment(curSent, [prevAnchor, curAnchor], srcFile)
                         prevAnchor = curAnchor
                     elif (seg_anchor.tag == self.pfx_tei + 'seg'
-                          and 'type' in seg_anchor.attrib
-                          and seg_anchor.attrib['type'] == 'utterance'):
+                          and self.pfx_xml + 'id' in seg_anchor.attrib):
                         if curSent is not None:
                             curSentences.append(curSent)
+                        self.pID += 1
+                        segID = seg_anchor.attrib[self.pfx_xml + 'id']
+                        self.seg2pID[segID] = self.pID
                         curSent = {'words': self.get_segment_words(seg_anchor),
                                    'text': '',
-                                   'lang': 0}
+                                   'lang': 0,
+                                   'para_alignment': [{'para_id': self.pID}]}
                         if len(sentMeta) > 0:
                             curSent['meta'] = copy.deepcopy(sentMeta)
                 if curSent is not None:
@@ -460,7 +455,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 self.add_src_alignment(curSent, [curAnchor, endAnchor], srcFile)
             self.add_full_text(anno, curSentences)
             self.process_words(anno)
-            self.add_para_ids(curSentences)
+            self.add_para_offsets(curSentences)
             for tierName in self.corpusSettings['tier_languages']:
                 lang = self.corpusSettings['tier_languages'][tierName]
                 langID = self.corpusSettings['languages'].index(lang)
@@ -471,8 +466,9 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                     paraSent = {'words': [],
                                 'text': '',
                                 'lang': langID,
-                                'src_alignment': copy.deepcopy(sent['src_alignment']),
                                 'para_alignment': copy.deepcopy(sent['para_alignment'])}
+                    if 'src_alignment' in sent:
+                        paraSent['src_alignment'] = copy.deepcopy(sent['src_alignment'])
                     paraSentences[tierName].append(paraSent)
                 self.add_full_text(anno, paraSentences[tierName], tierName)
             for sent in curSentences:
@@ -491,7 +487,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                         paraSent['text'] = '—'
                     else:
                         paraSent['words'] = self.tp.tokenizer.tokenize(paraSent['text'])
-                    paraSent['para_alignment']['off_end'] = len(paraSent['text'])
+                    paraSent['para_alignment'][0]['off_end'] = len(paraSent['text'])
                     yield paraSent
 
     def convert_file(self, fnameSrc, fnameTarget):
@@ -509,6 +505,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
 
         textJSON = {'meta': curMeta, 'sentences': []}
         nTokens, nWords, nAnalyze = 0, 0, 0
+        self.seg2pID = {}
         srcTree = etree.parse(fnameSrc)
         self.tlis = self.get_tlis(srcTree)
         self.participants = self.load_speaker_meta(srcTree)

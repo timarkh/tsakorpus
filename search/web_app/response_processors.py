@@ -163,6 +163,13 @@ class SentenceViewer:
         """
         Build the contents of a div with one particular analysis.
         """
+        def field_sorting_key(x):
+            if x['key'] in self.settings['lang_props'][lang]['other_fields_order']:
+                return (self.settings['lang_props'][lang]['other_fields_order'].index(x['key']),
+                        x['key'])
+            return (len(self.settings['lang_props'][lang]['other_fields_order']),
+                    x['key'])
+
         ana4template = {'lex': '', 'pos': '', 'grdic': '', 'lex_fields': [], 'gr': '', 'other_fields': []}
         if 'lex' in ana:
             ana4template['lex'] = self.transliterate_baseline(ana['lex'], lang=lang, translit=translit)
@@ -193,10 +200,8 @@ class SentenceViewer:
         ana4template['grdic'] = self.build_gr_ana_part(grdicValues, lang, gramdic=True)
         ana4template['gr'] = self.build_gr_ana_part(grValues, lang, gramdic=False)
         if 'other_fields_order' in self.settings['lang_props'][lang]:
-            ana4template['lex_fields'].sort(key=lambda x: (self.settings['lang_props'][lang]['other_fields_order'].index(x['key']),
-                                                           x['key']))
-            ana4template['other_fields'].sort(key=lambda x: (self.settings['lang_props'][lang]['other_fields_order'].index(x['key']),
-                                                             x['key']))
+            ana4template['lex_fields'].sort(key=field_sorting_key)
+            ana4template['other_fields'].sort(key=field_sorting_key)
         else:
             # Order analysis fields alphabetically
             ana4template['lex_fields'].sort(key=lambda x: x['key'])
