@@ -203,7 +203,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         the event is used as the value.
         """
         for tierName in curWordAnno:
-            if tierName in ['tx', 'mb', 'mp', 'gr', 'ge', 'ps']:
+            if tierName in ['tx', 'mb', 'mp', 'gr', 'ge', 'ps', 'SpeakerContribution_Event']:
                 continue
             elif len(curWordAnno[tierName]) > 0:
                 ana[tierName] = curWordAnno[tierName]
@@ -236,6 +236,9 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0])
                 ana['gloss_index'] = self.rxBracketGloss.sub('', newIndexGloss)
             self.wordsByID[wordID]['ana'] = [ana]
+            self.wordsByID[wordID]['word_source'] = ''
+            if 'SpeakerContribution_Event' in curWordAnno:
+                self.wordsByID[wordID]['word_source'] = curWordAnno['SpeakerContribution_Event']
 
     def fragmentize_src_alignment(self, alignment):
         """
@@ -356,11 +359,13 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 iSentPos += 1
             word['off_end'] = iSentPos
 
-    def add_full_text(self, anno, curSentences, tierName='ts'):
+    def add_full_text(self, anno, curSentences, tierName=''):
         """
         Add full texts of the sentences from the tier requested
         (ts stands for the main text tier). Find relevant sentences
-        based on the time anchors.
+        based on the time anchors. If there is no such
+        tier, restore the text of the sentence from the word_source
+        properties of individual words. 
         Do not return anything.
         """
         seg2text = {}     # (from, to) -> sentence text
@@ -392,9 +397,12 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             if paraID in seg2text:
                 s['text'] = seg2text[paraID]
             else:
-                print(seg2text)
-                print(paraID)
-                print(s)
+                s['text'] = ''
+                for w in s['words']:
+                    if 'word_source' in w:
+                        s['text'] += w['word_source']
+                        del w['word_source']
+                s['text'] = s['text'].strip()
 
     def add_para_offsets(self, sentences):
         """
@@ -453,8 +461,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                     curSentences.append(curSent)
             if curSent is not None:
                 self.add_src_alignment(curSent, [curAnchor, endAnchor], srcFile)
-            self.add_full_text(anno, curSentences)
             self.process_words(anno)
+            self.add_full_text(anno, curSentences)
             self.add_para_offsets(curSentences)
             for tierName in self.corpusSettings['tier_languages']:
                 lang = self.corpusSettings['tier_languages'][tierName]
