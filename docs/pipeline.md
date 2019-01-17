@@ -47,7 +47,7 @@ During the indexation phase, there are following primary causes of memory consum
 
 Loading a source JSON document may require significantly more memory than it takes to store it on a hard drive. Consequently, loading large documents (> 100 Mb, which can happen in the case of e.g. long novels with heavy annotation) may lead to memory errors. If a memory error occurs, the file will still be indexed, but a much slower iterative JSON parser (ijson) will be used to process it.
 
-Memory consumed by Elasticsearch does not depend on the size of the corpus. Under default settings, it occupies 1.5-2 Gb of memory, but you should probably increase that amount in the Elasticsearch settings if you have a large corpus.
+Memory consumed by Elasticsearch does not depend on the size of the corpus. Under default settings, it occupies 2 Gb of memory. You have to increase that amount in the Elasticsearch settings (``jvm.options`` file, the parameters are called ``Xms`` and ``Xmx``) if you have a large corpus (e.g. 4 Gb for 20 million tokens or 8 Gb for 200 million tokens will probably do).
 
 Memory consumed by the indexator itself non-linearly depends on several parameters (number of tokens, number of sentences and number of documents), but for the sake of simplicity it can be thought of as depending on the number of tokens more or less linearly. The constant depends, of course, on the amount of annotation you have. In case of full morphological annotation, a ratio of 60-80 Mb per million tokens (for corpora containing 10-50 million tokens) can be expected.
 

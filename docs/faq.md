@@ -10,10 +10,10 @@ Short answers for long questions (See ``faq_ru.md`` for Russian version.)
   A: Yes.
 
 * Q: **Will it work if my corpus has 10-20 million words?**
-  A: Yes, but complex multi-word queries may be slow.
+  A: Yes, but you'll want to use more memory (say, 3-4 Gb), otherwise complex multi-word queries may be slow.
 
 * Q: **Will it work if my corpus has 100 million words?**
-  A: Never tried, but probably the same as above.
+  A: The largest corpus people have tried tsakorpus on so far has about 250 million words, which seems to work ok with at least 8 Gb memory. But multi-word queries will be slow anyway.
 
 * Q: **Can I have audio/video alignment so that the users can listen/watch whatever they find?**
   A: Yes.
