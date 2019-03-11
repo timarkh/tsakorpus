@@ -21,6 +21,7 @@ class Morphy_YAML2JSON(Txt2JSON):
     dictSuperscripts = {'_': 'sub', '^': 'sup', 'i': 'i'}
     wordFields = {'wf', 'wtype', 'Superscripts'}  # keys that should stay in the word dictionary,
                                                   # rather than go to the analyses
+    punc2delete = ['||', '|']
 
     def __init__(self, settingsDir='conf'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
@@ -288,7 +289,8 @@ class Morphy_YAML2JSON(Txt2JSON):
                                            'off_start': word['off_start'] + offset[0],
                                            'off_end': word['off_start'] + offset[1]})
             if (word['wtype'] == 'punct'
-                and self.rxPuncSpaceAfter.search(word['wf']) is not None
+                and (self.rxPuncSpaceAfter.search(word['wf']) is not None
+                     or len(word['wf']) == 0)
                 and len(s['text']) > 0
                 and s['text'][-1] != ' '):
                     s['text'] += ' '
@@ -467,12 +469,17 @@ class Morphy_YAML2JSON(Txt2JSON):
                 if 'ana' not in curWordTranslit or len(curWordTranslit['ana']) <= 0:
                     if obj['type'] == 'word':
                         curWordsTranscr.append({'wf': '!!!', 'wtype': 'word'})
+                    elif curWordTranslit['wf'] in self.punc2delete:  # line breaks, for example
+                        curWordsTranscr.append({'wf': ' ', 'wtype': 'punct'})
                     else:
                         curWordsTranscr.append(copy.deepcopy(curWordTranslit))
                 else:
                     logogram = ''
                     transcription = ''
+                    firstAna = True
                     for ana in curWordTranslit['ana']:
+                        if not firstAna:
+                            curWordsTranscr.append({'wf': '=', 'wtype': 'punct'})  # clitics
                         newSegment = {'wtype': 'word', 'wf': '!!!', 'ana': [ana]}
                         if 'segment' in ana:
                             newSegment['wf'] = ana['segment']
@@ -484,6 +491,7 @@ class Morphy_YAML2JSON(Txt2JSON):
                             transcription = ana['transcription']
                             del ana['transcription']
                         curWordsTranscr.append(newSegment)
+                        firstAna = False
                     curWordTranslit['ana'] = []
                     if len(logogram) > 0 or len(transcription) > 0:
                         curWordTranslit['ana'].append({})

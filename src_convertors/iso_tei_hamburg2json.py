@@ -344,7 +344,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             if iSentPos == len(sent['text']):
                 word['off_start'] = len(sent['text']) - 1
                 word['off_end'] = len(sent['text']) - 1
-                print('Unexpected end of sentence:', sent['text'])
+                print('Unexpected end of sentence, terminating now. Details:\nSentence (ts):', sent['text'],
+                      '\nWords (SpeakerContribution_Event):', '+'.join(w['wf'] for w in sent['words']))
                 return
             word['off_start'] = iSentPos
             word['off_end'] = iSentPos + len(wf)
@@ -509,6 +510,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         """
         # curMeta = self.get_meta(fnameSrc)
         # Currently, no metadata are loaded:
+        print(fnameSrc)
         curMeta = {'title': fnameSrc, 'author': '', 'year1': '1900', 'year2': '2017'}
 
         textJSON = {'meta': curMeta, 'sentences': []}
