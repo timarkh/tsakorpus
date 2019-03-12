@@ -144,14 +144,29 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 if 'from' not in wSpan.attrib or 'to' not in wSpan.attrib:
                     continue
                 if wSpan.attrib['from'] != wSpan.attrib['to']:
-                    continue
+                    # continue
+                    if wSpan.attrib['from'].startswith('w'):
+                        if wSpan.text is not None:
+                            print('Warning: span[from] = ' + wSpan.attrib['from']
+                                  + ', span[to] = ' + wSpan.attrib['to']
+                                  + ', text = "' + wSpan.text + '".')
+                        else:
+                            print('Warning: span[from] = ' + wSpan.attrib['from']
+                                  + ', span[to] = ' + wSpan.attrib['to']
+                                  + ', text is empty.')
+                    else:
+                        continue
                 spanID = wSpan.attrib['from']
                 if spanID.startswith('seg'):
                     continue
                 elif spanID.startswith('w'):
                     wordID = spanID
+                elif spanID.startswith('inc'):
+                    wordID = spanID
                 elif spanID.startswith('m'):
                     wordID = self.morph2wordID[spanID][0]
+                else:
+                    continue
                 if wordID != prevWordID:
                     prevWordID = wordID
                     curWordNMorphs = 0
@@ -314,10 +329,20 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         ({word ID -> word object in the list}).
         """
         wordList = []
+        prevTag = ''
         for wordNode in segment:
-            if self.pfx_xml + 'id' not in wordNode.attrib:
+            if wordNode in (self.pfx_tei + 'w', self.pfx_tei + 'pc') and self.pfx_xml + 'id' not in wordNode.attrib:
                 continue
             if wordNode.tag == self.pfx_tei + 'w':
+                # if prevTag == self.pfx_tei + 'w' and len(wordList) > 0:
+                #     # If there is no time anchor between two words,
+                #     # treat it as a single token divided by a word-internal whitespace.
+                #     # TODO: This is a temporary solution. Changes have to be made
+                #     # to the source Exmaralda files to avoid splitting such words.
+                #     wordList[-1]['wf'] += ' ' + wordNode.text.strip()
+                #     self.wordsByID[wordNode.attrib[self.pfx_xml + 'id']] = wordList[-1]
+                #     print('Warning: consecutive words with no acnhor between them (' + wordList[-1]['wf'] + ')')
+                # else:
                 word = {'wf': wordNode.text.strip(), 'wtype': 'word'}
                 wordList.append(word)
                 self.wordsByID[wordNode.attrib[self.pfx_xml + 'id']] = word
@@ -325,6 +350,13 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 word = {'wf': wordNode.text.strip(), 'wtype': 'punc'}
                 wordList.append(word)
                 self.wordsByID[wordNode.attrib[self.pfx_xml + 'id']] = word
+            elif wordNode.tag == self.pfx_tei + 'incident':
+                # Treat "incidents" as punctuation
+                # continue
+                word = {'wf': '((' + wordNode[0].text.strip() + '))', 'wtype': 'punc', 'incident': True}
+                wordList.append(word)
+                self.wordsByID[wordNode.attrib[self.pfx_xml + 'id']] = word
+            prevTag = wordNode.tag
         return wordList
 
     def align_words_and_baseline(self, sent):
@@ -338,6 +370,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             wf = word['wf']
             if len(wf) <= 0:
                 continue
+            # if 'incident' in word:
+            #     sent['text'] = sent['text'][:iSentPos] + ' ' + wf + ' ' + sent['text'][iSentPos:]
             while (iSentPos < len(sent['text'])
                    and sent['text'][iSentPos].lower() != wf[iWordPos].lower()):
                 iSentPos += 1
@@ -383,9 +417,11 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                     if span.attrib['from'] not in self.seg2pID:
                         self.log_message('Wrong "from" attribute: '
                                          + span.attrib['from'])
+                        continue
                     if span.attrib['to'] not in self.seg2pID:
                         self.log_message('Wrong "to" attribute: '
                                          + span.attrib['to'])
+                        continue
                     spanText = span.text
                     if spanText is None:
                         spanText = ''
