@@ -1439,8 +1439,12 @@ def search_word(searchType='word'):
     displayFreqRank = True
     if 'display_freq_rank' in settings and not settings['display_freq_rank']:
         displayFreqRank = False
+    displayGr = True
+    if 'word_search_display_gr' in settings and not settings['word_search_display_gr']:
+        displayGr = False
     return render_template('result_words.html', data=hitsProcessed,
                            word_table_fields=otherWordTableFields,
+                           word_search_display_gr=displayGr,
                            display_freq_rank=displayFreqRank)
 
 

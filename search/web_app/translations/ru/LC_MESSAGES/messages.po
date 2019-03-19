@@ -707,6 +707,9 @@ msgstr "суммарная частотность:"
 msgid "word_th_word"
 msgstr "слово"
 
+msgid "word_th_gr"
+msgstr "грамм."
+
 msgid "word_th_lemma"
 msgstr "лемма"
 

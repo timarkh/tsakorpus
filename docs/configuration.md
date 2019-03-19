@@ -78,6 +78,8 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``display_freq_rank`` (optional) -- boolean value that determines if the quantile / frequency rank column should be displayed for word/lemma query hits. Defaults to true.
 
+* ``word_search_display_gr`` (optional) -- boolean value that determines if the grammar column should be displayed for word/lemma query hits. Defaults to true.
+
 #### The ``lang_props`` dictionary
 For each language in the corpus, the ``lang_props`` dictionary should contain a dicrionary whose keys are the names of the parameters. The following parameters are available:
 

@@ -252,7 +252,7 @@ class Indexator:
                                      if freq >= quantiles[q])) + '%'
         return ''
 
-    def get_lemma(self, word):
+    def get_lemma(self, word, lower_lemma=True):
         """
         Join all lemmata in the JSON representation of a word with
         an analysis and return them as a string.
@@ -265,19 +265,65 @@ class Indexator:
                 if 'lex' in ana:
                     if type(ana['lex']) == list:
                         for l in ana['lex']:
-                            curLemmata.add(l.lower())
+                            lAdd = l
+                            if lower_lemma:
+                                lAdd = lAdd.lower()
+                            curLemmata.add(lAdd)
                     else:
-                        curLemmata.add(ana['lex'].lower())
+                        lAdd = ana['lex']
+                        if lower_lemma:
+                            lAdd = lAdd.lower()
+                        curLemmata.add(lAdd)
             return '/'.join(l for l in sorted(curLemmata))
         curLemmata = []
         for ana in word['ana']:
             if 'lex' in ana:
                 if type(ana['lex']) == list:
                     for l in ana['lex']:
-                        curLemmata.append(l.lower())
+                        lAdd = l
+                        if lower_lemma:
+                            lAdd = lAdd.lower()
+                        curLemmata.append(lAdd)
                 else:
-                    curLemmata.append(ana['lex'].lower())
+                    lAdd = ana['lex']
+                    if lower_lemma:
+                        lAdd = lAdd.lower()
+                    curLemmata.append(lAdd)
         return '/'.join(curLemmata)
+
+    def get_grdic(self, word, lang):
+        """
+        Join all dictionary grammar tags strings in the JSON representation of a word with
+        an analysis and return them as a string.
+        """
+        if 'ana' not in word:
+            return ''
+        curGramm = set()
+        translations = set()
+        for ana in word['ana']:
+            grTags = ''
+            if 'gr.pos' in ana:
+                value = ana['gr.pos']
+                if type(value) == list:
+                    value = ', '.join(value)
+                grTags = value
+            for field in sorted(ana):
+                value = ana[field]
+                if type(value) == list:
+                    value = ', '.join(value)
+                if ('lang_props' in self.settings
+                        and lang in self.settings['lang_props']
+                        and 'dictionary_categories' in self.settings['lang_props'][lang]
+                        and field.startswith('gr.')
+                        and field[3:] in self.settings['lang_props'][lang]['dictionary_categories']):
+                    if len(grTags) > 0:
+                        grTags += ', '
+                    grTags += value
+                elif field.startswith('trans_'):
+                    translations.add(value)
+            if len(grTags) > 0:
+                curGramm.add(grTags)
+        return ' | '.join(grdic for grdic in sorted(curGramm)), ' | '.join(tr for tr in sorted(translations))
 
     def iterate_lemmata(self, langID, lemmaFreqs, lemmaDIDs):
         """
@@ -390,12 +436,63 @@ class Indexator:
                      '_source': emptyLemmaJson}
         yield curAction
 
+    def generate_dictionary(self, fnameOut):
+        """
+        For each language, print out an HTML dictionary containing all lexemes of the corpus.
+        """
+        for langID in range(len(self.languages)):
+            iWord = 0
+            print('Generating dictionary for ' + self.languages[langID] + '...')
+            lexFreqs = {}       # lemma ID -> its frequency
+            wFreqsSorted = [v for v in sorted(self.wordFreqs[langID].values(), reverse=True)]
+            freqToRank, quantiles = self.get_freq_ranks(wFreqsSorted)
+            # for wID in self.wordFreqs[langID]:
+            for w, wID in self.tmpWordIDs[langID].items():
+                if iWord % 500 == 0:
+                    print('processing word', iWord, 'for the dictionary')
+                wJson = json.loads(w)
+                if 'ana' not in wJson:
+                    continue
+                lemma = self.get_lemma(wJson, lower_lemma=False)
+                grdic, translations = self.get_grdic(wJson, self.languages[langID])
+                wordFreq = self.wordFreqs[langID][wID]
+                lexTuple = (lemma, grdic, translations)
+                if lexTuple not in lexFreqs:
+                    lexFreqs[lexTuple] = wordFreq
+                else:
+                    lexFreqs[lexTuple] += wordFreq
+                iWord += 1
+            fOut = open(os.path.join(self.corpus_dir, 'dictionary_' + self.languages[langID] + '.html'), 'w', encoding='utf-8')
+            fOut.write('<html>\n<head><title>' + self.languages[langID]
+                       + ' dictionary</title></head>\n<body>\n')
+            prevLetter = ''
+            for lemma, grdic, trans in sorted(lexFreqs, key=lambda x: (x[0].lower(), -lexFreqs[x])):
+                if len(lemma) <= 0:
+                    continue
+                curLetter = lemma.lower()[0]
+                if curLetter != prevLetter:
+                    if prevLetter != '':
+                        fOut.write('</tbody>\n</table>\n')
+                    fOut.write('<h2>' + curLetter.upper() + '</h2>\n')
+                    fOut.write('<table>\n<thead>\n<th>Lemma</th><th>Grammar</th>'
+                               '<th>Translations</th><th>Frequency</th></thead>\n<tbody>\n')
+                    prevLetter = curLetter
+                fOut.write('<tr>\n<td>' + lemma + '</td><td>' + grdic + '</td>'
+                           '<td>' + trans + '</td><td>'
+                           + str(lexFreqs[(lemma, grdic, trans)]) + '</td></tr>\n')
+            if prevLetter != '':
+                fOut.write('</tbody>\n</table>\n')
+            fOut.write('</body>\n</html>')
+            fOut.close()
+
     def index_words(self):
         """
         Index all words that have been collected at the previous stage
         in self.words (while the sentences were being indexed).
         """
         bulk(self.es, self.iterate_words(), chunk_size=300, request_timeout=60)
+        if 'generate_dictionary' in self.settings and self.settings['generate_dictionary']:
+            self.generate_dictionary(os.path.join(self.corpus_dir, 'dictionary.html'))
 
     def add_parallel_sids(self, sentences, paraIDs):
         """

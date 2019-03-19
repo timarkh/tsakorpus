@@ -139,11 +139,10 @@ class SentenceViewer:
             simpleAnalyses, simpleMatchingAnalyses = self.simplify_ana(simpleAnalyses, simpleMatchingAnalyses)
         return simpleAnalyses, simpleMatchingAnalyses
 
-    def build_gr_ana_part(self, grValues, lang, gramdic=False):
+    def build_gr_ana_part_text(self, grValues, lang):
         """
         Build a string with gramtags ordered according to the settings
         for the language specified by lang.
-        gramdic == True iff dictionary values (such as gender) are processed. 
         """
         def key_comp(p):
             if p[0] not in self.settings['lang_props'][lang]['gr_fields_order']:
@@ -155,6 +154,15 @@ class SentenceViewer:
             if len(grAnaPart) > 0:
                 grAnaPart += ', '
             grAnaPart += fv[1]
+        return grAnaPart
+
+    def build_gr_ana_part(self, grValues, lang, gramdic=False):
+        """
+        Build an HTML div with gramtags ordered according to the settings
+        for the language specified by lang.
+        gramdic == True iff dictionary values (such as gender) are processed. 
+        """
+        grAnaPart = self.build_gr_ana_part_text(grValues, lang)
         if not gramdic:
             return render_template('grammar_popup.html', grAnaPart=grAnaPart).strip()
         return render_template('gramdic_popup.html', grAnaPart=grAnaPart).strip()
@@ -822,12 +830,14 @@ class SentenceViewer:
             if 'wf_display' in wSource:
                 wfDisplay = self.transliterate_baseline(wSource['wf_display'], lang=lang, translit=translit)
             lemma = self.get_lemma(wSource)
+            gr = self.get_gramm(wSource, lang)
             otherFields = self.get_word_table_fields(wSource)
         else:
             nSents = 0
             wf = wfDisplay = ''
             otherFields = []
             lemma = self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit)
+            gr = ''
         wID = -1
         if 'w_id' in w:
             wID = w['w_id']
@@ -836,11 +846,16 @@ class SentenceViewer:
         displayFreqRank = True
         if 'display_freq_rank' in self.settings and not self.settings['display_freq_rank']:
             displayFreqRank = False
+        displayGr = True
+        if 'word_search_display_gr' in self.settings and not self.settings['word_search_display_gr']:
+            displayGr = False
         return render_template('word_table_row.html',
                                ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
                                wf=wf,
                                wf_display=wfDisplay,
                                lemma=lemma,
+                               gr=gr,
+                               word_search_display_gr=displayGr,
                                other_fields=otherFields,
                                freq=freq,
                                display_freq_rank=displayFreqRank,
@@ -862,10 +877,15 @@ class SentenceViewer:
         rank = ''
         nSents = ''
         nDocs = str(nDocuments)
+        displayGr = True
+        if 'word_search_display_gr' in self.settings and not self.settings['word_search_display_gr']:
+            displayGr = False
         return render_template('word_table_row.html',
                                ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
                                wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
                                lemma=self.get_lemma(wSource),
+                               gr=self.get_gramm(wSource, lang),
+                               word_search_display_gr=displayGr,
                                freq=freq,
                                rank=rank,
                                nSents=nSents,
@@ -971,6 +991,42 @@ class SentenceViewer:
                 else:
                     curLemmata.append(ana['lex'].lower())
         return '/'.join(curLemmata)
+
+    def get_gramm(self, word, lang):
+        """
+        Join all grammar tags strings in the JSON representation of a word with
+        an analysis and return them as a string.
+        """
+        if 'ana' not in word:
+            return ''
+        if 'keep_lemma_order' not in self.settings or not self.settings['keep_lemma_order']:
+            curGramm = set()
+            simplifiedAnas, simpleMatchingAnalyses = self.simplify_ana(word['ana'], [])
+            for ana in simplifiedAnas:
+                grTagsList = []
+                for field in sorted(ana):
+                        value = ana[field]
+                        if type(value) == list:
+                            value = ', '.join(value)
+                        if field.startswith('gr.'):
+                            grTagsList.append((field[3:], value))
+                grTags = self.build_gr_ana_part_text(grTagsList, lang)
+                if len(grTags) > 0:
+                    curGramm.add(grTags)
+            return ' | '.join(gt for gt in sorted(curGramm))
+        curGramm = []
+        for ana in word['ana']:
+            grTagsList = []
+            for field in sorted(ana):
+                value = ana[field]
+                if type(value) == list:
+                    value = ', '.join(value)
+                if field.startswith('gr.'):
+                    grTagsList.append((field[3:], value))
+            grTags = self.build_gr_ana_part_text(grTagsList, lang)
+            if len(grTags) > 0:
+                curGramm.append(grTags)
+        return ' | '.join(curGramm)
 
     def get_word_table_fields(self, word):
         """

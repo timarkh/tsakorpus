@@ -709,6 +709,9 @@ msgstr "word"
 msgid "word_th_lemma"
 msgstr "lemma"
 
+msgid "word_th_gr"
+msgstr "grammar"
+
 msgid "word_th_transcription"
 msgstr "transcription"
 
