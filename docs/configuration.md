@@ -40,6 +40,8 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``word_fields`` -- list with names of the word-level analysis fields that should be available in word-level search queries. These include all fields that can occur inside the ``ana`` nested objects, except ``lex``, ``parts``, ``gloss`` and the grammatical fields that start with ``gr.``.
 
+* ``word_fields_by_tier`` (if there is more than one language/tier with different annotation) -- dictionary that describes which word-level search fields should be turned on for which tier. Each tier that does not support all of the word search fields (e.g. does not support Lemma search because it has no lemmatization) has to appear in this dictionary as a key. The corresponding value is a list of all search fields that should be switched on when searching in this tier. This includes all main and additional word-level search fields, except for wordform (``wf``), which is always available. When the user selects a tier, the fields not supported by it, as well as their labels, turn grey (but are not actually disabled).
+
 * ``kw_word_fields`` (optional) -- list with names of the word-level analysis fields that should be treated as keywords rather than text, except ``lex``, ``parts``, ``gloss`` and the grammatical fields that start with ``gr.``. Full-text search in these fields will be impossible. Defaults to empty list.
 
 * ``word_table_fields`` (optional) -- list with names of the word-level analysis fields that should be displayed in the table with Word search results, along with the wordform and lemma, which appear automatically. Defaults to empty list.

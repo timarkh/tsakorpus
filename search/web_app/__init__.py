@@ -393,6 +393,14 @@ def search_page():
         mediaYoutube = True
     else:
         mediaYoutube = False
+    if 'word_fields_by_tier' in settings:
+        wordFieldsByTier = settings['word_fields_by_tier']
+    else:
+        wordFieldsByTier = {}
+    if 'auto_switch_tiers' in settings:
+        autoSwitchTiers = settings['auto_switch_tiers']
+    else:
+        autoSwitchTiers = {}
     return render_template('index.html',
                            locale=get_locale(),
                            corpus_name=corpus_name,
@@ -405,6 +413,8 @@ def search_page():
                            gloss_search_enabled=settings['gloss_search_enabled'],
                            debug=settings['debug'],
                            subcorpus_selection=settings['search_meta'],
+                           word_fields_by_tier=json.dumps(wordFieldsByTier, ensure_ascii=False, indent=-1),
+                           auto_switch_tiers=json.dumps(autoSwitchTiers, ensure_ascii=False, indent=-1),
                            max_request_time=settings['query_timeout'] + 1,
                            locales=settings['interface_languages'],
                            random_seed=get_session_data('seed'))

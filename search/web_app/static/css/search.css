@@ -313,6 +313,9 @@
 	transition: box-shadow 0.3s, border 0.3s;
 }
 
+.disabled_search_input {
+	color: #AAAAAA;
+}
 
 .distance_input {
 	width: 45px;

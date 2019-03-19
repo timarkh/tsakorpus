@@ -24,6 +24,8 @@ var selectGrammTagsCaption = "{{ _('Select combinations of tags') }}";
 var selectGlossCaption = "{{ _('Select glosses') }}";
 var forTheQueryCaption = "{{ _('the query') }}";
 var nothingFoundCaption = "{{ _('Nothing found.') }}";
+var autoSwitchTiers = {{ auto_switch_tiers|safe }};
+var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 </script>
 <!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,400i" rel="stylesheet"> -->
 {% if media %}
@@ -71,17 +73,17 @@ var nothingFoundCaption = "{{ _('Nothing found.') }}";
 						<div class="word_search" id="first_word">
 							<div class="word_search_l">
 								<div class="query_word_header"><div class="circle circle_w1"></div>{{ _('Word_header') }} {{ _('Number_sign') }}1</div>
-								{{ _('Word:') }} <input type="text" class="search_input" name="wf1" id="wf1"><br>
-								{{ _('Lemma:') }} <input type="text" class="search_input" name="lex1" id="lex1"><br>
-								{{ _('Grammar:') }} <input type="text" class="search_input gram_selector_input" name="gr1" id="gr1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gr" data-nword="1"></span><br>
+								<span id="_label_wf1" class="search_label">{{ _('Word:') }}</span> <input type="text" class="search_input" name="wf1" id="wf1"><br>
+								<span id="_label_lex1" class="search_label">{{ _('Lemma:') }}</span> <input type="text" class="search_input" name="lex1" id="lex1"><br>
+								<span id="_label_gr1" class="search_label">{{ _('Grammar:') }}</span> <input type="text" class="search_input gram_selector_input" name="gr1" id="gr1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gr" data-nword="1"></span><br>
 								<input type="hidden" class="search_input" name="w_id1" id="w_id1">
 								{% if gloss_search_enabled %}
-								{{ _('Gloss:') }} <input type="text" class="search_input gram_selector_input" name="gloss_index1" id="gloss1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gloss" data-nword="1"></span><br>
+								<span id="_label_gloss1" class="search_label">{{ _('Gloss:') }}</span> <input type="text" class="search_input gram_selector_input" name="gloss_index1" id="gloss1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gloss" data-nword="1"></span><br>
 								{% endif %}
 								<hr class="separator">
 								<div class="add_word_fields"></div>
 								{% if languages|length > 1 %}
-									{{ _('Language/tier:') }} <select name="lang1" id="lang1" class="search_input">
+									{{ _('Language/tier:') }} <select name="lang1" id="lang1" class="tier_select search_input">
 									{% for lang in languages %}
 									<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
 									{% endfor %}

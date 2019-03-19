@@ -244,6 +244,7 @@ function load_additional_word_fields() {
 		type: "GET",
 		success: function(result) {
 			$("div.add_word_fields").html(result);
+			change_tier({'target': $('#lang1')});
 		},
 		error: function(errorThrown) {
 			alert( JSON.stringify(errorThrown) );
@@ -311,6 +312,7 @@ function assign_input_events() {
 	$('#load_query').unbind('click');
 	$('#query_load_ok').unbind('click');
 	$('.toggle_glossed_layer').unbind('click');
+	$(".tier_select").unbind('change');
 	$("span.word_plus").click(add_word_inputs);
 	$("span.word_minus").click(del_word_inputs);
 	$("span.word_expand").click(expand_word_input);
@@ -328,6 +330,7 @@ function assign_input_events() {
 	$('#load_query').click(show_load_query);
 	$('#query_load_ok').click(load_query);
 	$('.toggle_glossed_layer').click(toggle_glossed_layer);
+	$(".tier_select").change(change_tier);
 }
 
 function assign_show_hide() {

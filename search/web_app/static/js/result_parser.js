@@ -412,3 +412,44 @@ function row_comparer(index) {
 }
 
 function getCellValue(row, index){ return $(row).children('td').eq(index).html(); }
+
+function change_tier(e) {
+	var newTier = $(e.target).val();
+	var curNum = $(e.target).attr('id').replace(/^.*[^0-9]/g, '');
+	var allowedFields = [];
+	var allowedLabels = [];
+	if (newTier in wordFieldsByTier) {
+		allowedFields = wordFieldsByTier[newTier].slice();
+		allowedFields.push("wf");
+		allowedFields.push("lang");
+		allowedFields.push("sentence_index");
+	}
+	for (var iField = 0; iField < allowedFields.length; iField++) {
+		allowedFields[iField] += curNum;
+		allowedLabels.push('_label_' + allowedFields[iField]);
+	}
+	$('.search_input').each(function (index) {
+		wordNum = $(this).attr('id').replace(/^.*[^0-9]/g, '');
+		if (wordNum != curNum || $(this).attr('id').startsWith('sent_meta')) {
+			return;
+		}
+		if (allowedFields.length <= 0 || allowedFields.includes($(this).attr('id'))) {
+			$(this).removeClass('disabled_search_input');
+		}
+		else {
+			$(this).addClass('disabled_search_input');
+		}
+	});
+	$('.search_label').each(function (index) {
+		wordNum = $(this).attr('id').replace(/^.*[^0-9]/g, '');
+		if (wordNum != curNum || $(this).attr('id').startsWith('_label_sent_meta')) {
+			return;
+		}
+		if (allowedLabels.length <= 0 || allowedLabels.includes($(this).attr('id'))) {
+			$(this).removeClass('disabled_search_input');
+		}
+		else {
+			$(this).addClass('disabled_search_input');
+		}
+	});
+}
