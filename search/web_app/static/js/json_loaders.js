@@ -304,6 +304,7 @@ function assign_input_events() {
 	//$("neg_query_checkbox").unbind('change');
 	$("span.neg_query").unbind('click');
 	$("#show_help").unbind('click');
+	$("#show_dictionary").unbind('click');
 	$("#show_word_stat").unbind('click');
 	$("span.locale").unbind('click');
 	$(".search_input").unbind('on');
@@ -322,6 +323,7 @@ function assign_input_events() {
 	//$("neg_query_checkbox").change(negative_query);
 	$("span.neg_query").click(negative_query_span);
 	$("#show_help").click(show_help);
+	$("#show_dictionary").click(show_dictionary);
 	$("#show_word_stat").click(show_word_stats);
 	$("span.locale").click(change_locale);
 	$(".search_input").on("keydown", search_if_enter);
@@ -503,6 +505,21 @@ function show_help(e) {
 		});
 }
 
+function show_dictionary(e) {
+	var lang = $('#lang1 option:selected').val();
+	$.ajax({
+			url: "dictionary/" + lang,
+			type: "GET",
+			success: function(result) {
+				$('#dictionary_dialogue_body').html(result);
+				$('#dictionary_dialogue').modal('show');
+				assign_dictionary_events();
+			},
+			error: function(errorThrown) {
+			}
+		});
+}
+
 function gramm_selector_loaded(result) {
 	$("#gram_sel_body").html(result);
 	$("#gramm_selector_ok").unbind('click');
@@ -517,6 +534,17 @@ function gloss_selector_loaded(result) {
 	$("#gloss_selector_ok").click(gloss_selector_ok);
 	$("#gloss_selector_cancel").unbind('click');
 	$("#gloss_selector_cancel").click(function() {$('#gram_selector').modal('toggle');});
+}
+
+function assign_dictionary_events(){
+	$(".dictionary_lemma").unbind("click");
+	$(".dictionary_lemma").click(input_lemma);
+}
+
+function input_lemma(e) {
+	$('#wf1').val("");
+	$('#lex1').val($(e.target).html());
+	$('#gr1').val($(e.target).next().html().replace(" ", ""));
 }
 
 function gram_selector_ok(e) {

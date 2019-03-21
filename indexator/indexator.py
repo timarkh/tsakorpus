@@ -448,10 +448,11 @@ class Indexator:
             freqToRank, quantiles = self.get_freq_ranks(wFreqsSorted)
             # for wID in self.wordFreqs[langID]:
             for w, wID in self.tmpWordIDs[langID].items():
-                if iWord % 500 == 0:
+                if iWord % 1000 == 0:
                     print('processing word', iWord, 'for the dictionary')
+                iWord += 1
                 wJson = json.loads(w)
-                if 'ana' not in wJson:
+                if 'ana' not in wJson or len(wJson['ana']) <= 0:
                     continue
                 lemma = self.get_lemma(wJson, lower_lemma=False)
                 grdic, translations = self.get_grdic(wJson, self.languages[langID])
@@ -461,10 +462,13 @@ class Indexator:
                     lexFreqs[lexTuple] = wordFreq
                 else:
                     lexFreqs[lexTuple] += wordFreq
-                iWord += 1
-            fOut = open(os.path.join(self.corpus_dir, 'dictionary_' + self.languages[langID] + '.html'), 'w', encoding='utf-8')
-            fOut.write('<html>\n<head><title>' + self.languages[langID]
-                       + ' dictionary</title></head>\n<body>\n')
+            if len(lexFreqs) <= 0:
+                continue
+
+            fOut = open(os.path.join('../search/web_app/templates', 'dictionary_' + self.settings['corpus_name']
+                                     + '_' + self.languages[langID] + '.html'), 'w', encoding='utf-8')
+            fOut.write('<h1 class="dictionary_header"> {{ _(\'Dictionary_header\') }} '
+                       '({{ _(\'langname_' + self.languages[langID] + '\') }})</h1>\n')
             prevLetter = ''
             for lemma, grdic, trans in sorted(lexFreqs, key=lambda x: (x[0].lower(), -lexFreqs[x])):
                 if len(lemma) <= 0:
@@ -473,16 +477,19 @@ class Indexator:
                 if curLetter != prevLetter:
                     if prevLetter != '':
                         fOut.write('</tbody>\n</table>\n')
-                    fOut.write('<h2>' + curLetter.upper() + '</h2>\n')
-                    fOut.write('<table>\n<thead>\n<th>Lemma</th><th>Grammar</th>'
-                               '<th>Translations</th><th>Frequency</th></thead>\n<tbody>\n')
+                    fOut.write('<h2 class="dictionary_letter">' + curLetter.upper() + '</h2>\n')
+                    fOut.write('<table class="dictionary_table">\n<thead>\n'
+                               '<th>{{ _(\'word_th_lemma\') }}</th>'
+                               '<th>{{ _(\'word_th_gr\') }}</th>'
+                               '<th>{{ _(\'word_th_trans_en\') }}</th>'
+                               '<th>{{ _(\'word_th_frequency\') }}</th>'
+                               '</thead>\n<tbody>\n')
                     prevLetter = curLetter
-                fOut.write('<tr>\n<td>' + lemma + '</td><td>' + grdic + '</td>'
+                fOut.write('<tr>\n<td class="dictionary_lemma">' + lemma + '</td><td>' + grdic + '</td>'
                            '<td>' + trans + '</td><td>'
                            + str(lexFreqs[(lemma, grdic, trans)]) + '</td></tr>\n')
             if prevLetter != '':
                 fOut.write('</tbody>\n</table>\n')
-            fOut.write('</body>\n</html>')
             fOut.close()
 
     def index_words(self):

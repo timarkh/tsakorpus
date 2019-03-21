@@ -703,6 +703,15 @@ msgstr "документах,"
 msgid "total frequency:"
 msgstr "суммарная частотность:"
 
+msgid "Dictionary_header"
+msgstr "Словарь"
+
+msgid "Show dictionary"
+msgstr "Показать словарь"
+
+msgid "word_th_trans_en"
+msgstr "перевод (EN)"
+
 #: templates/result_words.html:4
 msgid "word_th_word"
 msgstr "слово"

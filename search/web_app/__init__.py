@@ -401,6 +401,10 @@ def search_page():
         autoSwitchTiers = settings['auto_switch_tiers']
     else:
         autoSwitchTiers = {}
+    if 'generate_dictionary' in settings:
+        generateDictionary = settings['generate_dictionary']
+    else:
+        generateDictionary = False
     return render_template('index.html',
                            locale=get_locale(),
                            corpus_name=corpus_name,
@@ -415,6 +419,7 @@ def search_page():
                            subcorpus_selection=settings['search_meta'],
                            word_fields_by_tier=json.dumps(wordFieldsByTier, ensure_ascii=False, indent=-1),
                            auto_switch_tiers=json.dumps(autoSwitchTiers, ensure_ascii=False, indent=-1),
+                           generate_dictionary=generateDictionary,
                            max_request_time=settings['query_timeout'] + 1,
                            locales=settings['interface_languages'],
                            random_seed=get_session_data('seed'))
@@ -1682,3 +1687,14 @@ def help_dialogue():
     return render_template('help_dialogue_' + l + '.html',
                            media=settings['media'],
                            gloss_search_enabled=settings['gloss_search_enabled'])
+
+
+@app.route('/dictionary/<lang>')
+def get_dictionary(lang):
+    if 'generate_dictionary' not in settings or not settings['generate_dictionary']:
+        return 'No dictionary available for this language.'
+    dictFilename = 'dictionary_' + corpus_name + '_' + lang + '.html'
+    try:
+        return render_template(dictFilename)
+    except:
+        return ''

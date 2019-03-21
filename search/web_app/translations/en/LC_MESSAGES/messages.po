@@ -702,6 +702,15 @@ msgstr "documents found,"
 msgid "total frequency:"
 msgstr "total frequency:"
 
+msgid "Dictionary_header"
+msgstr "Dictionary"
+
+msgid "Show dictionary"
+msgstr "Show dictionary"
+
+msgid "word_th_trans_en"
+msgstr "translation (EN)"
+
 #: templates/result_words.html:4
 msgid "word_th_word"
 msgstr "word"

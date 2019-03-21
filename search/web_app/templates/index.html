@@ -51,6 +51,9 @@ var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 	{% endif %}
 {% endfor %}
 {% endif %}
+{% if generate_dictionary %}
+<span id="show_dictionary" class="glyphicon glyphicon-book" aria-hidden="true"><span class="tooltip_prompt">{{ _('Show dictionary') }}</span></span>
+{% endif %}
 <span id="show_help" class="glyphicon glyphicon-question-sign" aria-hidden="true"><span class="tooltip_prompt">{{ _('Show help') }}</span></span>
 </p>
 <div id="search_div" class="transitions init-hidden">
@@ -240,6 +243,20 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 			</div>
 			<div class="modal-body" id="help_dialogue_body">
 			<p>The help text should be loaded here.</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="dictionary_dialogue" tabindex="-1" role="dialog" aria-labelledby="dictionary_dialogue_header" aria-hidden="true" data-field="gr1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="dictionary_dialogue_header">{{ _('Dictionary_header') }}</h4>
+			</div>
+			<div class="modal-body" id="dictionary_dialogue_body">
+			<p>The dictionary text should be loaded here.</p>
 			</div>
 		</div>
 	</div>
