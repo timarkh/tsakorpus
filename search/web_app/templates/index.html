@@ -206,6 +206,10 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 </video>
 </div>
 {% endif %}
+{% if images %}
+<div id="image_div" style="display: none">
+</div>
+{% endif %}
 <div id="res_p">
 <p style="font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;">{{ _('(Place for results)') }}</p></div>
 <div class="progress" style="visibility: hidden">
@@ -261,6 +265,20 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 		</div>
 	</div>
 </div>
+{% if images %}
+<div class="modal fade" id="full_image" tabindex="-1" role="dialog" aria-labelledby="full_image_header" aria-hidden="true" data-field="gr1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			</div>
+			<div class="modal-body" id="full_image_body">
+			<img id="img_fullres" src="">
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
 
 {% include "query_share_load.html" %}
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -272,6 +290,13 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 	<script>
 	$(function() {
 		$('#res_p').css('width', 'calc(95vw - ' + $('#media_div').width().toString() + 'px)');
+	});
+	</script>
+{% endif %}
+{% if images %}
+	<script>
+	$(function() {
+		$('#res_p').css('width', 'calc(95vw - ' + $('#image_div').width().toString() + 'px)');
 	});
 	</script>
 {% endif %}

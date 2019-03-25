@@ -191,6 +191,8 @@ class Splitter:
                     self.append_sentence(sentences, curSentence, text)
                     curSentence = {'words': []}
                     continue
+            elif i == len(tokens) - 1:
+                self.append_sentence(sentences, curSentence, text)
         self.recalculate_offsets(sentences)
         self.add_next_word_id(sentences)
         return sentences

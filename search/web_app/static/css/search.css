@@ -626,6 +626,26 @@ hr.separator {
 	display: inline-block;
 }
 
+#image_div {
+	max-width: 450px;
+	max-height: 500px;
+	padding: 10px;
+	float: left;
+	display: inline-block;
+	overflow: scroll;
+	cursor: pointer;
+}
+
+#image_src {
+	max-width: 600px;
+	max-height: 600px;
+}
+
+#full_image_body {
+	overflow: scroll;
+	max-height: 80rem;
+}
+
 #lower_part {
 	display: inline-block;
 }

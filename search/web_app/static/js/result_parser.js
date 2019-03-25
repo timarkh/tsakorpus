@@ -27,6 +27,15 @@ function hide_player() {
 	$('#media_div').css('display', 'none');
 }
 
+function show_img() {
+	$('#image_div').css('display', 'inline-block');
+	$('#image_src').click(toggle_full_image);
+}
+
+function hide_img() {
+	$('#image_div').css('display', 'none');
+}
+
 function assign_word_events() {
 	$("span.word").unbind('click');
 	$("span.expand").unbind('click');
@@ -36,6 +45,7 @@ function assign_word_events() {
 	$("span.stat_w").unbind('click');
 	$("span.page_link").unbind('click');
 	$(".cx_toggle_chk").unbind('change');
+	$(".sent_lang").unbind('change');
 	$('span.word').click(highlight_cur_word);
 	$('span.expand').click(expand_context);
 	$('span.get_glossed_copy').click(copy_glossed_sentence);
@@ -44,6 +54,7 @@ function assign_word_events() {
 	$('span.stat_w').click(show_word_stats);
 	$("span.page_link").click(page_click);
 	$(".cx_toggle_chk").change(context_toggle);
+	$('.sent_lang').click(show_sentence_img);
 	assign_para_highlight();
 	assign_src_alignment();
 	assign_gram_popup();
@@ -271,6 +282,22 @@ function assign_src_alignment() {
 	});
 }
 
+function show_sentence_img(e) {
+	var e_obj = $(e.currentTarget);
+	while (e_obj.attr('class') != 'sent_lang') {
+		e_obj = e_obj.parent();
+	}
+	var imgSrc = $(e_obj).attr('data-img');
+	if (typeof imgSrc !== typeof undefined && imgSrc !== false) {
+		$('#image_div').html('<img id="image_src" src="img/' + imgSrc + '">');
+		$('#img_fullres').attr('src', 'img/' + imgSrc);
+		show_img();
+	}
+	else {
+		hide_img();
+	}
+}
+
 function assign_sent_meta_popup() {
     $("span.sent_lang").unbind('hover');
 	$("span.sent_lang").unbind('mousemove');
@@ -453,3 +480,8 @@ function change_tier(e) {
 		}
 	});
 }
+
+function toggle_full_image() {
+	$('#full_image').modal('show');
+}
+	

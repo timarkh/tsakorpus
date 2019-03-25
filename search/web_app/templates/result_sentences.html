@@ -21,7 +21,7 @@
 	<span class="sentence" id='res{{ loop.index - 1 }}'>
 	{% for lang in data.languages %}
 		{% if lang in c.languages %}
-		<span class="sent_lang" id='res{{ context_loop.index - 1 }}_{{ lang }}'>
+		<span class="sent_lang" id='res{{ context_loop.index - 1 }}_{{ lang }}' {% if c.languages[lang].img %}data-img="{{ c.languages[lang].img }}"{% endif %}>
 		{{ c.languages[lang].text | safe }}
 		</span>
 		{% if not loop.last %}{% endif %}

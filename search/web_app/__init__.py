@@ -405,6 +405,10 @@ def search_page():
         generateDictionary = settings['generate_dictionary']
     else:
         generateDictionary = False
+    if 'images' in settings:
+        images = settings['images']
+    else:
+        images = False
     return render_template('index.html',
                            locale=get_locale(),
                            corpus_name=corpus_name,
@@ -413,6 +417,7 @@ def search_page():
                            transliterations=transliterations,
                            input_methods=inputMethods,
                            media=settings['media'],
+                           images=images,
                            youtube=mediaYoutube,
                            gloss_search_enabled=settings['gloss_search_enabled'],
                            debug=settings['debug'],
@@ -1525,6 +1530,12 @@ def send_media(path):
     """
     return send_from_directory(os.path.join('../media', corpus_name), path)
 
+@app.route('/img/<path:path>')
+def send_image(path):
+    """
+    Return the requested image file.
+    """
+    return send_from_directory(os.path.join('../img', corpus_name), path)
 
 def prepare_results_for_download(pageData):
     """

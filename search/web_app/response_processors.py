@@ -594,7 +594,7 @@ class SentenceViewer:
         Process one sentence taken from response['hits']['hits'].
         If getHeader is True, retrieve the metadata from the database.
         Return dictionary {'header': document header HTML,
-                           {'languages': {'<language_name>': {'text': sentence HTML}}}}.
+                           {'languages': {'<language_name>': {'text': sentence HTML[, 'img': related image name]}}}}.
         """
         if len(langView) <= 0 and len(lang) > 0:
             langView = lang
@@ -713,8 +713,10 @@ class SentenceViewer:
             relationsSatisfied = False
         text = self.view_sentence_meta(sSource, format) +\
                self.transliterate_baseline(''.join(chars), lang=lang, translit=translit)
-        return {'header': header, 'languages': {langView: {'text': text,
-                                                           'highlighted_text': highlightedText}},
+        langViewContents = {'text': text, 'highlighted_text': highlightedText}
+        if 'images' in self.settings and self.settings['images'] and 'img' in sSource['meta']:
+            langViewContents['img'] = sSource['meta']['img']
+        return {'header': header, 'languages': {langView: langViewContents},
                 'toggled_on': relationsSatisfied,
                 'src_alignment': fragmentInfo}
 
