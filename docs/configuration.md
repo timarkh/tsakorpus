@@ -16,6 +16,8 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``media_length`` -- an integer that determines the duration of media files in seconds. During indexing, source media files are split into overlapping pieces of equal duration (recommended duration is 1-3 minutes). This parameter is required at search time in order to recalculate offsets of neighboring sentences that were aligned with different pieces.
 
+* ``images`` (true/false) -- determines whether the corpus contains any aligned image files and, therefore, whether the aligned images should appear next to the search results. The images should be located in the ``search/img/%corpus_name%`` directory, and the filename is taken from the ``img`` parameter in the sentence-level metadata. Defaults to false.
+
 * ``max_context_expand`` -- an integer that determines how many times the user may expand a context from search results, which can be important if there are copyright restrictions on the texts. Negative values mean unlimited expanding.
 
 * ``query_timeout`` -- an integer that determines the upper bound on sentence search query execution in seconds. This bound is applied stricly for the Elasticsearch query execution and not so strictly when postprocessing results found by Elasticsearch.
@@ -49,6 +51,8 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 * ``accidental_word_fields`` (optional) -- list with names of the word-level analysis fields that should not be taken into account in word searches, even if they are searchable in the sentences. For example, such a field might contain indication that a word precedes or follows a punctuation mark: it can be useful in sentence search, but hardly relevant for word search. Defaults to empty list.
 
 * ``keep_lemma_order`` (true/false; optional) -- determines whether the order of multiple analyses should be kept when a string with the lemmata is concatenated for displaying. Defaults to false. For example, if a word has 3 analyses with the lemmara B, A and B, ``false`` means that the output string of lemmata will look like A/B, and ``true``, B/A/B. The latter may be needed if multiple analyses actually refer to different parts of a graphic word, e.g. host and clitics if they are represented as a single token.
+
+* ``generate_dictionary`` (true/false; optional) -- determines whether a dictionary of lexemes should be generated at indexation time for each of the languages. If true, the dictionary is stored in the ``search/web_app/templates`` directory and could be accessed by clicking the red book glyph in the web interface. Defaults to false.
 
 * ``languages`` -- list of names of the languages used in the corpus. The order of the languages determines how they are encoded in the index (the code of the language is its index in this list) and, in the case of parallel corpora, in which order they are displayed within one parallel context.
 
@@ -98,6 +102,8 @@ For each language in the corpus, the ``lang_props`` dictionary should contain a 
 * ``gloss_selection`` -- dictionary that describes what should appear in the Gloss selection popup. Currently, its only key is ``columns``, where the value is a list containing lists of tag descriptors, each of these inner lists representing a single column in the popup. Each descriptor is a dictionary with possible keys ``type`` (obligatory), ``value`` and ``tooltip``. The corresponding values are strings. ``type`` parameter can equal ``gloss`` (description of a gloss tag), ``header`` (description of a header for a group of gloss tags), or ``separator`` (a line that separates one group of tags from another). ``value`` and ``tooltip`` determine what text will appear on the tag an on the tooltip.
 
 * ``gramm_selection`` -- dictionary that describes what should appear in the Grammar selection popup. Has same contents as ``gloss_selecton``, but the ``type`` of grammatical tags is ``gramm`` rather than ``gloss``.
+
+* ``lexicographic_order`` (list of strings; optional) -- list of characters ordered alphabetically for sorting words and lemmata. If absent, standard Unicode ordering is applied.
 
 
 ### categories.json

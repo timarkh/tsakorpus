@@ -191,24 +191,46 @@ class Indexator:
             except KeyError:
                 self.wordDocFreqs[langID][(wID, self.dID)] = 1
 
-    def sort_words(self):
+    def make_sorting_function(self, lang):
+        """
+        Return a function that can be used for sorting tokens
+        in a list according to the alphabetical ordering specified
+        for the language lang.
+        """
+        sortingFunction = lambda x: x
+        if lang in self.settings['lang_props'] and 'lexicographic_order' in self.settings['lang_props'][lang]:
+            dictSort = {self.settings['lang_props'][lang]['lexicographic_order'][i]:
+                            (i, self.settings['lang_props'][lang]['lexicographic_order'][i])
+                        for i in range(len(self.settings['lang_props'][lang]['lexicographic_order']))}
+            maxIndex = len(dictSort)
+
+            def charReplaceFunction(c):
+                if c in dictSort:
+                    return dictSort[c]
+                return (maxIndex, c)
+
+            sortingFunction = lambda x: [charReplaceFunction(c) for c in x.lower()]
+        return sortingFunction
+
+    def sort_words(self, lang):
         """
         Sort word forms and lemmata stored at earlier stages.
         Return dictionaries with positions of word forms and
-        lemmata in the sorted list. Delete the original lists.
+        lemmata in the sorted list.
+        If there is a custom alphabetical order for the language,
+        use it. Otherwise, use standard lexicographic sorting.
         """
         wfsSorted = {}
         iOrder = 0
-        for wf in sorted(self.wfs):
+        sortingFunction = self.make_sorting_function(lang)
+        for wf in sorted(self.wfs, key=sortingFunction):
             wfsSorted[wf] = iOrder
             iOrder += 1
-        self.wfs = None
         lemmataSorted = {}
         iOrder = 0
-        for l in sorted(self.lemmata):
+        for l in sorted(self.lemmata, key=sortingFunction):
             lemmataSorted[l] = iOrder
             iOrder += 1
-        self.lemmata = None
         return wfsSorted, lemmataSorted
 
     def get_freq_ranks(self, freqsSorted):
@@ -357,9 +379,9 @@ class Indexator:
         in Elasticsearch.
         """
         self.wID = 0
-        wfsSorted, lemmataSorted = self.sort_words()
 
         for langID in range(len(self.languages)):
+            wfsSorted, lemmataSorted = self.sort_words(self.languages[langID])
             iWord = 0
             print('Processing words in ' + self.languages[langID] + '...')
             lemmaFreqs = {}       # lemma ID -> its frequency
@@ -435,6 +457,9 @@ class Indexator:
                      '_id': 0,
                      '_source': emptyLemmaJson}
         yield curAction
+        self.wfs = None
+        self.lemmata = None
+
 
     def generate_dictionary(self, fnameOut):
         """
@@ -470,7 +495,8 @@ class Indexator:
             fOut.write('<h1 class="dictionary_header"> {{ _(\'Dictionary_header\') }} '
                        '({{ _(\'langname_' + self.languages[langID] + '\') }})</h1>\n')
             prevLetter = ''
-            for lemma, grdic, trans in sorted(lexFreqs, key=lambda x: (x[0].lower(), -lexFreqs[x])):
+            sortingFunction = self.make_sorting_function(self.settings['languages'][langID])
+            for lemma, grdic, trans in sorted(lexFreqs, key=lambda x: (sortingFunction(x[0].lower()), -lexFreqs[x])):
                 if len(lemma) <= 0:
                     continue
                 curLetter = lemma.lower()[0]
