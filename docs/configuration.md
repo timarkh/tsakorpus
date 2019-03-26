@@ -64,6 +64,8 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``all_language_search_enabled`` -- boolean value that determines if the user may make language-inspecific queries. Relevant only in a corpus with multiple languages.
 
+* ``fulltext_search_enabled`` (optional) -- boolean value that determines whether a text box for full-text search should be displayed. Defaults to true.
+
 * ``gloss_search_enabled`` -- boolean value that determines if the gloss search textbox should be present in the word query form. Should be enabled for glossed corpora.
 
 * ``ambiguous_analyses`` -- boolean value that has to be set to true if there are tokens in the corpus which have multiple (ambiguous) analyses. In this case, the user can select if they want to search only among unambiguously analyzed words.

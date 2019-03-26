@@ -50,6 +50,8 @@ var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 		|&nbsp;&nbsp;
 	{% endif %}
 {% endfor %}
+{% else %}
+<span style="padding-right: 70px;">&nbsp;</span>
 {% endif %}
 {% if generate_dictionary %}
 <span id="show_dictionary" class="glyphicon glyphicon-book" aria-hidden="true"><span class="tooltip_prompt">{{ _('Show dictionary') }}</span></span>
@@ -113,7 +115,9 @@ var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 						</div>
 					</div>
 					<br>
+{% if fulltext_search_enabled %}
 					{{ _('Full-text search:') }} <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise" id="precise"> {{ _('Precise match') }}<br>
+{% endif %}
 				</div>
 		
 				<div class="tab-pane" id="display_options_tab">

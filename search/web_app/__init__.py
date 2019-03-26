@@ -409,6 +409,10 @@ def search_page():
         images = settings['images']
     else:
         images = False
+    if 'fulltext_search_enabled' in settings:
+        fulltextSearch = settings['fulltext_search_enabled']
+    else:
+        fulltextSearch = True
     return render_template('index.html',
                            locale=get_locale(),
                            corpus_name=corpus_name,
@@ -420,6 +424,7 @@ def search_page():
                            images=images,
                            youtube=mediaYoutube,
                            gloss_search_enabled=settings['gloss_search_enabled'],
+                           fulltext_search_enabled=fulltextSearch,
                            debug=settings['debug'],
                            subcorpus_selection=settings['search_meta'],
                            word_fields_by_tier=json.dumps(wordFieldsByTier, ensure_ascii=False, indent=-1),
