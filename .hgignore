@@ -9,3 +9,4 @@ search/media/*
 search/tmp/*
 src_convertors/error.log
 docs_doxygen/*
+search/img/*
