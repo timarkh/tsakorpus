@@ -2,8 +2,8 @@ import re
 
 def khinalug_input_normal(field, text):
     """
-    Prepare a string from one of the qury fields for subsequent
-    processing: replace common shortcuts with valid Adyghe characters.
+    Prepare a string from one of the query fields for subsequent
+    processing: replace common shortcuts with valid Khinalug characters.
     """
     if field not in ('wf', 'lex', 'lex2', 'trans_ru', 'trans_ru2'):
         return text

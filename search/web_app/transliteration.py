@@ -4,6 +4,7 @@ from transliterators.khinalug import khinalug_input_normal
 from transliterators.beserman import beserman_translit_cyrillic
 from transliterators.udmurt import udmurt_translit_upa
 from transliterators.erzya import erzya_translit_upa
+from transliterators.albanian import albanian_input_normal
 
 
 def trans_IPA_baseline(text, lang):
@@ -31,5 +32,7 @@ def input_method_normal(field, text, lang):
         return adyghe_input_normal(field, text)
     elif lang == 'khinalug':
         return khinalug_input_normal(field, text)
+    elif lang == 'albanian':
+        return albanian_input_normal(field, text)
     return text
 
