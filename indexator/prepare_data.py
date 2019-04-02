@@ -223,7 +223,7 @@ class PrepareData:
                              'index': False},
              'words': {'type': 'nested',
                        'properties': word_mapping['mappings']['word']['properties']}}
-        sentMetaDict = {}
+        sentMetaDict = {'sent_analyses_kw': {'type': 'keyword'}}
         for meta in self.settings['sentence_meta']:
             if meta.startswith('year') or ('integer_meta_fields' in self.settings
                                            and meta in self.settings['integer_meta_fields']):

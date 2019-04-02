@@ -1526,16 +1526,20 @@ def get_word_fields():
     wordFields = None
     sentMeta = None
     intMetaFields = None
+    sentMetaValues = None
     if 'word_fields' in settings and len(settings['word_fields']) > 0:
         wordFields = settings['word_fields']
     if 'sentence_meta' in settings and len(settings['sentence_meta']) > 0:
         sentMeta = settings['sentence_meta']
     if 'integer_meta_fields' in settings and len(settings['integer_meta_fields']) > 0:
         intMetaFields = settings['integer_meta_fields']
+    if 'sentence_meta_values' in settings and len(settings['sentence_meta_values']) > 0:
+        sentMetaValues = settings['sentence_meta_values']
     result += render_template('common_additional_search_fields.html',
                               word_fields=wordFields,
                               sentence_meta=sentMeta,
                               int_meta_fields=intMetaFields,
+                              sentence_meta_values=sentMetaValues,
                               ambiguous_analyses=settings['ambiguous_analyses'])
     return result
 
@@ -1593,6 +1597,8 @@ def download_cur_results_xlsx():
         return ''
     results = prepare_results_for_download(pageData)
     XLSXFilename = 'results-' + str(uuid.uuid4()) + '.xlsx'
+    if not os.path.exists('tmp'):
+        os.makedirs('tmp')
     workbook = xlsxwriter.Workbook('tmp/' + XLSXFilename)
     worksheet = workbook.add_worksheet('Search results')
     for i in range(len(results)):

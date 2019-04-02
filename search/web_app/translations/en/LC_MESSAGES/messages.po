@@ -385,6 +385,9 @@ msgstr "Language of translation"
 msgid "metafield_date_trans"
 msgstr "Date of translation"
 
+msgid "metafield_sent_analyses"
+msgstr "Sentence analyzed"
+
 
 
 # Names of the metadata values you have in the corpus:
@@ -445,6 +448,15 @@ msgstr "F"
 
 msgid "metavalue_experiment"
 msgstr "experiment"
+
+msgid "metavalue_unique"
+msgstr "unambiguously"
+
+msgid "metavalue_complete"
+msgstr "completely, but ambiguously"
+
+msgid "metavalue_incomplete"
+msgstr "incompletely"
 
 
 # Names of additional word-level annotation fields:

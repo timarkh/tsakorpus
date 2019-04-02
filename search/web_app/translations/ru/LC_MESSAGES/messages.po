@@ -386,6 +386,9 @@ msgstr "язык перевода"
 msgid "metafield_date_trans"
 msgstr "дата перевода"
 
+msgid "metafield_sent_analyses"
+msgstr "Разбор предложения"
+
 
 # Names of the metadata values you have in the corpus:
 
@@ -445,6 +448,15 @@ msgstr "Ж"
 
 msgid "metavalue_experiment"
 msgstr "эксперимент"
+
+msgid "metavalue_unique"
+msgstr "однозначно"
+
+msgid "metavalue_complete"
+msgstr "полностью, но с омонимией"
+
+msgid "metavalue_incomplete"
+msgstr "не полностью"
 
 
 # Names of additional word-level annotation fields:

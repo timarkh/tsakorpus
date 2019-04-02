@@ -30,6 +30,8 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``sentence_meta`` -- list with names of the sentence-level metadata fields that should be available in word-level search queries.
 
+* ``sentence_meta_values`` (optional) -- dictionary where keys are names of sentence-level metadata fields and values are lists of their respective values. You should use this dictionary for metadata fields that have short lists of allowed values. Instead of text boxes, such metadata fields will be represented by selectors where all values will be listed in the order specified in the lists.
+
 * ``integer_meta_fields`` -- list with names of the sentence-level metadata fields that have integer values and therefore should be represented by ranges rather than by single text boxes in the query interface.
 
 * ``search_meta`` -- dictionary with the description of what should appear on different tabs of the "Select subcorpus" dialogue:

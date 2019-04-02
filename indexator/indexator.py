@@ -128,8 +128,11 @@ class Indexator:
         Take words list from a sentence, remove all non-searchable
         fields from them and add them to self.words dictionary.
         Add w_id property to each word of the words list.
+        Return the value of the 'sent_analyzed' meta field.
         """
         sIDAdded = set()   # word IDs for which the current settence ID has been counted for it
+        bUniquelyAnalyzed = True
+        bFullyAnalyzed = True
         for w in words:
             if w['wtype'] != 'word':
                 continue
@@ -147,6 +150,8 @@ class Indexator:
                             wClean[field] = wClean[field].lower()
                         self.wfs.add(wClean[field])
             if 'ana' in w:
+                if len(w['ana']) > 1:
+                    bUniquelyAnalyzed = False
                 lemma = self.get_lemma(w)
                 self.lemmata.add(lemma)
                 wClean['ana'] = []
@@ -156,6 +161,9 @@ class Indexator:
                         if anaField in self.goodWordFields or anaField in self.AdditionalWordFields:
                             cleanAna[anaField] = ana[anaField]
                     wClean['ana'].append(cleanAna)
+            if 'ana' not in w or len(w['ana']) <= 0:
+                bFullyAnalyzed = False
+                bUniquelyAnalyzed = False
             wCleanTxt = json.dumps(wClean, ensure_ascii=False, sort_keys=True)
             if wCleanTxt in self.tmpWordIDs[langID]:
                 wID = self.tmpWordIDs[langID][wCleanTxt]
@@ -190,6 +198,11 @@ class Indexator:
                 self.wordDocFreqs[langID][(wID, self.dID)] += 1
             except KeyError:
                 self.wordDocFreqs[langID][(wID, self.dID)] = 1
+        if not bFullyAnalyzed:
+            return 'incomplete'
+        if not bUniquelyAnalyzed:
+            return 'complete'
+        return 'unique'
 
     def make_sorting_function(self, lang):
         """
@@ -558,8 +571,11 @@ class Indexator:
                 s['lang'] = langID
             s['n_words'] = 0
             if 'words' in s:
-                self.process_sentence_words(s['words'], langID)
+                sentAnaMeta = self.process_sentence_words(s['words'], langID)
                 s['n_words'] = sum(1 for w in s['words'] if 'wtype' in w and w['wtype'] == 'word')
+                if 'meta' not in s:
+                    s['meta'] = {}
+                s['meta']['sent_analyses'] = sentAnaMeta
             if prevLast:
                 prevLast = False
             elif self.numSents > 0:
@@ -570,7 +586,7 @@ class Indexator:
                 prevLast = True
             s['doc_id'] = self.dID
             if 'meta' in s:
-                for metaField in [mf for mf in s['meta'].keys() if not mf.startswith('year')]:
+                for metaField in [mf for mf in s['meta'].keys() if not (mf.startswith('year') or mf.endswith('_kw'))]:
                     s['meta'][metaField + '_kw'] = s['meta'][metaField]
             # self.es.index(index=self.name + '.sentences',
             #               doc_type='sentence',

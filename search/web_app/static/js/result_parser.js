@@ -450,6 +450,7 @@ function change_tier(e) {
 		allowedFields.push("wf");
 		allowedFields.push("lang");
 		allowedFields.push("sentence_index");
+		allowedFields.push("n_ana");
 	}
 	for (var iField = 0; iField < allowedFields.length; iField++) {
 		allowedFields[iField] += curNum;
