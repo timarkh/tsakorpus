@@ -23,7 +23,7 @@ class TextProcessor:
                                       categories=self.categories,
                                       errorLog=errorLog)
 
-    def process_string(self, s):
+    def process_string(self, s, lang=''):
         """
         Turn a string into a list of JSON sentences.
         Return the list and the statistics (number of words etc.).
@@ -31,7 +31,7 @@ class TextProcessor:
         s = self.cleaner.clean_text(s)
         tokens = self.tokenizer.tokenize(s)
         sentences = self.splitter.split(tokens, s)
-        nTokens, nWords, nAnalyzed = self.parser.analyze(sentences)
+        nTokens, nWords, nAnalyzed = self.parser.analyze(sentences, lang=lang)
         return sentences, nTokens, nWords, nAnalyzed
 
     @staticmethod

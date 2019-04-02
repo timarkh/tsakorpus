@@ -72,6 +72,9 @@ var srcAlignments = {{ data.src_alignment | safe }};
 	{% if data.media %}
 	hide_player();
 	{% endif %}
+	{% if data.images %}
+	hide_img();
+	{% endif %}
 	show_query_panel();
 	searchType = 'none';
 	</script>

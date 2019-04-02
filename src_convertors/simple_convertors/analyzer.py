@@ -14,7 +14,7 @@ class DumbMorphParser:
     rxWordsRNC = re.compile('<w>(<ana.*?/(?:ana)?>)([^<>]+)</w>', flags=re.DOTALL)
     rxAnalysesRNC = re.compile('<ana *([^<>]+)(?:></ana>|/>)\\s*')
     rxAnaFieldRNC = re.compile('([^ <>"=]+) *= *"([^<>"]+)')
-    rxSplitGramTags = re.compile('[, /=]')
+    rxSplitGramTags = re.compile('[,， /=]')
     rxHyphenParts = re.compile('[^\\-]+|-+')
     rxGlossParts = re.compile('[^ \\-=<>]+')
     rxGlossIndexPart = re.compile('^(.*)\\{(.*?)\\}')

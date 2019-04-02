@@ -97,44 +97,76 @@ class ImgCsv2JSON(Txt2JSON):
         if 'language' not in fields:
             self.log_message('No language, assuming ' + self.corpusSettings['languages'][0] + '.')
             fields['language'] = self.corpusSettings['languages'][0]
-        elif fields['language'] not in self.corpusSettings['languages']:
+        elif fields['language'].lower() not in self.corpusSettings['languages']:
             self.log_message('Wrong language: ' + fields['language'])
             return
-        langCode = self.corpusSettings['languages'].index(fields['language'])
+        langCode = self.corpusSettings['languages'].index(fields['language'].lower())
         fields['text'] = fields['text'].replace('\\n', '\n')
+        if 'text_trans' in fields:
+            fields['text_trans'] = fields['text_trans'].replace('\\n', '\n')
         if self.rxSpaces.search(fields['text']) is not None:
             return
         sentMeta = copy.deepcopy(fields)
         del sentMeta['text']
         del sentMeta['language']
+        if 'text_trans' in sentMeta:
+            del sentMeta['text_trans']
         if 'img' in sentMeta and not sentMeta['img'].lower().endswith(('.jpg', '.png', '.gif')):
             sentMeta['img'] += '.jpg'
         # for seJson in self.process_text(fields['text'], fields['language']):
-        sentences, nTokens, nWords, nAnalyze = self.tp.process_string('‣ ' + fields['text'] + '\n')
+        sentences, nTokens, nWords, nAnalyze = self.tp.process_string('‣ ' + fields['text'] + '\n',
+                                                                      lang=fields['language'].lower())
+        sentencesTrans = []
+        if 'text_trans' in fields:
+            sentencesTrans, nTokensTrans, nWordsTrans, nAnalyzeTrans = self.tp.process_string('‣ ' + fields['text_trans'] + '\n',
+                                                                                              lang='english')
         for iSe in range(len(sentences)):
+            self.pID += 1
             seJson = sentences[iSe]
+            if iSe < len(sentencesTrans):
+                seTransJson = sentencesTrans[iSe]
+            else:
+                seTransJson = {'text': '–',
+                               'words': [{'wf': '–',
+                                          'wtype': 'punct',
+                                          'off_start': 0,
+                                          'off_end': 1}]}
             if seJson is None or ('words' in seJson and len(seJson['words']) <= 0):
                 continue
             if iSe == len(sentences) - 1 or all(sentences[iNextSe] is None
                                                 or 'words' in sentences[iNextSe] and len(sentences[iNextSe]['words']) <= 0
                                                 for iNextSe in range(iSe + 1, len(sentences))):
                 seJson['text'] += '\n'
+                seTransJson['text'] += '\n'
             seJson['lang'] = langCode
             seJson['meta'] = sentMeta
+            seJson['para_alignment'] = [{'off_start': 0, 'off_end': len(seJson['text']), 'para_id': self.pID}]
+
+            seTransJson['lang'] = self.corpusSettings['languages'].index('english_trans')
+            seTransJson['meta'] = sentMeta
+            seTransJson['para_alignment'] = [{'off_start': 0, 'off_end': len(seTransJson['text']), 'para_id': self.pID}]
             yield seJson
+            yield seTransJson
 
     def convert_file(self, fnameSrc, fnameTarget):
+        transLangID = self.corpusSettings['languages'].index('english_trans')
         nTokens, nWords, nAnalyze = 0, 0, 0
         textJSON = {'meta': {}, 'sentences': []}
         fSrc = open(fnameSrc, 'r', encoding='utf-8-sig')
         sentences = [s for line in fSrc
                      for s in self.process_line(line) if len(line) > 3]
-        sentences.sort(key=lambda s: s['meta']['img'])
+        sentences.sort(key=lambda s: (s['meta']['img'], s['lang'] == transLangID))
         prevImg = ''
         for s in sentences:
             curImg = s['meta']['img']
             if curImg != prevImg:
                 if len(prevImg) > 0:
+                    if len(textJSON['sentences']) > 0:
+                        textJSON['sentences'][-1]['last'] = True
+                    for i in range(len(textJSON['sentences']) - 1):
+                        if textJSON['sentences'][i]['lang'] != textJSON['sentences'][i + 1]['lang']:
+                            if textJSON['sentences'][i + 1]['lang'] == transLangID:
+                                textJSON['sentences'][i]['last'] = True
                     self.write_output(re.sub('\\.(json|json\\.gz)$',
                                              '_' + self.rxStripExt.sub('', prevImg) + '.\\1', fnameTarget), textJSON)
                 curMeta = self.get_meta(curImg)

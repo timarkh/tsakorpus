@@ -33,6 +33,9 @@
 {% if data.media %}
 <script type='text/javascript'>hide_player();</script>
 {% endif %}
+{% if data.images %}
+<script type='text/javascript'>hide_img();</script>
+{% endif %}
 {% if data.n_occurrences > 0 %}
 <script type='text/javascript'>
 	searchType = 'words';

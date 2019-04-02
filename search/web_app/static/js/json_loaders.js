@@ -192,6 +192,7 @@ function continue_progress_bar() {
 				$('#progress_bar_seconds').html(max_request_time - secElapsed);
 				if (secElapsed == 2) {
 					hide_player();
+					hide_img();
 					hide_query_panel();
 					$('.progress').css('visibility', 'visible');
 				}

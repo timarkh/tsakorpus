@@ -1184,6 +1184,10 @@ def search_sent(page=-1):
     hitsProcessed['page'] = get_session_data('page')
     hitsProcessed['page_size'] = get_session_data('page_size')
     hitsProcessed['media'] = settings['media']
+    if 'images' in settings:
+        hitsProcessed['images'] = settings['images']
+    else:
+        hitsProcessed['images'] = False
     hitsProcessed['subcorpus_enabled'] = False
     if 'subcorpus_enabled' in hits:
         hitsProcessed['subcorpus_enabled'] = True
@@ -1447,6 +1451,10 @@ def search_word(searchType='word'):
                                                             pageSize=get_session_data('page_size'))
 
     hitsProcessed['media'] = settings['media']
+    if 'images' in settings:
+        hitsProcessed['images'] = settings['images']
+    else:
+        hitsProcessed['images'] = False
     set_session_data('progress', 100)
     otherWordTableFields = []
     if 'word_table_fields' in settings and searchType == 'word':
@@ -1501,6 +1509,10 @@ def search_doc():
                                                exclude=get_session_data('excluded_doc_ids'),
                                                corpusSize=corpus_size)
     hitsProcessed['media'] = settings['media']
+    if 'images' in settings:
+        hitsProcessed['images'] = settings['images']
+    else:
+        hitsProcessed['images'] = False
     return render_template('result_docs.html', data=hitsProcessed)
 
 
