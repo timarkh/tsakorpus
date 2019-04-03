@@ -25,6 +25,7 @@ class DumbMorphParser:
         self.rxAllGlosses = self.prepare_gloss_regex()
         self.analyses = {}
         self.errorLog = errorLog
+        self.grammRules = []
         if 'multivalued_ana_features' in self.settings:
             self.settings['multivalued_ana_features'] = set(self.settings['multivalued_ana_features'])
         else:
@@ -43,6 +44,60 @@ class DumbMorphParser:
                     self.load_analyses(os.path.join(self.settings['corpus_dir'],
                                                     self.settings['parsed_wordlist_filename'][language]),
                                        language)
+        self.load_rules()
+
+    def load_rules(self):
+        """
+        Load rules for converting the glosses into bags of grammatical
+        tags.
+        """
+        self.load_gramm_rules(os.path.join(self.settings['corpus_dir'], 'conf/gramRules.txt'))
+
+    @staticmethod
+    def prepare_rule(rule):
+        """
+        Make a compiled regex out of a rule represented as a string.
+        """
+
+        def replReg(s):
+            if "'" in s:
+                return ''
+            return ' re.search(\'' + s + \
+                   '\', ana[\'parts\']) is not None or ' + \
+                   're.search(\'' + s + \
+                   '\', ana[\'gloss\']) is not None '
+
+        ruleParts = rule.split('"')
+        rule = ''
+        for i in range(len(ruleParts)):
+            if i % 2 == 0:
+                rule += re.sub('([^\\[\\]~|& \t\']+)', ' \'\\1\' in tagsAndGlosses ',
+                               ruleParts[i]).replace('|', ' or ').replace('&', ' and ') \
+                    .replace('~', ' not ').replace('[', '(').replace(']', ')')
+            else:
+                rule += replReg(ruleParts[i])
+        return rule
+
+    def load_gramm_rules(self, fname):
+        """
+        Load main set of rules for converting the glosses into bags
+        of grammatical tags.
+        """
+        if len(fname) <= 0 or not os.path.isfile(fname):
+            return
+        rules = []
+        f = open(fname, 'r', encoding='utf-8-sig')
+        for line in f:
+            line = re.sub('#.*', '', line).strip()
+            if len(line) > 0:
+                rule = [i.strip() for i in line.split('->')]
+                if len(rule) != 2:
+                    continue
+                rule[1] = set(rule[1].split(','))
+                rule[0] = self.prepare_rule(rule[0])
+                rules.append(rule)
+        f.close()
+        self.grammRules = rules
 
     def log_message(self, message):
         """
@@ -121,25 +176,51 @@ class DumbMorphParser:
                 regexes[lang] = re.compile(sRegex, flags=re.I)
         return regexes
 
-    def gloss2gr(self, ana, lang):
+    def gloss2gr(self, ana, lang, useGlossList=False):
         """
         For an analysis that has glosses, but no tags for inflectional
         categories, add these categories.
+        If useGlossList, use the list of glosses to distinguish between
+        glosses and stem translations. In the opposite case, consider
+        everyjting other than "STEM" a gloss.
         """
         # TODO: Add rules for translating the glosses into tags.
         if 'gloss_index' not in ana:
             return
-        glosses = self.rxAllGlosses[lang].findall(ana['gloss_index'])
-        for gloss in glosses:
-            if gloss.lower() in self.categories[lang]:
-                field = 'gr.' + self.categories[lang][gloss.lower()]
-                if field not in ana:
-                    ana[field] = gloss.lower()
+        if useGlossList:
+            glosses = self.rxAllGlosses[lang].findall(ana['gloss_index'])
+        else:
+            glosses = [self.rxGlossIndexPart.search(g).group(1)
+                       for g in self.rxGlossParts.findall(ana['gloss_index'])]
+        addedGrammTags = set()
+        tagsAndGlosses = set()
+        for field in ana:
+            if field.startswith('gr.'):
+                if type(ana[field]) == str:
+                    tagsAndGlosses.add(ana[field])
+                elif type(ana[field]) == list:
+                    tagsAndGlosses |= set(ana[field])
+        tagsAndGlosses |= set(gl.strip('-=:.<>') for gl in glosses)
+        if len(self.grammRules) > 0:
+            for rule in self.grammRules:
+                if eval(rule[0]):
+                    addedGrammTags |= rule[1]
+        else:
+            for gl in glosses:
+                if gl.upper() == gl:
+                    gl = gl.lower()
+                addedGrammTags.add(gl)
+        # print(list(addedGrammTags), list(tagsAndGlosses))
+        for tag in addedGrammTags:
+            if tag in self.categories[lang]:
+                anaCatName = 'gr.' + self.categories[lang][tag]
+                if anaCatName not in ana:
+                    ana[anaCatName] = tag
                 else:
-                    if type(ana[field]) == str:
-                        ana[field] = [ana[field]]
-                    if gloss.lower() not in ana[field]:
-                        ana[field].append(gloss.lower())
+                    if type(ana[anaCatName]) == str:
+                        ana[anaCatName] = [ana[anaCatName], tag]
+                    elif tag not in ana[field]:
+                        ana[anaCatName].append(tag)
 
     def find_stems(self, glossIndex, lang):
         """

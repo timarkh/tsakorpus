@@ -69,7 +69,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 speakerMeta = json.loads(f.read())
                 f.close()
             except FileNotFoundError:
-                print('The speaker metadata file not found.')
+                self.log_message('The speaker metadata file not found.')
         else:
             for speaker in srcTree.xpath('/tei:TEI/tei:teiHeader/tei:profileDesc/tei:particDesc/tei:person',
                                          namespaces=self.namespaces):
@@ -143,71 +143,103 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             for wSpan in tier:
                 if 'from' not in wSpan.attrib or 'to' not in wSpan.attrib:
                     continue
+                spanIDs = [wSpan.attrib['from']]
+                wSpanTexts = [wSpan.text]
                 if wSpan.attrib['from'] != wSpan.attrib['to']:
                     # continue
-                    if wSpan.attrib['from'].startswith('w'):
+                    if wSpan.attrib['from'].startswith('w') and wSpan.attrib['to'].startswith('w'):
+                        # Some tiers, such as information structure, allow spans that include
+                        # multiple words. In this case, assign the value to each of the words
+                        # in the span in case of annotation tiers. However, if the tier is
+                        # SpeakerContribution_Event, try to split it into words so that each
+                        # word gets a corresponding part of the value.
+                        if tierID == 'SpeakerContribution_Event' and wSpan.text is not None:
+                            wSpanParts = re.findall('[^ ]+ *', wSpan.text)
+                            wSpanTexts = []
+                        iSpanPart = 0
+                        spanIDs = []
+                        for wID in range(int(wSpan.attrib['from'][1:]), int(wSpan.attrib['to'][1:]) + 1):
+                            spanIDs.append('w' + str(wID))
+                            if tierID == 'SpeakerContribution_Event' and wSpan.text is not None:
+                                if iSpanPart < len(wSpanParts):
+                                    wSpanTexts.append(wSpanParts[iSpanPart])
+                                else:
+                                    wSpanTexts.append('')
+                                iSpanPart += 1
+                            else:
+                                wSpanTexts.append(wSpan.text)
                         if wSpan.text is not None:
-                            print('Warning: span[from] = ' + wSpan.attrib['from']
-                                  + ', span[to] = ' + wSpan.attrib['to']
-                                  + ', text = "' + wSpan.text + '".')
+                            self.log_message('Warning: span[from] = ' + wSpan.attrib['from']
+                                             + ', span[to] = ' + wSpan.attrib['to']
+                                             + ', text = "' + wSpan.text + '".')
                         else:
-                            print('Warning: span[from] = ' + wSpan.attrib['from']
-                                  + ', span[to] = ' + wSpan.attrib['to']
-                                  + ', text is empty.')
+                            self.log_message('Warning: span[from] = ' + wSpan.attrib['from']
+                                             + ', span[to] = ' + wSpan.attrib['to']
+                                             + ', text is empty.')
                     else:
                         continue
-                spanID = wSpan.attrib['from']
-                if spanID.startswith('seg'):
-                    continue
-                elif spanID.startswith('w'):
-                    wordID = spanID
-                elif spanID.startswith('inc'):
-                    wordID = spanID
-                elif spanID.startswith('m'):
-                    wordID = self.morph2wordID[spanID][0]
-                else:
-                    continue
-                if wordID != prevWordID:
-                    prevWordID = wordID
-                    curWordNMorphs = 0
-                if wordID not in wordAnno:
-                    wordAnno[wordID] = {}
-                if self.pfx_xml + 'id' in wSpan.attrib:
-                    self.morph2wordID[wSpan.attrib[self.pfx_xml + 'id']] = (wordID, curWordNMorphs)
-                    curWordNMorphs += 1
-                    if wSpan.text is not None:
-                        wordAnno[wordID][tierID] = wSpan.text
+                for spanID in spanIDs:
+                    wSpanText = wSpanTexts.pop(0)
+                    if spanID.startswith('seg'):
+                        continue
+                    elif spanID.startswith('w'):
+                        wordID = spanID
+                    elif spanID.startswith('inc'):
+                        wordID = spanID
+                    elif spanID.startswith('m'):
+                        wordID = self.morph2wordID[spanID][0]
                     else:
-                        wordAnno[wordID][tierID] = ''
-                elif tierID not in ['mb', 'mp', 'ge', 'gr']:
-                    # Word-based annotations: one flat span for each word
-                    if tierID not in wordAnno[wordID]:
-                        wordAnno[wordID][tierID] = ''
-                    if len(wordAnno[wordID][tierID]) > 0:
-                        wordAnno[wordID][tierID] += '-'
-                    if wSpan.text is not None:
-                        wordAnno[wordID][tierID] += wSpan.text
-                else:
-                    # Multiple morphemes inside one span in e.g. the mb tier
-                    wordAnno[wordID][tierID] = ''
-                    for mSpan in wSpan:
-                        if self.pfx_xml + 'id' in mSpan.attrib:
-                            mID = mSpan.attrib[self.pfx_xml + 'id']
-                        elif ('from' in mSpan.attrib and 'to' in mSpan.attrib
-                              and mSpan.attrib['from'] == mSpan.attrib['to']):
-                            mID = mSpan.attrib['from']
-                        else:
-                            continue
-                        self.morph2wordID[mID] = (wordID, curWordNMorphs)
+                        continue
+                    if wordID != prevWordID:
+                        prevWordID = wordID
+                        curWordNMorphs = 0
+                    if wordID not in wordAnno:
+                        wordAnno[wordID] = {}
+                    if self.pfx_xml + 'id' in wSpan.attrib:
+                        self.morph2wordID[wSpan.attrib[self.pfx_xml + 'id']] = (wordID, curWordNMorphs)
                         curWordNMorphs += 1
+                        if wSpanText is not None:
+                            wordAnno[wordID][tierID] = wSpanText
+                        else:
+                            wordAnno[wordID][tierID] = ''
+                    elif tierID not in ['mb', 'mp', 'ge', 'gr']:
+                        # Word-based annotations: one flat span for each word
                         if tierID not in wordAnno[wordID]:
                             wordAnno[wordID][tierID] = ''
                         if len(wordAnno[wordID][tierID]) > 0:
                             wordAnno[wordID][tierID] += '-'
-                        if mSpan.text is not None:
-                            wordAnno[wordID][tierID] += mSpan.text
-                        else:
-                            wordAnno[wordID][tierID] += '∅'
+                        if wSpanText is not None:
+                            wordAnno[wordID][tierID] += wSpanText
+                    else:
+                        # Multiple morphemes inside one span in e.g. the mb tier
+                        wordAnno[wordID][tierID] = ''
+                        for mSpan in wSpan:
+                            if self.pfx_xml + 'id' in mSpan.attrib:
+                                mID = mSpan.attrib[self.pfx_xml + 'id']
+                            elif ('from' in mSpan.attrib and 'to' in mSpan.attrib
+                                  and mSpan.attrib['from'] == mSpan.attrib['to']):
+                                mID = mSpan.attrib['from']
+                            else:
+                                # continue
+                                mID = wordID + '_covert'    # categories not expressed overtly
+                                if 'mb' not in wordAnno[wordID]:
+                                    wordAnno[wordID]['mb'] = '∅'
+                                elif mID not in self.morph2wordID:
+                                    wordAnno[wordID]['mb'] += '-∅'
+                                if 'mp' not in wordAnno[wordID]:
+                                    wordAnno[wordID]['mp'] = '∅'
+                                elif mID not in self.morph2wordID:
+                                    wordAnno[wordID]['mp'] += '-∅'
+                            self.morph2wordID[mID] = (wordID, curWordNMorphs)
+                            curWordNMorphs += 1
+                            if tierID not in wordAnno[wordID]:
+                                wordAnno[wordID][tierID] = ''
+                            if len(wordAnno[wordID][tierID]) > 0:
+                                wordAnno[wordID][tierID] += '-'
+                            if mSpan.text is not None:
+                                wordAnno[wordID][tierID] += mSpan.text
+                            else:
+                                wordAnno[wordID][tierID] += '∅'
         return wordAnno
 
     def add_ana_fields(self, ana, curWordAnno):
@@ -347,13 +379,13 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 wordList.append(word)
                 self.wordsByID[wordNode.attrib[self.pfx_xml + 'id']] = word
             elif wordNode.tag == self.pfx_tei + 'pc':
-                word = {'wf': wordNode.text.strip(), 'wtype': 'punc'}
+                word = {'wf': wordNode.text.strip(), 'wtype': 'punct'}
                 wordList.append(word)
                 self.wordsByID[wordNode.attrib[self.pfx_xml + 'id']] = word
             elif wordNode.tag == self.pfx_tei + 'incident':
                 # Treat "incidents" as punctuation
                 # continue
-                word = {'wf': '((' + wordNode[0].text.strip() + '))', 'wtype': 'punc', 'incident': True}
+                word = {'wf': '((' + wordNode[0].text.strip() + '))', 'wtype': 'punct', 'incident': True}
                 wordList.append(word)
                 self.wordsByID[wordNode.attrib[self.pfx_xml + 'id']] = word
             prevTag = wordNode.tag
@@ -376,11 +408,23 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                    and sent['text'][iSentPos].lower() != wf[iWordPos].lower()):
                 iSentPos += 1
             if iSentPos == len(sent['text']):
-                word['off_start'] = len(sent['text']) - 1
-                word['off_end'] = len(sent['text']) - 1
-                print('Unexpected end of sentence, terminating now. Details:\nSentence (ts):', sent['text'],
-                      '\nWords (SpeakerContribution_Event):', '+'.join(w['wf'] for w in sent['words']))
-                return
+                if iWord == 0 and word['wtype'] == 'punct':
+                    # Try repairing it by inserting that punctuation to the sentence text
+                    sent['text'] = wf + sent['text']
+                    iSentPos = 0
+                    print('Unexpected end of sentence, attempting to repair sentence text. '
+                          'Details:\nSentence (SpeakerContribution_Event):', sent['text'],
+                          '\nWords (annotationBlock/u/seg):',
+                          '+'.join(w['wf'] for w in sent['words']))
+                else:
+                    for iWordRest in range(iWord, len(sent['words'])):
+                        sent['words'][iWordRest]['off_start'] = len(sent['text']) - 1
+                        sent['words'][iWordRest]['off_end'] = len(sent['text']) - 1
+                    word['off_end'] = len(sent['text']) - 1
+                    print('Unexpected end of sentence, terminating alignment now. '
+                          'Details:\nSentence (SpeakerContribution_Event):', sent['text'],
+                          '\nWords (annotationBlock/u/seg):', '+'.join(w['wf'] for w in sent['words']))
+                    return
             word['off_start'] = iSentPos
             word['off_end'] = iSentPos + len(wf)
             while iSentPos < len(sent['text']) and iWordPos < len(wf):
@@ -426,7 +470,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                     if spanText is None:
                         spanText = ''
                     seg2text[(self.seg2pID[span.attrib['from']],
-                              self.seg2pID[span.attrib['to']])] = spanText.strip()
+                              self.seg2pID[span.attrib['from']])] = spanText.strip()
         for s in curSentences:
             if 'para_alignment' not in s or len(s['para_alignment']) <= 0:
                 continue
@@ -472,7 +516,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             if 'who' in anno.attrib and anno.attrib['who'][1:] in self.participants:
                 sentMeta = self.participants[anno.attrib['who'][1:]]
             prevAnchor = anno.attrib['start']
-            endAnchor = anno.attrib['end']
+            curAnchor = endAnchor = anno.attrib['end']
             curSent = None
             for u in anno.xpath('tei:u', namespaces=self.namespaces):
                 for seg_anchor in u:
@@ -518,7 +562,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 self.add_full_text(anno, paraSentences[tierName], tierName)
             for sent in curSentences:
                 if len(sent['text']) <= 0:
-                    print('Zero length sentence:', sent)
+                    self.log_message('Zero length sentence: ' + json.dumps(sent, ensure_ascii=False, indent=None))
                     continue
                 self.align_words_and_baseline(sent)
                 yield sent
@@ -526,7 +570,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 for paraSent in paraSentences[tierName]:
                     if len(paraSent['text']) <= 0:
                         paraSent['words'] = [{'wf': '—',
-                                              'wtype': 'punc',
+                                              'wtype': 'punct',
                                               'off_start': 0,
                                               'off_end': 1}]
                         paraSent['text'] = '—'
@@ -552,13 +596,14 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         textJSON = {'meta': curMeta, 'sentences': []}
         nTokens, nWords, nAnalyze = 0, 0, 0
         self.seg2pID = {}
+        self.morph2wordID = {}
         srcTree = etree.parse(fnameSrc)
         self.tlis = self.get_tlis(srcTree)
         self.participants = self.load_speaker_meta(srcTree)
         srcFileNode = srcTree.xpath('/tei:TEI/tei:teiHeader/tei:fileDesc/tei:sourceDesc/tei:recordingStmt/tei:recording/tei:media',
                                     namespaces=self.namespaces)
-        if len(srcFileNode) > 0 and self.pfx_tei + 'url' in srcFileNode[0].attrib:
-            srcFile = self.rxStripDir.sub('', srcFileNode[0].attrib[self.pfx_tei + 'url'])
+        if len(srcFileNode) > 0 and 'url' in srcFileNode[0].attrib:
+            srcFile = self.rxStripDir.sub('', srcFileNode[0].attrib['url'])
         else:
             srcFile = ''
         textJSON['sentences'] = [s for s in self.get_sentences(srcTree, srcFile)]
@@ -571,7 +616,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         self.write_output(fnameTarget, textJSON)
         return nTokens, nWords, nAnalyze
 
-    def process_corpus(self):
+    def process_corpus(self, cutMedia=True):
         """
         Take every Exmaralda file from the source directory subtree, turn it
         into a parsed json and store it in the target directory.
@@ -580,6 +625,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         This is the main function of the class.
         """
         Txt2JSON.process_corpus(self)
+        if not cutMedia:
+            return
         for path, dirs, files in os.walk(os.path.join(self.corpusSettings['corpus_dir'],
                                                       self.srcExt)):
             for fname in files:
@@ -592,5 +639,5 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
 
 if __name__ == '__main__':
     x2j = ISO_TEI_Hamburg2JSON()
-    x2j.process_corpus()
+    x2j.process_corpus(cutMedia=True)
 
