@@ -14,7 +14,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
     carried out in Hamburg and then translated into a certain ISO TEI subset.
     """
 
-    rxBracketGloss = re.compile('\\.?\\[.*?\\]')
+    rxBracketGloss = re.compile('[.-]?\\[.*?\\]')
     rxWordPunc = re.compile('^( *)([^\\w]*)(.*?)([^\\w]*?)( *)$')
     rxLetters = re.compile('\w+')
     rxFloat = re.compile('^[0-9]+(?:\.[0-9]+)?$')
@@ -214,6 +214,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                         # Multiple morphemes inside one span in e.g. the mb tier
                         wordAnno[wordID][tierID] = ''
                         for mSpan in wSpan:
+                            mText = mSpan.text
                             if self.pfx_xml + 'id' in mSpan.attrib:
                                 mID = mSpan.attrib[self.pfx_xml + 'id']
                             elif ('from' in mSpan.attrib and 'to' in mSpan.attrib
@@ -222,22 +223,23 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                             else:
                                 # continue
                                 mID = wordID + '_covert'    # categories not expressed overtly
-                                if 'mb' not in wordAnno[wordID]:
-                                    wordAnno[wordID]['mb'] = '∅'
-                                elif mID not in self.morph2wordID:
-                                    wordAnno[wordID]['mb'] += '-∅'
-                                if 'mp' not in wordAnno[wordID]:
-                                    wordAnno[wordID]['mp'] = '∅'
-                                elif mID not in self.morph2wordID:
-                                    wordAnno[wordID]['mp'] += '-∅'
+                                mText = '[' + mText + ']'
+                                # if 'mb' not in wordAnno[wordID]:
+                                #     wordAnno[wordID]['mb'] = '∅'
+                                # elif mID not in self.morph2wordID:
+                                #     wordAnno[wordID]['mb'] += '-∅'
+                                # if 'mp' not in wordAnno[wordID]:
+                                #     wordAnno[wordID]['mp'] = '∅'
+                                # elif mID not in self.morph2wordID:
+                                #     wordAnno[wordID]['mp'] += '-∅'
                             self.morph2wordID[mID] = (wordID, curWordNMorphs)
                             curWordNMorphs += 1
                             if tierID not in wordAnno[wordID]:
                                 wordAnno[wordID][tierID] = ''
                             if len(wordAnno[wordID][tierID]) > 0:
                                 wordAnno[wordID][tierID] += '-'
-                            if mSpan.text is not None:
-                                wordAnno[wordID][tierID] += mSpan.text
+                            if mText is not None:
+                                wordAnno[wordID][tierID] += mText
                             else:
                                 wordAnno[wordID][tierID] += '∅'
         return wordAnno
@@ -271,6 +273,9 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             if 'ge' in curWordAnno:
                 ana['gloss'] = curWordAnno['ge']
                 self.glosses |= set(g for g in ana['gloss'].split('-') if g.upper() == g)
+            if 'gr' in curWordAnno:
+                ana['gloss_ru'] = curWordAnno['gr']
+                self.tp.parser.process_gloss_in_ana(ana, 'ru')
             if 'ps' in curWordAnno:
                 self.add_pos_ana(ana, curWordAnno['ps'])
             self.tp.parser.process_gloss_in_ana(ana)
@@ -282,6 +287,16 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 self.add_ana_fields(ana, curWordAnno)
                 self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0])
                 ana['gloss_index'] = self.rxBracketGloss.sub('', newIndexGloss)
+            if 'gloss_index_ru' in ana:
+                stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index_ru'],
+                                                                 self.corpusSettings['languages'][0])
+                ana['trans_ru'] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
+                del ana['gloss_index_ru']
+                del ana['gloss_ru']
+                if 'glosses_covert_ru' in ana:
+                    del ana['glosses_covert_ru']
+            if 'gloss' in ana:
+                ana['gloss'] = self.rxBracketGloss.sub('', ana['gloss'])
             self.wordsByID[wordID]['ana'] = [ana]
             self.wordsByID[wordID]['word_source'] = ''
             if 'SpeakerContribution_Event' in curWordAnno:
@@ -515,8 +530,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 continue
             if 'who' in anno.attrib and anno.attrib['who'][1:] in self.participants:
                 sentMeta = self.participants[anno.attrib['who'][1:]]
-            prevAnchor = anno.attrib['start']
-            curAnchor = endAnchor = anno.attrib['end']
+            curAnchor = prevAnchor = anno.attrib['start']
+            endAnchor = anno.attrib['end']
             curSent = None
             for u in anno.xpath('tei:u', namespaces=self.namespaces):
                 for seg_anchor in u:
@@ -639,5 +654,5 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
 
 if __name__ == '__main__':
     x2j = ISO_TEI_Hamburg2JSON()
-    x2j.process_corpus(cutMedia=True)
+    x2j.process_corpus(cutMedia=False)
 
