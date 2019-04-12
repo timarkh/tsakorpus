@@ -567,12 +567,15 @@ class SentenceViewer:
         If there is a metadata dictionary in the sentence, transform it
         to an HTML span or a text for CSV.
         """
-        if 'meta' not in sSource or len(sSource['meta']) <= 0:
+        if 'meta' not in sSource:
             return ''
+        meta2show = {k: sSource['meta'][k] for k in sSource['meta'] if k not in ['sent_analyses']}
+        if len(meta2show) <= 0:
+            return
         metaSpan = '<span class="sentence_meta">'
         if format == 'csv':
             metaSpan = '['
-        for k, v in sSource['meta'].items():
+        for k, v in meta2show.items():
             if k.endswith('_kw'):
                 continue
             if format == 'csv':

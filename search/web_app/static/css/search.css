@@ -1119,3 +1119,17 @@ svg circle {
 	outline: none;
 	background: transparent;
 }
+
+/* Predefined styles for certain tiers 
+(add styles for your languages/tiers if
+different languages should be displayed
+in different styles) */
+
+.sent_lang_ref {
+	font-size: 70%;
+	color: #777777;
+}
+
+.sent_lang_english_note {
+	color: #444444;
+}

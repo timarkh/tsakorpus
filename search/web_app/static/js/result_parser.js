@@ -284,7 +284,7 @@ function assign_src_alignment() {
 
 function show_sentence_img(e) {
 	var e_obj = $(e.currentTarget);
-	while (e_obj.attr('class') != 'sent_lang') {
+	while (e_obj.hasClass('sent_lang')) {
 		e_obj = e_obj.parent();
 	}
 	var imgSrc = $(e_obj).attr('data-img');

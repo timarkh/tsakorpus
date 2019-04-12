@@ -214,6 +214,9 @@ msgstr "обычный"
 msgid "inputmethod_strict"
 msgstr "точный"
 
+msgid "inputmethod_simplified"
+msgstr "упрощённый"
+
 
 
 # Names of the metadata fields you have in the corpus:

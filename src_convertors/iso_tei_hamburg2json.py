@@ -37,6 +37,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         self.morph2wordID = {}   # morph ID -> (word ID, position in the word)
         self.pID = 0         # id of last aligned segment
         self.seg2pID = {}    # ids of <seg> tags -> parallel IDs of corresponding sentences
+        self.wordIDseq = []  # sequence of word/punctuation/incident IDs
+                             # (needed to understand ranges such as "w13 to inc2")
         self.glosses = set()
         self.posRules = {}
         self.load_pos_rules(os.path.join(self.corpusSettings['corpus_dir'], 'conf/posRules.txt'))
@@ -73,14 +75,14 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         else:
             for speaker in srcTree.xpath('/tei:TEI/tei:teiHeader/tei:profileDesc/tei:particDesc/tei:person',
                                          namespaces=self.namespaces):
-                if 'id' not in speaker.attrib:
+                if self.pfx_xml + 'id' not in speaker.attrib:
                     continue
-                speakerID = speaker.attrib['id']
+                speakerID = speaker.attrib[self.pfx_xml + 'id']
                 if 'n' in speaker.attrib:
                     speakerCode = speaker.attrib['n']
                 else:
                     speakerCode = speakerID
-                speakerMeta[speakerID] = {'speakerCode': speakerCode}
+                speakerMeta[speakerID] = {'speaker': speakerCode}
                 if 'sex' in speaker.attrib:
                     if speaker.attrib['sex'] in ['1', 'M']:
                         speakerMeta[speakerID]['gender'] = 'M'
@@ -111,6 +113,15 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             tlis[tli.attrib[self.pfx_xml + 'id']] = {'n': iTli, 'time': timeValue}
             iTli += 1
         return tlis
+
+    def id_range2list(self, idFrom, idTo):
+        """
+        Turn a range of word/punctuation/incident (such as "w13 to inc2") IDs into a list
+        of consecutive IDs.
+        """
+        if idFrom not in self.wordIDseq or idTo not in self.wordIDseq:
+            return []
+        return self.wordIDseq[self.wordIDseq.index(idFrom):self.wordIDseq.index(idTo) + 1]
 
     def add_pos_ana(self, ana, pos):
         """
@@ -147,7 +158,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 wSpanTexts = [wSpan.text]
                 if wSpan.attrib['from'] != wSpan.attrib['to']:
                     # continue
-                    if wSpan.attrib['from'].startswith('w') and wSpan.attrib['to'].startswith('w'):
+                    if (wSpan.attrib['from'].startswith(('w', 'pc', 'inc'))
+                            and wSpan.attrib['to'].startswith(('w', 'pc', 'inc'))):
                         # Some tiers, such as information structure, allow spans that include
                         # multiple words. In this case, assign the value to each of the words
                         # in the span in case of annotation tiers. However, if the tier is
@@ -157,9 +169,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                             wSpanParts = re.findall('[^ ]+ *', wSpan.text)
                             wSpanTexts = []
                         iSpanPart = 0
-                        spanIDs = []
-                        for wID in range(int(wSpan.attrib['from'][1:]), int(wSpan.attrib['to'][1:]) + 1):
-                            spanIDs.append('w' + str(wID))
+                        spanIDs = self.id_range2list(wSpan.attrib['from'], wSpan.attrib['to'])
+                        for wID in spanIDs:
                             if tierID == 'SpeakerContribution_Event' and wSpan.text is not None:
                                 if iSpanPart < len(wSpanParts):
                                     wSpanTexts.append(wSpanParts[iSpanPart])
@@ -268,11 +279,21 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             curWordAnno = wordAnno[wordID]
             # mp: morph breaks with empty morphemes (corresponds to the mc tier: POS and morph categories)
             # mb: morph breaks without empty morphemes (corresponds to the gr/ge tiers: actual glosses)
-            if 'mb' in curWordAnno:
-                ana['parts'] = curWordAnno['mb']
             if 'ge' in curWordAnno:
                 ana['gloss'] = curWordAnno['ge']
                 self.glosses |= set(g for g in ana['gloss'].split('-') if g.upper() == g)
+            if 'mp' in curWordAnno:
+                # mp contains normalized versions of morphemes. If this tier exists,
+                # take normalized stem from it and make it a lemma. Then forget mp
+                # and write glosses based on the mb tier, if it exists.
+                ana['parts'] = curWordAnno['mp']
+                self.tp.parser.process_gloss_in_ana(ana)
+                if 'gloss_index' in ana:
+                    stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index'],
+                                                                     self.corpusSettings['languages'][0])
+                    ana['lex'] = ' '.join(s[1] for s in stems)
+            if 'mb' in curWordAnno:
+                ana['parts'] = curWordAnno['mb']
             if 'gr' in curWordAnno:
                 ana['gloss_ru'] = curWordAnno['gr']
                 self.tp.parser.process_gloss_in_ana(ana, 'ru')
@@ -282,7 +303,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             if 'gloss_index' in ana:
                 stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index'],
                                                                  self.corpusSettings['languages'][0])
-                ana['lex'] = ' '.join(s[1] for s in stems)
+                if 'lex' not in ana:
+                    ana['lex'] = ' '.join(s[1] for s in stems)
                 ana['trans_en'] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
                 self.add_ana_fields(ana, curWordAnno)
                 self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0])
@@ -380,6 +402,10 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         for wordNode in segment:
             if wordNode in (self.pfx_tei + 'w', self.pfx_tei + 'pc') and self.pfx_xml + 'id' not in wordNode.attrib:
                 continue
+            try:
+                wordID = wordNode.attrib[self.pfx_xml + 'id']
+            except KeyError:
+                continue
             if wordNode.tag == self.pfx_tei + 'w':
                 # if prevTag == self.pfx_tei + 'w' and len(wordList) > 0:
                 #     # If there is no time anchor between two words,
@@ -392,17 +418,19 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 # else:
                 word = {'wf': wordNode.text.strip(), 'wtype': 'word'}
                 wordList.append(word)
-                self.wordsByID[wordNode.attrib[self.pfx_xml + 'id']] = word
+                self.wordsByID[wordID] = word
+                self.wordIDseq.append(wordID)
             elif wordNode.tag == self.pfx_tei + 'pc':
                 word = {'wf': wordNode.text.strip(), 'wtype': 'punct'}
                 wordList.append(word)
-                self.wordsByID[wordNode.attrib[self.pfx_xml + 'id']] = word
+                self.wordsByID[wordID] = word
             elif wordNode.tag == self.pfx_tei + 'incident':
                 # Treat "incidents" as punctuation
                 # continue
                 word = {'wf': '((' + wordNode[0].text.strip() + '))', 'wtype': 'punct', 'incident': True}
                 wordList.append(word)
-                self.wordsByID[wordNode.attrib[self.pfx_xml + 'id']] = word
+                self.wordsByID[wordID] = word
+                self.wordIDseq.append(wordID)
             prevTag = wordNode.tag
         return wordList
 
@@ -452,6 +480,13 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                     continue
                 iSentPos += 1
             word['off_end'] = iSentPos
+        if len(sent['words']) > 0 and sent['words'][0]['off_start'] > 0:
+            # Add the beginning of the sentence as punctuation.
+            leadingPunct = {'wf': sent['text'][:sent['words'][0]['off_start']],
+                            'wtype': 'punct',
+                            'off_start': 0,
+                            'off_end': sent['words'][0]['off_start']}
+            sent['words'].insert(0, leadingPunct)
 
     def add_full_text(self, anno, curSentences, tierName=''):
         """
@@ -490,15 +525,19 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             if 'para_alignment' not in s or len(s['para_alignment']) <= 0:
                 continue
             paraID = (s['para_alignment'][0]['para_id'], s['para_alignment'][0]['para_id'])
-            if paraID in seg2text:
-                s['text'] = seg2text[paraID]
-            else:
+            if 'text' not in s:
                 s['text'] = ''
+            if paraID in seg2text:
+                s['text'] += seg2text[paraID]
+            else:
                 for w in s['words']:
                     if 'word_source' in w:
                         s['text'] += w['word_source']
                         del w['word_source']
-                s['text'] = s['text'].strip()
+                s['text'] = s['text'].strip(' \t')
+            if 'src_alignment' in s:
+                for sa in s['src_alignment']:
+                    sa['off_end_sent'] = len(s['text'])
 
     def add_para_offsets(self, sentences):
         """
@@ -521,6 +560,9 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         if len(annotations) <= 0:
             return
         for anno in annotations:
+            firstSentence = False
+            if len(annotations) > 1:
+                firstSentence = True
             curSentences = []
             paraSentences = {}  # tier name -> parallel sentences (translations, alternative transcriptions, etc.)
             sentMeta = {}
@@ -528,8 +570,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 self.log_message('No start or end attribute in annotationBlock '
                                  + anno.attrib[self.pfx_xml + 'id'])
                 continue
-            if 'who' in anno.attrib and anno.attrib['who'][1:] in self.participants:
-                sentMeta = self.participants[anno.attrib['who'][1:]]
+            if 'who' in anno.attrib and anno.attrib['who'] in self.participants:
+                sentMeta = self.participants[anno.attrib['who']]
             curAnchor = prevAnchor = anno.attrib['start']
             endAnchor = anno.attrib['end']
             curSent = None
@@ -551,6 +593,12 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                                    'text': '',
                                    'lang': 0,
                                    'para_alignment': [{'para_id': self.pID}]}
+                        if firstSentence and 'who' in anno.attrib and anno.attrib['who'] in self.participants:
+                            firstSentence = False
+                            curSent['words'].insert(0, {'wtype': 'punct',
+                                                        'wf': '[' + self.participants[anno.attrib['who']]['speaker'] + ']'})
+                            curSent['words'].insert(0, {'wtype': 'punct', 'wf': '\n'})
+                            curSent['text'] = '\n[' + self.participants[anno.attrib['who']]['speaker'] + '] '
                         if len(sentMeta) > 0:
                             curSent['meta'] = copy.deepcopy(sentMeta)
                 if curSent is not None:
@@ -612,6 +660,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         nTokens, nWords, nAnalyze = 0, 0, 0
         self.seg2pID = {}
         self.morph2wordID = {}
+        self.wordIDseq = []
         srcTree = etree.parse(fnameSrc)
         self.tlis = self.get_tlis(srcTree)
         self.participants = self.load_speaker_meta(srcTree)

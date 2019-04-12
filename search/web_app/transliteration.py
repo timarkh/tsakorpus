@@ -5,6 +5,7 @@ from transliterators.beserman import beserman_translit_cyrillic
 from transliterators.udmurt import udmurt_translit_upa
 from transliterators.erzya import erzya_translit_upa
 from transliterators.albanian import albanian_input_normal
+from transliterators.uralic_simple import uralic_input_simplified
 
 
 def trans_IPA_baseline(text, lang):
@@ -35,4 +36,10 @@ def input_method_normal(field, text, lang):
     elif lang == 'albanian':
         return albanian_input_normal(field, text)
     return text
+
+
+def input_method_simplified(field, text, lang):
+    if lang in ('selkup', 'kamas', 'nganasan'):
+        return uralic_input_simplified(field, text)
+
 

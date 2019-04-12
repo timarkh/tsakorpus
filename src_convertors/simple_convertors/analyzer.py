@@ -263,7 +263,7 @@ class DumbMorphParser:
             gloss_lang = '_' + gloss_lang
         if 'gloss' + gloss_lang not in ana or 'parts' not in ana:
             return
-        wordParts = self.rxGlossParts.findall(ana['parts'].replace('{', '(').replace('{', ')'))
+        wordParts = self.rxGlossParts.findall(ana['parts'].replace('{', '(').replace('{', ')').replace(' ', '.'))
         glosses = self.rxGlossParts.findall(ana['gloss' + gloss_lang])
         glossesOvert = [g for g in glosses if self.rxBracketGloss.search(g) is None]
         glossesCovert = [g.strip('[]') for g in glosses if self.rxBracketGloss.search(g) is not None]

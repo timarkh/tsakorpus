@@ -213,6 +213,9 @@ msgstr "normal"
 msgid "inputmethod_strict"
 msgstr "strict"
 
+msgid "inputmethod_simplified"
+msgstr "simplified"
+
 
 
 # Names of the metadata fields you have in the corpus:
