@@ -16,7 +16,7 @@
 		{% endfor %}
 		</select><br>
 		{% else %}
-		{{ _('metafield_' + field) | capitalize }}: <input type="text" class="search_input" name="sent_meta_{{ field }}1" id="sent_meta_{{ field }}1"><br>
+		{{ _('metafield_' + field) | capitalize }}: <input type="text" class="search_input" name="sent_meta_{{ field }}1" id="sent_meta_{{ field }}1" {% if "sent_meta_" + field in default_values %} value='{{ default_values["sent_meta_" + field] }}' {% endif %}><br>
 		{% endif %}
 	{% endfor %}
 {% endif %}

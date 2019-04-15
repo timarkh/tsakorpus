@@ -1527,6 +1527,7 @@ def get_word_fields():
     sentMeta = None
     intMetaFields = None
     sentMetaValues = None
+    defaultValues = {}
     if 'word_fields' in settings and len(settings['word_fields']) > 0:
         wordFields = settings['word_fields']
     if 'sentence_meta' in settings and len(settings['sentence_meta']) > 0:
@@ -1535,11 +1536,14 @@ def get_word_fields():
         intMetaFields = settings['integer_meta_fields']
     if 'sentence_meta_values' in settings and len(settings['sentence_meta_values']) > 0:
         sentMetaValues = settings['sentence_meta_values']
+    if 'default_values' in settings:
+        defaultValues = settings['default_values']
     result += render_template('common_additional_search_fields.html',
                               word_fields=wordFields,
                               sentence_meta=sentMeta,
                               int_meta_fields=intMetaFields,
                               sentence_meta_values=sentMetaValues,
+                              default_values=defaultValues,
                               ambiguous_analyses=settings['ambiguous_analyses'])
     return result
 

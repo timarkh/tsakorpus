@@ -32,6 +32,8 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``sentence_meta_values`` (optional) -- dictionary where keys are names of sentence-level metadata fields and values are lists of their respective values. You should use this dictionary for metadata fields that have short lists of allowed values. Instead of text boxes, such metadata fields will be represented by selectors where all values will be listed in the order specified in the lists.
 
+* ``default_values`` (optional) -- dictionary where keys are names of textboxes in the word search panel and values are the strings that should appear there by default. Currently, it only works for simple string-valued sentence metadata fields. The textboxes should be called by the IDs they have in the HTML, e.g. ``sent_meta_speaker`` rather than ``speaker`` if ``speaker`` is a sentence-levele metadata field.
+
 * ``integer_meta_fields`` -- list with names of the sentence-level metadata fields that have integer values and therefore should be represented by ranges rather than by single text boxes in the query interface.
 
 * ``search_meta`` -- dictionary with the description of what should appear on different tabs of the "Select subcorpus" dialogue:
