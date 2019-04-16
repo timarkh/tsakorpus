@@ -31,6 +31,16 @@ class Splitter:
         except:
             print('Please check your sentence start regexp.')
             self.rxSentStart = re.compile('[A-ZА-ЯЁ]')
+        # "Transparent punctuation" is punctuation that should not be counted
+        # when calculating distances between words.
+        if 'transparent_punctuation' in self.settings:
+            try:
+                self.rxPuncTransparent = re.compile(self.settings['transparent_punctuation'])
+            except:
+                print('Please check your transparent punctuation regexp.')
+                self.rxPuncTransparent = re.compile('^ *$')
+        else:
+            self.rxPuncTransparent = re.compile('^ *$')
 
     def join_sentences(self, sentenceL, sentenceR):
         """
@@ -111,7 +121,10 @@ class Splitter:
             if words[i]['wtype'] not in ['style_span']:
                 words[i]['next_word'] = i + 1
             if wordsStarted and not (all(words[j]['wtype'] != 'word' for j in range(i, len(words)))):
-                words[i]['sentence_index'] = i - leadingPunct
+                if words[i]['wtype'] == 'word' or self.rxPuncTransparent.search(words[i]['wf']) is None:
+                    words[i]['sentence_index'] = i - leadingPunct
+                else:
+                    leadingPunct += 1
 
     def add_next_word_id(self, sentences):
         """

@@ -158,7 +158,8 @@ class Txt2JSON:
         """
         for rule in self.excludeByMetaRules:
             if all(k in meta and meta[k] == rule[k] for k in rule):
-                print(rule, meta)
+                self.log_message('File excluded by meta: ' + json.dumps(meta, ensure_ascii=False)
+                                 + ' (rule: ' + json.dumps(rule, ensure_ascii=False) + ').')
                 return True
         return False
 

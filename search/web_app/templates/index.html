@@ -105,7 +105,9 @@ var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 								{% endif %}
 							</div>
 							<div class="word_search_r">
+								{% if negative_search_enabled %}
 								<span class="neg_query glyphicon glyphicon-off" aria-label="{{ _('negative_query') }}" aria-hidden="true"><span class="tooltip_prompt">{{ _('negative_query') }}</span></span><br>
+								{% endif %}
 								<span class="word_plus glyphicon glyphicon-plus-sign" aria-label="{{ _('add_word') }}" aria-hidden="true"><span class="tooltip_prompt">{{ _('add_word') }}</span></span><br>
 								<span class="add_minus_stub"></span>
 								<span class="add_distance_stub"></span>

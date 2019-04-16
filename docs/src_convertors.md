@@ -41,6 +41,8 @@ The configuration files are ``corpus.json`` and ``categories.json``. The latter 
 
 * ``gzip`` -- boolean value that determines if the resulting JSON file should be gzipped (which will take slightly more time, but much less disk space).
 
+* ``transparent_punctuation`` (optional) -- regexp that determines which punctuation should be considered "transparent", i.e. should not be counted when calculating distances between words for a multiword query. This parameter influences the assignment of ``sentence_index`` values, which is added to words and punctuation marks at conversion time and then used in multiword queries at search time. By default it equals ``^ *$``.
+
 ### The convertors
 There are several source convertors for different input formats (see ``pipeline.md``). Each of them is a class located in one Python file:
 

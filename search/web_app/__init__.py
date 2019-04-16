@@ -413,6 +413,11 @@ def search_page():
         fulltextSearch = settings['fulltext_search_enabled']
     else:
         fulltextSearch = True
+    if 'negative_search_enabled' in settings:
+        negativeSearchEnabled = settings['negative_search_enabled']
+    else:
+        negativeSearchEnabled = True
+
     return render_template('index.html',
                            locale=get_locale(),
                            corpus_name=corpus_name,
@@ -424,6 +429,7 @@ def search_page():
                            images=images,
                            youtube=mediaYoutube,
                            gloss_search_enabled=settings['gloss_search_enabled'],
+                           negative_search_enabled=negativeSearchEnabled,
                            fulltext_search_enabled=fulltextSearch,
                            debug=settings['debug'],
                            subcorpus_selection=settings['search_meta'],
