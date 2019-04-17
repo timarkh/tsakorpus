@@ -778,10 +778,24 @@ class SentenceViewer:
                 analyses = []
                 if 'ana' in w:
                     analyses = self.simplify_ana(w['ana'], [])[0]
-                parts += ' || '.join(ana['parts'] for ana in analyses if 'parts' in ana)
-                gloss += ' || '.join(ana['gloss'] for ana in analyses if 'gloss' in ana)
+                setParts = set(ana['parts'] for ana in analyses if 'parts' in ana)
+                setGloss = set(ana['gloss'] for ana in analyses if 'gloss' in ana)
+                setLemmata = set(ana['lex'] for ana in analyses if 'lex' in ana)
+                if len(setParts) > 1:
+                    parts += ' || '.join(ana['parts'] for ana in analyses if 'parts' in ana)
+                elif len(setParts) == 1:
+                    parts += setParts.pop()
+                else:
+                    parts += w['wf']
+                if len(setGloss) != 1:
+                    gloss += ' || '.join(ana['gloss'] for ana in analyses if 'gloss' in ana)
+                else:
+                    gloss += setGloss.pop()
                 gramm += ' || '.join(get_ana_gramm(ana) for ana in analyses)
-                lemmata += ' || '.join(ana['lex'] for ana in analyses if 'lex' in ana)
+                if len(setLemmata) != 1:
+                    lemmata += ' || '.join(ana['lex'] for ana in analyses if 'lex' in ana)
+                else:
+                    lemmata += setLemmata.pop()
         if self.rxTabs.search(parts) is not None:
             parts = ''
         if self.rxTabs.search(gloss) is not None:
@@ -790,6 +804,8 @@ class SentenceViewer:
             gramm = ''
         if self.rxTabs.search(lemmata) is not None:
             lemmata = ''
+        if len(parts) > 0:
+            return text + parts + '\n' + gloss + '\n' + lemmata + '\n' + gramm + '\n'
         return text + tokens + '\n' + parts + '\n' + gloss + '\n' + lemmata + '\n' + gramm + '\n'
 
     def count_word_subcorpus_stats(self, w, docIDs):
