@@ -484,7 +484,7 @@ class InterfaceQueryParser:
         for field in self.wordFields:
             wordAnaFields.add('words.ana.' + field)
         wordFields = {'words.wf', 'words.wtype', 'words.n_ana', 'words.sentence_index',
-                      'words.w_id'}
+                      'words.w_id', 'words.l_id'}
         queryDict = {k: queryDict[k] for k in queryDict
                      if queryDict[k] is not None and queryDict[k] != {}}
         queryDictWords, queryDictWordsAna = {}, {}
@@ -860,12 +860,10 @@ class InterfaceQueryParser:
             if searchIndex == 'sentences':
                 curPrelimQuery[pathPfx + 'wtype'] = self.make_bool_query('word',
                                                                          pathPfx + 'wtype', lang)
-            if 'wf' + strWordNum in htmlQuery and len(htmlQuery['wf' + strWordNum]) > 0:
-                curPrelimQuery[pathPfx + 'wf'] = self.make_bool_query(htmlQuery['wf' + strWordNum],
-                                                                      pathPfx + 'wf', lang)
-            if 'w_id' + strWordNum in htmlQuery and len(htmlQuery['w_id' + strWordNum]) > 0:
-                curPrelimQuery[pathPfx + 'w_id'] = self.make_bool_query(htmlQuery['w_id' + strWordNum],
-                                                                        pathPfx + 'w_id', lang)
+            for field in ['wf', 'w_id', 'l_id']:
+                if field + strWordNum in htmlQuery and len(htmlQuery[field + strWordNum]) > 0:
+                    curPrelimQuery[pathPfx + field] = self.make_bool_query(htmlQuery[field + strWordNum],
+                                                                           pathPfx + field, lang)
             if ('sentence_index' + strWordNum in htmlQuery
                     and len(htmlQuery['sentence_index' + strWordNum]) > 0
                     and self.rxNumber.search(htmlQuery['sentence_index' + strWordNum]) is not None

@@ -7,7 +7,7 @@
 {{ _('total frequency:') }} {{ data.total_freq }}.</p>
 <div class="word_results">
 <table class="words_list_table">
-<thead><th>{{ _('word_th_word') }}</th><th>{{ _('word_th_lemma') }}</th>
+<thead>{% if search_type == "word" %}<th>{{ _('word_th_word') }}</th>{% endif %}<th>{{ _('word_th_lemma') }}</th>
 {% if word_search_display_gr %}
 <th>{{ _('word_th_gr') }}</th>
 {% endif %}

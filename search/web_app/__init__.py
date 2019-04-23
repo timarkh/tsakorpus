@@ -1474,7 +1474,8 @@ def search_word(searchType='word'):
     return render_template('result_words.html', data=hitsProcessed,
                            word_table_fields=otherWordTableFields,
                            word_search_display_gr=displayGr,
-                           display_freq_rank=displayFreqRank)
+                           display_freq_rank=displayFreqRank,
+                           search_type=searchType)
 
 
 @app.route('/search_doc_query')

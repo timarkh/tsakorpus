@@ -7,6 +7,7 @@ function print_json(results) {
 	$('.progress').css('visibility', 'hidden');
 	$('#analysis').css('display', 'none');
 	$('#w_id1').val('');
+	$('#l_id1').val('');
 	$("#res_p").html( "<p style=\"font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;\">Success!<hr>" + JSON.stringify(results, null, 2).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;") ) + "</p>";
 }
 
@@ -15,6 +16,7 @@ function print_html(results) {
 	$('.progress').css('visibility', 'hidden');
 	$('#analysis').css('display', 'none');
 	$('#w_id1').val('');
+	$('#l_id1').val('');
 	$("#res_p").html(results);
 	toggle_interlinear();
 }
@@ -42,7 +44,9 @@ function assign_word_events() {
 	$("span.get_glossed_copy").unbind('click');
 	$("span.context_header").unbind('click');
 	$("span.search_w").unbind('click');
+	$("span.search_l").unbind('click');
 	$("span.stat_w").unbind('click');
+	$("span.stat_l").unbind('click');
 	$("span.page_link").unbind('click');
 	$(".cx_toggle_chk").unbind('change');
 	$(".sent_lang").unbind('change');
@@ -51,7 +55,9 @@ function assign_word_events() {
 	$('span.get_glossed_copy').click(copy_glossed_sentence);
 	$('span.context_header').click(show_doc_meta);
 	$('span.search_w').click(search_word_from_list);
+	$('span.search_l').click(search_lemma_from_list);
 	$('span.stat_w').click(show_word_stats);
+	$('span.stat_l').click(show_lemma_stats);
 	$("span.page_link").click(page_click);
 	$(".cx_toggle_chk").change(context_toggle);
 	$('.sent_lang').click(show_sentence_img);
@@ -119,6 +125,14 @@ function search_word_from_list(e) {
 	if (wID == "") return;
 	clear_search_form();
 	$('#w_id1').val(wID);
+	$("#search_sent").click();
+}
+
+function search_lemma_from_list(e) {
+	var lID = $(e.currentTarget).attr('data-lid');
+	if (lID == "") return;
+	clear_search_form();
+	$('#l_id1').val(lID);
 	$("#search_sent").click();
 }
 
@@ -371,6 +385,25 @@ function show_word_stats(e) {
 		clear_search_form();
 		$('#word_stats_wf').html(wf);
 		$('#w_id1').val(wID);
+	}
+	else {
+		$('#word_stats_wf').html(forTheQueryCaption);
+	}
+	$('#word_stats').modal('show');
+	if ($('#word_stats_by_meta').hasClass('active')) {
+		$('#select_meta_word_stat').trigger('change');
+	} else if ($('#word_stats_by_freq').hasClass('active')) {
+		$('#select_freq_stat_type').trigger('change');
+	}
+}
+
+function show_lemma_stats(e) {
+	var lID = $(e.currentTarget).attr('data-lid');
+	var lemma = $(e.currentTarget).attr('data-lemma');
+	if (lID != null && lID != "" && lemma != null && lemma != "") {
+		clear_search_form();
+		$('#word_stats_wf').html(lemma);
+		$('#l_id1').val(lID);
 	}
 	else {
 		$('#word_stats_wf').html(forTheQueryCaption);

@@ -870,8 +870,26 @@ class SentenceViewer:
         displayGr = True
         if 'word_search_display_gr' in self.settings and not self.settings['word_search_display_gr']:
             displayGr = False
-        return render_template('word_table_row.html',
-                               ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
+        if searchType == 'word':
+            return render_template('word_table_row.html',
+                                   ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
+                                   wf=wf,
+                                   wf_display=wfDisplay,
+                                   lemma=lemma,
+                                   gr=gr,
+                                   word_search_display_gr=displayGr,
+                                   other_fields=otherFields,
+                                   freq=freq,
+                                   display_freq_rank=displayFreqRank,
+                                   rank=rank,
+                                   nSents=nSents,
+                                   nDocs=nDocs,
+                                   wID=wID,
+                                   wfSearch=wSource['wf'])
+        return render_template('lemma_table_row.html',
+                               ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"',
+                                                                                                        "&quot;").replace(
+                                   '<', '&lt;').replace('>', '&gt;'),
                                wf=wf,
                                wf_display=wfDisplay,
                                lemma=lemma,
@@ -883,7 +901,7 @@ class SentenceViewer:
                                rank=rank,
                                nSents=nSents,
                                nDocs=nDocs,
-                               wID=wID,
+                               lID=wID,
                                wfSearch=wSource['wf'])
 
     def process_word_subcorpus(self, w, nDocuments, freq, lang, translit=None):

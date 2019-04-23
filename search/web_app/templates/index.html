@@ -82,6 +82,7 @@ var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 								<span id="_label_lex1" class="search_label">{{ _('Lemma:') }}</span> <input type="text" class="search_input" name="lex1" id="lex1"><br>
 								<span id="_label_gr1" class="search_label">{{ _('Grammar:') }}</span> <input type="text" class="search_input gram_selector_input" name="gr1" id="gr1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gr" data-nword="1"></span><br>
 								<input type="hidden" class="search_input" name="w_id1" id="w_id1">
+								<input type="hidden" class="search_input" name="l_id1" id="l_id1">
 								{% if gloss_search_enabled %}
 								<span id="_label_gloss1" class="search_label">{{ _('Gloss:') }}</span> <input type="text" class="search_input gram_selector_input" name="gloss_index1" id="gloss1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gloss" data-nword="1"></span><br>
 								{% endif %}

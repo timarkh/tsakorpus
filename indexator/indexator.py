@@ -127,7 +127,7 @@ class Indexator:
         """
         Take words list from a sentence, remove all non-searchable
         fields from them and add them to self.words dictionary.
-        Add w_id property to each word of the words list.
+        Add w_id and l_id properties to each word of the words list.
         Return the value of the 'sent_analyzed' meta field.
         """
         sIDAdded = set()   # word IDs for which the current settence ID has been counted for it
@@ -179,7 +179,7 @@ class Indexator:
                                   for i in range(len(self.languages))) + 1
                     self.tmpLemmaIDs[langID][lemma] = lemmaID
                 self.word2lemma[langID][wID] = lemmaID
-
+                w['l_id'] = lemmaID
             try:
                 self.wordFreqs[langID][wID] += 1
             except KeyError:

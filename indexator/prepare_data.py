@@ -174,6 +174,7 @@ class PrepareData:
         """
         wordProps = word_mapping['mappings']['word']['properties']
         wordProps['w_id'] = {'type': 'integer'}
+        wordProps['l_id'] = {'type': 'integer'}
         m = {'prev_id': {'type': 'integer'},
              'next_id': {'type': 'integer'},
              'doc_id': {'type': 'integer'},

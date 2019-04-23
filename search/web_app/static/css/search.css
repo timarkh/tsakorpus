@@ -364,11 +364,11 @@
 	margin-left: 3px;
 }
 
-.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .stat_w, #show_help, #show_dictionary {
+.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .stat_w, .search_l, .stat_l, #show_help, #show_dictionary {
 	cursor: pointer;
 }
 
-.search_w, .stat_w {
+.search_w, .stat_w, .search_l, .stat_l {
 	padding-left: 10px;
 	padding-right: 5px;
 }
