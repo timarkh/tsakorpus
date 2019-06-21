@@ -42,6 +42,10 @@ if 'line_plot_meta' in settings:
     linePlotMetafields = settings['line_plot_meta']
 else:
     linePlotMetafields = ['year']   # metadata fields whose statistics can be displayed on a line plot
+if 'citation' not in settings:
+    settings['citation'] = None
+if 'start_page_url' not in settings:
+    settings['start_page_url'] = None
 
 
 def jsonp(func):
@@ -436,6 +440,8 @@ def search_page():
                            word_fields_by_tier=json.dumps(wordFieldsByTier, ensure_ascii=False, indent=-1),
                            auto_switch_tiers=json.dumps(autoSwitchTiers, ensure_ascii=False, indent=-1),
                            generate_dictionary=generateDictionary,
+                           citation=settings['citation'],
+                           start_page_url=settings['start_page_url'],
                            max_request_time=settings['query_timeout'] + 1,
                            locales=settings['interface_languages'],
                            random_seed=get_session_data('seed'))

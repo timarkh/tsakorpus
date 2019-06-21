@@ -503,6 +503,9 @@ msgstr "Название корпуса"
 msgid "Show help"
 msgstr "Показать справку"
 
+msgid "How to cite"
+msgstr "Как цитировать корпус"
+
 #: templates/index.html:40
 msgid "Query"
 msgstr "Запрос"

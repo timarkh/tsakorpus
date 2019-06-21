@@ -58,6 +58,10 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``generate_dictionary`` (true/false; optional) -- determines whether a dictionary of lexemes should be generated at indexation time for each of the languages. If true, the dictionary is stored in the ``search/web_app/templates`` directory and could be accessed by clicking the red book glyph in the web interface. Defaults to false.
 
+* ``start_page_url`` (optional) -- a string with the URL of the start page of the corpus, if there is one. It is used to link the header of the search page to the start page.
+
+* ``citation`` (optional) -- an HTML string that answers the question "How to cite the corpus". If it is present, a quotation mark image will appear at the top of the page. The citation information will appear as a dialogue if the user clicks that image.
+
 * ``languages`` -- list of names of the languages used in the corpus. The order of the languages determines how they are encoded in the index (the code of the language is its index in this list) and, in the case of parallel corpora, in which order they are displayed within one parallel context.
 
 * ``interface_languages`` -- dictionary with all available web interface languages. The keys are the codes of the languages, the values are their names.

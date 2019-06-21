@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="{{ locale }}">
 <head>
-<title>{{ _('Corpus search page') }}</title>
+<title>{{ _('corpus_title') }} - {{ _('Corpus search page') }}</title>
 <link rel="stylesheet" type="text/css" href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="static/css/search.css">
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -39,7 +39,11 @@ var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 {% endif %}
 </head>
 <body>
-<p id="header"><span id="corpus_title">{{ _('corpus_title') }}</span> {% if debug %}{{ _('Corpus name') }}: {{ corpus_name }}.{% endif %}
+<p id="header"><span id="corpus_title">
+{% if start_page_url %}<a href="{{ start_page_url }}">{% endif %}
+{{ _('corpus_title') }}
+{% if start_page_url %}</a>{% endif %}
+</span> {% if debug %}{{ _('Corpus name') }}: {{ corpus_name }}.{% endif %}
 {% if locales|length > 1 %}
 &nbsp;&nbsp;
 {% for l_code in locales %}
@@ -57,6 +61,9 @@ var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 <span id="show_dictionary" class="glyphicon glyphicon-book" aria-hidden="true"><span class="tooltip_prompt">{{ _('Show dictionary') }}</span></span>
 {% endif %}
 <span id="show_help" class="glyphicon glyphicon-question-sign" aria-hidden="true"><span class="tooltip_prompt">{{ _('Show help') }}</span></span>
+{% if citation %}
+<span id="cite_corpus"><span class="tooltip_prompt">{{ _('How to cite') }}</span><img id="cite_corpus_img" src="static/img/cite.png"></span>
+{% endif %}
 </p>
 <div id="search_div" class="transitions init-hidden">
 	<div class="show-hide">
@@ -245,7 +252,7 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 	</div>
 </div>
 
-<div class="modal fade" id="help_dialogue" tabindex="-1" role="dialog" aria-labelledby="help_dialogue_header" aria-hidden="true" data-field="gr1">
+<div class="modal fade" id="help_dialogue" tabindex="-1" role="dialog" aria-labelledby="help_dialogue_header" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -259,7 +266,7 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 	</div>
 </div>
 
-<div class="modal fade" id="dictionary_dialogue" tabindex="-1" role="dialog" aria-labelledby="dictionary_dialogue_header" aria-hidden="true" data-field="gr1">
+<div class="modal fade" id="dictionary_dialogue" tabindex="-1" role="dialog" aria-labelledby="dictionary_dialogue_header" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -272,6 +279,21 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 		</div>
 	</div>
 </div>
+{% if citation %}
+<div class="modal fade" id="citation_dialogue" tabindex="-1" role="dialog" aria-labelledby="citation_dialogue_header" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="citation_dialogue_header">{{ _('How to cite') }}</h4>
+			</div>
+			<div class="modal-body" id="citation_dialogue_body">
+			<p>{{ citation | safe }}</p>
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
 {% if images %}
 <div class="modal fade" id="full_image" tabindex="-1" role="dialog" aria-labelledby="full_image_header" aria-hidden="true" data-field="gr1">
 	<div class="modal-dialog">

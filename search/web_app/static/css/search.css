@@ -364,7 +364,7 @@
 	margin-left: 3px;
 }
 
-.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .stat_w, .search_l, .stat_l, #show_help, #show_dictionary {
+.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .stat_w, .search_l, .stat_l, #show_help, #show_dictionary, #cite_corpus {
 	cursor: pointer;
 }
 
@@ -432,6 +432,16 @@
 	color: darkred;
 	font-size: 20px;
 	padding-right: 10px;
+}
+
+#cite_corpus {
+	display: inline-block;
+	vertical-align: top;
+}
+
+#cite_corpus_img {
+	max-height: 24px;
+	margin-left: 20px;
 }
 
 #show_help:hover {

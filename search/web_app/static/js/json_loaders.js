@@ -306,6 +306,7 @@ function assign_input_events() {
 	$("span.neg_query").unbind('click');
 	$("#show_help").unbind('click');
 	$("#show_dictionary").unbind('click');
+	$("#cite_corpus").unbind('click');
 	$("#show_word_stat").unbind('click');
 	$("span.locale").unbind('click');
 	$(".search_input").unbind('on');
@@ -325,6 +326,7 @@ function assign_input_events() {
 	$("span.neg_query").click(negative_query_span);
 	$("#show_help").click(show_help);
 	$("#show_dictionary").click(show_dictionary);
+	$("#cite_corpus").click(show_citation);
 	$("#show_word_stat").click(show_word_stats);
 	$("span.locale").click(change_locale);
 	$(".search_input").on("keydown", search_if_enter);
@@ -519,6 +521,10 @@ function show_dictionary(e) {
 			error: function(errorThrown) {
 			}
 		});
+}
+
+function show_citation(e) {
+	$('#citation_dialogue').modal('show');
 }
 
 function gramm_selector_loaded(result) {

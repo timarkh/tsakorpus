@@ -502,6 +502,9 @@ msgstr "Corpus name"
 msgid "Show help"
 msgstr "Show help"
 
+msgid "How to cite"
+msgstr "How to cite the corpus"
+
 #: templates/index.html:40
 msgid "Query"
 msgstr "Query"
