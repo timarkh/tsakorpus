@@ -21,6 +21,15 @@ function print_html(results) {
 	toggle_interlinear();
 }
 
+function update_wordlist(results) {
+	$('.progress').css('visibility', 'hidden');
+	$('#analysis').css('display', 'none');
+	$('#w_id1').val('');
+	$('#l_id1').val('');
+	$("#td_load_more_words").replaceWith(results);
+	toggle_interlinear();
+}
+
 function show_player() {
 	$('#media_div').css('display', 'inline-block');
 }
@@ -50,6 +59,7 @@ function assign_word_events() {
 	$("span.page_link").unbind('click');
 	$(".cx_toggle_chk").unbind('change');
 	$(".sent_lang").unbind('change');
+	$("#td_load_more_words").unbind('click');
 	$('span.word').click(highlight_cur_word);
 	$('span.expand').click(expand_context);
 	$('span.get_glossed_copy').click(copy_glossed_sentence);
@@ -61,6 +71,7 @@ function assign_word_events() {
 	$("span.page_link").click(page_click);
 	$(".cx_toggle_chk").change(context_toggle);
 	$('.sent_lang').click(show_sentence_img);
+	$("#td_load_more_words").click(load_more_words);
 	assign_para_highlight();
 	assign_src_alignment();
 	assign_gram_popup();
@@ -298,7 +309,7 @@ function assign_src_alignment() {
 
 function show_sentence_img(e) {
 	var e_obj = $(e.currentTarget);
-	while (e_obj.hasClass('sent_lang')) {
+	while (!e_obj.hasClass('sent_lang')) {
 		e_obj = e_obj.parent();
 	}
 	var imgSrc = $(e_obj).attr('data-img');
@@ -458,8 +469,17 @@ function make_sortable() {
 		if (!this.asc) {
 			rows = rows.reverse()
 		}
+		lastRow = null;
 		for (var i = 0; i < rows.length; i++) {
-			table.append(rows[i])
+			if (rows[i].id != "td_load_more_words") {
+				table.append(rows[i]);
+			}
+			else {
+				lastRow = rows[i];
+			}
+		}
+		if (lastRow != null) {
+			table.append(lastRow);
 		}
 	})
 }
@@ -518,4 +538,20 @@ function change_tier(e) {
 function toggle_full_image() {
 	$('#full_image').modal('show');
 }
-	
+
+function load_more_words(e) {
+	var page = $(this).attr('data-page');
+	var searchType = $(this).attr('data-searchtype');
+	url = "search_" + searchType + "/" + page;
+	$.ajax({
+		url: url,
+		type: "GET",
+		//beforeSend: start_progress_bar,
+		//complete: stop_progress_bar,
+		success: update_wordlist,
+		error: function(errorThrown) {
+			$('.progress').css('visibility', 'hidden');
+			alert( JSON.stringify(errorThrown) );
+		}
+	});
+}

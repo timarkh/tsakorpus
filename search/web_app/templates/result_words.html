@@ -1,49 +1,56 @@
-{% if data.timeout %}
-<p class="message">{{ _('The search was not finished due to the query timeout. You only see partial results.') }}</p>
+{% if page <= 1 %}
+	{% if data.timeout %}
+	<p class="message">{{ _('The search was not finished due to the query timeout. You only see partial results.') }}</p>
+	{% endif %}
+	<p>{{ _('Search result:') }}
+	{{ data.n_occurrences }} {% if data.n_occurrences == 1 %}{{ _('unique word') }}{% elif data.n_occurrences % 10 == 1 and data.n_occurrences % 100 != 11 %}{{ _('different words_1') }}{% elif 2 <= data.n_occurrences % 10 <= 4 and not 12 <= data.n_occurrences % 100 <= 14 %}{{ _('different words_2-4') }}{% else %}{{ _('different words') }}{% endif %}
+	{{ _('in approximately') }} {{ data.n_docs }} {% if data.n_docs == 1 %}{{ _('document found,') }}{% elif data.n_docs % 10 == 1 and data.n_docs % 100 != 11 %}{{ _('documents_1 found,') }}{% elif 2 <= data.n_docs % 10 <= 4 and not 12 <= data.n_docs % 100 <= 14 %}{{ _('documents_2-4 found,') }}{% else %}{{ _('documents found,') }}{% endif %}
+	{{ _('total frequency:') }} {{ data.total_freq }}.</p>
+	<div class="word_results">
+	<table class="words_list_table">
+	<thead>{% if search_type == "word" %}<th>{{ _('word_th_word') }}</th>{% endif %}<th>{{ _('word_th_lemma') }}</th>
+	{% if word_search_display_gr %}
+	<th>{{ _('word_th_gr') }}</th>
+	{% endif %}
+	{% for item in word_table_fields %}
+	<th>{{ _('word_th_' + item) }}</th>
+	{% endfor %}
+	<th>{{ _('word_th_frequency') }}</th>
+	{% if display_freq_rank %}
+	<th>{{ _('word_th_freq. rank / quantile') }}</th>
+	{% endif %}
+	<th>{{ _('word_th_# sentences') }}</th><th>{{ _('word_th_# documents') }}</th><th>{{ _('word_th_search in corpus') }}</th><th>{{ _('word_th_word stats') }}</th></thead>
+	<tbody>
 {% endif %}
-<p>{{ _('Search result:') }}
-{{ data.n_occurrences }} {% if data.n_occurrences == 1 %}{{ _('unique word') }}{% elif data.n_occurrences % 10 == 1 and data.n_occurrences % 100 != 11 %}{{ _('different words_1') }}{% elif 2 <= data.n_occurrences % 10 <= 4 and not 12 <= data.n_occurrences % 100 <= 14 %}{{ _('different words_2-4') }}{% else %}{{ _('different words') }}{% endif %}
-{{ _('in approximately') }} {{ data.n_docs }} {% if data.n_docs == 1 %}{{ _('document found,') }}{% elif data.n_docs % 10 == 1 and data.n_docs % 100 != 11 %}{{ _('documents_1 found,') }}{% elif 2 <= data.n_docs % 10 <= 4 and not 12 <= data.n_docs % 100 <= 14 %}{{ _('documents_2-4 found,') }}{% else %}{{ _('documents found,') }}{% endif %}
-{{ _('total frequency:') }} {{ data.total_freq }}.</p>
-<div class="word_results">
-<table class="words_list_table">
-<thead>{% if search_type == "word" %}<th>{{ _('word_th_word') }}</th>{% endif %}<th>{{ _('word_th_lemma') }}</th>
-{% if word_search_display_gr %}
-<th>{{ _('word_th_gr') }}</th>
-{% endif %}
-{% for item in word_table_fields %}
-<th>{{ _('word_th_' + item) }}</th>
-{% endfor %}
-<th>{{ _('word_th_frequency') }}</th>
-{% if display_freq_rank %}
-<th>{{ _('word_th_freq. rank / quantile') }}</th>
-{% endif %}
-<th>{{ _('word_th_# sentences') }}</th><th>{{ _('word_th_# documents') }}</th><th>{{ _('word_th_search in corpus') }}</th><th>{{ _('word_th_word stats') }}</th></thead>
-<tbody>
 {% for w in data.words %}
 {{ w | safe }}
 {% endfor %}
-</tbody>
-</table>
-</div>
-{% if data.message %}
-<p class="message">{{ data.message }}</p>
+{% if show_next and not data.timeout %}
+<tr id="td_load_more_words" data-page="{{ page+1 }}" data-searchtype="{{ search_type }}"><td colspan="100"><span class="glyphicon glyphicon-triangle-bottom" title="Load more"></span></td></tr>
 {% endif %}
 <script type='text/javascript'>assign_word_events(); make_sortable();</script>
-{% if data.media %}
-<script type='text/javascript'>hide_player();</script>
-{% endif %}
-{% if data.images %}
-<script type='text/javascript'>hide_img();</script>
-{% endif %}
-{% if data.n_occurrences > 0 %}
-<script type='text/javascript'>
-	searchType = 'words';
-	hide_query_panel();
-</script>
-{% else %}
-<script type='text/javascript'>
-	show_query_panel();
-	searchType = 'none';
-</script>
+{% if page <= 1 %}
+	</tbody>
+	</table>
+	</div>
+	{% if data.message %}
+	<p class="message">{{ data.message }}</p>
+	{% endif %}
+	{% if data.media %}
+	<script type='text/javascript'>hide_player();</script>
+	{% endif %}
+	{% if data.images %}
+	<script type='text/javascript'>hide_img();</script>
+	{% endif %}
+	{% if data.n_occurrences > 0 %}
+	<script type='text/javascript'>
+		searchType = 'words';
+		hide_query_panel();
+	</script>
+	{% else %}
+	<script type='text/javascript'>
+		show_query_panel();
+		searchType = 'none';
+	</script>
+	{% endif %}
 {% endif %}

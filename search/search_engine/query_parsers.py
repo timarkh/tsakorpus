@@ -308,7 +308,8 @@ class InterfaceQueryParser:
                 esQuery['nested']['inner_hits']['name'] = queryName
         return esQuery
 
-    def wrap_inner_word_query(self, innerQuery, query_from=0, query_size=10, sortOrder='random', docIDs=None):
+    def wrap_inner_word_query(self, innerQuery, query_from=0, query_size=10,
+                              sortOrder='random', randomSeed=None, docIDs=None):
         """
         Make a full-fledged Elasticsearch word query out of the contents
         of the "query" parameter and additional options. Specifically,
@@ -318,7 +319,7 @@ class InterfaceQueryParser:
         """
         if docIDs is None:
             if sortOrder == 'random':
-                innerQuery = self.make_random(innerQuery)
+                innerQuery = self.make_random(innerQuery, randomSeed=randomSeed)
             esQuery = {'query': innerQuery, 'size': query_size, 'from': query_from,
                        '_source': {'excludes': ['sids']}}
             esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'dids'}},
@@ -334,7 +335,7 @@ class InterfaceQueryParser:
             innerWordFreqQuery = {'bool': {'must': [{'has_parent': hasParentQuery}],
                                            'filter': [{'terms': {'d_id': docIDs}}]}}
             if sortOrder == 'random':
-                innerWordFreqQuery = self.make_random(innerWordFreqQuery)
+                innerWordFreqQuery = self.make_random(innerWordFreqQuery, randomSeed=randomSeed)
             subAggregations = {'subagg_freq': {'sum': {'field': 'freq'}}}
             order = {}
             if sortOrder == 'wf':
@@ -358,7 +359,7 @@ class InterfaceQueryParser:
         return esQuery
 
     def full_word_query(self, queryDict, query_from=0, query_size=10, sortOrder='random',
-                        lang=-1):
+                        randomSeed=None, lang=-1):
         """
         Make a full ES query for the words index out of a dictionary
         with bool queries.
@@ -426,6 +427,7 @@ class InterfaceQueryParser:
             #         query['bool']['filter'].append({'terms': {'dids': docIDs}})
         esQuery = self.wrap_inner_word_query(query, query_from=query_from,
                                              query_size=query_size, sortOrder=sortOrder,
+                                             randomSeed=randomSeed,
                                              docIDs=docIDs)
         return esQuery
 
@@ -905,7 +907,7 @@ class InterfaceQueryParser:
                                                  includeNextWordField=includeNextWordField)
         elif searchIndex == 'words':
             queryDict = self.full_word_query(prelimQuery, query_from, query_size, sortOrder,
-                                             lang=langID)
+                                             randomSeed, lang=langID)
         else:
             queryDict = {'query': {'match_none': ''}}
         return queryDict

@@ -1324,11 +1324,15 @@ def search_lemma_json():
     return search_word_json(searchType='lemma')
 
 
+@app.route('/search_word_json/<int:page>')
 @app.route('/search_word_json')
 @jsonp
-def search_word_json(searchType='word'):
+def search_word_json(searchType='word', page=0):
     query = copy_request_args()
     change_display_options(query)
+    if page <= 0:
+        page = 1
+        set_session_data('page', page)
     if 'doc_ids' not in query:
         docIDs = subcorpus_ids(query)
         if docIDs is not None:
@@ -1358,6 +1362,7 @@ def search_word_json(searchType='word'):
                           sortOrder=sortOrder,
                           randomSeed=get_session_data('seed'),
                           query_size=get_session_data('page_size'),
+                          page=get_session_data('page'),
                           distances=queryWordConstraints)
 
     hits = []
@@ -1381,16 +1386,26 @@ def search_word_json(searchType='word'):
     return jsonify(hits)
 
 
+@app.route('/search_lemma/<int:page>')
 @app.route('/search_lemma')
-def search_lemma():
-    return search_word(searchType='lemma')
+def search_lemma(page=0):
+    return search_word(searchType='lemma', page=page)
 
 
+@app.route('/search_word/<int:page>')
 @app.route('/search_word')
-def search_word(searchType='word'):
+def search_word(searchType='word', page=0):
     set_session_data('progress', 0)
-    query = copy_request_args()
-    change_display_options(query)
+    if request.args and page <= 0:
+        query = copy_request_args()
+        page = 1
+        change_display_options(query)
+        if get_session_data('sort') not in ('random', 'freq', 'wf', 'lemma'):
+            set_session_data('sort', 'random')
+        set_session_data('last_query', query)
+    else:
+        query = get_session_data('last_query')
+    set_session_data('page', page)
     if 'doc_ids' not in query:
         docIDs = subcorpus_ids(query)
         if docIDs is not None:
@@ -1424,6 +1439,7 @@ def search_word(searchType='word'):
                           sortOrder=sortOrder,
                           randomSeed=get_session_data('seed'),
                           query_size=get_session_data('page_size'),
+                          page=get_session_data('page'),
                           distances=queryWordConstraints,
                           includeNextWordField=constraintsTooComplex)
 
@@ -1477,11 +1493,17 @@ def search_word(searchType='word'):
     displayGr = True
     if 'word_search_display_gr' in settings and not settings['word_search_display_gr']:
         displayGr = False
-    return render_template('result_words.html', data=hitsProcessed,
+    bShowNextButton = True
+    if len(hitsProcessed['words']) != get_session_data('page_size'):
+        bShowNextButton = False
+    return render_template('result_words.html',
+                           data=hitsProcessed,
                            word_table_fields=otherWordTableFields,
                            word_search_display_gr=displayGr,
                            display_freq_rank=displayFreqRank,
-                           search_type=searchType)
+                           search_type=searchType,
+                           page=page,
+                           show_next=bShowNextButton)
 
 
 @app.route('/search_doc_query')

@@ -1130,6 +1130,11 @@ svg circle {
 	background: transparent;
 }
 
+#td_load_more_words {
+	cursor: pointer;
+	text-align: center;
+}
+
 /* Predefined styles for certain tiers 
 (add styles for your languages/tiers if
 different languages should be displayed
