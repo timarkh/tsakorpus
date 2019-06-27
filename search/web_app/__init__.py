@@ -1494,7 +1494,7 @@ def search_word(searchType='word', page=0):
     if 'word_search_display_gr' in settings and not settings['word_search_display_gr']:
         displayGr = False
     bShowNextButton = True
-    if len(hitsProcessed['words']) != get_session_data('page_size'):
+    if 'words' not in hitsProcessed or len(hitsProcessed['words']) != get_session_data('page_size'):
         bShowNextButton = False
     return render_template('result_words.html',
                            data=hitsProcessed,
