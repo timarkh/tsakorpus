@@ -3,7 +3,7 @@ import re
 dic2cyr = {'a': 'а', 'b': 'б', 'v': 'в',
            'g': 'г', 'd': 'д', 'e': 'э',
            'ž': 'ж', 'š': 'ш', 'e̮': 'ӧ',
-           'ə': 'ө', 'ʒˊ': 'ӟ', 'ǯ': 'ӝ', 'ć': 'ч', 'č': 'ӵ',
+           'ə': 'ө', 'ʒˊ': 'ӟ', 'ǯ': 'ӝ', 'č́': 'ч', 'č': 'ӵ',
            'z': 'з', 'i': 'ӥ', 'j': 'й', 'k': 'к',
            'l': 'л', 'm': 'м', 'n': 'н',
            'o': 'о', 'p': 'п', 'r': 'р',
@@ -79,10 +79,10 @@ def udmurt_translit_upa(text):
     res = rxCyrVSoft.sub('\\1', res)
     res = res.replace('šʼ', 'ś')
     res = res.replace('žʼ', 'ź')
-    res = res.replace('čʼ', 'ć')
+    res = res.replace('čʼ', 'č́')
     res = res.replace('nʼ', 'ń')
     res = res.replace('Šʼ', 'Ś')
     res = res.replace('Žʼ', 'Ź')
-    res = res.replace('Čʼ', 'Ć')
+    res = res.replace('Čʼ', 'Č́')
     res = res.replace('Nʼ', 'Ń')
     return res
