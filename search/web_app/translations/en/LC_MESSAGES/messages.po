@@ -37,6 +37,9 @@ msgstr "Komi"
 msgid "langname_komi_zyrian"
 msgstr "Komi-Zyrian"
 
+msgid "langname_komi-zyrian"
+msgstr "Komi-Zyrian"
+
 msgid "langname_komi_permyak"
 msgstr "Komi-Permyak"
 

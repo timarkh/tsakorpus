@@ -38,6 +38,9 @@ msgstr "коми"
 msgid "langname_komi_zyrian"
 msgstr "коми-зырянский"
 
+msgid "langname_komi-zyrian"
+msgstr "коми-зырянский"
+
 msgid "langname_komi_permyak"
 msgstr "коми-пермяцкий"
 

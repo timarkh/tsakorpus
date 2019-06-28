@@ -41,8 +41,10 @@ def input_method_normal(field, text, lang):
 def input_method_simplified(field, text, lang):
     if lang in ('selkup', 'kamas', 'nganasan'):
         return uralic_input_simplified(field, text)
-    elif lang in ('udmurt', 'komi', 'meadow_mari', 'hill_mari',
+    elif lang in ('udmurt', 'komi', 'komi-zyrian', 'komi-permyak',
+                  'meadow_mari', 'hill_mari',
                   'tatar', 'bashkir', 'chuvash'):
         return uralic_input_simplified_cyr(field, text)
+    return text
 
 
