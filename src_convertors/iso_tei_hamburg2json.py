@@ -234,6 +234,10 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                             else:
                                 # continue
                                 mID = wordID + '_covert'    # categories not expressed overtly
+                                if mText is None:
+                                    self.log_message('Empty morpheme description cell: word ID ' +
+                                                     wordID + ', tier ' + tierID + '.')
+                                    continue
                                 mText = '[' + mText + ']'
                                 # if 'mb' not in wordAnno[wordID]:
                                 #     wordAnno[wordID]['mb'] = '∅'
