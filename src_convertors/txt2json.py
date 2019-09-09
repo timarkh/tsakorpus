@@ -27,12 +27,12 @@ class Txt2JSON:
         self.errorLog = ''
         self.settingsDir = settingsDir
         self.corpusSettings = {}
-        self.load_settings()
+        self.load_settings(corpusSpecific=False)
         self.corpusSettings['corpus_dir'] = os.path.join(self.corpusSettings['corpus_dir'],
                                                          self.corpusSettings['corpus_name'])
         self.settingsDir = os.path.join(self.corpusSettings['corpus_dir'],
                                         'conf')
-        self.load_settings()
+        self.load_settings(corpusSpecific=True)
 
         fCategories = open(os.path.join(self.settingsDir, 'categories.json'), 'r',
                            encoding='utf-8-sig')
@@ -47,15 +47,20 @@ class Txt2JSON:
             self.excludeByMetaRules = self.corpusSettings['exclude_by_meta']
         self.srcExt = 'txt'
 
-    def load_settings(self):
+    def load_settings(self, corpusSpecific=False):
         """
-        Load settings from the corpus-specific settings file
-        (they may override the general settings loaded earlier).
+        Load settings from the general settings file or
+        the corpus-specific settings file (the latter may
+        override the general settings loaded earlier).
         Clean the error log file, if any.
         """
         fCorpus = open(os.path.join(self.settingsDir, 'corpus.json'), 'r',
                        encoding='utf-8-sig')
-        self.corpusSettings.update(json.loads(fCorpus.read()))
+        localSettings = json.loads(fCorpus.read())
+        if corpusSpecific:
+            if 'corpus_dir' in localSettings:
+                del localSettings['corpus_dir']     # This key should not be overwritten
+        self.corpusSettings.update(localSettings)
         if self.corpusSettings['json_indent'] < 0:
             self.corpusSettings['json_indent'] = None
         fCorpus.close()
