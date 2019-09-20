@@ -334,7 +334,16 @@ class DumbMorphParser:
         """
         Normalize a word before searching for it in the list of analyses.
         """
-        return word.strip().lower()
+        word = word.strip().lower()
+        if 'char_replacements' in self.settings:
+            wordClean = ''
+            for c in word:
+                if c in self.settings['char_replacements']:
+                    wordClean += self.settings['char_replacements'][c]
+                else:
+                    wordClean += c
+            word = wordClean
+        return word
 
     def analyze_word(self, wf, lang=''):
         if lang not in self.analyses:
