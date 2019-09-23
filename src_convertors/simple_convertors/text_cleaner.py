@@ -95,8 +95,10 @@ class TextCleaner:
         if self.settings['languages'][0] in ['ossetic', 'iron', 'digor']:
             text = self.rxCyrAeSmall.sub('ӕ', text)
             text = self.rxCyrAeBig.sub('Ӕ', text)
-        text = text.replace(u'…', u'...')
-        text = text.replace(u'\\', u'/')
+        text = text.replace('…', '...')
+        text = text.replace('\\r\\n', '\n')
+        text = text.replace('\\n', '\n')
+        text = text.replace('\\', '/')
         return text
 
     def clean_social_networks(self, text):

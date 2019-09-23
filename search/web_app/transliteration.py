@@ -4,7 +4,7 @@ from transliterators.khinalug import khinalug_input_normal
 from transliterators.beserman import beserman_translit_cyrillic
 from transliterators.udmurt import udmurt_translit_upa
 from transliterators.erzya import erzya_translit_upa
-from transliterators.albanian import albanian_input_normal
+from transliterators.albanian import albanian_input_normal, albanian_input_simplified
 from transliterators.uralic_simple import uralic_input_simplified, uralic_input_simplified_cyr
 
 
@@ -33,7 +33,7 @@ def input_method_normal(field, text, lang):
         return adyghe_input_normal(field, text)
     elif lang == 'khinalug':
         return khinalug_input_normal(field, text)
-    elif lang == 'albanian':
+    elif lang in ('albanian', 'albanian_orig'):
         return albanian_input_normal(field, text)
     return text
 
@@ -45,6 +45,8 @@ def input_method_simplified(field, text, lang):
                   'meadow_mari', 'hill_mari',
                   'tatar', 'bashkir', 'chuvash'):
         return uralic_input_simplified_cyr(field, text)
+    elif lang in ('albanian', 'albanian_orig'):
+        return albanian_input_simplified(field, text)
     return text
 
 
