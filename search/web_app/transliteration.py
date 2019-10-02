@@ -52,13 +52,13 @@ def input_method_simplified(field, text, lang):
 
 
 def input_method_latin(field, text, lang):
-    if lang == 'armeinan':
+    if lang == 'armenian':
         return armenian_input_latin(field, text)
     return text
 
 
 def trans_meillet_baseline(text, lang):
-    if lang == 'armeinan':
+    if lang == 'armenian':
         return armenian_translit_meillet(text)
     return text
 

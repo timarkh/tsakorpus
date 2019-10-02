@@ -49,7 +49,7 @@ def armenian_translit_meillet(text):
     return textTrans
 
 
-def armenian_input_simplified(field, text):
+def armenian_input_latin(field, text):
     """
     Prepare a string from one of the query fields for subsequent
     processing: replace latin characters with Armenian equivalents.
