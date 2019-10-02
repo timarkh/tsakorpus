@@ -40,6 +40,10 @@ class TextCleaner:
     rxUdmDzh = re.compile('(?<=[а-яА-ЯӜӞӴӝӟӵ])љ|љ(?=[а-яА-ЯӜӞӴӝӟӵ])')
     rxUdmZj = re.compile('(?<=[а-яА-ЯӜӞӴӝӟӵ])њ|њ(?=[а-яА-ЯӜӞӴӝӟӵ])')
 
+    rxArmPeriod = re.compile('(?<![a-zA-Z ]):')
+    rxArmIntraWordPunc = re.compile('[՞՜՛]')
+    rxArmOldCond = re.compile('^կը +')
+
     rxRNCStress = re.compile('`(\\w)')
     rxModifierStress = re.compile('(\\w)́')
 
@@ -95,6 +99,8 @@ class TextCleaner:
         if self.settings['languages'][0] in ['ossetic', 'iron', 'digor']:
             text = self.rxCyrAeSmall.sub('ӕ', text)
             text = self.rxCyrAeBig.sub('Ӕ', text)
+        if self.settings['languages'][0] in ['armenian']:
+            text = self.rxArmPeriod.sub('։', text)
         text = text.replace('…', '...')
         text = text.replace('\\r\\n', '\n')
         text = text.replace('\\n', '\n')
@@ -119,6 +125,25 @@ class TextCleaner:
             text = re.sub('(?<=\\w)ӧӧ+', 'ӧ', text)
             text = re.sub('(?<=\\w)ӥӥ+', 'ӥ', text)
         return text
+
+    def clean_token(self, text):
+        """
+        Clean a token for search purposes (the baseline will
+        still have the original, uncleaned version).
+        """
+        wordClean = text
+        if self.settings['languages'][0] in ['armenian']:
+            wordClean = self.rxArmOldCond.sub('կ', text)
+            wordClean = self.rxArmIntraWordPunc.sub('', wordClean)
+        return wordClean
+
+    def clean_tokens(self, tokens):
+        """
+        Clean token['wf'] for each token in the list.
+        """
+        for token in tokens:
+            if 'wf' in token and token['wtype'] == 'word':
+                token['wf'] = self.clean_token(token['wf'])
 
     def clean_token_rnc(self, text):
         """

@@ -31,6 +31,7 @@ class TextProcessor:
         s = self.cleaner.clean_text(s)
         tokens = self.tokenizer.tokenize(s)
         sentences = self.splitter.split(tokens, s)
+        self.cleaner.clean_tokens(tokens)
         nTokens, nWords, nAnalyzed = self.parser.analyze(sentences, lang=lang)
         return sentences, nTokens, nWords, nAnalyzed
 
