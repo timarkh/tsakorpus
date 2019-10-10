@@ -152,6 +152,8 @@ class Txt2JSON:
             fname2check = fname2check.lower()
         if fname2check not in self.meta:
             print('File not in meta:', fname)
+            if 'nometa_skip' in self.corpusSettings and self.corpusSettings['nometa_skip']:
+                return None
         else:
             curMeta.update(self.meta[fname2check])
         return curMeta
