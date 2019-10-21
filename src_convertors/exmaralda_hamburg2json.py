@@ -131,7 +131,8 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         for tier in srcTree.xpath('/basic-transcription/basic-body/tier[@type=\'a\']'):
             if 'id' not in tier.attrib:
                 continue
-            tierID = tier.attrib['id']
+            # tierID = tier.attrib['id']
+            tierID = tier.attrib['category']
             for event in tier:
                 if 'start' not in event.attrib or 'end' not in event.attrib:
                     continue
@@ -196,7 +197,10 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                 ana['lex'] = ' '.join(s[1] for s in stems)
                 ana['trans_en'] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
                 self.add_ana_fields(ana, curWordAnno)
-                self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0])
+                useGlossList = False
+                if 'glosses' in self.corpusSettings:
+                    useGlossList = True
+                self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0], useGlossList=useGlossList)
                 ana['gloss_index'] = self.rxBracketGloss.sub('', newIndexGloss)
             curToken['ana'] = [ana]
             yield curToken
@@ -293,9 +297,16 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                 if len(text) <= 0:
                     text = event.text
                 if text is None or len(text) <= 0:
-                    continue
+                    text = ''
                 text = self.tp.cleaner.clean_text(text)
-                words = self.tp.tokenizer.tokenize(text)
+                if len(text) <= 0:
+                    words = [{'wf': '—',
+                              'wtype': 'punct',
+                              'off_start': 0,
+                              'off_end': 1}]
+                    text = '—'
+                else:
+                    words = self.tp.tokenizer.tokenize(text)
                 paraAlignment = {'off_start': 0, 'off_end': len(text), 'para_id': self.pID}
                 paraSent = {'words': words, 'text': text, 'para_alignment': [paraAlignment],
                             'lang': len(self.corpusSettings['languages']) + iTier}
@@ -392,7 +403,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         self.write_output(fnameTarget, textJSON)
         return nTokens, nWords, nAnalyze
 
-    def process_corpus(self):
+    def process_corpus(self, cutMedia=True):
         """
         Take every Exmaralda file from the source directory subtree, turn it
         into a parsed json and store it in the target directory.
@@ -401,6 +412,8 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         This is the main function of the class.
         """
         Txt2JSON.process_corpus(self)
+        if not cutMedia:
+            return
         for path, dirs, files in os.walk(os.path.join(self.corpusSettings['corpus_dir'],
                                                       self.srcExt)):
             for fname in files:
@@ -413,5 +426,5 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
 
 if __name__ == '__main__':
     x2j = Exmaralda_Hamburg2JSON()
-    x2j.process_corpus()
+    x2j.process_corpus(cutMedia=False)
 

@@ -168,7 +168,7 @@ class DumbMorphParser:
             if lang not in self.categories:
                 self.categories[lang] = {}
             if 'glosses' in self.settings and lang in self.settings['glosses']:
-                sRegex = '|'.join(re.escape(g) for g in sorted(self.settings['glosses'][lang], key=len))
+                sRegex = '|'.join(re.escape(g) for g in sorted(self.settings['glosses'][lang], key=lambda x: -len(x)))
                 sRegex = '\\b(' + sRegex + ')\\b'
                 regexes[lang] = re.compile(sRegex)
             else:
@@ -266,7 +266,7 @@ class DumbMorphParser:
         wordParts = self.rxGlossParts.findall(ana['parts'].replace('{', '(').replace('{', ')').replace(' ', '.'))
         glosses = self.rxGlossParts.findall(ana['gloss' + gloss_lang])
         glossesOvert = [g for g in glosses if self.rxBracketGloss.search(g) is None]
-        glossesCovert = [g.strip('[]') for g in glosses if self.rxBracketGloss.search(g) is not None]
+        glossesCovert = [g.strip('[].') for g in glosses if self.rxBracketGloss.search(g) is not None]
         if len(wordParts) <= 0 or len(glosses) == 0 or len(wordParts) != len(glossesOvert):
             self.log_message('Wrong gloss or partitioning: ' + ana['parts'] + ' != ' + ana['gloss' + gloss_lang])
             return

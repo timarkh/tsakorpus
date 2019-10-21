@@ -7,6 +7,8 @@ def uralic_input_simplified(field, text):
     """
     if field not in ('wf', 'lex'):
         return text
+    text = text.replace('ia', 'i͡?a')
+    text = text.replace('ua', 'u͡?a')
     text = text.replace('a', '[aäă]ː?')
     text = text.replace('o', '[oöɔ]ː?')
     text = text.replace('u', '[uü]ː?')
@@ -17,6 +19,7 @@ def uralic_input_simplified(field, text):
     text = text.replace('c', '[cč]ʼ?')
     text = text.replace('n', '[nŋ]ʼ?')
     text = text.replace('z', '[zžǯ]ʼ?')
+    text = text.replace('d', '[dð]ʼ?')
     text = text.replace('\'', '[\'ʼʔ]')
     return text
 
