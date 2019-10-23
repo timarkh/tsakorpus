@@ -20,7 +20,7 @@ class Txt2JSON:
     def __init__(self, settingsDir='conf'):
         """
         Load settings, including corpus name and directory, from the
-        corpus.json file in settings directory. Then load all other
+        conversion_settings.json file in settings directory. Then load all other
         settings from the corpus directory. These may override the
         initially loaded settings.
         """
@@ -54,8 +54,13 @@ class Txt2JSON:
         override the general settings loaded earlier).
         Clean the error log file, if any.
         """
-        fCorpus = open(os.path.join(self.settingsDir, 'corpus.json'), 'r',
-                       encoding='utf-8-sig')
+        try:
+            fCorpus = open(os.path.join(self.settingsDir, 'conversion_settings.json'), 'r',
+                           encoding='utf-8-sig')
+        except IOError:
+            # Obsolete settings file name; I keep it here for backward compatibility
+            fCorpus = open(os.path.join(self.settingsDir, 'corpus.json'), 'r',
+                           encoding='utf-8-sig')
         localSettings = json.loads(fCorpus.read())
         if corpusSpecific:
             if 'corpus_dir' in localSettings:
@@ -161,7 +166,7 @@ class Txt2JSON:
     def exclude_text(self, meta):
         """
         Check if the file should be excluded from output based on the
-        metadata rules specified in "exclude_by_meta" in corpus.json.
+        metadata rules specified in "exclude_by_meta" in conversion_settings.json.
         """
         for rule in self.excludeByMetaRules:
             if all(k in meta and meta[k] == rule[k] for k in rule):

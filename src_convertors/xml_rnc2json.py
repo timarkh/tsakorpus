@@ -17,7 +17,7 @@ class Xml_Rnc2JSON(Txt2JSON):
     Currently, simple XML files ("main corpus") and XML files
     with aligned parallel texts are supported. Type of corpus
     is determined by the value of the "corpus_type" parameter
-    in corpus.json (main/parallel).
+    in conversion_settings.json (main/parallel).
     """
 
     rxSeTags = re.compile('<se(?: [^<>]*)?> *| *</se>')

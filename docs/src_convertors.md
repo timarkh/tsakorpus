@@ -2,14 +2,14 @@
 This document describes how to run the srcipts that convert files in various input formats to the tsakorpus JSON. All of the convertors are located in the ``src_convertors`` directory.
 
 ### Paths
-If you want to convert your corpus named ``%corpus_name%`` with one of the source convertors, you have to create a directory ``src_convertors/corpus/%corpus_name%``. The configuration files are located in ``src_convertors/conf`` and ``src_convertors/corpus/%corpus_name%/conf``. Whenever the two configuration files have the same fields, the one located inside the corpus directory overrides the general one. The main purpose of the ``src_convertors/conf/corpus.json`` file (the one higher up in the tree) is to tell the converter where to look for the source files, which is why the parameters ``corpus_dir`` (which equals ``corpus`` by default) and ``corpus_name`` have to be specified there. All the rest can be put to the lower configuration file.
+If you want to convert your corpus named ``%corpus_name%`` with one of the source convertors, you have to create a directory ``src_convertors/corpus/%corpus_name%``. The configuration files are located in ``src_convertors/conf`` and ``src_convertors/corpus/%corpus_name%/conf``. Whenever the two configuration files have the same fields, the one located inside the corpus directory overrides the general one. The main purpose of the ``src_convertors/conf/conversion_settings.json`` file (the one higher up in the tree) is to tell the converter where to look for the source files, which is why the parameters ``corpus_dir`` (which equals ``corpus`` by default) and ``corpus_name`` have to be specified there. All the rest can be put to the lower configuration file.
 
-All source files have to have the same type and extension. The source files should be placed in ``src_convertors/corpus/%corpus_name%/%ext%``, where ``%ext`` is their extension. If the extension is ``json``, you have to name this directory ``json_input`` to avoid name collision with the target directory. This directory can have any number of subdirectories of arbitrary depth. After the files have been converted, the resulting JSON files will be located in ``src_convertors/corpus/%corpus_name%/json``. If you run disambiguation after that, the disambiguated JSON files will be located in ``src_convertors/corpus/%corpus_name%/json_disamb``. If you have a media-aligned corpus, the source media files have to be located next to the corresponding ELAN or Exmaralda files (and referenced there). The resulting media files (compressed and split into pieces) will appear in ``src_convertors/corpus/%corpus_name%/media``.
+All source files have to have the same type and extension. The source files should be placed in ``src_convertors/corpus/%corpus_name%/%ext%``, where ``%ext`` is their extension. If the extension is ``json``, you have to name this directory ``json_input`` to avoid name collision with the target directory. This directory can have any number of subdirectories of arbitrary depth. After the files have been converted, the resulting JSON files will be located in ``src_convertors/corpus/%corpus_name%/json``. If you run disambiguation after that, the disambiguated JSON files will be located in ``src_convertors/corpus/%corpus_name%/json_disamb``. If you have a media-aligned corpus, the source media files have to be located next to the corresponding ELAN or EXMAARaLDA files (and referenced there). The resulting media files (compressed and split into pieces) will appear in ``src_convertors/corpus/%corpus_name%/media``.
 
 ### Configuration files
-The configuration files are ``corpus.json`` and ``categories.json``. The latter describes which tags correspond to which grammatical categories and has the same format as ``categories.json`` in the main configuration directory (see ``configuration.md``). The ``corpus.json`` has a different set of fields compared to the eponymous file in the main configuration directory:
+The configuration files are ``conversion_settings.json`` and ``categories.json``. The latter describes which tags correspond to which grammatical categories and has the same format as ``categories.json`` in the main configuration directory (see ``configuration.md``). The ``conversion_settings.json`` has a number of key-value pairs that describe the contents of the corpus and tell the convertors how to deal with it:
 
-* ``corpus_name`` -- the name of the corpus. During source conversion, this parameter is only used to determine the path to the corpus files. This field should be present in the general configuration file (``src_convertors/conf/corpus.json``).
+* ``corpus_name`` -- the name of the corpus. During source conversion, this parameter is only used to determine the path to the corpus files. This field should be present in the general configuration file (``src_convertors/conf/conversion_settings.json``).
 
 * ``meta_filename`` -- the name of the metadata file. This file should be located in ``src_convertors/corpus/%corpus_name%/``. The file should have tab-delimited format where each line represents one source file, the first column contains the name of the file and other columns contain all the metadata, one column per metafield.
 
@@ -50,7 +50,7 @@ There are several source convertors for different input formats (see ``pipeline.
 
 * Convertor of morphologically annotated XML (possibly parallel) in one of the formats used by Russian National Corpus: ``xml_rnc2json.py``.
 
-* Exmaralda media-aligned files convertor: ``exmaralda_hamburg2json.py``.
+* EXMARaLDA media-aligned files convertor (works only for non-segmented EXB files where events coincide with segments): ``exmaralda_hamburg2json.py``.
 
 * ELAN media-aligned files convertor: ``eaf2json.py``.
 
@@ -115,7 +115,7 @@ Since text in different tiers belongs to different speakers and languages, it is
 }
 ```
 
-Second, tier types should be consistent throughout your corpus. If you have translations/comments, then translation/comment tiers should have a type of their own and have to be aligned with the main (transcription) tiers. The names of the tiers should be described in the following parameters in ``corpus.json``:
+Second, tier types should be consistent throughout your corpus. If you have translations/comments, then translation/comment tiers should have a type of their own and have to be aligned with the main (transcription) tiers. The names of the tiers should be described in the following parameters in ``conversion_settings.json``:
 
 * ``main_tiers`` -- an array with the names of the tiers that must be treated as transcription baseline. Normally, this array will contain only one name.
 
@@ -132,11 +132,11 @@ There are several problems with Fieldworks files. First, XMLs coming from differ
 
 Tsakorpus FLEX convertor addresses the first problem by using flexible data extraction that was tested on different kinds of XML. Nevertheless, I cannot guarantee that it will work with any FLEX XML. I do not have any solution for second and third problems. The fourth problem can be solved by writing a set of rules which will allow the convertor to reconstruct hidden categories.
 
-You can create several files with rules in the ``corpus/%corpus_name%/conf`` directory:
+Optionally, you can create several files with rules in the ``corpus/%corpus_name%/conf`` directory:
 
 * ``posRules.txt``. This is a tab-delimited file where each line consists of two columns: a part-of-speech tag used in FLEX and a tag you want to replace it with in the online version of your corpus. All tags that do not have a replacement will be left as is.
 
-* ``gramRules.txt``. This is a text file with rules that explain how to reconstruct grammatical tags from the glosses. Each rule has two part separated by `` -> ``. The right-hand part is the reconstructed tag or comma-separated set of tags, and the left-hand part is the condition under which it should be added to a word. The condition must describe a combination of glosses and part-of-speech tags. It can be simply a single gloss/tag (written as is), or a regexp that should have a match somewhere inside the glossing (written in double quotes), or a boolean expression which can use brackets, | for disjunction, & for conjunction, ~ for negation and expressions of two previous kinds. Here are several examples with comments:
+* ``gramRules.csv`` or ``gramRules.txt``. This is a text file with rules that explain how to reconstruct grammatical tags from the glosses. Each rule has two part separated by a tab (csv) or `` -> `` (txt). The right-hand part is the reconstructed tag or comma-separated set of tags, and the left-hand part is the condition under which it should be added to a word. The condition must describe a combination of glosses and part-of-speech tags. It can be simply a single gloss/tag (written as is), or a regexp that should have a match somewhere inside the glossing (written in double quotes), or a boolean expression which can use brackets, | for disjunction, & for conjunction, ~ for negation and expressions of two previous kinds. Here are several examples with comments:
 ```
 1Pl -> 1,pl                   # if the word has a gloss 1Pl, add "1" and "pl" to the set of grammatical tags
 "Poss\.1(-Acc-Sg)?$" -> 1sg   # if the word has a gloss Poss.1, either followed by glosses Acc and Sg, or at the end of the word, add the tag 1sg

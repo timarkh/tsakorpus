@@ -1,3 +1,5 @@
+This document descrtibes the settings used by the indexator and the search interface. You should configure them if you already have corpus files in JSON ready for indexing. For source convertors configuration, please refer to ``src_convertors.md``.
+
 ## Configuration files
 All configuration files for the search interface and indexator are stored in the ./conf directory. All of them have JSON format. The main configuration file is corpus.json.
 

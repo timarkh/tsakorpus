@@ -18,8 +18,13 @@ class JSON2CG:
     rxCGAna = re.compile('<ana_([0-9]+)>', flags=re.DOTALL)
 
     def __init__(self):
-        f = open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
-                 'r', encoding='utf-8')
+        try:
+            f = open(os.path.join(self.SETTINGS_DIR, 'conversion_settings.json'),
+                     'r', encoding='utf-8')
+        except IOError:
+            # Obsolete settings file name; I keep it here for backward compatibility
+            f = open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
+                     'r', encoding='utf-8')
         self.settings = json.loads(f.read())
         f.close()
         self.name = self.settings['corpus_name']
@@ -42,8 +47,13 @@ class JSON2CG:
         (they may override the general settings loaded earlier).
         Clean the error log file, if any.
         """
-        fCorpus = open(os.path.join(self.corpus_dir, 'conf', 'corpus.json'), 'r',
-                       encoding='utf-8-sig')
+        try:
+            fCorpus = open(os.path.join(self.corpus_dir, 'conf', 'conversion_settings.json'), 'r',
+                           encoding='utf-8-sig')
+        except IOError:
+            # Obsolete settings file name; I keep it here for backward compatibility
+            fCorpus = open(os.path.join(self.corpus_dir, 'conf', 'corpus.json'), 'r',
+                        encoding='utf-8-sig')
         self.settings.update(json.loads(fCorpus.read()))
         fCorpus.close()
 

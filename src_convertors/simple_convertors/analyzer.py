@@ -52,7 +52,9 @@ class DumbMorphParser:
         Load rules for converting the glosses into bags of grammatical
         tags.
         """
+        self.grammRules = []
         self.load_gramm_rules(os.path.join(self.settings['corpus_dir'], 'conf/gramRules.txt'))
+        self.load_gramm_rules(os.path.join(self.settings['corpus_dir'], 'conf/gramRules.csv'), separator='\t')
 
     @staticmethod
     def prepare_rule(rule):
@@ -79,7 +81,7 @@ class DumbMorphParser:
                 rule += replReg(ruleParts[i])
         return rule
 
-    def load_gramm_rules(self, fname):
+    def load_gramm_rules(self, fname, separator='->'):
         """
         Load main set of rules for converting the glosses into bags
         of grammatical tags.
@@ -91,14 +93,14 @@ class DumbMorphParser:
         for line in f:
             line = re.sub('#.*', '', line).strip()
             if len(line) > 0:
-                rule = [i.strip() for i in line.split('->')]
+                rule = [i.strip() for i in line.split(separator)]
                 if len(rule) != 2:
                     continue
                 rule[1] = set(rule[1].split(','))
                 rule[0] = self.prepare_rule(rule[0])
                 rules.append(rule)
         f.close()
-        self.grammRules = rules
+        self.grammRules += rules
 
     def log_message(self, message):
         """
