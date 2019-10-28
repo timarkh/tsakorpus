@@ -730,5 +730,5 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
 
 if __name__ == '__main__':
     x2j = ISO_TEI_Hamburg2JSON()
-    x2j.process_corpus(cutMedia=False)
+    x2j.process_corpus(cutMedia=True)
 
