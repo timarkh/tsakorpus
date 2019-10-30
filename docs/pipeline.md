@@ -9,7 +9,7 @@ If you have a corpus in one of several accepted formats (see *Source files* belo
 
 1. The source conversion part (``src_convertors`` directory, may be performed on any computer).
 
-    * You manually prepare settings for the source convertor (``conversion_settings.json`` and ``categories.json``).
+    * You manually prepare settings for the source convertor (``conversion_settings.json`` and ``categories.json``, and possibly other files).
 
     * You put your source files to the appropriate folder and run the appropriate convertor. You get a folder with JSON files as a result.
 
@@ -31,7 +31,7 @@ If you have a corpus in one of several accepted formats (see *Source files* belo
 
     * If you are setting up the corpus for the first time, you set up apache/nginx/... configuration files so that some URL would resolve to your corpus and switch it on.
 
-    * You reload apache/nginx, wait a little and check if th search works.
+    * You reload apache/nginx, wait a little and check if the search works.
 
 ### Source files
 In order to be available for search, your corpus has to be uploaded to the elasticsearch database, which is done by the indexator. The corpus passed to the indexator should consist of a number of JSON documents or gzipped JSON documents. Each of the documents contains a dictionary with the metadata for that document and an array of sentences (or sentence-like segments, such as ELAN/EXMARaLDA aligned segments) with annotation. It is not possible to have documents without sentence segmentation because the sentence is the basic search unit: when you search for contexts that contain some words, you get a list of sentences as a result. You can find the detailed specification of the JSON format used by tsakorpus in input_format.md.
@@ -53,6 +53,8 @@ You can generate JSON files yourself, or use one of the several convertors that 
 * Plain text questonnaire convertor (``txt_questionnaires2json.py``). This is an ad hoc plain text convertor for Beserman Udmurt files that contain single usage examples from the dictionary together with their translations. You probably don't need it.
 
 Before you run a convertor, you have to adjust settings in the ``src_convertors/conf`` directory and put your source corpus files to the ``src_convertors/corpus/%corpus_name%`` directory. See src_convertors.md for further details.
+
+Normally, conversion takes 1-10 minutes per million tokens. However, if the source convertor has to cut media files, this may take much longer (several hours per million tokens).
 
 ### Indexing
 In order to index a copus, you have to adjust settings in the ``conf`` directory (see configuration.md) and put the source JSON or gzipped JSON filed to ``corpus/%corpus_name%``. It is important to choose a unique name for the corpus, as it defines the names of the elasticsearch database indexes where it is stored. Since there is no authorization in elasticsearch, accidentally choosing a name coinciding with another corpus that already exists on the server will lead to the destruction of the latter, even if it was not yours.
@@ -82,7 +84,7 @@ Memory consumed by the indexator itself non-linearly depends on several paramete
 
 The disk space required by the index depends primarily on the size of the corpus. Again, in case of full morphological annotation, you can expect 1 million tokens to take 0.5-0.7 Gb of disk space.
 
-The time needed to index a corpus may vary significantly depending on the amount of annotation and your hardware characteristics. Very roughly, you can expect 5-10 minutes per million tokens on an ordinary desktop computer. However, if the source convertor has to cut media files, this may take much longer (several hours per million tokens).
+The time needed to index a corpus may vary significantly depending on the amount of annotation and your hardware characteristics. Very roughly, you can expect 5-10 minutes per million tokens on an ordinary desktop computer.
 
 ### Translation
 If you want your web interface to have several language options, you have to provide translations for all captions and messages. English and Russian translations for the main part of the interface is included in the distribution. If you do not intend to have other languages in the interface, you have to do the following:
