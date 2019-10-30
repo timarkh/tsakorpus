@@ -26,58 +26,6 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         self.pID = 0         # id of last aligned segment
         self.glosses = set()
 
-    def add_coma_key_to_meta(self, dictMeta, el):
-        """
-        Add metadata for a single key-value pair represented
-        as an XML element taken from the COMA file.
-        """
-        if 'Name' not in el.attrib or 'coma_meta_conversion' not in self.corpusSettings:
-            return
-        if el.attrib['Name'] == '3 Date of recording':
-            m = re.search('^([0-9]{4})', el.text)
-            if m is not None:
-                dictMeta['year_from'] = m.group(1)
-                dictMeta['year_to'] = m.group(1)
-        elif el.attrib['Name'] in self.corpusSettings['coma_meta_conversion']:
-            dictMeta[self.corpusSettings['coma_meta_conversion'][el.attrib['Name']]] = el.text.strip()
-
-    def load_meta(self):
-        """
-        Load the metadata for the files of the corpus from a COMA XML
-        file whose name is indicated in the settings.
-        """
-        self.meta = {}
-        if len(self.corpusSettings['meta_filename']) <= 0:
-            return
-        fnameMeta = os.path.join(self.corpusSettings['corpus_dir'],
-                                 self.corpusSettings['meta_filename'])
-        if not os.path.exists(fnameMeta):
-            print('Metadata file not found.')
-        else:
-            srcTree = etree.parse(fnameMeta)
-            exbDescrs = srcTree.xpath('/Corpus/CorpusData/Communication')
-            for exbDescr in exbDescrs:
-                fname = ''
-                title = ''
-                curMetaDict = {}
-                for el in exbDescr:
-                    if el.tag == 'Transcription':
-                        elFname = el.xpath('Filename')
-                        if (len(elFname) > 0 and elFname[0].text is not None
-                                and elFname[0].text.lower().endswith('.exb')):
-                            fname = elFname[0].text
-                        elTitle = el.xpath('Filename')
-                        if len(elTitle) > 0 and elTitle[0].text is not None:
-                            title = elTitle[0].text
-                    elif el.tag == 'Description':
-                        for descrKey in el:
-                            if descrKey.tag != 'Key':
-                                continue
-                            self.add_coma_key_to_meta(curMetaDict, descrKey)
-                if len(fname) > 0:
-                    curMetaDict['title'] = title
-                    self.meta[fname] = curMetaDict
-
     def get_tlis(self, srcTree):
         """
         Retrieve and return all time labels from the XML tree.

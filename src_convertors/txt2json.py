@@ -3,6 +3,7 @@ import re
 import json
 import gzip
 import time
+from lxml import etree
 from simple_convertors.text_processor import TextProcessor
 from json2cg import JSON2CG
 
@@ -92,37 +93,94 @@ class Txt2JSON:
         except:
             return
 
-    def load_meta(self):
+    def load_meta_csv(self, fnameMeta):
         """
         Load the metadata for the files of the corpus from a tab-delimited
-        meta file whose name is indicated in the settings.
+        metadata file whose name is indicated in the settings.
+        """
+        fMeta = open(fnameMeta, 'r', encoding='utf-8-sig')
+        for line in fMeta:
+            if len(line) <= 3:
+                continue
+            metaValues = line.split('\t')
+            curMetaDict = {}
+            for i in range(len(self.corpusSettings['meta_fields'])):
+                fieldName = self.corpusSettings['meta_fields'][i]
+                if i >= len(metaValues):
+                    break
+                if fieldName == 'filename':
+                    metaValues[i] = metaValues[i].replace('\\', '/')
+                    if not self.corpusSettings['meta_files_case_sensitive']:
+                        metaValues[i] = metaValues[i].lower()
+                    self.meta[metaValues[i]] = curMetaDict
+                else:
+                    curMetaDict[fieldName] = metaValues[i].strip()
+        fMeta.close()
+
+    def add_coma_key_to_meta(self, dictMeta, el):
+        """
+        Add metadata for a single key-value pair represented
+        as an XML element taken from the COMA file.
+        """
+        if 'Name' not in el.attrib or 'coma_meta_conversion' not in self.corpusSettings:
+            return
+        if re.search('\\b[Dd]ate +of +recording\\b', el.attrib['Name']) is not None:
+            # Ad-hoc for the date of creation
+            m = re.search('^([0-9]{4})', el.text)
+            if m is not None:
+                dictMeta['year_from'] = m.group(1)
+                dictMeta['year_to'] = m.group(1)
+        elif el.attrib['Name'] in self.corpusSettings['coma_meta_conversion']:
+            dictMeta[self.corpusSettings['coma_meta_conversion'][el.attrib['Name']]] = el.text.strip()
+
+    def load_meta_coma(self, fnameMeta):
+        """
+        Load the communication-level metadata for the files of the corpus
+        from a Coma XML file whose name is indicated in the settings.
+        """
+        srcTree = etree.parse(fnameMeta)
+        exbDescrs = srcTree.xpath('/Corpus/CorpusData/Communication')
+        for exbDescr in exbDescrs:
+            fname = ''
+            title = ''
+            curMetaDict = {}
+            for el in exbDescr:
+                if el.tag == 'Transcription':
+                    elFname = el.xpath('Filename')
+                    if (len(elFname) > 0 and elFname[0].text is not None
+                            and elFname[0].text.lower().endswith(('.exb', '.eaf'))):
+                        fname = elFname[0].text
+                        if not self.corpusSettings['meta_files_ext']:
+                            fname = re.sub('\\.[^.]*$', '', fname)
+                    elTitle = el.xpath('Filename')
+                    if len(elTitle) > 0 and elTitle[0].text is not None:
+                        title = elTitle[0].text
+                elif el.tag == 'Description':
+                    for descrKey in el:
+                        if descrKey.tag != 'Key':
+                            continue
+                        self.add_coma_key_to_meta(curMetaDict, descrKey)
+            if len(fname) > 0:
+                if 'title' not in curMetaDict:
+                    curMetaDict['title'] = title
+                self.meta[fname] = curMetaDict
+
+    def load_meta(self):
+        """
+        Look at the metadata file extension, if any, and call the
+        appropriate function for loading the metadata.
         """
         self.meta = {}
         if len(self.corpusSettings['meta_filename']) <= 0:
             return
-        try:
-            fMeta = open(os.path.join(self.corpusSettings['corpus_dir'],
-                                      self.corpusSettings['meta_filename']),
-                         'r', encoding='utf-8-sig')
-            for line in fMeta:
-                if len(line) <= 3:
-                    continue
-                metaValues = line.split('\t')
-                curMetaDict = {}
-                for i in range(len(self.corpusSettings['meta_fields'])):
-                    fieldName = self.corpusSettings['meta_fields'][i]
-                    if i >= len(metaValues):
-                        break
-                    if fieldName == 'filename':
-                        metaValues[i] = metaValues[i].replace('\\', '/')
-                        if not self.corpusSettings['meta_files_case_sensitive']:
-                            metaValues[i] = metaValues[i].lower()
-                        self.meta[metaValues[i]] = curMetaDict
-                    else:
-                        curMetaDict[fieldName] = metaValues[i].strip()
-            fMeta.close()
-        except FileNotFoundError:
+        fnameMeta = os.path.join(self.corpusSettings['corpus_dir'],
+                                 self.corpusSettings['meta_filename'])
+        if not os.path.exists(fnameMeta):
             print('Metadata file not found.')
+        if self.corpusSettings['meta_filename'].lower().endswith('.coma'):
+            self.load_meta_coma(fnameMeta)
+        else:
+            self.load_meta_csv(fnameMeta)
 
     def write_output(self, fnameTarget, textJSON):
         """

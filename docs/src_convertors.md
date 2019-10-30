@@ -11,7 +11,7 @@ The configuration files are ``conversion_settings.json`` and ``categories.json``
 
 * ``corpus_name`` -- the name of the corpus. During source conversion, this parameter is only used to determine the path to the corpus files. This field should be present in the general configuration file (``src_convertors/conf/conversion_settings.json``).
 
-* ``meta_filename`` -- the name of the metadata file. This file should be located in ``src_convertors/corpus/%corpus_name%/``. The file should have tab-delimited format where each line represents one source file, the first column contains the name of the file and other columns contain all the metadata, one column per metafield.
+* ``meta_filename`` -- the name of the metadata file. This file should be located in ``src_convertors/corpus/%corpus_name%/``. CSV and Coma formats are recognized. In the case of CSV, the file should have tab-delimited format where each line represents one source file, the first column contains the name of the file and other columns contain all the metadata, one column per metafield. In the case of a Coma file, see also ``coma_meta_conversion`` parameter below.
 
 * ``meta_fields`` -- list of metafield names. The values for the listed fields should appear in the metadata file in the same order (value for the first field in the first column, and so on). The name of the first metafield should be ``filename``. In the metadata file, it corresponds to the first column that contains the name of the file being described by that line.
 
@@ -21,7 +21,11 @@ The configuration files are ``conversion_settings.json`` and ``categories.json``
 
 * ``meta_files_case_sensitive`` -- boolean value that determines whether the filenames in the metadata file should be treated as case sensitive.
 
+* ``nometa_skip`` (optional) -- boolean value that determines if the files not referenced in the metadata should be skipped. Defaults to false.
+
 * ``exclude_by_meta`` (optional) -- list of dictionaries, each of which contains a rule that determines what input documents should be skipped based on its metadata. The document is skipped if it conforms to at least one rule. A document conforms to the rule if its metadata contains all the key-value pairs present in the rule, while possibly containing other keys. Defaults to empty list.
+
+* ``coma_meta_conversion`` (optional) -- dictionary that determines which communication-level description fields from a Coma metadata file have to be used and what metafield parameters they map to. Only usable with the Coma metadata files.
 
 * ``parsed_wordlist_filename`` (optional) -- the name of the file with the morphologically annotated word list (for the converters which accept such a file). If you have several lists for different languages, the value should be a dictionary where keys are the names of the languages and values are the names of the files.
 
@@ -33,7 +37,7 @@ The configuration files are ``conversion_settings.json`` and ``categories.json``
 
 * ``languages`` -- an array with the names of the languages which exist in the corpus.
 
-* ``cg_disambiguate`` (optional) -- boolean value that determines whether your corpus has to be disambiguated with the Constraint Grammar rules after the annotation. Defaults to fals.
+* ``cg_disambiguate`` (optional) -- boolean value that determines whether your corpus has to be disambiguated with the Constraint Grammar rules after the annotation. Defaults to false.
 
 * ``cg_filename`` (optional) -- the names of the files with the Constraint Grammar rules (if you want to disambiguate your corpus). This files should be located in ``src_convertors/corpus/%corpus_name%/``. The value of this field is a dictionary where the keys are the names of the languages and the values are the names of the corresponding files. It is not obligatory to list all the languages you have.
 

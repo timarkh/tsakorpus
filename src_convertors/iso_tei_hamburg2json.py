@@ -286,6 +286,9 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         Iterate over words in an annotation block and add their
         analyses to the corresponding word objects in the sentences.
         """
+        useGlossList = False
+        if 'glosses' in self.corpusSettings and len(self.corpusSettings['glosses']) > 0:
+            useGlossList = True
         wordAnno = self.collect_annotation(annoTree)
         for wordID in wordAnno:
             ana = {}
@@ -323,7 +326,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                     ana['lex'] = ' '.join(s[1] for s in stems)
                 ana['trans_en'] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
                 self.add_ana_fields(ana, curWordAnno)
-                self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0])
+                self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0],
+                                        useGlossList=useGlossList)
                 ana['gloss_index'] = self.rxBracketGloss.sub('', newIndexGloss)
             for glossLang in ('ru', 'de'):
                 if 'gloss_index_' + glossLang in ana:
@@ -670,11 +674,11 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         Return number of tokens, number of words and number of
         words with at least one analysis in the document.
         """
-        # curMeta = self.get_meta(fnameSrc)
-        # Currently, no metadata are loaded:
         print(fnameSrc)
-        curMeta = {'title': fnameSrc, 'author': '',
-                   'year_from': '1900', 'year_to': str(datetime.datetime.now().year)}
+        curMeta = self.get_meta(fnameSrc)
+        if len(curMeta) == 1:
+            curMeta = {'filename': fnameSrc, 'title': fnameSrc, 'author': '',
+                       'year_from': '1900', 'year_to': str(datetime.datetime.now().year)}
 
         textJSON = {'meta': curMeta, 'sentences': []}
         nTokens, nWords, nAnalyzed = 0, 0, 0
@@ -730,5 +734,5 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
 
 if __name__ == '__main__':
     x2j = ISO_TEI_Hamburg2JSON()
-    x2j.process_corpus(cutMedia=True)
+    x2j.process_corpus(cutMedia=False)
 

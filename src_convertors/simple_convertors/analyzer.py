@@ -53,8 +53,14 @@ class DumbMorphParser:
         tags.
         """
         self.grammRules = []
-        self.load_gramm_rules(os.path.join(self.settings['corpus_dir'], 'conf/gramRules.txt'))
-        self.load_gramm_rules(os.path.join(self.settings['corpus_dir'], 'conf/gramRules.csv'), separator='\t')
+        self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
+                                           'conf/grammRules.txt'))
+        self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
+                                           'conf/gramRules.txt'))  # Backward compatibility
+        self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
+                                           'conf/grammRules.csv'), separator='\t')
+        self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
+                                           'conf/gramRules.csv'), separator='\t')  # Backward compatibility
 
     @staticmethod
     def prepare_rule(rule):
@@ -170,11 +176,13 @@ class DumbMorphParser:
             if lang not in self.categories:
                 self.categories[lang] = {}
             if 'glosses' in self.settings and lang in self.settings['glosses']:
-                sRegex = '|'.join(re.escape(g) for g in sorted(self.settings['glosses'][lang], key=lambda x: -len(x)))
+                sRegex = '|'.join(re.escape(g) for g in sorted(self.settings['glosses'][lang],
+                                                               key=lambda x: -len(x)))
                 sRegex = '\\b(' + sRegex + ')\\b'
                 regexes[lang] = re.compile(sRegex)
             else:
-                sRegex = '|'.join(re.escape(g) for g in sorted(self.categories[lang], key=len))
+                sRegex = '|'.join(re.escape(g) for g in sorted(self.categories[lang],
+                                                               key=len))
                 sRegex = '\\b(' + sRegex + ')\\b'
                 regexes[lang] = re.compile(sRegex, flags=re.I)
         return regexes
