@@ -9,29 +9,29 @@ If you have a corpus in one of several accepted formats (see *Source files* belo
 
 1. The source conversion part (``src_convertors`` directory, may be performed on any computer).
 
-* You manually prepare settings for the source convertor (``conversion_settings.json`` and ``categories.json``).
+    * You manually prepare settings for the source convertor (``conversion_settings.json`` and ``categories.json``).
 
-* You put your source files to the appropriate folder and run the appropriate convertor. You get a folder with JSON files as a result.
+    * You put your source files to the appropriate folder and run the appropriate convertor. You get a folder with JSON files as a result.
 
-* If there is no convertor available for your data, you will have to write one yourself (see ``docs/input_format.md`` for the information on the output JSON format).
+    * If there is no convertor available for your data, you will have to write one yourself (see ``docs/input_format.md`` for the information on the output JSON format).
 
 2. The indexing part (outside of ``src_convertors`` directory, should be performed on the server with Elasticsearch service running).
 
-* If you have multiple corpora, a separate tsakorpus instance (i.e. tsakorpus directory and apache config file) is needed for each of them.
+    * If you have multiple corpora, a separate tsakorpus instance (i.e. tsakorpus directory and apache config file) is needed for each of them.
 
-* You manually prepare settings for the indexing and search (``conf/corpus.json``) and copy the ``categories.json`` to ``conf``.
+    * You manually prepare settings for the indexing and search (``conf/corpus.json``) and copy the ``categories.json`` to ``conf``.
 
-* You manually adjust and/or add interface translations by editing ``messages.po`` files in language subdirectories of ``search/web_app/translations`` (see ``docs/interface_languages.md``).
+    * You manually adjust and/or add interface translations by editing ``messages.po`` files in language subdirectories of ``search/web_app/translations`` (see ``docs/interface_languages.md``).
 
-* If you want to use custom transliteration for input or output, you have to edit the scripts in ``search/transliterators`` and ``search/web_app/transliteration.py`` (see Transliteration section below).
+    * If you want to use custom transliteration for input or output, you have to edit the scripts in ``search/transliterators`` and ``search/web_app/transliteration.py`` (see Transliteration section below).
 
-* You put the JSON files to the appropriate folder inside ``corpus``.
+    * You put the JSON files to the appropriate folder inside ``corpus``.
 
-* You run ``indexator/indexator.py``.
+    * You run ``indexator/indexator.py``.
 
-* If you are setting up the corpus for the first time, you set up apache/nginx/... configuration files so that some URL would resolve to your corpus and switch it on.
+    * If you are setting up the corpus for the first time, you set up apache/nginx/... configuration files so that some URL would resolve to your corpus and switch it on.
 
-* You reload apache/nginx, wait a little and check if th search works.
+    * You reload apache/nginx, wait a little and check if th search works.
 
 ### Source files
 In order to be available for search, your corpus has to be uploaded to the elasticsearch database, which is done by the indexator. The corpus passed to the indexator should consist of a number of JSON documents or gzipped JSON documents. Each of the documents contains a dictionary with the metadata for that document and an array of sentences (or sentence-like segments, such as ELAN/EXMARaLDA aligned segments) with annotation. It is not possible to have documents without sentence segmentation because the sentence is the basic search unit: when you search for contexts that contain some words, you get a list of sentences as a result. You can find the detailed specification of the JSON format used by tsakorpus in input_format.md.
