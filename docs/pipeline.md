@@ -4,8 +4,37 @@ This document describes in brief which steps are required for deploying your cor
 ### Installation
 Tsakorpus does not require installation. All you have to do is make sure all the dependencies are installed (see readme.md) and copy the entire contents of the repository to a directory on your computer. This concerns both Linux and Windows. For indexing and searching operations you need the elasticsearch service running. On Windows, this may mean manually launching elasticsearch.bat in the elasticsearch/bin directory before you are going to work with tsakorpus.
 
+### Pipeline overview
+If you have a corpus in one of several accepted formats (see *Source files* below), this is the typical pipeline:
+
+1. The source conversion part (``src_convertors`` directory, may be performed on any computer).
+
+* You manually prepare settings for the source convertor (``conversion_settings.json`` and ``categories.json``).
+
+* You put your source files to the appropriate folder and run the appropriate convertor. You get a folder with JSON files as a result.
+
+* If there is no convertor available for your data, you will have to write one yourself (see ``docs/input_format.md`` for the information on the output JSON format).
+
+2. The indexing part (outside of ``src_convertors`` directory, should be performed on the server with Elasticsearch service running).
+
+* If you have multiple corpora, a separate tsakorpus instance (i.e. tsakorpus directory and apache config file) is needed for each of them.
+
+* You manually prepare settings for the indexing and search (``conf/corpus.json``) and copy the ``categories.json`` to ``conf``.
+
+* You manually adjust and/or add interface translations by editing ``messages.po`` files in language subdirectories of ``search/web_app/translations`` (see ``docs/interface_languages.md``).
+
+* If you want to use custom transliteration for input or output, you have to edit the scripts in ``search/transliterators`` and ``search/web_app/transliteration.py`` (see Transliteration section below).
+
+* You put the JSON files to the appropriate folder inside ``corpus``.
+
+* You run ``indexator/indexator.py``.
+
+* If you are setting up the corpus for the first time, you set up apache/nginx/... configuration files so that some URL would resolve to your corpus and switch it on.
+
+* You reload apache/nginx, wait a little and check if th search works.
+
 ### Source files
-In order to be available for search, your corpus has to be uploaded to the elasticsearch database, which is done by the indexator. The corpus passed to the indexator should consist of a number of JSON documents or gzipped JSON documents. Each of the documents contains a dictionary with the metadata for that document and an array of sentences (or sentence-like segments, such as ELAN/Exmaralda aligned segments) with annotation. It is not possible to have documents without sentence segmentation because the sentence is the basic search unit: when you search for contexts that contain some words, you get a list of sentences as a result. You can find the detailed specification of the JSON format used by tsakorpus in input_format.md.
+In order to be available for search, your corpus has to be uploaded to the elasticsearch database, which is done by the indexator. The corpus passed to the indexator should consist of a number of JSON documents or gzipped JSON documents. Each of the documents contains a dictionary with the metadata for that document and an array of sentences (or sentence-like segments, such as ELAN/EXMARaLDA aligned segments) with annotation. It is not possible to have documents without sentence segmentation because the sentence is the basic search unit: when you search for contexts that contain some words, you get a list of sentences as a result. You can find the detailed specification of the JSON format used by tsakorpus in input_format.md.
 
 You can generate JSON files yourself, or use one of the several convertors that come with tsakorpus. The convertors are located in the ``src_convertors`` directory. A convertor takes a collection of files in one of the source formats, as well as a number of additional setting files, and converts them to the tsakorpus JSON. Currently, the following convertors are available:
 
@@ -53,7 +82,7 @@ Memory consumed by the indexator itself non-linearly depends on several paramete
 
 The disk space required by the index depends primarily on the size of the corpus. Again, in case of full morphological annotation, you can expect 1 million tokens to take 0.5-0.7 Gb of disk space.
 
-The time needed to index a corpus may vary significantly depending on the amount of annotation and your hardware characteristics. Very roughly, you can expect 5-10 minutes per million tokens on an ordinary desktop computer.
+The time needed to index a corpus may vary significantly depending on the amount of annotation and your hardware characteristics. Very roughly, you can expect 5-10 minutes per million tokens on an ordinary desktop computer. However, if the source convertor has to cut media files, this may take much longer (several hours per million tokens).
 
 ### Translation
 If you want your web interface to have several language options, you have to provide translations for all captions and messages. English and Russian translations for the main part of the interface is included in the distribution. If you do not intend to have other languages in the interface, you have to do the following:
