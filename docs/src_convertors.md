@@ -47,6 +47,8 @@ The configuration files are ``conversion_settings.json`` and ``categories.json``
 
 * ``transparent_punctuation`` (optional) -- regexp that determines which punctuation should be considered "transparent", i.e. should not be counted when calculating distances between words for a multiword query. This parameter influences the assignment of ``sentence_index`` values, which is added to words and punctuation marks at conversion time and then used in multiword queries at search time. Defaults to ``^ *$``.
 
+* ``one_morph_per_cell`` (optional, for the ELAN convertor) -- boolean value that determines whether the annotation tiers contain one cell per morpheme/gloss (true) or one cell per entire glossing (false). For example, if the morpheme segmentation of the German word *ge-schloss-en* is kept in three different cells (*ge-*, *schloss* and *-en*), this value should be set to true. Defaults to false.
+
 ### The convertors
 There are several source convertors for different input formats (see ``pipeline.md``). Each of them is a class located in one Python file:
 
@@ -130,9 +132,11 @@ Since text in different tiers belongs to different speakers and languages, it is
 
 Second, tier types should be consistent throughout your corpus. If you have translations/comments, then translation/comment tiers should have a type of their own and have to be aligned with the main (transcription) tiers. The names of the tiers should be described in the following parameters in ``conversion_settings.json``:
 
-* ``main_tiers`` -- an array with the names of the tiers that must be treated as transcription baseline. Normally, this array will contain only one name.
+* ``main_tiers`` -- an array with the names of the tiers that must be treated as transcription baseline. Names can be specified with regexes. Normally, this array will contain only one name.
 
-* ``aligned_tiers`` -- an array with the names of translation/comment tiers that have a main tier as their parent.
+* ``aligned_tiers`` -- an array with the names of translation/comment tiers that have a main tier as their parent. Names can be specified with regexes.
+
+* ``analysis_tiers`` (optional) -- a dictionary describing which ELAN tiers correspond to which word-level analysis fields. The keys are the tier names (or regexes), and the possible values are currently ``word`` (tokens), ``parts`` (morpheme segmentation) and ``gloss`` (glosses).
 
 * ``tier_languages`` -- a dictionary where keys are the names of the tier types (listed in the above two arrays) and the values are the names of their languages.
 

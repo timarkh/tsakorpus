@@ -185,10 +185,17 @@ class Eaf2JSON(Txt2JSON):
             tokens.append(curToken)
         return tokens
 
-    def retrieve_analyses(self, aID, lang=''):
+    def retrieve_analyses(self, aID, lang='', topLevel=True):
         """
         Compile list of analyses retrieved from the relevant tiers of an analyzed
         EAF file associated with the token identified by aID.
+        topLevel == True iff the function was called by a token processor,
+        rather than by the same function recursively. This is needed because
+        certain wrap-up operations should be performed only on the top level,
+        e.g. gloss-to-tag conversion or collation of analyses.
+        TODO: actually, the top-level tier here is the lowest tier in the
+        hierarchy where subdivision of a parent cell implies multiple
+        analyses. A POS or a lemma tier could be top-level, for example.
         """
         analyses = []
         analysisTiers = []
@@ -200,7 +207,7 @@ class Eaf2JSON(Txt2JSON):
                 if childID not in self.segmentTree:
                     continue
                 contents = self.segmentTree[childID][0]
-                for ana in self.retrieve_analyses(childID, lang=lang):
+                for ana in self.retrieve_analyses(childID, lang=lang, topLevel=False):
                     if tierType == 'lemma':
                         ana['lex'] = contents
                     elif tierType == 'parts':
@@ -221,8 +228,51 @@ class Eaf2JSON(Txt2JSON):
             for partAna in combination:
                 ana.update(partAna)
             if len(ana) > 0:
-                self.tp.parser.process_gloss_in_ana(ana)
                 analyses.append(ana)
+        if topLevel:
+            if ('one_morph_per_cell' in self.corpusSettings
+                    and self.corpusSettings['one_morph_per_cell']):
+                curLex = set()
+                curStemGloss = set()
+                allAnaFields = set()
+                for ana in analyses:
+                    for k in ana:
+                        allAnaFields.add(k)
+                totalAna = {k: '' for k in allAnaFields}
+                for k in totalAna:
+                    for ana in analyses:
+                        if k in ['lex'] or k.startswith('gr.'):
+                            if len(totalAna[k]) <= 0:
+                                totalAna[k] = ana[k]
+                            elif type(totalAna[k]) == str and totalAna[k] != ana[k]:
+                                totalAna[k] = [totalAna[k], ana[k]]
+                            elif type(totalAna[k]) == list and ana[k] not in totalAna[k]:
+                                totalAna[k].append(ana[k])
+                        else:
+                            if len(totalAna[k]) > 0 and k not in ['parts']:
+                                totalAna[k] += '-'
+                            if k not in ana:
+                                totalAna[k] += '∅'
+                            else:
+                                totalAna[k] += ana[k]
+                                if k == 'parts' and not ana[k].startswith('-') and not ana[k].endswith('-'):
+                                    curLex.add(ana[k])
+                                    if 'gloss' in ana:
+                                        curStemGloss.add(ana['gloss'])
+                if 'lex' not in totalAna or len(totalAna['lex']) <= 0:
+                    totalAna['lex'] = [l for l in sorted(curLex)]
+                    if len(totalAna['lex']) == 1:
+                        totalAna['lex'] = totalAna['lex'][0]
+                if 'trans_en' not in totalAna or len(totalAna['trans_en']) <= 0:
+                    totalAna['trans_en'] = [t for t in sorted(curStemGloss)]
+                    if len(totalAna['trans_en']) == 1:
+                        totalAna['trans_en'] = totalAna['trans_en'][0]
+                analyses = [totalAna]
+
+            for ana in analyses:
+                self.tp.parser.process_gloss_in_ana(ana)
+                if 'gloss_index' in ana:
+                    self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0])
         if len(analyses) <= 0:
             return [{}]
         return analyses

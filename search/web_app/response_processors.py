@@ -145,6 +145,8 @@ class SentenceViewer:
         for the language specified by lang.
         """
         def key_comp(p):
+            if 'gr_fields_order' not in self.settings['lang_props'][lang]:
+                return -1
             if p[0] not in self.settings['lang_props'][lang]['gr_fields_order']:
                 return len(self.settings['lang_props'][lang]['gr_fields_order'])
             return self.settings['lang_props'][lang]['gr_fields_order'].index(p[0])
@@ -732,6 +734,8 @@ class SentenceViewer:
         linguistic paper.
         """
         def key_comp(p):
+            if 'gr_fields_order' not in self.settings['lang_props'][lang]:
+                return -1
             if p[0] not in self.settings['lang_props'][lang]['gr_fields_order']:
                 return len(self.settings['lang_props'][lang]['gr_fields_order'])
             return self.settings['lang_props'][lang]['gr_fields_order'].index(p[0])

@@ -14,4 +14,6 @@ The problem with the ELAN XML format is that the same data may be represented by
 
 * All parallel translations, as well as alternative representations of the same transcription and sentence-level metadata, should reside in separate tiers symbolically associated with the main tier.
 
+* If there is word-level annotation, e.g. morphological analysis, there should be a tokenized tier, which should be a symbolic subdivision of the "main" tier. You can list all tokens or just word tokens there. There should be no mismatches between words in the "main" tier and in the tokenized one, i.e. same words should look the same in the two tiers. All further annotation tiers (morpheme segmentation, glosses, POS, lemma etc.) should subdivide or be symbolically associated with this tokenized tier.
+
 (UNFINISHED)
