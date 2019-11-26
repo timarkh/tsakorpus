@@ -110,9 +110,9 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                 if tupleKey not in wordTlis:
                     for wordTli in wordTlis:
                         if ((wordTli[0] == tupleKey[0]
-                                     or self.tlis[tupleKey[0]]['time'] <= self.tlis[wordTli[0]]['time'])
+                                     or self.tlis[tupleKey[0]]['n'] <= self.tlis[wordTli[0]]['n'])
                                 and (wordTli[1] == tupleKey[1]
-                                     or self.tlis[tupleKey[1]]['time'] >= self.tlis[wordTli[1]]['time'])):
+                                     or self.tlis[tupleKey[1]]['n'] >= self.tlis[wordTli[1]]['n'])):
                             tupleKeys.append(wordTli)
 
                 for tk in tupleKeys:
@@ -363,7 +363,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         if curMeta is None:
             return 0, 0, 0
         textJSON = {'meta': curMeta, 'sentences': []}
-        nTokens, nWords, nAnalyze = 0, 0, 0
+        nTokens, nWords, nAnalyzed = 0, 0, 0
         srcTree = etree.parse(fnameSrc)
         self.tlis = self.get_tlis(srcTree)
         srcFileNode = srcTree.xpath('/basic-transcription/head/meta-information/referenced-file')
@@ -376,10 +376,16 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         for i in range(len(textJSON['sentences']) - 1):
             if textJSON['sentences'][i]['lang'] != textJSON['sentences'][i + 1]['lang']:
                 textJSON['sentences'][i]['last'] = True
+            for word in textJSON['sentences'][i]['words']:
+                nTokens += 1
+                if word['wtype'] == 'word':
+                    nWords += 1
+                if 'ana' in word and len(word['ana']) > 0:
+                    nAnalyzed += 1
         self.tp.splitter.recalculate_offsets(textJSON['sentences'])
         self.tp.splitter.add_next_word_id(textJSON['sentences'])
         self.write_output(fnameTarget, textJSON)
-        return nTokens, nWords, nAnalyze
+        return nTokens, nWords, nAnalyzed
 
     def process_corpus(self, cutMedia=True):
         """
