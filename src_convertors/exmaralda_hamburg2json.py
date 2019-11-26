@@ -16,6 +16,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
     rxBracketGloss = re.compile('\\.?\\[.*?\\]')
     rxSplitGlosses = re.compile('-|\\.(?=\\[)')
     rxWordPunc = re.compile('^( *)([^\\w]*)(.*?)([^\\w]*?)( *)$')
+    txTierXpath = '/basic-transcription/basic-body/tier[@id=\'tx\']'
     mediaExtensions = {'.wav', '.mp3', '.mp4', '.avi'}
 
     def __init__(self, settingsDir='conf'):
@@ -70,25 +71,54 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
             boundaries.append((sentStart, sentEnd))
         return boundaries
 
+    def get_word_tlis(self, srcTree):
+        """
+        Collect all pairs of time labels that delimit words.
+        """
+        txTiers = srcTree.xpath(Exmaralda_Hamburg2JSON.txTierXpath)
+        tliTuples = set()
+        for txTier in txTiers:
+            for event in txTier:
+                if 'start' not in event.attrib or 'end' not in event.attrib:
+                    continue
+                tliTuple = (event.attrib['start'], event.attrib['end'])
+                tliTuples.add(tliTuple)
+        return tliTuples
+
     def collect_annotation(self, srcTree):
         """
         Return a dictionary that contains all word-level annotation events,
         the keys are tuples (start time label, end time label).
         """
+        wordTlis = self.get_word_tlis(srcTree)
         wordAnno = {}
         for tier in srcTree.xpath('/basic-transcription/basic-body/tier[@type=\'a\']'):
             if 'id' not in tier.attrib:
                 continue
             # tierID = tier.attrib['id']
             tierID = tier.attrib['category']
+            if tierID in self.corpusSettings['translation_tiers'] or tierID in ('tx', 'ts'):
+                continue
             for event in tier:
-                if 'start' not in event.attrib or 'end' not in event.attrib:
+                if ('start' not in event.attrib or 'end' not in event.attrib
+                        or event.text is None):
                     continue
                 tupleKey = (event.attrib['start'], event.attrib['end'])
-                if tupleKey not in wordAnno:
-                    wordAnno[tupleKey] = {}
-                if event.text is not None:
-                    wordAnno[tupleKey][tierID] = event.text
+
+                # If an annotation spans several tokens, add it to each of them:
+                tupleKeys = [tupleKey]
+                if tupleKey not in wordTlis:
+                    for wordTli in wordTlis:
+                        if ((wordTli[0] == tupleKey[0]
+                                     or self.tlis[tupleKey[0]]['time'] <= self.tlis[wordTli[0]]['time'])
+                                and (wordTli[1] == tupleKey[1]
+                                     or self.tlis[tupleKey[1]]['time'] >= self.tlis[wordTli[1]]['time'])):
+                            tupleKeys.append(wordTli)
+
+                for tk in tupleKeys:
+                    if tk not in wordAnno:
+                        wordAnno[tk] = {}
+                    wordAnno[tk][tierID] = event.text
         return wordAnno
 
     def add_ana_fields(self, ana, curWordAnno):
@@ -110,7 +140,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         """
         Iterate over words found in the tx tier of the XML tree.
         """
-        txTier = srcTree.xpath('/basic-transcription/basic-body/tier[@id=\'tx\']')
+        txTier = srcTree.xpath(Exmaralda_Hamburg2JSON.txTierXpath)
         wordAnno = self.collect_annotation(srcTree)
         for event in txTier[0]:
             if 'start' not in event.attrib or 'end' not in event.attrib:
