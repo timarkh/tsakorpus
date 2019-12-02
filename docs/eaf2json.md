@@ -12,8 +12,40 @@ The problem with the ELAN XML format is that the same data may be represented by
 
 * The level of segmentation granularity (duration of segments) is not important for the convertor and should be based on your linguistic needs. However, one segment is treated as one sentence (i.e. basic search unit) in tsakorpus, so in a normal general-purpose corpus you would probably want to have one phrase / discourse unit / sentence per segment.
 
-* All parallel translations, as well as alternative representations of the same transcription and sentence-level metadata, should reside in separate tiers symbolically associated with the main tier.
+* All parallel translations, as well as alternative representations of the same transcription, sentence-level notes and sentence-level metadata, should reside in separate tiers symbolically associated with the main tier.
 
-* If there is word-level annotation, e.g. morphological analysis, there should be a tokenized tier, which should be a symbolic subdivision of the "main" tier. You can list all tokens or just word tokens there. There should be no mismatches between words in the "main" tier and in the tokenized one, i.e. same words should look the same in the two tiers. All further annotation tiers (morpheme segmentation, glosses, POS, lemma etc.) should subdivide or be symbolically associated with this tokenized tier.
+* If there is word-level annotation, e.g. morphological analysis, there should be a tokenized tier, which should be a symbolic subdivision of the "main" tier. You can list all tokens or just word tokens there. There should be no mismatches between words in the "main" tier and in the tokenized one, i.e. same words should look the same in the two tiers. All further annotation tiers (morpheme segmentation, glosses, POS, lemma etc.) should subdivide or be symbolically associated with this tokenized tier. If there are tokens with multiple analyses (e.g. resulting from a rule-based automatic morphological annotation that does not disambiguate based on the context), the next tier down the hierarchy (e.g. lemma) should subdivide the token. You will have as many lemmata as you have analyses for that token; each lemma cell will head one of the analyses. If you always have at most one analysis per token (which is the case for Fieldworks corpora), symbolic association can be used.
 
-(UNFINISHED)
+* You should explain the convertor which tier contain which information. There are several parameters in ``conversion_settings.json`` that do that: ``main_tiers``, ``aligned_tiers``, ``analysis_tiers`` and ``tier_languages``. Here is how they are used:
+
+  * In what follows, "tier name" means either a string or a regular expression used to identify tiers in your EAFs. The convertor first looks for exact coincidences among tier types. If it does not find a match, it then uses the "tier name" as a regex to search among tier IDs. (Although having consistent and informative tier types throughout your corpus is best practice, there are corpora where you can only distinguish between e.g. lemma and POS tiers based on their IDs because they have the same type. This regex thing is a workaround for such cases.)
+  
+  * ``main_tiers`` is an array with the names of the top-level / time-aligned tiers. Normally, this array will contain only one name. There may be multiple such tiers in each file, each corresponding to one participant, but they normally have the same type and/or the same naming pattern, e.g. ``tx@.*``. "Main tiers" usually means "transcription tiers", but not always. For example, it is common to have the "reference tier" as a top-level tier and the transcription tier as its daughter in FLEX corpora. If you want to reorder the tiers in the web interface (e.g. make the transcription appear at the top and the sentence IDs on the bottom), you can do that by ordering corresponding languages in the ``languages`` array.
+
+  * ``aligned_tiers`` is an array with the names of translation/comment/transcription tiers that have a main tier as their parent.
+
+  * ``analysis_tiers`` (optional) is a dictionary describing which ELAN tiers correspond to which word-level analysis fields. The keys are the tier names (or regexes), and the possible values are currently ``word`` (tokens), ``lemma``, ``pos`` (part of speech), ``gramm`` (any number of comma-separated grammatical tags; may include part of speech as well), ``parts`` (morpheme segmentation) and ``gloss`` (glosses).
+
+  * ``tier_languages`` is a dictionary where keys are the names of the tier types (listed in ``main_tiers`` and ``analysis_tiers``) and the values are the names of their languages.
+
+* If you have glossing, there is another relevant parameter in ``conversion_settings.json``: ``one_morph_per_cell``. It is a boolean value that indicates whether each morpheme and each morpheme gloss occupy exactly one cell (``true``) or the whole morpheme segmentation / glossing is written inside one cell with hyphens as separators (``false``).
+
+Here is an example of a relevant part of the ``conversion_settings.json`` file:
+
+```
+{
+...
+  "languages": ["klingon", "english", "english_note", "ref"],
+  "tier_languages": {"tx@.*": "klingon", "ft@.*": "english", "not@.*": "english_note", "ref@.*": "ref"},
+  "main_tiers": ["ref@.*"],
+  "aligned_tiers": ["tx@.*", "ft@.*", "not@.*"],
+  "analysis_tiers": {
+    "word@.*": "word",
+    "ps@.*": "pos",
+    "mb@.*": "parts",
+    "ge@.*": "gloss"
+  },
+  "one_morph_per_cell": true,
+...
+}
+```
