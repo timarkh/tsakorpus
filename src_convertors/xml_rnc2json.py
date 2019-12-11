@@ -241,7 +241,11 @@ class Xml_Rnc2JSON(Txt2JSON):
     def convert_file(self, fnameSrc, fnameTarget):
         textJSON = {'meta': {}, 'sentences': []}
         nTokens, nWords, nAnalyzed = 0, 0, 0
-        srcTree = etree.parse(fnameSrc)
+        try:
+            srcTree = etree.parse(fnameSrc)
+        except:
+            self.log_message('Error when opening ' + fnameSrc)
+            return 0, 0, 0
         if 'meta_in_header' not in self.corpusSettings or not self.corpusSettings['meta_in_header']:
             textJSON['meta'] = self.get_meta(fnameSrc)
         else:
