@@ -25,6 +25,9 @@ class Xml_Flex2JSON(Txt2JSON):
         self.load_rules()
         self.POSTags = set()    # All POS tags encountered in the XML
         self.rxStemGlosses = re.compile('^$')
+        self.mainGlossLang = 'en'
+        if 'main_gloss_language' in self.corpusSettings:
+            self.mainGlossLang = self.corpusSettings['main_gloss_language']
     
     def load_rules(self):
         """
@@ -198,8 +201,16 @@ class Xml_Flex2JSON(Txt2JSON):
         anaJSON[transField] = stemGloss
         pureStem = self.rxFindStem.sub('', anaJSON['lex'])
         pureTrans = self.rxFindGloss.sub('', anaJSON[transField])
-        anaJSON['gloss'] += anaJSON[transField].replace(' ', '.').replace('-', '_')
-        anaJSON['gloss_index'] += 'STEM{' + pureStem + '}-'
+        if glossLang == self.mainGlossLang:
+            anaJSON['gloss'] += anaJSON[transField].replace(' ', '.').replace('-', '_')
+            anaJSON['gloss_index'] += 'STEM{' + pureStem + '}-'
+        else:
+            if 'gloss_' + glossLang not in anaJSON:
+                anaJSON['gloss_' + glossLang] = ''
+            if 'gloss_index_' + glossLang not in anaJSON:
+                anaJSON['gloss_index_' + glossLang] = ''
+            anaJSON['gloss_' + glossLang] += anaJSON[transField].replace(' ', '.').replace('-', '_')
+            anaJSON['gloss_index_' + glossLang] += 'STEM{' + pureStem + '}-'
         if pureTrans != anaJSON[transField]:
             # anaJSON['gloss'] += \
             #     '[' + '[STEM]'.join(self.rxFindStem.findall(anaJSON[transField])) + ']'
@@ -289,8 +300,16 @@ class Xml_Flex2JSON(Txt2JSON):
                                     and gloss[-1] not in '-=:.'):
                                 gloss += '='
                             curGlossList.append(gloss.strip('-=:.'))
-                            anaJSON['gloss'] += gloss
-                            anaJSON['gloss_index'] += glossIndex
+                            if glossLang == self.mainGlossLang:
+                                anaJSON['gloss'] += gloss
+                                anaJSON['gloss_index'] += glossIndex
+                            else:
+                                if 'gloss_' + glossLang not in anaJSON:
+                                    anaJSON['gloss_' + glossLang] = ''
+                                if 'gloss_index_' + glossLang not in anaJSON:
+                                    anaJSON['gloss_index_' + glossLang] = ''
+                                anaJSON['gloss_' + glossLang] += gloss
+                                anaJSON['gloss_index_' + glossLang] += glossIndex
                     elif element.attrib['type'] == 'msa' and morphType == 'stem':
                         if element.text is None:
                             element.text = ' '
