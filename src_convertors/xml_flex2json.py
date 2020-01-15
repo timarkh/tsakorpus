@@ -26,8 +26,11 @@ class Xml_Flex2JSON(Txt2JSON):
         self.POSTags = set()    # All POS tags encountered in the XML
         self.rxStemGlosses = re.compile('^$')
         self.mainGlossLang = 'en'
+        self.badAnalysisLangs = []
         if 'main_gloss_language' in self.corpusSettings:
             self.mainGlossLang = self.corpusSettings['main_gloss_language']
+        if 'bad_analysis_languages' in self.corpusSettings:
+            self.badAnalysisLangs = self.corpusSettings['bad_analysis_languages']
     
     def load_rules(self):
         """
@@ -275,7 +278,7 @@ class Xml_Flex2JSON(Txt2JSON):
                     elif element.attrib['type'] == 'gls':
                         glossLang = 'en'
                         if 'lang' in element.attrib:
-                            if element.attrib['lang'] in self.corpusSettings['bad_analysis_languages']:
+                            if element.attrib['lang'] in self.badAnalysisLangs:
                                 continue
                             glossLang = re.sub('-.*', '', element.attrib['lang'])
                         if element.text is None:
