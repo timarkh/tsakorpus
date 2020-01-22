@@ -171,6 +171,7 @@ $(function() {
 	load_additional_word_fields();
 	assign_input_events();
 	assign_show_hide();
+	search_if_query();
 });
 
 function start_progress_bar() {
@@ -598,5 +599,12 @@ function toggle_glossed_layer(e) {
 	}
 	else {
 		$(classToToggle).css("display", "none");
+	}
+}
+
+function search_if_query() {
+	if ($('#query_to_load').val().length > 1) {
+		$('#query_load_ok').click();
+		$('#search_sent').click();
 	}
 }

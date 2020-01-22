@@ -421,6 +421,9 @@ def search_page():
         negativeSearchEnabled = settings['negative_search_enabled']
     else:
         negativeSearchEnabled = True
+    queryString = ''
+    if request.query_string is not None:
+        queryString = request.query_string.decode('utf-8')
 
     return render_template('index.html',
                            locale=get_locale(),
@@ -444,7 +447,8 @@ def search_page():
                            start_page_url=settings['start_page_url'],
                            max_request_time=settings['query_timeout'] + 1,
                            locales=settings['interface_languages'],
-                           random_seed=get_session_data('seed'))
+                           random_seed=get_session_data('seed'),
+                           query_string=queryString)
 
 
 @app.route('/search_sent_query/<int:page>')

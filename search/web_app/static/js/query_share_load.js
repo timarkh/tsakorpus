@@ -20,7 +20,7 @@ function clear_all_search_fields() {
 
 function load_query() {
 	var query = $('#query_to_load').val().trim();
-	$('#query_load_dialogue').modal('toggle');
+	$('#query_load_dialogue').modal('hide');
 	if (query.length <= 0) { return; }
 	var pairs = query.split('&');
 	var dictFields = {};
