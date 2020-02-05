@@ -52,7 +52,7 @@ You can generate JSON files yourself, or use one of the several convertors that 
 
 * Plain text questonnaire convertor (``txt_questionnaires2json.py``). This is an ad hoc plain text convertor for Beserman Udmurt files that contain single usage examples from the dictionary together with their translations. You probably don't need it.
 
-Before you run a convertor, you have to adjust settings in the ``src_convertors/conf`` directory and put your source corpus files to the ``src_convertors/corpus/%corpus_name%`` directory. See src_convertors.md for further details.
+Before you run a convertor, you have to adjust settings in the ``src_convertors/conf_conversion`` directory and put your source corpus files to the ``src_convertors/corpus/%corpus_name%`` directory or, if you are going to have only one corpus, to ``src_convertors/corpus``. See src_convertors.md for further details.
 
 Normally, conversion takes 1-10 minutes per million tokens. However, if the source convertor has to cut media files, this may take much longer (several hours per million tokens).
 

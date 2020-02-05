@@ -13,7 +13,7 @@ class Tmx2JSON(Xml_Rnc2JSON):
     and a csv with metadata.
     """
 
-    def __init__(self, settingsDir='conf'):
+    def __init__(self, settingsDir='conf_conversion'):
         Xml_Rnc2JSON.__init__(self, settingsDir=settingsDir)
         self.rxSegTags = re.compile('<seg[^<>]*> *| *</seg>', flags=re.DOTALL)
         self.srcExt = 'tmx'

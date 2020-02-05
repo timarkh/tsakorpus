@@ -18,21 +18,39 @@ class Txt2JSON:
     rxStripDir = re.compile('^.*[/\\\\]')
     rxStripExt = re.compile('\\.[^.]*$')
 
-    def __init__(self, settingsDir='conf'):
+    def __init__(self, settingsDir='conf_conversion'):
         """
         Load settings, including corpus name and directory, from the
         conversion_settings.json file in settings directory. Then load all other
         settings from the corpus directory. These may override the
         initially loaded settings.
+
+        Simplified scenario:
+        - only one corpus at any given time in src_convertors/corpus
+        - no src_convertors/conf_conversion folder or empty corpus name in
+        src_convertors/conf_conversion/conversion_settings.json
+        In this case, treat src_convertors/corpus as the corpus directory
+        and load settings from src_convertors/corpus/conf_conversion.
         """
+        if not os.path.exists(settingsDir) and os.path.exists('conf'):
+            # Backward compatibility: check the old name of configuration folder
+            settingsDir = 'conf'
         self.errorLog = ''
         self.settingsDir = settingsDir
-        self.corpusSettings = {}
-        self.load_settings(corpusSpecific=False)
-        self.corpusSettings['corpus_dir'] = os.path.join(self.corpusSettings['corpus_dir'],
-                                                         self.corpusSettings['corpus_name'])
+        self.corpusSettings = {'corpus_dir': 'corpus'}
+        if os.path.exists(self.settingsDir):
+            self.load_settings(corpusSpecific=False)
+            if len(self.corpusSettings['corpus_name']) > 0:
+                self.corpusSettings['corpus_dir'] = os.path.join(self.corpusSettings['corpus_dir'],
+                                                                 self.corpusSettings['corpus_name'])
+
         self.settingsDir = os.path.join(self.corpusSettings['corpus_dir'],
-                                        'conf')
+                                        settingsDir)
+        if (not os.path.exists(self.settingsDir)
+                and os.path.exists(os.path.join(self.corpusSettings['corpus_dir'], 'conf'))):
+            # Backward compatibility: check the old name of configuration folder
+            self.settingsDir = os.path.join(self.corpusSettings['corpus_dir'],
+                                            'conf')
         self.load_settings(corpusSpecific=True)
 
         fCategories = open(os.path.join(self.settingsDir, 'categories.json'), 'r',
@@ -296,7 +314,7 @@ class Txt2JSON:
         if nWords > 0:
             print(nAnalyzed, 'words parsed (' + str(nAnalyzed / nWords * 100) + '%).')
         if 'cg_disambiguate' in self.corpusSettings and self.corpusSettings['cg_disambiguate']:
-            translator = JSON2CG()
+            translator = JSON2CG(self.settingsDir, self.corpusSettings['corpus_dir'])
             translator.process_corpus()
 
 

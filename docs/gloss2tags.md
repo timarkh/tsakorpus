@@ -51,7 +51,7 @@ There are also additional reasons why glosses are not always the most transparen
 ### How to convert glosses to grammatical tags
 It is assumed that the part of speech is already present in the source data in some way, otherwise it would be difficult to restore it based on glosses only.
 
-If you want glosses to be automatically translated into grammatical tags, you can create a file with rules that describe that conversion in the ``corpus/%corpus_name%/conf`` directory:
+If you want glosses to be automatically translated into grammatical tags, you can create a file with rules that describe that conversion in the ``src_convertors/corpus/%corpus_name%/conf_conversion`` directory:
 
 * ``grammRules.csv`` or ``grammRules.txt``. This is a text file with rules that explain how to reconstruct grammatical tags from the glosses. Each rule has two part separated by a tab (csv) or `` -> `` (txt). The right-hand part is the reconstructed tag or comma-separated set of tags, and the left-hand part is the condition under which it should be added to a word. The condition must describe a combination of glosses and (optionally) part-of-speech tags. It can be simply a single gloss/tag (written as is), or a regexp that should have a match somewhere inside the glossing (written in double quotes), or a boolean expression which can use brackets, | for disjunction, & for conjunction, ~ for negation and expressions of the two previous kinds. Here are several examples with comments:
 ```

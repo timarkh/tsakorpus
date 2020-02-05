@@ -16,7 +16,7 @@ class SocialNetworks2JSON(Txt2JSON):
 
     allowedMetaKeys = {'account_type', 'sex', 'byear', 'home_town', 'city', 'author_id'}
 
-    def __init__(self, settingsDir='conf'):
+    def __init__(self, settingsDir='conf_conversion'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
         self.srcExt = 'json'
         self.glosses = set()

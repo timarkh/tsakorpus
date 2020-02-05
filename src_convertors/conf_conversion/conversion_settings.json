@@ -1,5 +1,5 @@
 {
-  "corpus_name": "nganasan",
+  "corpus_name": "",
   "corpus_dir": "corpus",
   "meta_filename": "meta.csv",
   "error_log": "error.log",
@@ -11,7 +11,7 @@
   "meta_files_ext": false,
   "meta_files_dir": true,
   "meta_files_case_sensitive": true,
-  "languages": ["nganasan"],
+  "languages": ["english"],
   "json_indent": -1,
   "gzip": true,
   "convert_quotes": true,

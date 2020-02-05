@@ -23,7 +23,7 @@ class Morphy_YAML2JSON(Txt2JSON):
                                                   # rather than go to the analyses
     punc2delete = ['||', '|']
 
-    def __init__(self, settingsDir='conf'):
+    def __init__(self, settingsDir='conf_conversion'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
         self.rxPuncSpaceBefore = re.compile(self.corpusSettings['punc_space_before'])
         self.rxPuncSpaceAfter = re.compile(self.corpusSettings['punc_space_after'])

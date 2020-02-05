@@ -28,7 +28,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
     pfx_xml = '{http://www.w3.org/XML/1998/namespace}'
     pfx_tei = '{http://www.tei-c.org/ns/1.0}'
 
-    def __init__(self, settingsDir='conf'):
+    def __init__(self, settingsDir='conf_conversion'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
         self.mc = MediaCutter(settings=self.corpusSettings)
         self.srcExt = 'xml'  # extension of the source files to be converted
@@ -42,7 +42,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                              # (needed to understand ranges such as "w13 to inc2")
         self.glosses = set()
         self.posRules = {}
-        self.load_pos_rules(os.path.join(self.corpusSettings['corpus_dir'], 'conf/posRules.txt'))
+        self.load_pos_rules(os.path.join(self.settingsDir, 'posRules.txt'))
 
     def load_pos_rules(self, fname):
         """

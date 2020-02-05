@@ -17,7 +17,7 @@ class TxtQuestionnaires2JSON(Txt2JSON):
 
     rxSpaces = re.compile('^ *$')
 
-    def __init__(self, settingsDir='conf'):
+    def __init__(self, settingsDir='conf_conversion'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
         self.srcExt = 'txt'
         self.pID = 0        # id of last aligned segment

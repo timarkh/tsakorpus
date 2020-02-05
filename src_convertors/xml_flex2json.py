@@ -15,7 +15,7 @@ class Xml_Flex2JSON(Txt2JSON):
     rxFindStem = re.compile(u'[-.=]?[{(‹][A-Z0-9.-:]+[})›][-.=]?|[-=.:][A-Z0-9]+$|^[=-]')
     rxFindGloss = re.compile(u'[-.=]?[{(][A-Z0-9a-z]+[})][-.=]?|[-=.:][A-Z0-9a-z]+$|^[=-]')
 
-    def __init__(self, settingsDir='conf'):
+    def __init__(self, settingsDir='conf_conversion'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
         self.srcExt = 'xml'
         self.pID = 0        # id of last aligned segment
@@ -37,9 +37,9 @@ class Xml_Flex2JSON(Txt2JSON):
         Load rules for converting the glosses into bags of grammatical
         tags.
         """
-        self.load_glosses(os.path.join(self.corpusSettings['corpus_dir'], 'conf/glossList.txt'))
-        self.load_gramm_rules(os.path.join(self.corpusSettings['corpus_dir'], 'conf/gramRules.txt'))
-        self.load_pos_rules(os.path.join(self.corpusSettings['corpus_dir'], 'conf/posRules.txt'))
+        self.load_glosses(os.path.join(self.settingsDir, 'glossList.txt'))
+        self.load_gramm_rules(os.path.join(self.settingsDir, 'gramRules.txt'))
+        self.load_pos_rules(os.path.join(self.settingsDir, 'posRules.txt'))
     
     def load_glosses(self, fname):
         """

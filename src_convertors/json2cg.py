@@ -13,22 +13,35 @@ class JSON2CG:
     Constraint Grammar format for subsequent disambiguation and
     backwards.
     """
-    SETTINGS_DIR = 'conf'
     rxCGWords = re.compile('"<[^<>]*>"\n(?:\t[^\n]*\n)*', flags=re.DOTALL)
     rxCGAna = re.compile('<ana_([0-9]+)>', flags=re.DOTALL)
 
-    def __init__(self):
-        try:
-            f = open(os.path.join(self.SETTINGS_DIR, 'conversion_settings.json'),
-                     'r', encoding='utf-8')
-        except IOError:
-            # Obsolete settings file name; I keep it here for backward compatibility
-            f = open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
-                     'r', encoding='utf-8')
-        self.settings = json.loads(f.read())
-        f.close()
-        self.name = self.settings['corpus_name']
-        self.corpus_dir = os.path.join('corpus', self.name)
+    def __init__(self, settingsDir='conf_conversion', corpusDir='corpus'):
+        if not os.path.exists(settingsDir) and os.path.exists('conf'):
+            # Backward compatibility: check the old name of configuration folder
+            settingsDir = 'conf'
+        self.settingsDir = settingsDir
+        self.corpusDir = corpusDir
+        self.settings = {'corpus_dir': corpusDir}
+        self.name = ''
+        if os.path.exists(self.settingsDir):
+            try:
+                f = open(os.path.join(self.settingsDir, 'conversion_settings.json'),
+                         'r', encoding='utf-8')
+            except IOError:
+                # Obsolete settings file name; I keep it here for backward compatibility
+                f = open(os.path.join(self.settingsDir, 'corpus.json'),
+                         'r', encoding='utf-8')
+            self.settings = json.loads(f.read())
+            f.close()
+            self.name = self.settings['corpus_name']
+        if len(self.name) > 0:
+            self.corpusDir = os.path.join(self.corpusDir, self.name)
+            self.settingsDir = os.path.join(self.corpusDir, settingsDir)
+            if (not os.path.exists(self.settingsDir)
+                    and os.path.exists(os.path.join(self.corpusDir, 'conf'))):
+                # Backward compatibility: check the old name of configuration folder
+                self.settingsDir = os.path.join(self.corpusDir, 'conf')
         self.load_settings()
         self.format = 'json'
         if self.settings['gzip']:
@@ -48,11 +61,11 @@ class JSON2CG:
         Clean the error log file, if any.
         """
         try:
-            fCorpus = open(os.path.join(self.corpus_dir, 'conf', 'conversion_settings.json'), 'r',
+            fCorpus = open(os.path.join(self.settingsDir, 'conversion_settings.json'), 'r',
                            encoding='utf-8-sig')
         except IOError:
             # Obsolete settings file name; I keep it here for backward compatibility
-            fCorpus = open(os.path.join(self.corpus_dir, 'conf', 'corpus.json'), 'r',
+            fCorpus = open(os.path.join(self.settingsDir, 'corpus.json'), 'r',
                         encoding='utf-8-sig')
         self.settings.update(json.loads(fCorpus.read()))
         fCorpus.close()
@@ -131,7 +144,7 @@ class JSON2CG:
         for language in docCG:
             if language not in self.settings['cg_filename']:
                 continue
-            dirOut = os.path.join(self.corpus_dir, 'cg')
+            dirOut = os.path.join(self.corpusDir, 'cg')
             language = re.sub('[/\\?.()*"\']', '', language)
             dirOutLang = os.path.join(dirOut, language)
             mDir = re.search('^(.+)[/\\\\]', fname)
@@ -153,7 +166,7 @@ class JSON2CG:
         the corpus/%corpus_name%/cg/%language_name% directory.
         """
         iDoc = 0
-        jsonDir = os.path.join(self.corpus_dir, 'json')
+        jsonDir = os.path.join(self.corpusDir, 'json')
         for root, dirs, files in os.walk(jsonDir):
             for fname in files:
                 fnameRel = fname
@@ -185,12 +198,12 @@ class JSON2CG:
         """
         for language in self.settings['languages']:
             language4dir = re.sub('[/\\?.()*"\']', '', language)
-            langDirIn = os.path.join(self.corpus_dir, 'cg', language4dir)
-            langDirOut = os.path.join(self.corpus_dir, 'cg_disamb', language4dir)
+            langDirIn = os.path.join(self.corpusDir, 'cg', language4dir)
+            langDirOut = os.path.join(self.corpusDir, 'cg_disamb', language4dir)
             if not os.path.exists(langDirOut):
                 os.makedirs(langDirOut)
             if self.settings['cg_disambiguate'] and language in self.settings['cg_filename']:
-                fullGrammarFname = os.path.abspath(os.path.join(self.corpus_dir,
+                fullGrammarFname = os.path.abspath(os.path.join(self.corpusDir,
                                                                 self.settings['cg_filename'][language]))
             else:
                 continue
@@ -301,8 +314,8 @@ class JSON2CG:
         """
         self.nWords = self.nAnalyzedWords = self.nonDisambAnalyses = self.disambAnalyses = 0
         iDoc = 0
-        jsonDirIn = os.path.join(self.corpus_dir, 'json')
-        jsonDirOut = os.path.join(self.corpus_dir, 'json_disamb')
+        jsonDirIn = os.path.join(self.corpusDir, 'json')
+        jsonDirOut = os.path.join(self.corpusDir, 'json_disamb')
         if not os.path.exists(jsonDirOut):
             os.makedirs(jsonDirOut)
         for root, dirs, files in os.walk(jsonDirIn):
@@ -321,7 +334,7 @@ class JSON2CG:
                     if language not in self.settings['cg_filename']:
                         continue
                     language4dir = re.sub('[/\\?.()*"\']', '', language)
-                    cgDirIn = os.path.join(self.corpus_dir, 'cg_disamb', language4dir)
+                    cgDirIn = os.path.join(self.corpusDir, 'cg_disamb', language4dir)
                     # print(fnameCgIn)
                     fnameCgInLanguage = os.path.join(cgDirIn, fnameCgIn)
                     if not os.path.exists(fnameCgInLanguage):

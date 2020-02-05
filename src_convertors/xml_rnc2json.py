@@ -32,7 +32,7 @@ class Xml_Rnc2JSON(Txt2JSON):
                        'h4': 'txt_h4', 'h5': 'txt_h5', 'h6': 'txt_h6',
                        'i': 'i', 'b': 'b', 'em': 'em'}
 
-    def __init__(self, settingsDir='conf'):
+    def __init__(self, settingsDir='conf_conversion'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
         self.srcExt = 'xml'
         self.pID = 0        # id of last aligned segment

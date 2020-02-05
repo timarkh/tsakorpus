@@ -19,7 +19,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
     txTierXpath = '/basic-transcription/basic-body/tier[@id=\'tx\']'
     mediaExtensions = {'.wav', '.mp3', '.mp4', '.avi'}
 
-    def __init__(self, settingsDir='conf'):
+    def __init__(self, settingsDir='conf_conversion'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
         self.mc = MediaCutter(settings=self.corpusSettings)
         self.srcExt = 'exb'  # extension of the source files to be converted
