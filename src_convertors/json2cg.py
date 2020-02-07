@@ -16,32 +16,32 @@ class JSON2CG:
     rxCGWords = re.compile('"<[^<>]*>"\n(?:\t[^\n]*\n)*', flags=re.DOTALL)
     rxCGAna = re.compile('<ana_([0-9]+)>', flags=re.DOTALL)
 
-    def __init__(self, settingsDir='conf_conversion', corpusDir='corpus'):
+    def __init__(self, settingsDir='conf_conversion', corpusDir='corpus', corpusName=''):
         if not os.path.exists(settingsDir) and os.path.exists('conf'):
             # Backward compatibility: check the old name of configuration folder
             settingsDir = 'conf'
         self.settingsDir = settingsDir
         self.corpusDir = corpusDir
         self.settings = {'corpus_dir': corpusDir}
-        self.name = ''
-        if os.path.exists(self.settingsDir):
-            try:
-                f = open(os.path.join(self.settingsDir, 'conversion_settings.json'),
-                         'r', encoding='utf-8')
-            except IOError:
-                # Obsolete settings file name; I keep it here for backward compatibility
-                f = open(os.path.join(self.settingsDir, 'corpus.json'),
-                         'r', encoding='utf-8')
-            self.settings = json.loads(f.read())
-            f.close()
-            self.name = self.settings['corpus_name']
-        if len(self.name) > 0:
-            self.corpusDir = os.path.join(self.corpusDir, self.name)
-            self.settingsDir = os.path.join(self.corpusDir, settingsDir)
-            if (not os.path.exists(self.settingsDir)
-                    and os.path.exists(os.path.join(self.corpusDir, 'conf'))):
-                # Backward compatibility: check the old name of configuration folder
-                self.settingsDir = os.path.join(self.corpusDir, 'conf')
+        self.name = corpusName
+        # if os.path.exists(self.settingsDir):
+        #     try:
+        #         f = open(os.path.join(self.settingsDir, 'conversion_settings.json'),
+        #                  'r', encoding='utf-8')
+        #     except IOError:
+        #         # Obsolete settings file name; I keep it here for backward compatibility
+        #         f = open(os.path.join(self.settingsDir, 'corpus.json'),
+        #                  'r', encoding='utf-8')
+        #     self.settings = json.loads(f.read())
+        #     f.close()
+        #     self.name = self.settings['corpus_name']
+        # if len(self.name) > 0:
+        #     self.corpusDir = os.path.join(self.corpusDir, self.name)
+        #     self.settingsDir = os.path.join(self.corpusDir, settingsDir)
+        #     if (not os.path.exists(self.settingsDir)
+        #             and os.path.exists(os.path.join(self.corpusDir, 'conf'))):
+        #         # Backward compatibility: check the old name of configuration folder
+        #         self.settingsDir = os.path.join(self.corpusDir, 'conf')
         self.load_settings()
         self.format = 'json'
         if self.settings['gzip']:

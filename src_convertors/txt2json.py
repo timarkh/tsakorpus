@@ -314,7 +314,9 @@ class Txt2JSON:
         if nWords > 0:
             print(nAnalyzed, 'words parsed (' + str(nAnalyzed / nWords * 100) + '%).')
         if 'cg_disambiguate' in self.corpusSettings and self.corpusSettings['cg_disambiguate']:
-            translator = JSON2CG(self.settingsDir, self.corpusSettings['corpus_dir'])
+            translator = JSON2CG(self.settingsDir,
+                                 self.corpusSettings['corpus_dir'],
+                                 self.corpusSettings['corpus_name'])
             translator.process_corpus()
 
 
