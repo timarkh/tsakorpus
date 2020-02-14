@@ -37,8 +37,10 @@ var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 <script src="static/js/videojs-youtube.js"></script>
 {% endif %}
 {% endif %}
+{% include "head_add.html" ignore missing %}
 </head>
 <body>
+{% include "header.html" ignore missing %}
 <p id="header"><span id="corpus_title">
 {% if start_page_url %}<a href="{{ start_page_url }}">{% endif %}
 {{ _('corpus_title') }}
@@ -313,6 +315,8 @@ To view this video please enable JavaScript, and consider upgrading to a web bro
 <script src="https://d3js.org/d3.v4.min.js"></script>
 {% include "subcorpus_selection.html" %}
 {% include "word_stats.html" %}
+
+{% include "footer.html" ignore missing %}
 <script type='text/javascript' src='static/js/select_subcorpus.js'></script>
 </body>
 {% if media %}
