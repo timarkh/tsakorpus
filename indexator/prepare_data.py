@@ -77,6 +77,7 @@ class PrepareData:
              'wtype': {'type': 'keyword'},
              'lang': {'type': 'byte'},
              'sentence_index': {'type': 'short'},
+             'sentence_index_neg': {'type': 'short'},
              'sids': {'type': 'integer', 'index': False},
              'n_ana': {'type': 'byte'},
              'ana': {'type': 'nested',

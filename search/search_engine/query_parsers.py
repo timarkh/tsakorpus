@@ -11,7 +11,7 @@ class InterfaceQueryParser:
     rxGlossQueryQuant = re.compile('^\\(([^()]+)\\)([*+?])$')
     rxGlossQuerySrc = re.compile('^([^{}]*)\\{([^{}]*)\\}$')
     rxFieldNum = re.compile('^([^0-9]+)([0-9]+)$')
-    rxNumber = re.compile('^(?:0|[1-9][0-9]*)$')
+    rxNumber = re.compile('^(?:0|-?[1-9][0-9]*)$')
     maxQuerySize = 500  # maximum number of hits to be requested
 
     dictOperators = {',': 'must',
@@ -431,13 +431,20 @@ class InterfaceQueryParser:
                                              docIDs=docIDs)
         return esQuery
 
-    def sentence_index_query(self, sentIndex, mustNot=False):
+    def sentence_index_query(self, sentIndex, mustNot=False, countFromEnd=False):
         """
         Make a part of the word query responsible for the index
         that the word has in the sentence. If mustNot is True,
         revert the query. sentIndex may be a non-negative integer
         or a list with two non-negative integers (range).
+        If countFromEnd == True, use sentence_index_neg property,
+        i.e. count indices starting from the end of the sentence.
+        (The latter option actually is not supposed to be used here,
+        but who knows.)
         """
+        propName = 'sentence_index'
+        if countFromEnd:
+            propName = 'sentence_index_neg'
         if sentIndex is None:
             return {}
         query = {}
@@ -448,18 +455,18 @@ class InterfaceQueryParser:
                 sentIndex = sentIndex[0]
         if type(sentIndex) == int:
             if not mustNot:
-                query = {'match': {'words.sentence_index': sentIndex}}
+                query = {'match': {'words.' + propName: sentIndex}}
             else:
                 query = {'bool':
                              {'must_not':
                                   {'term':
-                                       {'words.sentence_index': sentIndex}
+                                       {'words.' + propName: sentIndex}
                                    }
                               }
                          }
         elif type(sentIndex) == list and len(sentIndex) == 2:
             query = {'range':
-                        {'words.sentence_index':
+                        {'words.' + propName:
                             {
                                 'gte': sentIndex[0],
                                 'lte': sentIndex[1]
@@ -478,7 +485,7 @@ class InterfaceQueryParser:
         bool queries as input.
         sentIndexQuery may be None (no restriction on the index the
         word should have in the sentence), non-negative integer
-        (match sentence index), negative integer.
+        (match sentence index), or a list with two non-negative integers.
         If searchOutput is 'words', highlight only the first word.
         """
 
@@ -809,7 +816,7 @@ class InterfaceQueryParser:
         elif ('sentence_index1' in htmlQuery
                 and len(htmlQuery['sentence_index1']) > 0
                 and self.rxNumber.search(htmlQuery['sentence_index1']) is not None
-                and int(htmlQuery['sentence_index1']) > 0):
+                and int(htmlQuery['sentence_index1']) != 0):
             searchIndex = 'sentences'
         else:
             searchIndex = searchOutput
@@ -869,10 +876,15 @@ class InterfaceQueryParser:
             if ('sentence_index' + strWordNum in htmlQuery
                     and len(htmlQuery['sentence_index' + strWordNum]) > 0
                     and self.rxNumber.search(htmlQuery['sentence_index' + strWordNum]) is not None
-                    and int(htmlQuery['sentence_index' + strWordNum]) > 0):
-                sentIndex = int(htmlQuery['sentence_index' + strWordNum]) - 1
-                curPrelimQuery[pathPfx + 'sentence_index'] = self.make_bool_query(sentIndex,
-                                                                                  pathPfx + 'sentence_index', lang)
+                    and int(htmlQuery['sentence_index' + strWordNum]) != 0):
+                if int(htmlQuery['sentence_index' + strWordNum]) > 0:
+                    sentIndex = int(htmlQuery['sentence_index' + strWordNum]) - 1
+                    curPrelimQuery[pathPfx + 'sentence_index'] = self.make_bool_query(sentIndex,
+                                                                                      pathPfx + 'sentence_index', lang)
+                elif int(htmlQuery['sentence_index' + strWordNum]) < 0:
+                    sentIndex = -int(htmlQuery['sentence_index' + strWordNum]) - 1
+                    curPrelimQuery[pathPfx + 'sentence_index_neg'] = self.make_bool_query(sentIndex,
+                                                                                          pathPfx + 'sentence_index_neg', lang)
             if 'n_ana' + strWordNum in htmlQuery and htmlQuery['n_ana' + strWordNum] != 'any':
                 curPrelimQuery[pathPfx + 'n_ana'] = self.make_n_ana_query(htmlQuery['n_ana' + strWordNum],
                                                                           pathPfx + 'n_ana')

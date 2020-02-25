@@ -106,11 +106,14 @@ class Splitter:
         """
         Insert the ID of the next word in a single sentence. (This is important for
         the sentences that can have multiple tokenization variants.)
+        Assign both forward and backward numbers.
         """
         if len(s['words']) <= 0:
             return
         words = s['words']
+        # Forward numbering and next word ID (LTR)
         leadingPunct = 0
+        maxWordNum = 0
         wordsStarted = False
         for i in range(len(words)):
             if not wordsStarted:
@@ -123,8 +126,15 @@ class Splitter:
             if wordsStarted and not (all(words[j]['wtype'] != 'word' for j in range(i, len(words)))):
                 if words[i]['wtype'] == 'word' or self.rxPuncTransparent.search(words[i]['wf']) is None:
                     words[i]['sentence_index'] = i - leadingPunct
+                    maxWordNum = i - leadingPunct
                 else:
                     leadingPunct += 1
+
+        # Backward numbering
+        if maxWordNum > 0:
+            for i in range(len(words)):
+                if 'sentence_index' in words[i]:
+                    words[i]['sentence_index_neg'] = maxWordNum - words[i]['sentence_index']
 
     def add_next_word_id(self, sentences):
         """
