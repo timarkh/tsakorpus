@@ -493,7 +493,7 @@ class InterfaceQueryParser:
         for field in self.wordFields:
             wordAnaFields.add('words.ana.' + field)
         wordFields = {'words.wf', 'words.wtype', 'words.n_ana', 'words.sentence_index',
-                      'words.w_id', 'words.l_id'}
+                      'words.sentence_index_neg', 'words.w_id', 'words.l_id'}
         queryDict = {k: queryDict[k] for k in queryDict
                      if queryDict[k] is not None and queryDict[k] != {}}
         queryDictWords, queryDictWordsAna = {}, {}
