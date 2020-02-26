@@ -4,6 +4,9 @@ This document describes in brief which steps are required for deploying your cor
 ### Installation
 Tsakorpus does not require installation. All you have to do is make sure all the dependencies are installed (see readme.md) and copy the entire contents of the repository to a directory on your computer. This concerns both Linux and Windows. For indexing and searching operations you need the elasticsearch service running. On Windows, this may mean manually launching elasticsearch.bat in the elasticsearch/bin directory before you are going to work with tsakorpus.
 
+### Updates
+Tsakorpus is regularly updated. If you are going to make your corpus publicly available and maintain it, it is strongly recommended that you **create a fork** of this repository for your corpus before you start working with tsakorpus. Read more about forking in ``forks.md``.
+
 ### Pipeline overview
 If you have a corpus in one of several accepted formats (see *Source files* below), this is the typical pipeline:
 
