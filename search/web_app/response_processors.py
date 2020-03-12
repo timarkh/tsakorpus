@@ -599,7 +599,9 @@ class SentenceViewer:
         Process one sentence taken from response['hits']['hits'].
         If getHeader is True, retrieve the metadata from the database.
         Return dictionary {'header': document header HTML,
-                           {'languages': {'<language_name>': {'text': sentence HTML[, 'img': related image name]}}}}.
+                           {'languages': {'<language_name>': {'text': sentence HTML[,
+                               'img': related image name,
+                               'rtl': True if right-to-left script is used]}}}}.
         """
         if len(langView) <= 0 and len(lang) > 0:
             langView = lang
@@ -721,6 +723,8 @@ class SentenceViewer:
         langViewContents = {'text': text, 'highlighted_text': highlightedText}
         if 'images' in self.settings and self.settings['images'] and 'img' in sSource['meta']:
             langViewContents['img'] = sSource['meta']['img']
+        if 'rtl_languages' in self.settings and langView in self.settings['rtl_languages']:
+            langViewContents['rtl'] = True
         return {'header': header, 'languages': {langView: langViewContents},
                 'toggled_on': relationsSatisfied,
                 'src_alignment': fragmentInfo}
@@ -1251,6 +1255,8 @@ class SentenceViewer:
         result = {'n_occurrences': 0, 'n_sentences': 0,
                   'n_docs': 0, 'page': 1,
                   'message': 'Nothing found.'}
+        if 'context_header_rtl' in self.settings and self.settings['context_header_rtl']:
+            result['context_header_rtl'] = True
         if 'hits' not in response or 'total' not in response['hits']:
             return result
         result['message'] = ''

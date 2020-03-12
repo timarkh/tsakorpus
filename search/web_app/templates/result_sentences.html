@@ -14,14 +14,14 @@
 {% for c in data.contexts %}
 	{% set context_loop = loop %}
 	<div class="context {% if not c.toggled_on %} context_off{% endif %}" id='div_res{{ loop.index - 1 }}'>
-	<span class="ch_container">{{ c.header | safe }}</span>
+	<span class="ch_container"{% if data.context_header_rtl %} dir="rtl"{% endif %}>{{ c.header | safe }}</span>
 	<div class="cx_main">
 	<div class="cx_toggle_div"><input type="checkbox" class="cx_toggle_chk" {% if c.toggled_on %} checked{% endif %}></div>
 	<span class="get_glossed_copy" data-nsent="{{ loop.index - 1 }}"><span class="glyph_copy glyphicon glyphicon-copy" aria-hidden="true"></span></span>
 	<span class="sentence" id='res{{ loop.index - 1 }}'>
 	{% for lang in data.languages %}
 		{% if lang in c.languages %}
-		<span class="sent_lang sent_lang_{{ lang }}" id='res{{ context_loop.index - 1 }}_{{ lang }}' {% if c.languages[lang].img %}data-img="{{ c.languages[lang].img }}"{% endif %}>
+		<span class="sent_lang sent_lang_{{ lang }}" id='res{{ context_loop.index - 1 }}_{{ lang }}' {% if c.languages[lang].img %}data-img="{{ c.languages[lang].img }}"{% endif %}{% if c.languages[lang].rtl %} dir="rtl"{% endif %}>
 		{{ c.languages[lang].text | safe }}
 		</span>
 		{% if not loop.last %}{% endif %}

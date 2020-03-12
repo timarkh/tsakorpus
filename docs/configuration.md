@@ -66,6 +66,10 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``languages`` -- list of names of the languages used in the corpus. The order of the languages determines how they are encoded in the index (the code of the language is its index in this list) and, in the case of parallel corpora, in which order they are displayed within one parallel context.
 
+* ``rtl_languages`` (optional) -- list of languages which use right-to-left writing direction. Defaults to empty list.
+
+* ``context_header_rtl`` (optional) -- boolean value that determines if context headers for search hits, which contain metadata such as author and title, should be displayed in right-to-left direction. Defaults to false.
+
 * ``interface_languages`` -- dictionary with all available web interface languages. The keys are the codes of the languages, the values are their names.
 
 * ``transliterations`` -- list of supported transliterations. For each transliteration, there should be a function in search/web_app/transliteration.py named trans_%TRANSLITERATION_NAME%_baseline that takes the text and the name of the language as input and returns transliterated text.
