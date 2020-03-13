@@ -114,8 +114,8 @@ class PrepareData:
             'rank_true': {'type': 'integer'},
             'n_sents': {'type': 'integer'},
             'n_docs': {'type': 'integer'},
-            'w_id': {'type': 'integer'},       # word ID
-            'l_id': {'type': 'integer'},       # lemma ID
+            'w_id': {'type': 'keyword'},       # word ID
+            'l_id': {'type': 'keyword'},       # lemma ID
             'wf_order': {'type': 'integer'},   # position of the word form in sorted list of word forms
             'l_order': {'type': 'integer'}     # position of the lemma in sorted list of lemmata
         }
@@ -144,14 +144,13 @@ class PrepareData:
             m['word_join'] = {
                 'type': 'join',
                 'relations': {
-                    'word': 'word_freq'
+                    'word': 'word_freq',
+                    'lemma': 'lemma_freq'
                 }
             }
         mapping = {
             'mappings': {
-                'word': {
-                    'properties': m
-                }
+                'properties': m
             },
             'settings': self.wfAnalyzer
         }
@@ -182,9 +181,7 @@ class PrepareData:
                 m[meta + '_kw'] = {'type': 'keyword'}
         mapping = {
             'mappings': {
-                'doc': {
-                    'properties': m
-                }
+                'properties': m
             },
             'settings': self.docNormalizer
         }
@@ -195,7 +192,7 @@ class PrepareData:
         Return Elasticsearch mapping for the type "sentence", based
         on searchable features described in the corpus settings.
         """
-        wordProps = word_mapping['mappings']['word']['properties']
+        wordProps = word_mapping['mappings']['properties']
         m = {
             'prev_id': {'type': 'integer'},
             'next_id': {'type': 'integer'},
@@ -300,9 +297,7 @@ class PrepareData:
             m['meta'] = {'properties': sentMetaDict}
         mapping = {
             'mappings': {
-                'sentence': {
-                    'properties': m
-                }
+                'properties': m
             },
             'settings': self.wfAnalyzer
         }

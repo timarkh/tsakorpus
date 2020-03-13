@@ -23,10 +23,10 @@ class Indexator:
     SETTINGS_DIR = '../conf'
 
     def __init__(self):
-        f = open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
-                 'r', encoding='utf-8')
-        self.settings = json.loads(f.read())
-        f.close()
+        fSettings = open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
+                         'r', encoding='utf-8')
+        self.settings = json.load(fSettings)
+        fSettings.close()
         self.name = self.settings['corpus_name']
         self.languages = self.settings['languages']
         if len(self.languages) <= 0:
@@ -80,19 +80,40 @@ class Indexator:
         self.totalNumWords = 0
 
     def delete_indices(self):
+        """
+        If there already exist indices with the same names,
+        ask the user if they want to overwrite them. If they
+        say yes, remove the indices and return True. Otherwise,
+        return False.
+        """
+        if (self.es_ic.exists(index=self.name + '.docs')
+                or self.es_ic.exists(index=self.name + '.words')
+                or self.es_ic.exists(index=self.name + '.sentences')):
+            print('It seems a corpus named "' + self.name + '" already exists. '
+                  + 'Do you want to overwrite it? [y/n]')
+            reply = input()
+            if reply.lower() != 'y':
+                print('Indexation aborted.')
+                return False
         if self.es_ic.exists(index=self.name + '.docs'):
             self.es_ic.delete(index=self.name + '.docs')
         if self.es_ic.exists(index=self.name + '.words'):
             self.es_ic.delete(index=self.name + '.words')
-        if self.es_ic.exists(index=self.name + '.word_freqs'):
-            self.es_ic.delete(index=self.name + '.word_freqs')
         if self.es_ic.exists(index=self.name + '.sentences'):
             self.es_ic.delete(index=self.name + '.sentences')
+        # Obsolete index word_freq can be present in pre-2019 corpora
+        if self.es_ic.exists(index=self.name + '.word_freqs'):
+            self.es_ic.delete(index=self.name + '.word_freqs')
+        return True
 
     def create_indices(self):
-        self.wordMapping = self.pd.generate_words_mapping()
-        self.wordFreqMapping = self.pd.generate_wordfreq_mapping()
-        self.sentMapping = self.pd.generate_sentences_mapping(self.wordMapping)
+        """
+        Create empty elasticsearch indices for corpus data, using
+        mappings provided by PrepareData.
+        """
+        self.sentWordMapping = self.pd.generate_words_mapping(wordFreqs=False)
+        self.wordMapping = self.pd.generate_words_mapping(wordFreqs=True)
+        self.sentMapping = self.pd.generate_sentences_mapping(self.sentWordMapping)
         self.docMapping = self.pd.generate_docs_mapping()
         self.es_ic.create(index=self.name + '.docs',
                           body=self.docMapping)
@@ -120,17 +141,18 @@ class Indexator:
             word['n_ana'] = 0
         else:
             word['n_ana'] = len(word['ana'])
+            # n_ana is a (signed) byte, so a word can have at most 127 analyses
             if word['n_ana'] >= 127:
                 word['n_ana'] = 127
 
     def process_sentence_words(self, words, langID):
         """
-        Take words list from a sentence, remove all non-searchable
+        Take words from a sentence, remove all non-searchable
         fields from them and add them to self.words dictionary.
         Add w_id and l_id properties to each word of the words list.
         Return the value of the 'sent_analyzed' meta field.
         """
-        sIDAdded = set()   # word IDs for which the current settence ID has been counted for it
+        sIDAdded = set()   # word IDs for which the current settence ID has been counted
         bUniquelyAnalyzed = True
         bFullyAnalyzed = True
         for w in words:
@@ -170,7 +192,7 @@ class Indexator:
             else:
                 wID = sum(len(self.tmpWordIDs[i]) for i in range(len(self.languages)))
                 self.tmpWordIDs[langID][wCleanTxt] = wID
-            w['w_id'] = wID
+            w['w_id'] = 'w' + str(wID)
             if len(lemma) > 0:
                 try:
                     lemmaID = self.tmpLemmaIDs[langID][lemma]
@@ -179,7 +201,7 @@ class Indexator:
                                   for i in range(len(self.languages))) + 1
                     self.tmpLemmaIDs[langID][lemma] = lemmaID
                 self.word2lemma[langID][wID] = lemmaID
-                w['l_id'] = lemmaID
+                w['l_id'] = 'l' + str(lemmaID)
             try:
                 self.wordFreqs[langID][wID] += 1
             except KeyError:
@@ -371,19 +393,43 @@ class Indexator:
         for l, lID in self.tmpLemmaIDs[langID].items():
             if iLemma % 250 == 0:
                 print('indexing lemma', iLemma)
-            lemmaJson = {'wf': l,
-                         'freq': lemmaFreqs[lID],
-                         'rank_true': freqToRank[lemmaFreqs[lID]],
-                         'rank': self.quantile_label(lemmaFreqs[lID],
-                                                     freqToRank[lemmaFreqs[lID]],
-                                                     quantiles),
-                         'n_docs': len(lemmaDIDs[lID])}
-            curAction = {'_index': self.name + '.words',
-                         '_type': 'lemma',
-                         '_id': lID,
-                         '_source': lemmaJson}
+            lemmaJson = {
+                'wf': l,
+                'wtype': 'lemma',
+                'freq': lemmaFreqs[lID],
+                'rank_true': freqToRank[lemmaFreqs[lID]],
+                'rank': self.quantile_label(lemmaFreqs[lID],
+                                            freqToRank[lemmaFreqs[lID]],
+                                            quantiles),
+                'n_docs': len(lemmaDIDs[lID]),
+                'word_join': 'lemma'
+            }
+            curAction = {
+                '_index': self.name + '.words',
+                '_id': 'l' + str(lID),
+                '_source': lemmaJson
+            }
             iLemma += 1
             yield curAction
+            # TODO: Add lemma_freq objects.
+            # for docID in lemmaDIDs[lID]:
+            #     lfreqJson = {
+            #         'wtype': 'lemma_freq',
+            #         'l_id': 'l' + str(lID),
+            #         'd_id': docID,
+            #         'l_order': lOrder,
+            #         'freq': self.lemmaDocFreqs[langID][(lID, docID)],
+            #         'word_join': {
+            #             'name': 'lemma_freq',
+            #             'parent': 'l' + str(lID)
+            #         }
+            #     }
+            #     curAction = {'_index': self.name + '.words',
+            #                  '_id': 'lfreq' + str(self.lemmaFreqID),
+            #                  '_source': lfreqJson,
+            #                  '_routing': 'l' + str(lID)}
+            #     self.lemmaFreqID += 1
+            #     yield curAction
 
     def iterate_words(self):
         """
@@ -418,6 +464,7 @@ class Indexator:
                     lOrder = lemmataSorted[self.get_lemma(wJson)]
                 wJson['wf_order'] = wfOrder
                 wJson['l_order'] = lOrder
+                wJson['l_id'] = 'l' + str(lID)
                 wordFreq = self.wordFreqs[langID][wID]
                 wJson['freq'] = wordFreq
                 try:
@@ -437,42 +484,52 @@ class Indexator:
                 wJson['rank'] = self.quantile_label(wJson['freq'],
                                                     wJson['rank_true'],
                                                     quantiles)  # for the user
-                curAction = {'_index': self.name + '.words',
-                             '_type': 'word',
-                             '_id': wID,
-                             '_source': wJson,
-                             '_parent': lID}
+                wJson['word_join'] = 'word'
+                wJson['wtype'] = 'word'
+                curAction = {
+                    '_index': self.name + '.words',
+                    '_id': 'w' + str(wID),
+                    '_source': wJson
+                }
                 yield curAction
 
                 for docID in wJson['dids']:
-                    wfreqJson = {'w_id': wID,
-                                 'd_id': docID,
-                                 'wf_order': wfOrder,
-                                 'l_order': lOrder,
-                                 'freq': self.wordDocFreqs[langID][(wID, docID)]}
+                    wfreqJson = {
+                        'wtype': 'word_freq',
+                        'w_id': 'w' + str(wID),
+                        'd_id': docID,
+                        'wf_order': wfOrder,
+                        'l_order': lOrder,
+                        'freq': self.wordDocFreqs[langID][(wID, docID)],
+                        'word_join': {
+                            'name': 'word_freq',
+                            'parent': 'w' + str(wID)
+                        }
+                    }
                     curAction = {'_index': self.name + '.words',
-                                 '_type': 'word_freq',
-                                 '_id': self.wordFreqID,
+                                 '_id': 'wfreq' + str(self.wordFreqID),
                                  '_source': wfreqJson,
-                                 '_parent': wID,
-                                 '_routing': lID}
+                                 '_routing': 'w' + str(wID)}
                     self.wordFreqID += 1
                     yield curAction
                 iWord += 1
                 self.wID += 1
             for lAction in self.iterate_lemmata(langID, lemmaFreqs, lemmaDIDs):
                 yield lAction
-        emptyLemmaJson = {'wf': 0,
-                          'freq': 0,
-                          'rank_true': -1}
-        curAction = {'_index': self.name + '.words',
-                     '_type': 'lemma',
-                     '_id': 0,
-                     '_source': emptyLemmaJson}
+        emptyLemmaJson = {
+            'wf': '',
+            'wtype': 'lemma',
+            'freq': 0,
+            'rank_true': -1
+        }
+        curAction = {
+            '_index': self.name + '.words',
+            '_id': 'l0',    # l prefix stands for "lemma"
+            '_source': emptyLemmaJson
+        }
         yield curAction
         self.wfs = None
         self.lemmata = None
-
 
     def generate_dictionary(self, fnameOut):
         """
@@ -589,11 +646,9 @@ class Indexator:
                 for metaField in [mf for mf in s['meta'].keys() if not (mf.startswith('year') or mf.endswith('_kw'))]:
                     s['meta'][metaField + '_kw'] = s['meta'][metaField]
             # self.es.index(index=self.name + '.sentences',
-            #               doc_type='sentence',
             #               id=self.sID,
             #               body=s)
             curAction = {'_index': self.name + '.sentences',
-                         '_type': 'sentence',
                          '_id': self.randomize_id(self.sID),
                          '_source': s}
             if len(self.languages) <= 1:
@@ -649,7 +704,6 @@ class Indexator:
         self.numSentsLang = [0] * len(self.languages)
         try:
             self.es.index(index=self.name + '.docs',
-                          doc_type='doc',
                           id=self.dID,
                           body=meta)
         except RequestError as err:
@@ -661,7 +715,6 @@ class Indexator:
                 shortMeta['title'] = meta['title']
                 shortMeta['title_kw'] = meta['title']
                 self.es.index(index=self.name + '.docs',
-                              doc_type='doc',
                               id=self.dID,
                               body=shortMeta)
         self.dID += 1
@@ -720,7 +773,9 @@ class Indexator:
         """
         t1 = time.time()
         self.compile_translations()
-        self.delete_indices()
+        indicesDeleted = self.delete_indices()
+        if not indicesDeleted:
+            return
         self.create_indices()
         self.index_dir()
         t2 = time.time()
