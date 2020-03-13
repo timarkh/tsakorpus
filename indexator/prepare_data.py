@@ -12,6 +12,10 @@ class PrepareData:
     rxBadField = re.compile('[^a-zA-Z0-9_]|^(?:lex|gr|gloss_index|wf|[wm]type|ana|sent_ids|id)$')
 
     def __init__(self):
+        """
+        Load corpus-specific settings from conf/corpus.json. Create
+        analyzer patterns used by Elasticsearch to tokenize text.
+        """
         f = open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
                  'r', encoding='utf-8')
         self.settings = json.loads(f.read())
@@ -64,86 +68,94 @@ class PrepareData:
     def generate_words_mapping(self, wordFreqs=True):
         """
         Return Elasticsearch mapping for the type "word", based
-        on searchable features described in word_fields.json and
-        categories.json.
-        If wordFreqs is True, also include mapping for the type
-        "word_freq" (this is needed only for the words index, but
+        on searchable features described in the corpus settings.
+        This type is used for storing both words and lemmata.
+        If wordFreqs is True, also include fields for a "word_freq"
+        object (this is needed only for the words index, but
         not for the sentences index).
         """
-        m = {'wf': {'type': 'text',
-                    'fielddata': True,
-                    'analyzer': 'wf_analyzer'},
-             'wf_display': {'type': 'text', 'index': False},
-             'wtype': {'type': 'keyword'},
-             'lang': {'type': 'byte'},
-             'sentence_index': {'type': 'short'},
-             'sentence_index_neg': {'type': 'short'},
-             'sids': {'type': 'integer', 'index': False},
-             'n_ana': {'type': 'byte'},
-             'ana': {'type': 'nested',
-                     'properties': {'lex': {'type': 'text',
-                                            'fielddata': True,
-                                            'analyzer': 'wf_analyzer'},
-                                    'gloss_index': {'type': 'text',
-                                                    'analyzer': 'gloss_analyzer'}}},
-             'freq': {'type': 'integer'},
-             'rank': {'type': 'keyword'},
-             'rank_true': {'type': 'integer'},
-             'n_sents': {'type': 'integer'},
-             'n_docs': {'type': 'integer'},
-             'wf_order': {'type': 'integer'},   # position of the word form in sorted list of word forms
-             'l_order': {'type': 'integer'}     # position of the lemma in sorted list of lemmata
-             }
+        m = {
+            'wf': {
+                'type': 'text',
+                'fielddata': True,
+                'analyzer': 'wf_analyzer'
+            },
+            'wf_display': {
+                'type': 'text',
+                'index': False
+            },
+            'wtype': {'type': 'keyword'},
+            # wtype=word|punct|lemma|word_freq
+            # "lemma" and "word_freq" values are only used in the words index
+            'lang': {'type': 'byte'},
+            'sentence_index': {'type': 'short'},
+            'sentence_index_neg': {'type': 'short'},
+            'sids': {
+                'type': 'integer',
+                'index': False
+            },
+            'n_ana': {'type': 'byte'},
+            'ana': {
+                'type': 'nested',
+                'properties': {
+                    'lex': {
+                        'type': 'text',
+                        'fielddata': True,
+                        'analyzer': 'wf_analyzer'
+                    },
+                    'gloss_index': {
+                        'type': 'text',
+                        'analyzer': 'gloss_analyzer'
+                    }
+                }
+            },
+            'freq': {'type': 'integer'},
+            'rank': {'type': 'keyword'},
+            'rank_true': {'type': 'integer'},
+            'n_sents': {'type': 'integer'},
+            'n_docs': {'type': 'integer'},
+            'w_id': {'type': 'integer'},       # word ID
+            'l_id': {'type': 'integer'},       # lemma ID
+            'wf_order': {'type': 'integer'},   # position of the word form in sorted list of word forms
+            'l_order': {'type': 'integer'}     # position of the lemma in sorted list of lemmata
+        }
         for field in self.wordFields:
+            # additional word-level fields such as translation
             if self.rxBadField.search(field) is None and field not in self.kwFields:
                 m['ana']['properties'][field] = {'type': 'text'}
         for field in self.kwFields:
+            # additional word-level fields with no full-text search
             if self.rxBadField.search(field) is None:
                 m['ana']['properties'][field] = {'type': 'keyword'}
         for field in set(v for lang in self.categories.values()
                          for v in lang.values()):
+            # grammatical categories
             if self.rxBadField.search(field) is None:
                 m['ana']['properties']['gr.' + field] = {'type': 'keyword'}
-        if not wordFreqs:
-            return {'mappings': {'word': {'properties': m}},
-                    'settings': self.wfAnalyzer}
-        lemmaMapping = self.generate_lemma_mapping()
-        wordFreqMapping = self.generate_wordfreq_mapping()
-        return {'mappings': {'lemma': lemmaMapping,
-                             'word': {'properties': m, '_parent': {'type': 'lemma'}},
-                             'word_freq': wordFreqMapping},
-                'settings': self.wfAnalyzer}
-
-    def generate_lemma_mapping(self):
-        """
-        Return Elasticsearch mapping for the type "lemma".
-        """
-        m = {'wf': {'type': 'text',
-                    'fielddata': True,
-                    'analyzer': 'wf_analyzer'},
-             'lang': {'type': 'byte'},
-             'freq': {'type': 'integer'},
-             'rank': {'type': 'keyword'},
-             'rank_true': {'type': 'integer'},
-             'n_sents': {'type': 'integer'},
-             'n_docs': {'type': 'integer'},
-             'l_order': {'type': 'integer'}
+        if wordFreqs:
+            # If preparing a mapping for the words index:
+            # add fields used by word_freq objects, i.e. Document ID.
+            m['d_id'] = {'type': 'integer'}
+            # A join field is a mechanism by which a parent-child
+            # relation can be established. A word_freq object, which
+            # represents a number of occurrences of a particular word/lemma
+            # in a particular text, is a child of a word object
+            # that represents that word or lemma in general.
+            m['word_join'] = {
+                'type': 'join',
+                'relations': {
+                    'word': 'word_freq'
+                }
             }
-        return {'properties': m}
-
-    def generate_wordfreq_mapping(self):
-        """
-        Return Elasticsearch mapping for the type "word_freq".
-        Each element of word_freq index contains data about frequency
-        of a specific word in a specific document.
-        """
-        m = {'w_id': {'type': 'integer'},
-             'd_id': {'type': 'integer'},
-             'freq': {'type': 'integer'},
-             'wf_order': {'type': 'integer'},   # position of the word form in sorted list of word forms
-             'l_order': {'type': 'integer'}     # position of the lemma in sorted list of lemmata
-             }
-        return {'properties': m, '_parent': {'type': 'word'}}
+        mapping = {
+            'mappings': {
+                'word': {
+                    'properties': m
+                }
+            },
+            'settings': self.wfAnalyzer
+        }
+        return mapping
 
     def generate_docs_mapping(self):
         """
@@ -151,9 +163,10 @@ class PrepareData:
         Each element of docs index contains metadata about
         about a single document.
         """
-        m = {}
-        m['n_words'] = {'type': 'integer'}
-        m['n_sents'] = {'type': 'integer'}
+        m = {
+            'n_words': {'type': 'integer'},
+            'n_sents': {'type': 'integer'}
+        }
         if len(self.settings['languages']) > 1:
             for lang in self.settings['languages']:
                 m['n_words_' + lang] = {'type': 'integer'}
@@ -162,70 +175,120 @@ class PrepareData:
             if meta.startswith('year'):
                 m[meta] = {'type': 'integer'}
             else:
-                m[meta] = {'type': 'text',
-                           'analyzer': 'lowercase_normalizer'}
+                m[meta] = {
+                    'type': 'text',
+                    'analyzer': 'lowercase_normalizer'
+                }
                 m[meta + '_kw'] = {'type': 'keyword'}
-        return {'mappings': {'doc': {'properties': m}}, 'settings': self.docNormalizer}
+        mapping = {
+            'mappings': {
+                'doc': {
+                    'properties': m
+                }
+            },
+            'settings': self.docNormalizer
+        }
+        return mapping
 
     def generate_sentences_mapping(self, word_mapping):
         """
         Return Elasticsearch mapping for the type "sentence", based
-        on searchable features described in word_fields.json and
-        categories.json.
+        on searchable features described in the corpus settings.
         """
         wordProps = word_mapping['mappings']['word']['properties']
-        wordProps['w_id'] = {'type': 'integer'}
-        wordProps['l_id'] = {'type': 'integer'}
-        m = {'prev_id': {'type': 'integer'},
-             'next_id': {'type': 'integer'},
-             'doc_id': {'type': 'integer'},
-             'text': {'type': 'text'},
-             'lang': {'type': 'byte'},
-             'n_words': {'type': 'short'},
-             'src_alignment': {'type': 'nested',
-                               'properties': {
-                                   'mtype': {'type': 'keyword'},
-                                   'src': {'type': 'keyword',
-                                           'index': False},
-                                   'off_start_src': {'type': 'float',
-                                                     'index': False},
-                                   'off_start_sent': {'type': 'short',
-                                                      'index': False},
-                                   'off_end_src': {'type': 'float',
-                                                   'index': False},
-                                   'off_end_sent': {'type': 'short',
-                                                    'index': False},
-                                   'rect_src': {'type': 'integer',
-                                                'index': False},
-                                   'src_id': {'type': 'keyword',
-                                              'index': False},
-                               }},
-             'para_ids': {'type': 'keyword'},
-             'para_alignment': {'type': 'nested',
-                                'properties': {
-                                    'off_start': {'type': 'short',
-                                                  'index': False},
-                                    'off_end': {'type': 'short',
-                                                'index': False},
-                                    'para_id': {'type': 'keyword',
-                                                'index': False},
-                                    'sent_ids': {'type': 'integer',
-                                                 'index': False}
-                                }},
-             'style_spans': {'type': 'nested',
-                             'properties': {
-                                 'off_start': {'type': 'short',
-                                               'index': False},
-                                 'off_end': {'type': 'short',
-                                             'index': False},
-                                 'span_class': {'type': 'keyword',
-                                                'index': False}
-                             }},
-             'segment_ids': {'type': 'integer',
-                             'index': False},
-             'words': {'type': 'nested',
-                       'properties': word_mapping['mappings']['word']['properties']}}
-        sentMetaDict = {'sent_analyses_kw': {'type': 'keyword'}}
+        m = {
+            'prev_id': {'type': 'integer'},
+            'next_id': {'type': 'integer'},
+            'doc_id': {'type': 'integer'},
+            'text': {'type': 'text'},
+            'lang': {'type': 'byte'},
+            'words': {
+                'type': 'nested',
+                'properties': wordProps
+            },
+            'n_words': {'type': 'short'},
+            'src_alignment': {
+                'type': 'nested',
+                'properties': {
+                    'mtype': {'type': 'keyword'},
+                    'src': {
+                        'type': 'keyword',
+                        'index': False
+                    },
+                    'off_start_src': {
+                        'type': 'float',
+                        'index': False
+                    },
+                    'off_start_sent': {
+                        'type': 'short',
+                        'index': False
+                    },
+                    'off_end_src': {
+                        'type': 'float',
+                        'index': False}
+                    ,
+                    'off_end_sent': {
+                        'type': 'short',
+                        'index': False
+                    },
+                    'rect_src': {
+                        'type': 'integer',
+                        'index': False
+                    },
+                    'src_id': {
+                        'type': 'keyword',
+                        'index': False
+                    },
+                }},
+            'para_ids': {'type': 'keyword'},
+            'para_alignment': {
+                'type': 'nested',
+                'properties': {
+                    'off_start': {
+                        'type': 'short',
+                        'index': False
+                    },
+                    'off_end': {
+                        'type': 'short',
+                        'index': False
+                    },
+                    'para_id': {
+                        'type': 'keyword',
+                        'index': False
+                    },
+                    'sent_ids': {
+                        'type': 'integer',
+                        'index': False
+                    }
+                }
+            },
+            'style_spans': {
+                'type': 'nested',
+                'properties': {
+                    'off_start': {
+                        'type': 'short',
+                        'index': False
+                    },
+                    'off_end': {
+                        'type': 'short',
+                        'index': False
+                    },
+                    'span_class': {
+                        'type': 'keyword',
+                        'index': False
+                    }
+                }},
+            'segment_ids': {
+                'type': 'integer',
+                'index': False
+            }
+        }
+
+        sentMetaDict = {
+            'sent_analyses_kw': {
+                'type': 'keyword'
+            }
+        }
         for meta in self.settings['sentence_meta']:
             if meta.startswith('year') or ('integer_meta_fields' in self.settings
                                            and meta in self.settings['integer_meta_fields']):
@@ -235,7 +298,15 @@ class PrepareData:
                 sentMetaDict[meta + '_kw'] = {'type': 'keyword'}
         if len(sentMetaDict) > 0:
             m['meta'] = {'properties': sentMetaDict}
-        return {'mappings': {'sentence': {'properties': m}}, 'settings': self.wfAnalyzer}
+        mapping = {
+            'mappings': {
+                'sentence': {
+                    'properties': m
+                }
+            },
+            'settings': self.wfAnalyzer
+        }
+        return mapping
 
     def generate_mappings(self):
         """
@@ -246,9 +317,11 @@ class PrepareData:
         mWord = self.generate_words_mapping()
         mSent = self.generate_sentences_mapping(mSentWord)
         mDoc = self.generate_docs_mapping()
-        mappings = {'docs': mDoc,
-                    'sentences': mSent,
-                    'words': mWord}
+        mappings = {
+            'docs': mDoc,
+            'sentences': mSent,
+            'words': mWord
+        }
         return mappings
 
     def write_mappings(self, fnameOut):
