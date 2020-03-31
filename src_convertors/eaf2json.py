@@ -22,7 +22,7 @@ class Eaf2JSON(Txt2JSON):
     rxSpaces = re.compile('[ \t]+')
     rxLetters = re.compile('\w+')
 
-    def __init__(self, settingsDir='conf'):
+    def __init__(self, settingsDir='conf_conversion'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
         self.speakerMeta = self.load_speaker_meta()
         self.mc = MediaCutter(settings=self.corpusSettings)
