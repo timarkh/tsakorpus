@@ -33,6 +33,7 @@ class Eaf2JSON(Txt2JSON):
         self.participants = {}     # main tier ID -> participant ID
         self.segmentTree = {}      # aID -> (contents, parent aID, tli1, tli2)
         self.segmentChildren = {}  # (aID, child tier type) -> [child aID]
+        self.spanAnnoTiers = {}    # span annotation tier ID -> [(tli1, tli2, contents)]
 
     def load_speaker_meta(self):
         speakerMeta = {}
@@ -323,6 +324,51 @@ class Eaf2JSON(Txt2JSON):
             words += self.add_punc(text[iSentPos:], iSentPos)
         return words
 
+    def process_span_annotation_tier(self, tierNode):
+        """
+        If the tier in tierNode is a span annotation tier, extract its data
+        and save it to self.spanAnnoTiers[annoTierID].
+        """
+        if ('span_annotation_tiers' not in self.corpusSettings
+                or len(self.corpusSettings['span_annotation_tiers']) <= 0):
+            return
+        annoTierRules = {}
+        if ('LINGUISTIC_TYPE_REF' in tierNode.attrib and
+                tierNode.attrib['LINGUISTIC_TYPE_REF'] in self.corpusSettings['span_annotation_tiers']):
+            annoTierRules = self.corpusSettings['span_annotation_tiers'][tierNode.attrib['LINGUISTIC_TYPE_REF']]
+        else:
+            for k, v in self.corpusSettings['span_annotation_tiers'].items():
+                if not k.startswith('^'):
+                    k = '^' + k
+                if not k.endswith('$'):
+                    k += '$'
+                try:
+                    rxTierID = re.compile(k)
+                    if rxTierID.search(tierNode.attrib['TIER_ID']) is not None:
+                        annoTierRules = v
+                        break
+                except:
+                    continue
+        if len(annoTierRules) <= 0 or 'sentence_meta' not in annoTierRules:
+            return
+        annoTierID = annoTierRules['sentence_meta']
+        if annoTierID not in self.spanAnnoTiers:
+            self.spanAnnoTiers[annoTierID] = []
+
+        segments = tierNode.xpath('ANNOTATION/ALIGNABLE_ANNOTATION')
+        for segNode in segments:
+            if ('ANNOTATION_ID' not in segNode.attrib
+                    or segNode.attrib['ANNOTATION_ID'] not in self.segmentTree):
+                continue
+            segData = self.segmentTree[segNode.attrib['ANNOTATION_ID']]
+            if segData[2] is None or segData[3] is None:
+                continue
+            tli1 = segData[2]
+            tli2 = segData[3]
+            text = segData[0]
+            self.spanAnnoTiers[annoTierID].append((tli1, tli2, text))
+        self.spanAnnoTiers[annoTierID].sort()
+
     def process_tier(self, tierNode, aID2pID, srcFile, alignedTier=False):
         """
         Extract segments from the tier node and iterate over them, returning
@@ -354,6 +400,9 @@ class Eaf2JSON(Txt2JSON):
                 except:
                     continue
         if len(lang) <= 0 or lang not in self.corpusSettings['languages']:
+            # A top-level tier can also contain span annotations, let's check it:
+            if not alignedTier and len(lang) <= 0:
+                self.process_span_annotation_tier(tierNode)
             return
         langID = self.corpusSettings['languages'].index(lang)
         
@@ -413,6 +462,84 @@ class Eaf2JSON(Txt2JSON):
                     curSent['para_alignment'] = [paraAlignment]
             self.add_src_alignment(curSent, tli1, tli2, srcFile)
             yield curSent
+
+    def add_span_annotations(self, sentences):
+        """
+        Add span-like annotations, i.e. annotations that could span several
+        tokens or even sentences and reside in time-aligned tiers.
+        Add them to the relevant sentences as style spans and/or as sentence-level
+        metadata values, depending on what is said in corpusSettings['span_annotation_tiers'].
+        Modify sentences, do not return anything.
+        """
+        sentences.sort(key=lambda s: s['src_alignment'][0]['true_off_start_src'])
+        for annoTierID in self.spanAnnoTiers:
+            curRules = {}
+            for tierID in self.corpusSettings['span_annotation_tiers']:
+                if ('sentence_meta' in self.corpusSettings['span_annotation_tiers'][tierID]
+                        and self.corpusSettings['span_annotation_tiers'][tierID]['sentence_meta'] == annoTierID):
+                    curRules = self.corpusSettings['span_annotation_tiers'][tierID]
+                    break
+            if len(curRules) <= 0:
+                continue
+
+            iSentence = 0
+            iSpan = 0
+            while iSentence < len(sentences) and iSpan < len(self.spanAnnoTiers[annoTierID]):
+                curSpan = self.spanAnnoTiers[annoTierID][iSpan]
+                curSentence = sentences[iSentence]
+                if 'languages' in curRules and 'lang' in curSentence:
+                    if self.corpusSettings['languages'][curSentence['lang']] not in curRules['languages']:
+                        iSentence += 1
+                        continue
+                curSpanStart = float(self.tlis[curSpan[0]]['time']) / EAF_TIME_MULTIPLIER
+                curSpanEnd = float(self.tlis[curSpan[1]]['time']) / EAF_TIME_MULTIPLIER
+                curSpanValue = curSpan[2]
+                # This is happening before the offsets are recalculated to account for media cutting
+                curSentenceStart = float(curSentence['src_alignment'][0]['off_start_src']) / EAF_TIME_MULTIPLIER
+                curSentenceEnd = float(curSentence['src_alignment'][0]['off_end_src']) / EAF_TIME_MULTIPLIER
+                if curSpanStart >= curSentenceEnd - 0.1 or len(curSentence['words']) <= 0:
+                    iSentence += 1
+                    continue
+                elif curSpanEnd <= curSentenceStart + 0.1:
+                    iSpan += 1
+                    continue
+                if 'meta' not in curSentence:
+                    curSentence['meta'] = {}
+                if annoTierID not in curSentence['meta']:
+                    curSentence['meta'][annoTierID] = []
+                curSentence['meta'][annoTierID].append(curSpanValue + ' [' + str(iSpan) + ']')
+
+                # The ugly part: span-like annotations in ELAN are time-aligned, but usually
+                # they refer to tokens, which are symbolical subdivisions of a time-aligned
+                # sentence. So the "real" time boundaries of span-like annotations are visually
+                # aligned with "imaginary" time boundaries of tokens.
+                # We will calculate these imaginary boundaries to compare them to the annotation
+                # boundaries and know which tokens the annotation should cover.
+                # Note that the visual alignment can be imperfect, so we have to account for that.
+                tokenDuration = (curSentenceEnd - curSentenceStart) / len(curSentence['words'])
+                tokensInvolved = []
+                for iToken in range(len(curSentence['words'])):
+                    tokenStart = curSentenceStart + (iToken + 0.1) * tokenDuration
+                    tokenEnd = curSentenceStart + (iToken + 0.9) * tokenDuration
+                    if curSpanStart <= tokenStart and tokenEnd <= curSpanEnd:
+                        tokensInvolved.append(iToken)
+                if (len(tokensInvolved) > 0
+                        and 'styles' in curRules
+                        and curSpanValue in curRules['styles']):
+                    spanOffStart = curSentence['words'][tokensInvolved[0]]['off_start']
+                    spanOffEnd = curSentence['words'][tokensInvolved[-1]]['off_end']
+                    spanStyle = curRules['styles'][curSpanValue]
+                    if 'style_spans' not in curSentence:
+                        curSentence['style_spans'] = []
+                    curSentence['style_spans'].append({
+                        'off_start': spanOffStart,
+                        'off_end': spanOffEnd,
+                        'span_class': spanStyle
+                    })
+                if curSpanEnd < curSentenceEnd:
+                    iSpan += 1
+                else:
+                    iSentence += 1
 
     def get_sentences(self, srcTree, srcFile):
         """
@@ -525,6 +652,7 @@ class Eaf2JSON(Txt2JSON):
         curMeta = self.get_meta(fnameSrc)
         textJSON = {'meta': curMeta, 'sentences': []}
         nTokens, nWords, nAnalyzed = 0, 0, 0
+        self.spanAnnoTiers = {}
         srcTree = etree.parse(fnameSrc)
         self.tlis = self.get_tlis(srcTree)
         self.build_segment_tree(srcTree)
@@ -536,6 +664,7 @@ class Eaf2JSON(Txt2JSON):
         else:
             srcFile = ''
         textJSON['sentences'] = [s for s in self.get_sentences(srcTree, srcFile)]
+        self.add_span_annotations(textJSON['sentences'])
         textJSON['sentences'].sort(key=lambda s: (s['lang'], s['src_alignment'][0]['true_off_start_src']))
         for i in range(len(textJSON['sentences']) - 1):
             # del textJSON['sentences'][i]['src_alignment'][0]['true_off_start_src']
