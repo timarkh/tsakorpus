@@ -663,16 +663,15 @@ class SentenceViewer:
             if len(curStyles) > 0 and i in offStyleEnds:
                 styleSpanEndAddition = '</span>' * len(offStyleEnds[i])
                 curStyles -= offStyleEnds[i]
-            if i in offStyleStarts:
-                nonUsedStyles = []
-                for style in offStyleStarts[i]:
-                    if style not in curStyles:
-                        nonUsedStyles.append(style)
-                        curStyles.add(style)
             if (i not in offStarts and i not in offEnds
                     and i not in offParaStarts and i not in offParaEnds
                     and i not in offSrcStarts and i not in offSrcEnds):
                 if i in offStyleStarts:
+                    nonUsedStyles = []
+                    for style in offStyleStarts[i]:
+                        if style not in curStyles:
+                            nonUsedStyles.append(style)
+                            curStyles.add(style)
                     for style in nonUsedStyles:
                         chars[i] = '<span class="' + style + '">' + chars[i]
                 chars[i] = styleSpanEndAddition + chars[i]
@@ -685,7 +684,8 @@ class SentenceViewer:
                     addition = '}}'
                 else:
                     addition = '</span>'
-                    addition += '</span>' * len(curStyles)
+                    if len(curStyles) > 0:
+                        addition += '</span>' * len(curStyles)
                 if i in offEnds:
                     curWords -= offEnds[i]
                 if i in offStyleEnds:
@@ -694,6 +694,10 @@ class SentenceViewer:
                     curWords -= offParaEnds[i]
                 if i in offSrcEnds:
                     curWords -= offSrcEnds[i]
+                if i in offStyleStarts:
+                    for style in offStyleStarts[i]:
+                        if style not in curStyles:
+                            curStyles.add(style)
             newWord = False
             if i in offStarts:
                 curWords |= offStarts[i]
