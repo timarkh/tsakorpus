@@ -217,10 +217,10 @@ class JSON2CG:
                     mDir = re.search('^(.+)[/\\\\]', fullFnameOut)
                     if mDir is not None and not os.path.exists(mDir.group(1)):
                         os.makedirs(mDir.group(1))
-                    cgCmd = 'cg3 -g "' + fullGrammarFname + '" -I "' + fullFnameIn + '" -O "' + fullFnameOut + '"'
                     proc = subprocess.Popen('cg3 -g "' + fullGrammarFname + '"',
                                             stdin=subprocess.PIPE,
-                                            stdout=subprocess.PIPE)
+                                            stdout=subprocess.PIPE,
+                                            shell=True)
                     fIn = open(fullFnameIn, 'r', encoding='utf-8-sig')
                     text = fIn.read()
                     fIn.close()
