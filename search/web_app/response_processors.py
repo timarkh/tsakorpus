@@ -672,7 +672,7 @@ class SentenceViewer:
             styleSpanEndAddition = ''
             if len(curStyles) > 0 and i in offStyleEnds:
                 styleSpanEndAddition = '</span>' * len(offStyleEnds[i])
-                curStyles -= offStyleEnds[i]
+                curStyles -= set(offStyleEnds[i])
             if (i not in offStarts and i not in offEnds
                     and i not in offParaStarts and i not in offParaEnds
                     and i not in offSrcStarts and i not in offSrcEnds):
