@@ -49,6 +49,7 @@ function hide_img() {
 
 function assign_word_events() {
 	$("span.word").unbind('click');
+	//$("span.style_span").unbind('click');
 	$("span.expand").unbind('click');
 	$("span.get_glossed_copy").unbind('click');
 	$("span.context_header").unbind('click');
@@ -61,6 +62,7 @@ function assign_word_events() {
 	$(".sent_lang").unbind('change');
 	$("#td_load_more_words").unbind('click');
 	$('span.word').click(highlight_cur_word);
+	//$('span.style_span').click(highlight_cur_word);
 	$('span.expand').click(expand_context);
 	$('span.get_glossed_copy').click(copy_glossed_sentence);
 	$('span.context_header').click(show_doc_meta);
@@ -79,7 +81,8 @@ function assign_word_events() {
 }
 
 function highlight_cur_word(e) {
-	targetClasses = $(this).attr('class').split(' ');
+	var e_obj = $(e.currentTarget);
+	targetClasses = e_obj.attr('class').split(' ');
 	$('.w_highlighted').removeClass('w_highlighted');
 	targetClasses.forEach(highlight_word_spans);
 }
