@@ -700,7 +700,7 @@ class SentenceViewer:
                 if i in offEnds:
                     curWords -= offEnds[i]
                 if i in offStyleEnds:
-                    curWords -= offStyleEnds[i]
+                    curWords -= set(offStyleEnds[i])
                 if i in offParaEnds:
                     curWords -= offParaEnds[i]
                 if i in offSrcEnds:
