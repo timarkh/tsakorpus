@@ -303,8 +303,14 @@ class Eaf2JSON(Txt2JSON):
                 sBuffer = ''
                 iBufferStart = iSentPos
             if iSentPos == len(text):
-                print('Unexpected end of sentence:', text)
-                return words
+                # If the remaining tokens consist of punctuation, add them to the sentence
+                if self.rxLetters.search(word) is None:
+                    text += word
+                    words += self.add_punc(word, iSentPos)
+                    continue
+                else:
+                    print('Unexpected end of sentence:', text)
+                    return words
             token = {'wf': word, 'off_start': iSentPos, 'off_end': iSentPos + len(word), 'wtype': 'word'}
             while iSentPos < len(text) and iWordPos < len(word):
                 if text[iSentPos].lower() == word[iWordPos].lower():
