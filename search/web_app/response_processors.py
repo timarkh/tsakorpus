@@ -498,7 +498,7 @@ class SentenceViewer:
             if 'tooltip_text' in sSource['style_spans'][iSpan]:
                 tooltipText = sSource['style_spans'][iSpan]['tooltip_text']
             styleSpan = '<span class="style_span ' + styleClass \
-                        + '" + data-tooltip-text="' + tooltipText + '">'
+                        + '" data-tooltip-text="' + tooltipText + '">'
             try:
                 offStarts[offStart].add(styleSpan)
             except KeyError:
@@ -722,6 +722,7 @@ class SentenceViewer:
                 chars[-1] += '}}'
             else:
                 chars[-1] += '</span>'
+        chars[-1] += '</span>' * len(curStyles)
         relationsSatisfied = True
         if 'toggled_on' in s and not s['toggled_on']:
             relationsSatisfied = False
