@@ -482,9 +482,8 @@ class SentenceViewer:
         Find spans of text that should be displayed in a non-default style,
         e.g. in italics or in superscript.
         Return two dicts, one with start offsets and the other with end offsets.
-        The keys are offsets. The values are dictionaries that contain
-        class names, tooltip text and, possibly, other information that could
-        be used for displaying the span.
+        The keys are offsets. The values are sets with HTML tags that contain
+        the class and other attributes, such as tooltip text.
         """
         offStarts, offEnds = {}, {}
         if 'style_spans' not in sSource:
@@ -494,22 +493,20 @@ class SentenceViewer:
                 offStart, offEnd = sSource['style_spans'][iSpan]['off_start'], sSource['style_spans'][iSpan]['off_end']
             except KeyError:
                 continue
-            className = 'style_' + sSource['style_spans'][iSpan]['span_class']
+            styleClass = 'style_' + sSource['style_spans'][iSpan]['span_class']
             tooltipText = ''
             if 'tooltip_text' in sSource['style_spans'][iSpan]:
                 tooltipText = sSource['style_spans'][iSpan]['tooltip_text']
-            styleData = {
-                'style': className,
-                'tooltip_text': tooltipText
-            }
+            styleSpan = '<span class="style_span ' + styleClass \
+                        + '" + data-tooltip-text="' + tooltipText + '">'
             try:
-                offStarts[offStart].append(styleData)
+                offStarts[offStart].add(styleSpan)
             except KeyError:
-                offStarts[offStart] = [styleData]
+                offStarts[offStart] = {styleSpan}
             try:
-                offEnds[offEnd].append(styleData)
+                offEnds[offEnd].add(styleSpan)
             except KeyError:
-                offEnds[offEnd] = [styleData]
+                offEnds[offEnd] = {styleSpan}
         return offStarts, offEnds
 
     def relativize_src_alignment(self, expandedContext, srcFiles):
@@ -671,20 +668,15 @@ class SentenceViewer:
             styleSpanEndAddition = ''
             if len(curStyles) > 0 and i in offStyleEnds:
                 styleSpanEndAddition = '</span>' * len(offStyleEnds[i])
-                curStyles -= set(offStyleEnds[i])
+                curStyles -= offStyleEnds[i]
             if (i not in offStarts and i not in offEnds
                     and i not in offParaStarts and i not in offParaEnds
                     and i not in offSrcStarts and i not in offSrcEnds):
                 if i in offStyleStarts:
                     for styleSpan in offStyleStarts[i]:
-                        styleClass = styleSpan['style']
-                        tooltipText = styleSpan['tooltip_text']
-                        curStyle = '<span class="style_span ' + styleClass \
-                                   + '" + data-tooltip-text="' + tooltipText \
-                                   + '">'
-                        if curStyle not in curStyles:
-                            curStyles.add(curStyle)
-                            chars[i] = curStyle + chars[i]
+                        if styleSpan not in curStyles:
+                            curStyles.add(styleSpan)
+                            chars[i] = styleSpan + chars[i]
                 chars[i] = styleSpanEndAddition + chars[i]
                 continue
 
@@ -700,20 +692,15 @@ class SentenceViewer:
                 if i in offEnds:
                     curWords -= offEnds[i]
                 if i in offStyleEnds:
-                    curWords -= set(offStyleEnds[i])
+                    curWords -= offStyleEnds[i]
                 if i in offParaEnds:
                     curWords -= offParaEnds[i]
                 if i in offSrcEnds:
                     curWords -= offSrcEnds[i]
                 if i in offStyleStarts:
                     for styleSpan in offStyleStarts[i]:
-                        styleClass = styleSpan['style']
-                        tooltipText = styleSpan['tooltip_text']
-                        curStyle = '<span class="style_span ' + styleClass \
-                                   + '" + data-tooltip-text="' + tooltipText \
-                                   + '">'
-                        if curStyle not in curStyles:
-                            curStyles.add(curStyle)
+                        if styleSpan not in curStyles:
+                            curStyles.add(styleSpan)
             newWord = False
             if i in offStarts:
                 curWords |= offStarts[i]
