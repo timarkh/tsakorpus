@@ -507,7 +507,8 @@ class Eaf2JSON(Txt2JSON):
                     curSentence['meta'] = {}
                 if annoTierID not in curSentence['meta']:
                     curSentence['meta'][annoTierID] = []
-                curSentence['meta'][annoTierID].append(curSpanValue)
+                if curSpanValue not in curSentence['meta'][annoTierID]:
+                    curSentence['meta'][annoTierID].append(curSpanValue)
 
                 # The ugly part: span-like annotations in ELAN are time-aligned, but usually
                 # they refer to tokens, which are symbolical subdivisions of a time-aligned
