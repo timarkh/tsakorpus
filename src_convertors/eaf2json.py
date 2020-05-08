@@ -282,7 +282,8 @@ class Eaf2JSON(Txt2JSON):
         """
         Return a list of words with their analyses retrieved from the relevant
         tiers of an analyzed EAF file. Try to align words with the text of the
-        entire sentence.
+        entire sentence. Return the text as well, since it may be slightly altered
+        if there is no exact correspondence between the text tier and the token tier.
         """
         words = []
         iSentPos = 0
@@ -310,7 +311,7 @@ class Eaf2JSON(Txt2JSON):
                     continue
                 else:
                     print('Unexpected end of sentence:', text)
-                    return words
+                    return words, text
             token = {'wf': word, 'off_start': iSentPos, 'off_end': iSentPos + len(word), 'wtype': 'word'}
             while iSentPos < len(text) and iWordPos < len(word):
                 if text[iSentPos].lower() == word[iWordPos].lower():
@@ -328,7 +329,7 @@ class Eaf2JSON(Txt2JSON):
             words.append(token)
         if iSentPos < len(text):
             words += self.add_punc(text[iSentPos:], iSentPos)
-        return words
+        return words, text
 
     def process_span_annotation_tier(self, tierNode):
         """
@@ -451,10 +452,10 @@ class Eaf2JSON(Txt2JSON):
                 self.tp.splitter.add_next_word_id_sentence(curSent)
                 self.tp.parser.analyze_sentence(curSent, lang=lang)
             else:
-                curSent['words'] = self.retrieve_words(text,
-                                                       self.segmentChildren[(segNode.attrib['ANNOTATION_ID'],
-                                                                             'word')],
-                                                       lang=lang)
+                curSent['words'], curSent['text'] = self.retrieve_words(text,
+                                                        self.segmentChildren[(segNode.attrib['ANNOTATION_ID'],
+                                                                              'word')],
+                                                        lang=lang)
                 self.tp.splitter.add_next_word_id_sentence(curSent)
             if len(self.corpusSettings['aligned_tiers']) > 0:
                 if not alignedTier:

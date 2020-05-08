@@ -697,10 +697,10 @@ class SentenceViewer:
                     curWords -= offParaEnds[i]
                 if i in offSrcEnds:
                     curWords -= offSrcEnds[i]
-                if i in offStyleStarts:
-                    for styleSpan in offStyleStarts[i]:
-                        if styleSpan not in curStyles:
-                            curStyles.add(styleSpan)
+            if i in offStyleStarts:
+                for styleSpan in offStyleStarts[i]:
+                    if styleSpan not in curStyles:
+                        curStyles.add(styleSpan)
             newWord = False
             if i in offStarts:
                 curWords |= offStarts[i]
