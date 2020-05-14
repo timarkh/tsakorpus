@@ -344,11 +344,11 @@ function assign_show_hide() {
 		e.preventDefault();
 		var $this=$(this),
 				rel=$this.attr("rel"),
-				el=$(".slide"),
+				el=$(".query_slide"),
 				wrapper=$("#search_div"),
 				dur=700;
 		switch(rel){
-			case "toggle-slide":
+			case "toggle-query_slide":
 				if(!el.is(":animated")){
 					imgSwap = $('.img-swap');
 					if (imgSwap.attr("class") == "img-swap") {
