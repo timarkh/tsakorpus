@@ -34,6 +34,7 @@ class Eaf2JSON(Txt2JSON):
         self.segmentTree = {}      # aID -> (contents, parent aID, tli1, tli2)
         self.segmentChildren = {}  # (aID, child tier type) -> [child aID]
         self.spanAnnoTiers = {}    # span annotation tier ID -> [(tli1, tli2, contents)]
+        self.alignedSpanAnnoTiers = {}   # aID of a segment -> {span annotation tier ID -> contents}
 
     def load_speaker_meta(self):
         speakerMeta = {}
@@ -71,6 +72,40 @@ class Eaf2JSON(Txt2JSON):
             if 'TIER_ID' not in tierNode.attrib:
                 continue
             callback(tierNode)
+
+    def add_aligned_style_span_data(self, parentID, annoTierID, text):
+        if annoTierID is None or len(annoTierID) <= 0 or parentID is None:
+            return
+        if parentID not in self.alignedSpanAnnoTiers:
+            self.alignedSpanAnnoTiers[parentID] = {}
+        self.alignedSpanAnnoTiers[parentID][annoTierID] = text
+
+    def get_span_tier_id(self, tierNode):
+        """
+        Return the sentence-level metadata field name for a tier that contains
+        sentence-level annotation, based on the span_annotation_tiers dictionary
+        in conversion_settings.json.
+        """
+        annoTierRules = {}
+        if ('LINGUISTIC_TYPE_REF' in tierNode.attrib and
+                tierNode.attrib['LINGUISTIC_TYPE_REF'] in self.corpusSettings['span_annotation_tiers']):
+            annoTierRules = self.corpusSettings['span_annotation_tiers'][tierNode.attrib['LINGUISTIC_TYPE_REF']]
+        else:
+            for k, v in self.corpusSettings['span_annotation_tiers'].items():
+                if not k.startswith('^'):
+                    k = '^' + k
+                if not k.endswith('$'):
+                    k += '$'
+                try:
+                    rxTierID = re.compile(k)
+                    if rxTierID.search(tierNode.attrib['TIER_ID']) is not None:
+                        annoTierRules = v
+                        break
+                except:
+                    continue
+        if len(annoTierRules) <= 0 or 'sentence_meta' not in annoTierRules:
+            return
+        return annoTierRules['sentence_meta']
 
     def cb_build_segment_tree(self, tierNode):
         tierType = ''  # analysis tiers: word/POS/gramm/gloss etc.
@@ -117,6 +152,8 @@ class Eaf2JSON(Txt2JSON):
                     self.segmentChildren[(segParent, tierType)].append(aID)
                 except KeyError:
                     self.segmentChildren[(segParent, tierType)] = [aID]
+            annoTierID = self.get_span_tier_id(tierNode)
+            self.add_aligned_style_span_data(segParent, annoTierID, segContents)
 
     def build_segment_tree(self, srcTree):
         """
@@ -333,32 +370,16 @@ class Eaf2JSON(Txt2JSON):
 
     def process_span_annotation_tier(self, tierNode):
         """
-        If the tier in tierNode is a span annotation tier, extract its data
-        and save it to self.spanAnnoTiers[annoTierID].
+        If the tier in tierNode is a span annotation tier, extract its data.
+        If the tier is time-aligned, save the data to self.spanAnnoTiers[annoTierID]
+        as time labels.
         """
         if ('span_annotation_tiers' not in self.corpusSettings
                 or len(self.corpusSettings['span_annotation_tiers']) <= 0):
             return
-        annoTierRules = {}
-        if ('LINGUISTIC_TYPE_REF' in tierNode.attrib and
-                tierNode.attrib['LINGUISTIC_TYPE_REF'] in self.corpusSettings['span_annotation_tiers']):
-            annoTierRules = self.corpusSettings['span_annotation_tiers'][tierNode.attrib['LINGUISTIC_TYPE_REF']]
-        else:
-            for k, v in self.corpusSettings['span_annotation_tiers'].items():
-                if not k.startswith('^'):
-                    k = '^' + k
-                if not k.endswith('$'):
-                    k += '$'
-                try:
-                    rxTierID = re.compile(k)
-                    if rxTierID.search(tierNode.attrib['TIER_ID']) is not None:
-                        annoTierRules = v
-                        break
-                except:
-                    continue
-        if len(annoTierRules) <= 0 or 'sentence_meta' not in annoTierRules:
+        annoTierID = self.get_span_tier_id(tierNode)
+        if annoTierID is None or len(annoTierID) <= 0:
             return
-        annoTierID = annoTierRules['sentence_meta']
         if annoTierID not in self.spanAnnoTiers:
             self.spanAnnoTiers[annoTierID] = []
 
@@ -407,8 +428,8 @@ class Eaf2JSON(Txt2JSON):
                 except:
                     continue
         if len(lang) <= 0 or lang not in self.corpusSettings['languages']:
-            # A top-level tier can also contain span annotations, let's check it:
-            if not alignedTier and len(lang) <= 0:
+            # A tier can also contain span annotations, let's check it:
+            if len(lang) <= 0 and not alignedTier:
                 self.process_span_annotation_tier(tierNode)
             return
         langID = self.corpusSettings['languages'].index(lang)
@@ -444,9 +465,40 @@ class Eaf2JSON(Txt2JSON):
             text = segData[0]
             curSent = {'text': text, 'words': None, 'lang': langID,
                        'meta': {'speaker': speaker}}
+            # Add speaker metadata
             if speaker in self.speakerMeta:
                 for k, v in self.speakerMeta[speaker].items():
                     curSent['meta'][k] = v
+            # Add metadata and style spans from sentence-aligned annotation tiers
+            if segNode.attrib['ANNOTATION_ID'] in self.alignedSpanAnnoTiers:
+                spanAnnoData = self.alignedSpanAnnoTiers[segNode.attrib['ANNOTATION_ID']]
+                for annoTierID in spanAnnoData:
+                    curSpanValue = spanAnnoData[annoTierID]
+                    if annoTierID not in curSent['meta']:
+                        curSent['meta'][annoTierID] = []
+                    if curSpanValue not in curSent['meta'][annoTierID]:
+                        curSent['meta'][annoTierID].append(curSpanValue)
+                    # Add style spans
+                    curRules = {}
+                    for tierID in self.corpusSettings['span_annotation_tiers']:
+                        if ('sentence_meta' in self.corpusSettings['span_annotation_tiers'][tierID]
+                                and self.corpusSettings['span_annotation_tiers'][tierID][
+                                    'sentence_meta'] == annoTierID):
+                            curRules = self.corpusSettings['span_annotation_tiers'][tierID]
+                            break
+                    if len(curRules) <= 0:
+                        continue
+                    if 'styles' in curRules and curSpanValue in curRules['styles']:
+                        spanStyle = curRules['styles'][curSpanValue]
+                        if 'style_spans' not in curSent:
+                            curSent['style_spans'] = []
+                        curSent['style_spans'].append({
+                            'off_start': 0,
+                            'off_end': len(curSent['text']),
+                            'span_class': spanStyle,
+                            'tooltip_text': curSpanValue
+                        })
+            # Tokenize the sentence or align it with an existing tokenization
             if (segNode.attrib['ANNOTATION_ID'], 'word') not in self.segmentChildren:
                 curSent['words'] = self.tp.tokenizer.tokenize(text)
                 self.tp.splitter.add_next_word_id_sentence(curSent)
