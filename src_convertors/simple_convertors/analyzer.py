@@ -53,14 +53,24 @@ class DumbMorphParser:
         tags.
         """
         self.grammRules = []
-        self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
-                                           'conf/grammRules.txt'))
-        self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
-                                           'conf/gramRules.txt'))  # Backward compatibility
-        self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
-                                           'conf/grammRules.csv'), separator='\t')
-        self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
-                                           'conf/gramRules.csv'), separator='\t')  # Backward compatibility
+        if os.path.exists(os.path.join(self.settings['corpus_dir'], 'conversion_settings')):
+            self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
+                                               'conversion_settings/grammRules.txt'))
+            self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
+                                               'conversion_settings/gramRules.txt'))  # Backward compatibility
+            self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
+                                               'conversion_settings/grammRules.csv'), separator='\t')
+            self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
+                                               'conversion_settings/gramRules.csv'), separator='\t')  # Backward compatibility
+        else:  # Backward compatibility
+            self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
+                                               'conf/grammRules.txt'))
+            self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
+                                               'conf/gramRules.txt'))  # Backward compatibility
+            self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
+                                               'conf/grammRules.csv'), separator='\t')
+            self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
+                                               'conf/gramRules.csv'), separator='\t')  # Backward compatibility
 
     @staticmethod
     def prepare_rule(rule):
