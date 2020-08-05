@@ -53,15 +53,15 @@ class DumbMorphParser:
         tags.
         """
         self.grammRules = []
-        if os.path.exists(os.path.join(self.settings['corpus_dir'], 'conversion_settings')):
+        if os.path.exists(os.path.join(self.settings['corpus_dir'], 'conf_conversion')):
             self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
-                                               'conversion_settings/grammRules.txt'))
+                                               'conf_conversion/grammRules.txt'))
             self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
-                                               'conversion_settings/gramRules.txt'))  # Backward compatibility
+                                               'conf_conversion/gramRules.txt'))  # Backward compatibility
             self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
-                                               'conversion_settings/grammRules.csv'), separator='\t')
+                                               'conf_conversion/grammRules.csv'), separator='\t')
             self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
-                                               'conversion_settings/gramRules.csv'), separator='\t')  # Backward compatibility
+                                               'conf_conversion/gramRules.csv'), separator='\t')  # Backward compatibility
         else:  # Backward compatibility
             self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
                                                'conf/grammRules.txt'))
