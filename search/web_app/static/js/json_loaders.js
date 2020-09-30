@@ -472,7 +472,7 @@ function choose_tags(e) {
 			}
 		});
 	}
-	else if (field_type == 'gloss') {
+	else if (field_type == 'gloss_index') {
 		$('#gram_sel_header').html(selectGlossCaption);
 		$.ajax({
 			url: "get_gloss_selector/" + lang,
