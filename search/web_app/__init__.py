@@ -1566,11 +1566,14 @@ def get_word_fields():
     sentMeta = None
     intMetaFields = None
     sentMetaValues = None
+    multipleChoiceFields = None
     defaultValues = {}
     if 'word_fields' in settings and len(settings['word_fields']) > 0:
         wordFields = settings['word_fields']
     if 'sentence_meta' in settings and len(settings['sentence_meta']) > 0:
         sentMeta = settings['sentence_meta']
+    if 'multiple_choice_fields' in settings and len(settings['multiple_choice_fields']) > 0:
+        multipleChoiceFields = settings['multiple_choice_fields']
     if 'integer_meta_fields' in settings and len(settings['integer_meta_fields']) > 0:
         intMetaFields = settings['integer_meta_fields']
     if 'sentence_meta_values' in settings and len(settings['sentence_meta_values']) > 0:
@@ -1580,6 +1583,7 @@ def get_word_fields():
     result += render_template('common_additional_search_fields.html',
                               word_fields=wordFields,
                               sentence_meta=sentMeta,
+                              multiple_choice_fields=multipleChoiceFields,
                               int_meta_fields=intMetaFields,
                               sentence_meta_values=sentMetaValues,
                               default_values=defaultValues,
@@ -1707,7 +1711,18 @@ def get_gramm_selector(lang=''):
     if lang not in settings['lang_props'] or 'gramm_selection' not in settings['lang_props'][lang]:
         return ''
     grammSelection = settings['lang_props'][lang]['gramm_selection']
-    return render_template('select_gramm.html', gramm=grammSelection)
+    return render_template('select_gramm.html', tag_table=grammSelection)
+
+
+@app.route('/get_add_field_selector/<field>')
+def get_add_field_selector(field=''):
+    """
+    Return HTML of the tags selection dialogue for an additional word-level field.
+    """
+    if 'multiple_choice_fields' not in settings or field not in settings['multiple_choice_fields']:
+        return ''
+    tagSelection = settings['multiple_choice_fields'][field]
+    return render_template('select_gramm.html', tag_table=tagSelection)
 
 
 @app.route('/get_gloss_selector/<lang>')

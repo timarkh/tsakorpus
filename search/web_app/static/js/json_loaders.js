@@ -247,6 +247,7 @@ function load_additional_word_fields() {
 		success: function(result) {
 			$("div.add_word_fields").html(result);
 			change_tier({'target': $('#lang1')});
+			assign_input_events();
 		},
 		error: function(errorThrown) {
 			alert( JSON.stringify(errorThrown) );
@@ -321,7 +322,7 @@ function assign_input_events() {
 	$("span.word_minus").click(del_word_inputs);
 	$("span.word_expand").click(expand_word_input);
 	$("span.add_rel").click(add_word_relations);
-	$("span.gram_selector_link").click(choose_grammar);
+	$("span.gram_selector_link").click(choose_tags);
 	$("#search_doc").click(select_subcorpus);
 	//$("neg_query_checkbox").change(negative_query);
 	$("span.neg_query").click(negative_query_span);
@@ -450,7 +451,7 @@ function add_word_relations(e) {
 	$("#wsearch_" + word_num).find(".word_search_l").append(word_rel_div);
 }
 
-function choose_grammar(e) {
+function choose_tags(e) {
 	var field_type = $(e.target).attr('data-field');
 	var word_num = parseInt($(e.target).attr('data-nword'));
 	var field = field_type + word_num.toString();
@@ -483,6 +484,22 @@ function choose_grammar(e) {
 				}
 				gloss_selector_loaded(result);
 				$('#gram_selector').modal('show');
+			},
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+	}
+	else {
+		// Additional word-level fields
+		$('#gram_sel_header').html(selectGrammTagsCaption);
+		$.ajax({
+			url: "get_add_field_selector/" + field_type,
+			type: "GET",
+			success: function(result) {
+				gramm_selector_loaded(result);
+				$('#gram_selector').modal('show');
+				$('#gramm_query_viewer').text($('#' + field).val());
 			},
 			error: function(errorThrown) {
 				alert( JSON.stringify(errorThrown) );
