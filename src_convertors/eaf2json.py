@@ -43,6 +43,7 @@ class Eaf2JSON(Txt2JSON):
         self.alignedSpanAnnoTiers = {}   # aID of a segment -> {span annotation tier ID -> contents}
         self.rxIgnoreTokens = None
         self.set_ignore_tokens()
+        self.usedMediaFiles = set() # filenames of media fragments referenced in the JSONs
 
     def set_ignore_tokens(self):
         """
@@ -110,6 +111,8 @@ class Eaf2JSON(Txt2JSON):
         sentence-level annotation, based on the span_annotation_tiers dictionary
         in conversion_settings.json.
         """
+        if 'span_annotation_tiers' not in self.corpusSettings:
+            return tierNode.attrib['TIER_ID'], None
         annoTierRules = {}
         if ('LINGUISTIC_TYPE_REF' in tierNode.attrib and
                 tierNode.attrib['LINGUISTIC_TYPE_REF'] in self.corpusSettings['span_annotation_tiers']):
@@ -188,24 +191,31 @@ class Eaf2JSON(Txt2JSON):
         self.segmentChildren = {}
         self.traverse_tree(srcTree, self.cb_build_segment_tree)
 
-    def fragmentize_src_alignment(self, alignment):
+    def fragmentize_src_alignment(self, sent):
         """
         Find corresponding media file fragment and transform a JSON
-        dictionary with the information about the alignment.
+        dictionaries with the information about the alignment.
         """
-        fileName, fileExt = os.path.splitext(alignment['src'].lower())
-        if fileExt not in self.mediaExtensions:
+        if 'src_alignment' not in sent:
             return
-        ts1 = alignment['off_start_src']
-        ts2 = alignment['off_end_src']
-        if len(ts1) <= 0 or len(ts2) <= 0:
-            return
-        ts1frag, ts2frag, srcFileFrag = self.mc.get_media_name(alignment['src'],
-                                                               float(ts1) / EAF_TIME_MULTIPLIER,
-                                                               float(ts2) / EAF_TIME_MULTIPLIER)
-        alignment['src'] = srcFileFrag
-        alignment['off_start_src'] = str(ts1frag)
-        alignment['off_end_src'] = str(ts2frag)
+        sent['src_alignment'].sort(key=lambda a: a['off_start_src'])
+        minTime = sent['src_alignment'][0]['off_start_src']
+        maxTime = sent['src_alignment'][-1]['off_end_src']
+        for alignment in sent['src_alignment']:
+            fileName, fileExt = os.path.splitext(alignment['src'].lower())
+            if fileExt not in self.mediaExtensions:
+                return
+            segStart = alignment['off_start_src']
+            segEnd = alignment['off_end_src']
+            ts1frag, ts2frag, srcFileFrag = self.mc.get_media_name(alignment['src'],
+                                                                   segStart,
+                                                                   segEnd,
+                                                                   minTime=minTime,
+                                                                   maxTime=maxTime)
+            self.usedMediaFiles.add(srcFileFrag)
+            alignment['src'] = srcFileFrag
+            alignment['off_start_src'] = ts1frag
+            alignment['off_end_src'] = ts2frag
 
     def add_src_alignment(self, sent, tli1, tli2, srcFile):
         """
@@ -216,16 +226,16 @@ class Eaf2JSON(Txt2JSON):
         sentAlignments = []
         ts1 = self.tlis[tli1]['time']
         ts2 = self.tlis[tli2]['time']
-        sentAlignments.append({'off_start_src': ts1,
-                               'off_end_src': ts2,
+        sentAlignments.append({'off_start_src': float(ts1) / EAF_TIME_MULTIPLIER,
+                               'off_end_src': float(ts2) / EAF_TIME_MULTIPLIER,
                                'true_off_start_src': float(ts1) / EAF_TIME_MULTIPLIER,
                                'off_start_sent': 0,
                                'off_end_sent': len(sent['text']),
                                'mtype': 'audio',
                                'src_id': ts1 + '_' + ts2,
                                'src': srcFile})
-        for alignment in sentAlignments:
-            self.fragmentize_src_alignment(alignment)
+        # for alignment in sentAlignments:
+        #     self.fragmentize_src_alignment(alignment)
         sent['src_alignment'] = sentAlignments
 
     def add_punc(self, words, text, prevText, startOffset):
@@ -805,6 +815,14 @@ class Eaf2JSON(Txt2JSON):
             srcFile = ''
         textJSON['sentences'] = [s for s in self.get_sentences(srcTree, srcFile)]
         self.add_span_annotations(textJSON['sentences'])
+        # First sorting: sort sentences by language, but keep them sorted by speaker
+        # (which they are now, since each speaker has a separate set of tiers in ELAN).
+        textJSON['sentences'].sort(key=lambda s: (s['lang']))
+        if 'sentence_segmentation' in self.corpusSettings and self.corpusSettings['sentence_segmentation']:
+            self.tp.splitter.resegment_sentences(textJSON['sentences'])
+        for s in textJSON['sentences']:
+            self.fragmentize_src_alignment(s)
+        # Final sorting: inside each language, sort sentences by their time offsets.
         textJSON['sentences'].sort(key=lambda s: (s['lang'], s['src_alignment'][0]['true_off_start_src']))
         for i in range(len(textJSON['sentences']) - 1):
             # del textJSON['sentences'][i]['src_alignment'][0]['true_off_start_src']
@@ -839,9 +857,9 @@ class Eaf2JSON(Txt2JSON):
                 if fileExt in self.mediaExtensions:
                     fname = os.path.abspath(os.path.join(path, fname))
                     print('Cutting media file', fname)
-                    self.mc.cut_media(fname)
+                    self.mc.cut_media(fname, usedFilenames=self.usedMediaFiles)
 
 
 if __name__ == '__main__':
     t2j = Eaf2JSON()
-    t2j.process_corpus(cutMedia=True)
+    t2j.process_corpus(cutMedia=False)

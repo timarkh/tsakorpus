@@ -42,15 +42,38 @@ class Splitter:
         else:
             self.rxPuncTransparent = re.compile('^ *$')
 
-    def join_sentences(self, sentenceL, sentenceR):
+    def join_sentences(self, sentenceL, sentenceR, absoluteOffsets=False):
         """
         Add the words and the text of sentenceR to sentenceL.
+        If absoluteOffsets == True, treat all start and end offsets as referring
+        to the whole text rather than to the corresponding sentences.
+        The operation may change sentenceR (it is assumed that sentenceR
+        is not used anymore after this function has been called).
         """
         if len(sentenceR['words']) <= 0:
             return
-        nSpacesBetween = sentenceR['words'][0]['off_start'] - sentenceL['words'][-1]['off_end']
+        if absoluteOffsets:
+            nSpacesBetween = sentenceR['words'][0]['off_start'] - sentenceL['words'][-1]['off_end']
+            startOffsetShiftR = 0
+        else:
+            nSpacesBetween = 1  # Default: one space between sentences
+            startOffsetShiftR = len(sentenceL['text']) + 1
+            for word in sentenceR['words']:
+                word['off_start'] += startOffsetShiftR
+                word['off_end'] += startOffsetShiftR
         sentenceL['words'] += sentenceR['words']
         sentenceL['text'] += ' ' * nSpacesBetween + sentenceR['text']
+
+        # Now, shift all character offsets in source alignment etc.
+        for segType in ['src_alignment', 'para_alignment', 'style_spans']:
+            if segType in sentenceR:
+                if segType not in sentenceL:
+                    sentenceL[segType] = []
+                for seg in sentenceR[segType]:
+                    for key in ['off_start', 'off_end', 'off_start_sent', 'off_end_sent']:
+                        if key in seg:
+                            seg[key] += startOffsetShiftR
+                    sentenceL[segType].append(seg)
 
     def append_sentence(self, sentences, s, text):
         """
@@ -68,7 +91,7 @@ class Splitter:
             return
         if len(sentences) > 0 and all(w['wtype'] == 'punct'
                                       for w in s['words']):
-            self.join_sentences(sentences[-1], s)
+            self.join_sentences(sentences[-1], s, absoluteOffsets=True)
         else:
             sentences.append(s)
 
@@ -192,6 +215,29 @@ class Splitter:
         """
         for s in sentences:
             self.add_contextual_flags_sentence(s)
+
+    def resegment_sentences(self, sentences):
+        """
+        Join adjacent sentences that look like parts of the same
+        sentence. This function is used in ELAN conversion, where
+        a sentence might be split into several alignment units.
+        This is best done if the sentence are sorted by speaker
+        and then by their time offset.
+        """
+        if ('sentence_segmentation' not in self.settings
+                or not self.settings['sentence_segmentation']
+                or 'sent_end_punc' not in self.settings):
+            return
+        for i in range(len(sentences) - 1, 0, -1):
+            sentenceR = sentences[i]
+            sentenceL = sentences[i - 1]
+            if ('text' in sentenceL
+                    and not self.rxSentEnd.search(sentenceL['text'])
+                    and sentenceL['lang'] == sentenceR['lang']
+                    and ('meta' not in sentenceL or 'speaker' not in sentenceL['meta']
+                         or sentenceL['meta']['speaker'] == sentenceR['meta']['speaker'])):
+                self.join_sentences(sentenceL, sentenceR, absoluteOffsets=False)
+                sentences.pop(i)
 
     def split(self, tokens, text):
         """

@@ -104,15 +104,15 @@ In parallel corpora, ``<body>`` contains translation units (``<para>``), which c
 
 Additional settings available for this convertor are the following:
 
-``corpus_type`` -- string that says whether the corpus is parallel (``parallel``) or not (``main``). Defaults to ``main``.
+* ``corpus_type`` -- string that says whether the corpus is parallel (``parallel``) or not (``main``). Defaults to ``main``.
 
-``meta_in_header`` -- Boolean value that determines if the metadata should be searched in the XML header. If it is found, it undergoes certain name changes to comply with the tsakorpus requirements, see ``get_meta_from_header`` function in ``xml_rnc2json.py``.
+* ``meta_in_header`` -- Boolean value that determines if the metadata should be searched in the XML header. If it is found, it undergoes certain name changes to comply with the tsakorpus requirements, see ``get_meta_from_header`` function in ``xml_rnc2json.py``.
 
-``multivalued_ana_features`` -- list of strings that determines which analysis attributes have to be treated as carrying multiple values separated by a whitespace.
+* ``multivalued_ana_features`` -- list of strings that determines which analysis attributes have to be treated as carrying multiple values separated by a whitespace.
 
-``language_codes`` -- dictionary that contains correspondences between the attribute values used to identify the language and the language names as specified in the ``languages`` list.
+* ``language_codes`` -- dictionary that contains correspondences between the attribute values used to identify the language and the language names as specified in the ``languages`` list.
 
-``clean_words_rnc`` -- Boolean value that determines if the tokens should undergo additional RNC-style cleaning (such as removal of the stress marks).
+* ``clean_words_rnc`` -- Boolean value that determines if the tokens should undergo additional RNC-style cleaning (such as removal of the stress marks).
 
 ### Processing glossed text (xml_flex2json, iso_tei_hamburg2json, exmaralda_hamburg2json, eaf2json)
 The default way of representing word-level morphological information in corpus linguistics is to assign each word a grammatical tag or a set of tags. Each tag represents one value of one particular morphosyntactic category. Part-of-speech (POS) tags are the most common example, but corpora of morphologically rich languages often have tags for other categories, such as tense, number or case. Information about lexical classes, such as animate nouns or motion verbs, can also be encoded in such a way. In tsakorpus, each tag is a string, and all tags are split into classes (e.g. "case tags") in ``categories.json`` (see ``configuration.md``).
@@ -150,6 +150,8 @@ Second, tier types should be consistent throughout your corpus. If you have tran
 * ``tier_languages`` -- a dictionary where keys are the names of the tier types (listed in the above two arrays) and the values are the names of their languages.
 
 * ``ignore_tokens`` -- a string with a regex that describes which tokens should be skipped when aligning a token tier with a text tier.
+
+* ``sentence_segmentation`` -- Boolean value that determines whether the convertor should resegment your text into sentences based on sentence-final punctuation set in ``sent_end_punc``. If ``false`` or absent, the time-aligned segments are treated as sentences.
 
 The source audio/video files will be split into small pieces with [ffmpeg](https://www.ffmpeg.org/). You have to have it installed, and its directory should be in the system PATH variable.
 
