@@ -252,13 +252,13 @@ class Eaf2JSON(Txt2JSON):
                 words[-1]['off_end'] += 1
                 text = text[1:]
 
-        curToken = {'wf': '', 'off_start': startOffset, 'off_end': startOffset, 'wtype': 'punc'}
+        curToken = {'wf': '', 'off_start': startOffset, 'off_end': startOffset, 'wtype': 'punct'}
         for i in range(len(text)):
             if self.rxSpaces.search(text[i]) is not None:
                 if len(curToken['wf']) > 0:
                     curToken['off_end'] = startOffset + i
                     words.append(curToken)
-                    curToken = {'wf': '', 'off_start': startOffset + i, 'off_end': startOffset + i, 'wtype': 'punc'}
+                    curToken = {'wf': '', 'off_start': startOffset + i, 'off_end': startOffset + i, 'wtype': 'punct'}
             else:
                 curToken['wf'] += text[i]
         if len(curToken['wf']) > 0:
@@ -752,12 +752,12 @@ class Eaf2JSON(Txt2JSON):
                 sentences[i]['words'].insert(0, {'off_start': -len(speaker) - 1,
                                                  'off_end': -1,
                                                  'wf': speaker,
-                                                 'wtype': 'punc',
+                                                 'wtype': 'punct',
                                                  'next_word': 0})
                 sentences[i]['words'].insert(0, {'off_start': -len(speaker) - 2,
                                                  'off_end': -len(speaker)-1,
                                                  'wf': '\n',
-                                                 'wtype': 'punc',
+                                                 'wtype': 'punct',
                                                  'next_word': -1})
                 for w in sentences[i]['words']:
                     w['off_start'] += addOffset

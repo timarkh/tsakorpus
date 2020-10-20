@@ -54,9 +54,11 @@ The configuration files are ``conversion_settings.json`` and ``categories.json``
 
 * ``transparent_punctuation`` (optional) -- regexp that determines which punctuation should be considered "transparent", i.e. should not be counted when calculating distances between words for a multiword query. This parameter influences the assignment of ``sentence_index`` values, which is added to words and punctuation marks at conversion time and then used in multiword queries at search time. Defaults to ``^ *$``.
 
-* ``non_word_internal_punct`` (optional) -- list of non-letter characters that should be never be treated as word-internal during tokenization (if built-in tokenization is used). Defaults to the newline character; whitespace is always included. For example, a tokenizer with default options will consider words like *bla-bla-bla* to constitute single tokens, but if you add hyphen to this list, *bla-bla-bla* will be split into three tokens.
+* ``non_word_internal_punct`` (optional) -- list of non-letter characters that should never be treated as word-internal during tokenization (if built-in tokenization is used). Defaults to the newline character; whitespace is always included. For example, a tokenizer with default options will consider words like *bla-bla-bla* to constitute single tokens, but if you add hyphen to this list, *bla-bla-bla* will be split into three tokens.
 
 * ``one_morph_per_cell`` (optional, for the ELAN convertor) -- boolean value that determines whether the annotation tiers contain one cell per morpheme/gloss (true) or one cell per entire glossing (false). For example, if the morpheme segmentation of the German word *ge-schloss-en* is kept in three different cells (*ge-*, *schloss* and *-en*), this value should be set to true. Defaults to false.
+
+* ``special_tokens`` (optional) -- dictionary that determines which tokens have to be treated in a special way when performing automatic tokenization. Each key is a regex, and the corresponding value is a dictionary that should be inserted in the JSON files as an object representing that token. E.g. ``"<(REPOST|USER|LINK)>": {"wtype": "punct"}`` would lead to tokens ``<REPOST>``, ``<USER>`` and ``<LINK>`` being tokenized as such (i.e. the angle brackets will not become separate tokens) and being treated as punctuation.
 
 ### The convertors
 There are several source convertors for different input formats (see ``pipeline.md``). Each of them is a class located in one Python file:
