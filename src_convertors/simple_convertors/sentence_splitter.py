@@ -272,7 +272,7 @@ class Splitter:
         Change sentences, do not return anything.
         """
         for s in sentences:
-            if 'words' not in sentences:
+            if 'words' not in s:
                 continue
             for w in s['words']:
                 if w['wtype'] != 'word' or len(w['wf']) <= 0:
