@@ -862,4 +862,4 @@ class Eaf2JSON(Txt2JSON):
 
 if __name__ == '__main__':
     t2j = Eaf2JSON()
-    t2j.process_corpus(cutMedia=False)
+    t2j.process_corpus(cutMedia=True)
