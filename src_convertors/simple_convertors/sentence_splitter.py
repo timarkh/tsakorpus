@@ -277,7 +277,8 @@ class Splitter:
             for w in s['words']:
                 if w['wtype'] != 'word' or len(w['wf']) <= 0:
                     continue
-                w['wf'] = w['wf'][0].upper() + w['wf'][:1]
+                w['wf'] = w['wf'][0].upper() + w['wf'][1:]
                 s['text'] = s['text'][:w['off_start']] \
                             + s['text'][w['off_start']].upper() \
                             + s['text'][w['off_start'] + 1:]
+                break
