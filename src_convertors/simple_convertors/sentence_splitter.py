@@ -265,3 +265,19 @@ class Splitter:
         self.recalculate_offsets(sentences)
         self.add_next_word_id(sentences)
         return sentences
+
+    def capitalize_sentences(self, sentences):
+        """
+        Capitalize first letter of the first word in each sentence.
+        Change sentences, do not return anything.
+        """
+        for s in sentences:
+            if 'words' not in sentences:
+                continue
+            for w in s['words']:
+                if w['wtype'] != 'word' or len(w['wf']) <= 0:
+                    continue
+                w['wf'] = w['wf'][0].upper() + w['wf'][:1]
+                s['text'] = s['text'][:w['off_start']] \
+                            + s['text'][w['off_start']].upper() \
+                            + s['text'][w['off_start'] + 1:]

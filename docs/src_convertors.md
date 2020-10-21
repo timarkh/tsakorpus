@@ -28,7 +28,7 @@ The configuration files are ``conversion_settings.json`` and ``categories.json``
 
 * ``meta_files_case_sensitive`` -- boolean value that determines whether the filenames in the metadata file should be treated as case sensitive.
 
-* ``nometa_skip`` (optional) -- boolean value that determines if the files not referenced in the metadata should be skipped. Defaults to false.
+* ``nometa_skip`` (optional) -- boolean value that determines if the files not referenced in the metadata should be skipped. Defaults to ``false``.
 
 * ``exclude_by_meta`` (optional) -- list of dictionaries, each of which contains a rule that determines what input documents should be skipped based on its metadata. The document is skipped if it conforms to at least one rule. A document conforms to the rule if its metadata contains all the key-value pairs present in the rule, while possibly containing other keys. Defaults to empty list.
 
@@ -44,7 +44,7 @@ The configuration files are ``conversion_settings.json`` and ``categories.json``
 
 * ``languages`` -- an array with the names of the languages which exist in the corpus.
 
-* ``cg_disambiguate`` (optional) -- boolean value that determines whether your corpus has to be disambiguated with the Constraint Grammar rules after the annotation. Defaults to false.
+* ``cg_disambiguate`` (optional) -- boolean value that determines whether your corpus has to be disambiguated with the Constraint Grammar rules after the annotation. Defaults to ``false``.
 
 * ``cg_filename`` (optional) -- the names of the files with the Constraint Grammar rules (if you want to disambiguate your corpus). This files should be located in ``src_convertors/corpus/%corpus_name%/``. The value of this field is a dictionary where the keys are the names of the languages and the values are the names of the corresponding files. It is not obligatory to list all the languages you have.
 
@@ -56,9 +56,11 @@ The configuration files are ``conversion_settings.json`` and ``categories.json``
 
 * ``non_word_internal_punct`` (optional) -- list of non-letter characters that should never be treated as word-internal during tokenization (if built-in tokenization is used). Defaults to the newline character; whitespace is always included. For example, a tokenizer with default options will consider words like *bla-bla-bla* to constitute single tokens, but if you add hyphen to this list, *bla-bla-bla* will be split into three tokens.
 
-* ``one_morph_per_cell`` (optional, for the ELAN convertor) -- boolean value that determines whether the annotation tiers contain one cell per morpheme/gloss (true) or one cell per entire glossing (false). For example, if the morpheme segmentation of the German word *ge-schloss-en* is kept in three different cells (*ge-*, *schloss* and *-en*), this value should be set to true. Defaults to false.
+* ``one_morph_per_cell`` (optional, for the ELAN convertor) -- boolean value that determines whether the annotation tiers contain one cell per morpheme/gloss (true) or one cell per entire glossing (false). For example, if the morpheme segmentation of the German word *ge-schloss-en* is kept in three different cells (*ge-*, *schloss* and *-en*), this value should be set to true. Defaults to ``false``.
 
 * ``special_tokens`` (optional) -- dictionary that determines which tokens have to be treated in a special way when performing automatic tokenization. Each key is a regex, and the corresponding value is a dictionary that should be inserted in the JSON files as an object representing that token. E.g. ``"<(REPOST|USER|LINK)>": {"wtype": "punct"}`` would lead to tokens ``<REPOST>``, ``<USER>`` and ``<LINK>`` being tokenized as such (i.e. the angle brackets will not become separate tokens) and being treated as punctuation.
+
+* ``capitalize_sentences`` (optional) -- Boolean value that determines if the first letter of the first word in each sentence should be automatically capitalized. Defaults to ``false``.
 
 ### The convertors
 There are several source convertors for different input formats (see ``pipeline.md``). Each of them is a class located in one Python file:

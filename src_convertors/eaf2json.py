@@ -839,6 +839,8 @@ class Eaf2JSON(Txt2JSON):
         self.add_speaker_marks(textJSON['sentences'])
         self.add_sentence_meta(textJSON['sentences'], curMeta)
         self.clean_up_sentences(textJSON['sentences'])
+        if 'capitalize_sentences' in self.corpusSettings and self.corpusSettings['capitalize_sentences']:
+            self.tp.splitter.capitalize_sentences(textJSON['sentences'])
         self.write_output(fnameTarget, textJSON)
         return nTokens, nWords, nAnalyzed
 
