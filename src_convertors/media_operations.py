@@ -125,6 +125,9 @@ class MediaCutter:
             if usedFilenames is not None and fnameOut not in usedFilenames:
                 continue
             fnameOut = os.path.join(outDir, fnameOut)
+            if os.path.exists(fnameOut):
+                print(fnameOut, 'already exists, skipping.')
+                continue
             splitStr += ' -strict experimental "' + fnameOut + '"'
             print('About to run: ' + splitCmd + splitStr)
             output = subprocess.Popen(splitCmd + splitStr, shell=True,
@@ -141,7 +144,7 @@ class MediaCutter:
         fileLen = self.settings['media_length']
         segmentLen = int(math.floor(fileLen / 3))
         for startOffset in range(3):
-            self.split_file(fname, outDir, fileLen, startOffset * segmentLen, segmentLen)
+            self.split_file(fname, outDir, fileLen, startOffset * segmentLen, segmentLen, usedFilenames=usedFilenames)
         print(fname, 'was successfully splitted.')
 
 
