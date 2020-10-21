@@ -18,7 +18,7 @@ class Eaf2JSON(Txt2JSON):
     word forms.
     """
 
-    mediaExtensions = {'.wav', '.mp3', '.mp4', '.avi'}
+    mediaExtensions = {'.wav', '.mp3', '.mp4', '.avi', '.mov', '.mts'}
     rxSpaces = re.compile('[ \t]+')
     rxLetters = re.compile('\w+')
     bracketPairs = {
@@ -855,9 +855,9 @@ class Eaf2JSON(Txt2JSON):
             mediaDir = self.corpusSettings['media_dir']
         for path, dirs, files in os.walk(mediaDir):
             # Process video files first
-            files = [fname for fname in files if fname.endswith(('.avi', '.mts', '.mov'))] + \
-                    [fname for fname in files if fname.endswith('.mp4')] + \
-                    [fname for fname in files if not fname.endswith(('.avi', '.mts', '.mov', '.mp4'))]
+            files = [fname for fname in files if fname.lower().endswith(('.avi', '.mts', '.mov'))] + \
+                    [fname for fname in files if fname.lower().endswith('.mp4')] + \
+                    [fname for fname in files if not fname.lower().endswith(('.avi', '.mts', '.mov', '.mp4'))]
             for fname in files:
                 fileExt = os.path.splitext(fname.lower())[1]
                 if fileExt in self.mediaExtensions:

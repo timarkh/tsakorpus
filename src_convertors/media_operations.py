@@ -101,7 +101,7 @@ class MediaCutter:
             if fname.lower().endswith('.mp4'):
                 splitStr += ' -vcodec copy -acodec copy'
                 newExt = '.mp4'
-            if fname.lower().endswith(('.avi', '.mts', '.mov', '.mp4')):
+            elif fname.lower().endswith(('.avi', '.mts', '.mov', '.mp4')):
                 splitStr += ' -vcodec libx264 -b 300k -acodec aac -ab 192k'
                 newExt = '.mp4'
             elif fname.lower().endswith(('.wav', '.wma', '.mp3')):
