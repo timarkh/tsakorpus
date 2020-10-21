@@ -98,9 +98,9 @@ class MediaCutter:
             splitStart = startOffset + splitLength * n
             splitStr += ' -ss ' + str(splitStart) + ' -i "' + fname + '"' + \
                         ' -t ' + str(splitLength)
-            # if fname.lower().endswith('.mp4'):
-            #     splitStr += ' -vcodec copy -acodec copy'
-            #     newExt = '.mp4'
+            if fname.lower().endswith('.mp4'):
+                splitStr += ' -vcodec copy -acodec copy'
+                newExt = '.mp4'
             if fname.lower().endswith(('.avi', '.mts', '.mp4')):
                 splitStr += ' -vcodec libx264 -b 300k -acodec aac -ab 192k'
                 newExt = '.mp4'
