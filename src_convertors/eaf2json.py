@@ -854,6 +854,9 @@ class Eaf2JSON(Txt2JSON):
         if 'media_dir' in self.corpusSettings:
             mediaDir = self.corpusSettings['media_dir']
         for path, dirs, files in os.walk(mediaDir):
+            # Process video files first
+            files = [fname for fname in files if fname.endswith(('.avi', '.mp4', '.mts'))] + \
+                    [fname for fname in files if not fname.endswith(('.avi', '.mp4', '.mts'))]
             for fname in files:
                 fileExt = os.path.splitext(fname.lower())[1]
                 if fileExt in self.mediaExtensions:
