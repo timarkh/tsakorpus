@@ -155,6 +155,8 @@ Second, tier types should be consistent throughout your corpus. If you have tran
 
 * ``sentence_segmentation`` -- Boolean value that determines whether the convertor should resegment your text into sentences based on sentence-final punctuation set in ``sent_end_punc``. If ``false`` or absent, the time-aligned segments are treated as sentences.
 
+* ``media_dir`` (optional) -- a string that indicates the path to the media files to be cut, if they are located in a different folder than the ELAN files.
+
 The source audio/video files will be split into small pieces with [ffmpeg](https://www.ffmpeg.org/). You have to have it installed, and its directory should be in the system PATH variable.
 
 ### Fieldworks FLEX files conversion (flex2json)
