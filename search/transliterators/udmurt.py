@@ -3,7 +3,7 @@ import re
 dic2cyr = {'a': 'а', 'b': 'б', 'v': 'в',
            'g': 'г', 'd': 'д', 'e': 'э',
            'ž': 'ж', 'š': 'ш', 'e̮': 'ӧ',
-           'ə': 'ө', 'ʒˊ': 'ӟ', 'ǯ': 'ӝ', 'č́': 'ч', 'č': 'ӵ',
+           'ə': 'ө', 'ǯ́': 'ӟ', 'ǯ': 'ӝ', 'č́': 'ч', 'č': 'ӵ',
            'z': 'з', 'i': 'ӥ', 'j': 'й', 'k': 'к',
            'l': 'л', 'm': 'м', 'n': 'н',
            'o': 'о', 'p': 'п', 'r': 'р',
@@ -45,15 +45,25 @@ def udmurt_translit_upa(text):
     """
     text = text.replace('жи', 'жӥ')
     text = text.replace('ӝи', 'ӝӥ')
+    text = text.replace('ӟи', 'ӟӥ')
+    text = text.replace('чи', 'чӥ')
+    text = text.replace('ӵи', 'ӵӥ')
     text = text.replace('ши', 'шӥ')
     text = text.replace('же', 'жэ')
     text = text.replace('ӝе', 'ӝэ')
+    text = text.replace('ӟе', 'ӟэ')
+    text = text.replace('че', 'чэ')
+    text = text.replace('ӵе', 'ӵэ')
     text = text.replace('ше', 'шэ')
     text = text.replace('Жи', 'Жӥ')
     text = text.replace('Ӝи', 'Ӝӥ')
+    text = text.replace('Ӟи', 'Ӟӥ')
     text = text.replace('Ши', 'Шӥ')
     text = text.replace('Же', 'Жэ')
     text = text.replace('Ӝе', 'Ӝэ')
+    text = text.replace('Ӟе', 'Ӟэ')
+    text = text.replace('Че', 'Чэ')
+    text = text.replace('Ӵе', 'Ӵэ')
     text = text.replace('Ше', 'Шэ')
 
     letters = []
