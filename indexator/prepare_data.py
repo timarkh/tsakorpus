@@ -141,11 +141,12 @@ class PrepareData:
             # represents a number of occurrences of a particular word/lemma
             # in a particular text, is a child of a word object
             # that represents that word or lemma in general.
-            m['word_join'] = {
+            m['freq_join'] = {
                 'type': 'join',
                 'relations': {
-                    'word': 'word_freq',
-                    'lemma': 'lemma_freq'
+                    'word': 'word_freq'
+                    # This comprises both words and lemmata
+                    # (and maybe other objects in the future).
                 }
             }
         mapping = {

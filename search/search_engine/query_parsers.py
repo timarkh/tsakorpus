@@ -331,6 +331,7 @@ class InterfaceQueryParser:
             elif sortOrder == 'freq':
                 esQuery['sort'] = {'freq': {'order': 'desc'}}
         else:
+            # TODO: Update for use with join (Elasticsearch >= 6)
             hasParentQuery = {'parent_type': 'word', 'score': True, 'query': innerQuery}
             innerWordFreqQuery = {'bool': {'must': [{'has_parent': hasParentQuery}],
                                            'filter': [{'terms': {'d_id': docIDs}}]}}

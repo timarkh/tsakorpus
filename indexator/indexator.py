@@ -11,6 +11,7 @@ import math
 import random
 import sys
 import subprocess
+import argparse
 from prepare_data import PrepareData
 from json_doc_reader import JSONDocReader
 
@@ -36,23 +37,33 @@ class Indexator:
         self.iterSent = None
         if self.input_format in ['json', 'json-gzip']:
             self.iterSent = JSONDocReader(format=self.input_format)
-        self.goodWordFields = ['lex', 'wf', 'wf_display',
-                               'parts', 'gloss', 'gloss_index', 'n_ana',
-                               'trans_en', 'trans_ru']
-        self.AdditionalWordFields = set()
+
+        # Make sure only commonly used word fields and those listed
+        # in corpus.json get into the database.
+        self.goodWordFields = [
+            'lex',          # lemma
+            'wf',           # word form (for search)
+            'wf_display',   # word form (for display; optional)
+            'parts',        # morpheme breaks in the word form
+            'gloss',        # glosses (for display)
+            'gloss_index',  # glosses (for search)
+            'n_ana'         # number of analyses
+        ]
+        self.additionalWordFields = set()
         if 'word_fields' in self.settings:
-            self.AdditionalWordFields |= set(self.settings['word_fields'])
+            self.additionalWordFields |= set(self.settings['word_fields'])
         if 'word_table_fields' in self.settings:
-            self.AdditionalWordFields |= set(self.settings['word_table_fields'])
+            self.additionalWordFields |= set(self.settings['word_table_fields'])
         if 'accidental_word_fields' in self.settings:
-            self.AdditionalWordFields -= set(self.settings['accidental_word_fields'])
+            self.additionalWordFields -= set(self.settings['accidental_word_fields'])
         f = open(os.path.join(self.SETTINGS_DIR, 'categories.json'),
                  'r', encoding='utf-8')
         categories = json.loads(f.read())
+        f.close()
         self.goodWordFields += ['gr.' + v for lang in categories
                                 for v in categories[lang].values()]
         self.goodWordFields = set(self.goodWordFields)
-        f.close()
+
         self.pd = PrepareData()
         self.es = Elasticsearch()
         self.es_ic = IndicesClient(self.es)
@@ -61,9 +72,9 @@ class Indexator:
         self.shuffled_ids.insert(0, 0)    # id=0 is special and should not change
         self.tmpWordIDs = [{} for i in range(len(self.languages))]    # word as JSON -> its integer ID
         self.tmpLemmaIDs = [{} for i in range(len(self.languages))]   # lemma as string -> its integer ID
-        self.word2lemma = [{} for i in range(len(self.languages))]    # word's ID -> ID of its lemma (or -1, if none)
-        self.wordFreqs = [{} for i in range(len(self.languages))]     # word's ID -> its frequency
-        self.wordSFreqs = [{} for i in range(len(self.languages))]    # word's ID -> its number of sentences
+        self.word2lemma = [{} for i in range(len(self.languages))]    # word/lemma ID -> ID of its lemma (or -1, if none)
+        self.wordFreqs = [{} for i in range(len(self.languages))]     # word/lemma ID -> its frequency
+        self.wordSFreqs = [{} for i in range(len(self.languages))]    # word/lemma ID -> its number of sentences
         self.wordDocFreqs = [{} for i in range(len(self.languages))]  # (word's ID, dID) -> word frequency in the document
         # self.wordSIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of sentence IDs
         self.wordDIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of document IDs
@@ -72,7 +83,8 @@ class Indexator:
         self.sID = 0          # current sentence ID for each language
         self.dID = 0          # current document ID
         self.wID = 0          # current word ID
-        self.wordFreqID = 0
+        self.wordFreqID = 0   # current word_freq ID for word/document frequencies
+        self.lemmaFreqID = 0  # current word_freq ID for lemma/document frequencies
         self.numWords = 0     # number of words in current document
         self.numSents = 0     # number of sentences in current document
         self.numWordsLang = [0] * len(self.languages)    # number of words in each language in current document
@@ -145,6 +157,33 @@ class Indexator:
             if word['n_ana'] >= 127:
                 word['n_ana'] = 127
 
+    def clean_word(self, w, langID):
+        """
+        Clean a word object by removing unnecessary fields, lowercasing
+        things if needed, etc. Return the cleaned object and the lemma.
+        Add word form and lemma to the global lists.
+        """
+        wClean = {'lang': langID}
+        lemma = ''
+        for field in w:
+            if field in self.goodWordFields or field in self.additionalWordFields:
+                wClean[field] = w[field]
+                if field == 'wf':
+                    if 'wf_lowercase' not in self.settings or self.settings['wf_lowercase']:
+                        wClean[field] = wClean[field].lower()
+                    self.wfs.add(wClean[field])
+        if 'ana' in w:
+            lemma = self.get_lemma(w)
+            self.lemmata.add(lemma)
+            wClean['ana'] = []
+            for ana in w['ana']:
+                cleanAna = {}
+                for anaField in ana:
+                    if anaField in self.goodWordFields or anaField in self.additionalWordFields:
+                        cleanAna[anaField] = ana[anaField]
+                wClean['ana'].append(cleanAna)
+        return wClean, lemma
+
     def process_sentence_words(self, words, langID):
         """
         Take words from a sentence, remove all non-searchable
@@ -152,9 +191,9 @@ class Indexator:
         Add w_id and l_id properties to each word of the words list.
         Return the value of the 'sent_analyzed' meta field.
         """
-        sIDAdded = set()   # word IDs for which the current settence ID has been counted
-        bUniquelyAnalyzed = True
-        bFullyAnalyzed = True
+        sIDAdded = set()            # word IDs for which the current settence ID has been counted
+        bFullyAnalyzed = True       # Whether each word in the sentence is analyzed
+        bUniquelyAnalyzed = True    # Whether, in addition, each word has exactly one analysis
         for w in words:
             if w['wtype'] != 'word':
                 continue
@@ -162,64 +201,52 @@ class Indexator:
             self.numWordsLang[langID] += 1
             self.totalNumWords += 1
             self.enhance_word(w)
-            wClean = {'lang': langID}
-            lemma = ''
-            for field in w:
-                if field in self.goodWordFields or field in self.AdditionalWordFields:
-                    wClean[field] = w[field]
-                    if field == 'wf':
-                        if 'wf_lowercase' not in self.settings or self.settings['wf_lowercase']:
-                            wClean[field] = wClean[field].lower()
-                        self.wfs.add(wClean[field])
-            if 'ana' in w:
-                if len(w['ana']) > 1:
-                    bUniquelyAnalyzed = False
-                lemma = self.get_lemma(w)
-                self.lemmata.add(lemma)
-                wClean['ana'] = []
-                for ana in w['ana']:
-                    cleanAna = {}
-                    for anaField in ana:
-                        if anaField in self.goodWordFields or anaField in self.AdditionalWordFields:
-                            cleanAna[anaField] = ana[anaField]
-                    wClean['ana'].append(cleanAna)
+
             if 'ana' not in w or len(w['ana']) <= 0:
                 bFullyAnalyzed = False
                 bUniquelyAnalyzed = False
+            elif len(w['ana']) > 1:
+                bUniquelyAnalyzed = False
+
+            wClean, lemma = self.clean_word(w, langID)
             wCleanTxt = json.dumps(wClean, ensure_ascii=False, sort_keys=True)
             if wCleanTxt in self.tmpWordIDs[langID]:
                 wID = self.tmpWordIDs[langID][wCleanTxt]
             else:
                 wID = sum(len(self.tmpWordIDs[i]) for i in range(len(self.languages)))
                 self.tmpWordIDs[langID][wCleanTxt] = wID
-            w['w_id'] = 'w' + str(wID)
+            wID = 'w' + str(wID)
+            w['w_id'] = wID
+            lID = 'l0'   # Default: no analysis
             if len(lemma) > 0:
                 try:
-                    lemmaID = self.tmpLemmaIDs[langID][lemma]
+                    lID = self.tmpLemmaIDs[langID][lemma]
                 except KeyError:
-                    lemmaID = sum(len(self.tmpLemmaIDs[i])
-                                  for i in range(len(self.languages))) + 1
-                    self.tmpLemmaIDs[langID][lemma] = lemmaID
-                self.word2lemma[langID][wID] = lemmaID
-                w['l_id'] = 'l' + str(lemmaID)
-            try:
-                self.wordFreqs[langID][wID] += 1
-            except KeyError:
-                self.wordFreqs[langID][wID] = 1
-            if wID not in sIDAdded:
-                sIDAdded.add(wID)
+                    lID = sum(len(self.tmpLemmaIDs[i])
+                              for i in range(len(self.languages))) + 1
+                    self.tmpLemmaIDs[langID][lemma] = lID
+                lID = 'l' + str(lID)
+                self.word2lemma[langID][wID] = lID
+                w['l_id'] = lID
+            for itemID in [wID, lID]:
                 try:
-                    self.wordSFreqs[langID][wID] += 1
+                    self.wordFreqs[langID][itemID] += 1
                 except KeyError:
-                    self.wordSFreqs[langID][wID] = 1
-            try:
-                self.wordDIDs[langID][wID].add(self.dID)
-            except KeyError:
-                self.wordDIDs[langID][wID] = {self.dID}
-            try:
-                self.wordDocFreqs[langID][(wID, self.dID)] += 1
-            except KeyError:
-                self.wordDocFreqs[langID][(wID, self.dID)] = 1
+                    self.wordFreqs[langID][itemID] = 1
+                if itemID not in sIDAdded:
+                    sIDAdded.add(itemID)
+                    try:
+                        self.wordSFreqs[langID][itemID] += 1
+                    except KeyError:
+                        self.wordSFreqs[langID][itemID] = 1
+                try:
+                    self.wordDIDs[langID][itemID].add(self.dID)
+                except KeyError:
+                    self.wordDIDs[langID][itemID] = {self.dID}
+                try:
+                    self.wordDocFreqs[langID][(itemID, self.dID)] += 1
+                except KeyError:
+                    self.wordDocFreqs[langID][(itemID, self.dID)] = 1
         if not bFullyAnalyzed:
             return 'incomplete'
         if not bUniquelyAnalyzed:
@@ -382,27 +409,34 @@ class Indexator:
                 curGramm.add(grTags)
         return ' | '.join(grdic for grdic in sorted(curGramm)), ' | '.join(tr for tr in sorted(translations))
 
-    def iterate_lemmata(self, langID, lemmaFreqs, lemmaDIDs):
+    def iterate_lemmata(self, langID, lemmataSorted):
         """
         Iterate over all lemmata for one language collected at the
         word iteration stage.
         """
-        lFreqsSorted = [v for v in sorted(lemmaFreqs.values(), reverse=True)]
+        lFreqsSorted = [self.wordFreqs[langID][itemID]
+                        for itemID in self.wordFreqs[langID]
+                        if itemID.startswith('l')]
+        lFreqsSorted.sort(reverse=True)
         freqToRank, quantiles = self.get_freq_ranks(lFreqsSorted)
         iLemma = 0
         for l, lID in self.tmpLemmaIDs[langID].items():
+            lID = 'l' + str(lID)
             if iLemma % 250 == 0:
                 print('indexing lemma', iLemma)
+            lOrder = lemmataSorted[l]
             lemmaJson = {
                 'wf': l,
                 'wtype': 'lemma',
-                'freq': lemmaFreqs[lID],
-                'rank_true': freqToRank[lemmaFreqs[lID]],
-                'rank': self.quantile_label(lemmaFreqs[lID],
-                                            freqToRank[lemmaFreqs[lID]],
+                'l_order': lOrder,
+                'freq': self.wordFreqs[langID][lID],
+                'rank_true': freqToRank[self.wordFreqs[langID][lID]],
+                'rank': self.quantile_label(self.wordFreqs[langID][lID],
+                                            freqToRank[self.wordFreqs[langID][lID]],
                                             quantiles),
-                'n_docs': len(lemmaDIDs[lID]),
-                'word_join': 'lemma'
+                'n_sents': self.wordSFreqs[langID][lID],
+                'n_docs': len(self.wordDIDs[langID][lID]),
+                'freq_join': 'word'
             }
             curAction = {
                 '_index': self.name + '.words',
@@ -411,25 +445,25 @@ class Indexator:
             }
             iLemma += 1
             yield curAction
-            # TODO: Add lemma_freq objects.
-            # for docID in lemmaDIDs[lID]:
-            #     lfreqJson = {
-            #         'wtype': 'lemma_freq',
-            #         'l_id': 'l' + str(lID),
-            #         'd_id': docID,
-            #         'l_order': lOrder,
-            #         'freq': self.lemmaDocFreqs[langID][(lID, docID)],
-            #         'word_join': {
-            #             'name': 'lemma_freq',
-            #             'parent': 'l' + str(lID)
-            #         }
-            #     }
-            #     curAction = {'_index': self.name + '.words',
-            #                  '_id': 'lfreq' + str(self.lemmaFreqID),
-            #                  '_source': lfreqJson,
-            #                  '_routing': 'l' + str(lID)}
-            #     self.lemmaFreqID += 1
-            #     yield curAction
+
+            for docID in self.wordDIDs[langID][lID]:
+                lfreqJson = {
+                    'wtype': 'word_freq',
+                    'l_id': 'l' + str(lID),
+                    'd_id': docID,
+                    'l_order': lOrder,
+                    'freq': self.wordDocFreqs[langID][(lID, docID)],
+                    'freq_join': {
+                        'name': 'word_freq',
+                        'parent': 'l' + str(lID)
+                    }
+                }
+                curAction = {'_index': self.name + '.words',
+                             '_id': 'lfreq' + str(self.lemmaFreqID),
+                             '_source': lfreqJson,
+                             '_routing': 'l' + str(lID)}
+                self.lemmaFreqID += 1
+                yield curAction
 
     def iterate_words(self):
         """
@@ -443,18 +477,20 @@ class Indexator:
             wfsSorted, lemmataSorted = self.sort_words(self.languages[langID])
             iWord = 0
             print('Processing words in ' + self.languages[langID] + '...')
-            lemmaFreqs = {}       # lemma ID -> its frequency
-            lemmaDIDs = {}        # lemma ID -> its document IDs
-            wFreqsSorted = [v for v in sorted(self.wordFreqs[langID].values(), reverse=True)]
+            wFreqsSorted = [self.wordFreqs[langID][itemID]
+                            for itemID in self.wordFreqs[langID]
+                            if itemID.startswith('w')]
+            wFreqsSorted.sort(reverse=True)
             freqToRank, quantiles = self.get_freq_ranks(wFreqsSorted)
             # for wID in self.wordFreqs[langID]:
             for w, wID in self.tmpWordIDs[langID].items():
+                wID = 'w' + str(wID)
                 if iWord % 500 == 0:
                     print('indexing word', iWord)
                 try:
                     lID = self.word2lemma[langID][wID]
                 except KeyError:
-                    lID = 0
+                    lID = 'l0'
                 wJson = json.loads(w)
                 wfOrder = len(wfsSorted) + 1
                 if 'wf' in wJson:
@@ -464,18 +500,9 @@ class Indexator:
                     lOrder = lemmataSorted[self.get_lemma(wJson)]
                 wJson['wf_order'] = wfOrder
                 wJson['l_order'] = lOrder
-                wJson['l_id'] = 'l' + str(lID)
+                wJson['l_id'] = lID
                 wordFreq = self.wordFreqs[langID][wID]
                 wJson['freq'] = wordFreq
-                try:
-                    lemmaFreqs[lID] += wordFreq
-                except KeyError:
-                    lemmaFreqs[lID] = wordFreq
-                if lID != 0:
-                    try:
-                        lemmaDIDs[lID] |= self.wordDIDs[langID][wID]
-                    except KeyError:
-                        lemmaDIDs[lID] = set(self.wordDIDs[langID][wID])
                 # wJson['sids'] = [sid for sid in sorted(self.wordSIDs[langID][wID])]
                 wJson['dids'] = [did for did in sorted(self.wordDIDs[langID][wID])]
                 wJson['n_sents'] = self.wordSFreqs[langID][wID]
@@ -484,7 +511,7 @@ class Indexator:
                 wJson['rank'] = self.quantile_label(wJson['freq'],
                                                     wJson['rank_true'],
                                                     quantiles)  # for the user
-                wJson['word_join'] = 'word'
+                wJson['freq_join'] = 'word'
                 wJson['wtype'] = 'word'
                 curAction = {
                     '_index': self.name + '.words',
@@ -501,7 +528,7 @@ class Indexator:
                         'wf_order': wfOrder,
                         'l_order': lOrder,
                         'freq': self.wordDocFreqs[langID][(wID, docID)],
-                        'word_join': {
+                        'freq_join': {
                             'name': 'word_freq',
                             'parent': 'w' + str(wID)
                         }
@@ -514,7 +541,7 @@ class Indexator:
                     yield curAction
                 iWord += 1
                 self.wID += 1
-            for lAction in self.iterate_lemmata(langID, lemmaFreqs, lemmaDIDs):
+            for lAction in self.iterate_lemmata(langID, lemmataSorted):
                 yield lAction
         emptyLemmaJson = {
             'wf': '',
@@ -531,7 +558,7 @@ class Indexator:
         self.wfs = None
         self.lemmata = None
 
-    def generate_dictionary(self, fnameOut):
+    def generate_dictionary(self):
         """
         For each language, print out an HTML dictionary containing all lexemes of the corpus.
         """
@@ -543,6 +570,7 @@ class Indexator:
             freqToRank, quantiles = self.get_freq_ranks(wFreqsSorted)
             # for wID in self.wordFreqs[langID]:
             for w, wID in self.tmpWordIDs[langID].items():
+                wID = 'w' + str(wID)
                 if iWord % 1000 == 0:
                     print('processing word', iWord, 'for the dictionary')
                 iWord += 1
@@ -595,7 +623,7 @@ class Indexator:
         """
         bulk(self.es, self.iterate_words(), chunk_size=300, request_timeout=60)
         if 'generate_dictionary' in self.settings and self.settings['generate_dictionary']:
-            self.generate_dictionary(os.path.join(self.corpus_dir, 'dictionary.html'))
+            self.generate_dictionary()
 
     def add_parallel_sids(self, sentences, paraIDs):
         """
@@ -787,5 +815,7 @@ class Indexator:
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Index corpus in Elasticsearch 7.x.')
+    parser.add_argument('-y', help='overwrite existing database without asking first')
     x = Indexator()
     x.load_corpus()
