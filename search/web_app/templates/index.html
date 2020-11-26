@@ -69,7 +69,7 @@ var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 </p>
 <div id="search_div" class="transitions init-hidden">
 	<div class="show-hide">
-	<div class="slide">
+	<div class="query_slide">
 		<form id="search_main">
 		<input type="hidden" name="n_words" id="n_words" value="1">
 		<input type="hidden" name="random_seed" id="random_seed" value={{ random_seed }}>
@@ -93,7 +93,7 @@ var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 								<input type="hidden" class="search_input" name="w_id1" id="w_id1">
 								<input type="hidden" class="search_input" name="l_id1" id="l_id1">
 								{% if gloss_search_enabled %}
-								<span id="_label_gloss1" class="search_label">{{ _('Gloss:') }}</span> <input type="text" class="search_input gram_selector_input" name="gloss_index1" id="gloss_index1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gloss" data-nword="1"></span><br>
+								<span id="_label_gloss1" class="search_label">{{ _('Gloss:') }}</span> <input type="text" class="search_input gram_selector_input" name="gloss_index1" id="gloss_index1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gloss_index" data-nword="1"></span><br>
 								{% endif %}
 								<hr class="separator">
 								<div class="add_word_fields"></div>
@@ -208,7 +208,7 @@ var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 			{% endif %}
 		</div>
 	</div>
-<div class="hide_query_button" align="center"><a href="#" rel="toggle-slide"><img src="static/img/arrow_up.png" class="img-swap" /><span id="hide_query_caption">{{ _('Back to search') }}</span></a></div>
+<div class="hide_query_button" align="center"><a href="#" rel="toggle-query_slide"><img src="static/img/arrow_up.png" class="img-swap" /><span id="hide_query_caption">{{ _('Back to search') }}</span></a></div>
 </div>
 </div>
 

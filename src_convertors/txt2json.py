@@ -157,30 +157,36 @@ class Txt2JSON:
         from a Coma XML file whose name is indicated in the settings.
         """
         srcTree = etree.parse(fnameMeta)
-        exbDescrs = srcTree.xpath('/Corpus/CorpusData/Communication')
-        for exbDescr in exbDescrs:
+        communications = srcTree.xpath('//Corpus/CorpusData/Communication')
+        for c in communications:
             fname = ''
             title = ''
             curMetaDict = {}
-            for el in exbDescr:
-                if el.tag == 'Transcription':
-                    elFname = el.xpath('Filename')
-                    if (len(elFname) > 0 and elFname[0].text is not None
-                            and elFname[0].text.lower().endswith(('.exb', '.eaf'))):
-                        fname = elFname[0].text
-                        if not self.corpusSettings['meta_files_ext']:
-                            fname = re.sub('\\.[^.]*$', '', fname)
-                    elTitle = el.xpath('Filename')
-                    if len(elTitle) > 0 and elTitle[0].text is not None:
-                        title = elTitle[0].text
-                elif el.tag == 'Description':
-                    for descrKey in el:
-                        if descrKey.tag != 'Key':
-                            continue
-                        self.add_coma_key_to_meta(curMetaDict, descrKey)
+            exbTranscrs = c.xpath('Transcription')
+            exbDescrs = c.xpath('Description|'
+                                'Setting/Description|'
+                                'Location/Description')
+            for exbTranscr in exbTranscrs:
+                elFname = exbTranscr.xpath('Filename')
+                if (len(elFname) > 0 and elFname[0].text is not None
+                        and elFname[0].text.lower().endswith(('.exb', '.eaf'))):
+                    fname = elFname[0].text
+                    if not self.corpusSettings['meta_files_ext']:
+                        fname = re.sub('\\.[^.]*$', '', fname)
+                elTitle = exbTranscr.xpath('Filename')
+                if len(elTitle) > 0 and elTitle[0].text is not None:
+                    title = elTitle[0].text
+            for exbDescr in exbDescrs:
+                for descrKey in exbDescr:
+                    if descrKey.tag != 'Key':
+                        continue
+                    self.add_coma_key_to_meta(curMetaDict, descrKey)
             if len(fname) > 0:
                 if 'title' not in curMetaDict:
-                    curMetaDict['title'] = title
+                    if len(title) > 0:
+                        curMetaDict['title'] = title
+                    else:
+                        curMetaDict['title'] = fname
                 self.meta[fname] = curMetaDict
 
     def load_meta(self):

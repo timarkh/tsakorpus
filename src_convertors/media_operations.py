@@ -25,40 +25,53 @@ class MediaCutter:
     def __init__(self, settings):
         self.settings = copy.deepcopy(settings)
 
-    def get_media_name(self, fname, ts1, ts2):
+    def get_media_name(self, fname, ts1, ts2, minTime=None, maxTime=None):
         """
         Choose the appropriate fragment of the source
         video file and return its name and the new offsets.
         The name has the following structure:
         base_name-offset-number_of_chunk_for_this_offset.
-        Offset of 0 means no offset, 1 means L/3, 2 means 2L/3.
+        Offset of 0 means no offset, 1 means L/3, 2 means 2*L/3.
+        The middle of the (minTime; maxTime) intevral should be as
+        close to the middle of the selected fragment as possible.
+        If no minTime and maxTime are supplied, they are considered
+        equal to ts1 and ts2, respectively.
         """
-        fileLen = self.settings['media_length']
-        segmentLen = math.floor(fileLen / 3)
-        startOffset = ts1 - 1
-        if ts2 - ts1 < segmentLen:
-            startOffset -= segmentLen
-        if startOffset < 0:
-            startOffset = 0
+        if minTime is None:
+            minTime = ts1
+        if maxTime is None:
+            maxTime = ts2
+        middle = float(minTime) + float(maxTime - minTime) / 2
+        fileLen = float(self.settings['media_length'])
+        segmentLen = fileLen / 3
+        if middle <= fileLen / 2:
+            frameNumber = 0
         else:
-            startOffset = int(math.floor(startOffset / segmentLen))  # in seconds
-        filenameOffset = startOffset % 3
-        filenameNumber = startOffset // 3
+            frameNumber = (middle - fileLen / 2) // segmentLen
+            relativeOffset = (middle - fileLen / 2) % segmentLen
+            if relativeOffset > fileLen / 6:
+                # The middle of the segment is closer to the middle of the next available frame
+                frameNumber += 1
+
+        filenameOffset = math.floor(frameNumber % 3)
+        filenameNumber = math.floor(frameNumber // 3)
         m = re.search('^(.*)\\.([^.]+)$', fname)
         if m is None:
             fname = fname + '-' + str(filenameOffset) + '-' + str(filenameNumber)
         else:
             fname = m.group(1) + '-' + str(filenameOffset) + '-' + \
                     str(filenameNumber) + '.mp4'    # + m.group(2)
-        ts1 -= startOffset * segmentLen
-        ts2 -= startOffset * segmentLen
+        ts1 -= frameNumber * segmentLen
+        ts2 -= frameNumber * segmentLen
         return ts1, ts2, fname
 
-    def split_file(self, fname, outDir, splitLength, startOffset=0, segmentLen=0):
+    def split_file(self, fname, outDir, splitLength, startOffset=0, segmentLen=0,
+                   usedFilenames=None):
         """
         Split the file into chunks of given length, starting from the
         given offset (actual offset in seconds equals startOffset * segmentLen).
         This function calls ffmpeg with relevant parameters.
+        If usedFilenames list is set, skip fragments that do not appear on it.
         """
         durationProbe = 'ffprobe -v error -show_entries format=duration ' \
                         '-of default=noprint_wrappers=1:nokey=1 "' + fname + '"'
@@ -88,8 +101,8 @@ class MediaCutter:
             if fname.lower().endswith('.mp4'):
                 splitStr += ' -vcodec copy -acodec copy'
                 newExt = '.mp4'
-            elif fname.lower().endswith(('.avi', '.mts')):
-                splitStr += ' -vcodec libx264 -b 300k -acodec aac -ab 128k'
+            elif fname.lower().endswith(('.avi', '.mts', '.mov', '.mp4')):
+                splitStr += ' -s 400x300 -vcodec libx264 -b:v 500k -acodec aac -ab 192k'
                 newExt = '.mp4'
             elif fname.lower().endswith(('.wav', '.wma', '.mp3')):
                 # splitStr += " -ab 196k"
@@ -109,13 +122,18 @@ class MediaCutter:
                 return
             fnameOut = mFname.group(2) + '-' + str(int(startOffset) // segmentLen) + '-' +\
                        str(n) + newExt
+            if usedFilenames is not None and fnameOut not in usedFilenames:
+                continue
             fnameOut = os.path.join(outDir, fnameOut)
+            if os.path.exists(fnameOut):
+                print(fnameOut, 'already exists, skipping.')
+                continue
             splitStr += ' -strict experimental "' + fnameOut + '"'
             print('About to run: ' + splitCmd + splitStr)
             output = subprocess.Popen(splitCmd + splitStr, shell=True,
                                       stdout=subprocess.PIPE).stdout.read()
 
-    def cut_media(self, fname):
+    def cut_media(self, fname, usedFilenames=None):
         """
         Cut media file into overlapping pieces whose length is specified
         in the settings. Write it to corpus/%corpus_name%/media.
@@ -126,7 +144,7 @@ class MediaCutter:
         fileLen = self.settings['media_length']
         segmentLen = int(math.floor(fileLen / 3))
         for startOffset in range(3):
-            self.split_file(fname, outDir, fileLen, startOffset * segmentLen, segmentLen)
+            self.split_file(fname, outDir, fileLen, startOffset * segmentLen, segmentLen, usedFilenames=usedFilenames)
         print(fname, 'was successfully splitted.')
 
 

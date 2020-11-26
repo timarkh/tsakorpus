@@ -28,7 +28,7 @@ The configuration files are ``conversion_settings.json`` and ``categories.json``
 
 * ``meta_files_case_sensitive`` -- boolean value that determines whether the filenames in the metadata file should be treated as case sensitive.
 
-* ``nometa_skip`` (optional) -- boolean value that determines if the files not referenced in the metadata should be skipped. Defaults to false.
+* ``nometa_skip`` (optional) -- boolean value that determines if the files not referenced in the metadata should be skipped. Defaults to ``false``.
 
 * ``exclude_by_meta`` (optional) -- list of dictionaries, each of which contains a rule that determines what input documents should be skipped based on its metadata. The document is skipped if it conforms to at least one rule. A document conforms to the rule if its metadata contains all the key-value pairs present in the rule, while possibly containing other keys. Defaults to empty list.
 
@@ -44,7 +44,7 @@ The configuration files are ``conversion_settings.json`` and ``categories.json``
 
 * ``languages`` -- an array with the names of the languages which exist in the corpus.
 
-* ``cg_disambiguate`` (optional) -- boolean value that determines whether your corpus has to be disambiguated with the Constraint Grammar rules after the annotation. Defaults to false.
+* ``cg_disambiguate`` (optional) -- boolean value that determines whether your corpus has to be disambiguated with the Constraint Grammar rules after the annotation. Defaults to ``false``.
 
 * ``cg_filename`` (optional) -- the names of the files with the Constraint Grammar rules (if you want to disambiguate your corpus). This files should be located in ``src_convertors/corpus/%corpus_name%/``. The value of this field is a dictionary where the keys are the names of the languages and the values are the names of the corresponding files. It is not obligatory to list all the languages you have.
 
@@ -54,9 +54,13 @@ The configuration files are ``conversion_settings.json`` and ``categories.json``
 
 * ``transparent_punctuation`` (optional) -- regexp that determines which punctuation should be considered "transparent", i.e. should not be counted when calculating distances between words for a multiword query. This parameter influences the assignment of ``sentence_index`` values, which is added to words and punctuation marks at conversion time and then used in multiword queries at search time. Defaults to ``^ *$``.
 
-* ``non_word_internal_punct`` (optional) -- list of non-letter characters that should be never be treated as word-internal during tokenization (if built-in tokenization is used). Defaults to the newline character; whitespace is always included. For example, a tokenizer with default options will consider words like *bla-bla-bla* to constitute single tokens, but if you add hyphen to this list, *bla-bla-bla* will be split into three tokens.
+* ``non_word_internal_punct`` (optional) -- list of non-letter characters that should never be treated as word-internal during tokenization (if built-in tokenization is used). Defaults to the newline character; whitespace is always included. For example, a tokenizer with default options will consider words like *bla-bla-bla* to constitute single tokens, but if you add hyphen to this list, *bla-bla-bla* will be split into three tokens.
 
-* ``one_morph_per_cell`` (optional, for the ELAN convertor) -- boolean value that determines whether the annotation tiers contain one cell per morpheme/gloss (true) or one cell per entire glossing (false). For example, if the morpheme segmentation of the German word *ge-schloss-en* is kept in three different cells (*ge-*, *schloss* and *-en*), this value should be set to true. Defaults to false.
+* ``one_morph_per_cell`` (optional, for the ELAN convertor) -- boolean value that determines whether the annotation tiers contain one cell per morpheme/gloss (true) or one cell per entire glossing (false). For example, if the morpheme segmentation of the German word *ge-schloss-en* is kept in three different cells (*ge-*, *schloss* and *-en*), this value should be set to true. Defaults to ``false``.
+
+* ``special_tokens`` (optional) -- dictionary that determines which tokens have to be treated in a special way when performing automatic tokenization. Each key is a regex, and the corresponding value is a dictionary that should be inserted in the JSON files as an object representing that token. E.g. ``"<(REPOST|USER|LINK)>": {"wtype": "punct"}`` would lead to tokens ``<REPOST>``, ``<USER>`` and ``<LINK>`` being tokenized as such (i.e. the angle brackets will not become separate tokens) and being treated as punctuation.
+
+* ``capitalize_sentences`` (optional) -- Boolean value that determines if the first letter of the first word in each sentence should be automatically capitalized. Defaults to ``false``.
 
 ### The convertors
 There are several source convertors for different input formats (see ``pipeline.md``). Each of them is a class located in one Python file:
@@ -104,15 +108,15 @@ In parallel corpora, ``<body>`` contains translation units (``<para>``), which c
 
 Additional settings available for this convertor are the following:
 
-``corpus_type`` -- string that says whether the corpus is parallel (``parallel``) or not (``main``). Defaults to ``main``.
+* ``corpus_type`` -- string that says whether the corpus is parallel (``parallel``) or not (``main``). Defaults to ``main``.
 
-``meta_in_header`` -- Boolean value that determines if the metadata should be searched in the XML header. If it is found, it undergoes certain name changes to comply with the tsakorpus requirements, see ``get_meta_from_header`` function in ``xml_rnc2json.py``.
+* ``meta_in_header`` -- Boolean value that determines if the metadata should be searched in the XML header. If it is found, it undergoes certain name changes to comply with the tsakorpus requirements, see ``get_meta_from_header`` function in ``xml_rnc2json.py``.
 
-``multivalued_ana_features`` -- list of strings that determines which analysis attributes have to be treated as carrying multiple values separated by a whitespace.
+* ``multivalued_ana_features`` -- list of strings that determines which analysis attributes have to be treated as carrying multiple values separated by a whitespace.
 
-``language_codes`` -- dictionary that contains correspondences between the attribute values used to identify the language and the language names as specified in the ``languages`` list.
+* ``language_codes`` -- dictionary that contains correspondences between the attribute values used to identify the language and the language names as specified in the ``languages`` list.
 
-``clean_words_rnc`` -- Boolean value that determines if the tokens should undergo additional RNC-style cleaning (such as removal of the stress marks).
+* ``clean_words_rnc`` -- Boolean value that determines if the tokens should undergo additional RNC-style cleaning (such as removal of the stress marks).
 
 ### Processing glossed text (xml_flex2json, iso_tei_hamburg2json, exmaralda_hamburg2json, eaf2json)
 The default way of representing word-level morphological information in corpus linguistics is to assign each word a grammatical tag or a set of tags. Each tag represents one value of one particular morphosyntactic category. Part-of-speech (POS) tags are the most common example, but corpora of morphologically rich languages often have tags for other categories, such as tense, number or case. Information about lexical classes, such as animate nouns or motion verbs, can also be encoded in such a way. In tsakorpus, each tag is a string, and all tags are split into classes (e.g. "case tags") in ``categories.json`` (see ``configuration.md``).
@@ -148,6 +152,12 @@ Second, tier types should be consistent throughout your corpus. If you have tran
 * ``analysis_tiers`` (optional) -- a dictionary describing which ELAN tiers correspond to which word-level analysis fields. The keys are the tier names (or regexes), and the possible values are currently ``word`` (tokens), ``parts`` (morpheme segmentation) and ``gloss`` (glosses).
 
 * ``tier_languages`` -- a dictionary where keys are the names of the tier types (listed in the above two arrays) and the values are the names of their languages.
+
+* ``ignore_tokens`` -- a string with a regex that describes which tokens should be skipped when aligning a token tier with a text tier.
+
+* ``sentence_segmentation`` -- Boolean value that determines whether the convertor should resegment your text into sentences based on sentence-final punctuation set in ``sent_end_punc``. If ``false`` or absent, the time-aligned segments are treated as sentences.
+
+* ``media_dir`` (optional) -- a string that indicates the path to the media files to be cut, if they are located in a different folder than the ELAN files.
 
 The source audio/video files will be split into small pieces with [ffmpeg](https://www.ffmpeg.org/). You have to have it installed, and its directory should be in the system PATH variable.
 
