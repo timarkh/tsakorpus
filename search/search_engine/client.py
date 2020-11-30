@@ -24,6 +24,7 @@ class SearchClient:
         self.qp = InterfaceQueryParser(self.settings_dir)
 
     def get_words(self, esQuery):
+        print(esQuery)
         if self.settings['query_timeout'] > 0:
             hits = self.es.search(index=self.name + '.words',
                                   body=esQuery, request_timeout=self.settings['query_timeout'])
@@ -33,6 +34,7 @@ class SearchClient:
         return hits
 
     def get_lemmata(self, esQuery):
+        print(esQuery)
         if self.settings['query_timeout'] > 0:
             hits = self.es.search(index=self.name + '.words',
                                   body=esQuery, request_timeout=self.settings['query_timeout'])
@@ -60,6 +62,16 @@ class SearchClient:
         return iterator
 
     def get_sentences(self, esQuery):
+        # esQuery = {
+        #     'query': {'bool': {'must': [{'nested': {'path': 'words', 'query': {'constant_score': {'filter': {'bool': {
+        #         'must': [{'match': {'words.wtype': 'word'}}, {'nested': {'path': 'words.ana', 'query': {
+        #             'constant_score': {'filter': {'wildcard': {'words.ana.lex': 'a*'}}, 'boost': 1}},
+        #                                                                  'score_mode': 'sum'}}]}},
+        #         'boost': 1}},
+        #                                             'score_mode': 'sum', 'inner_hits': {
+        #             'highlight': {'fields': {'words': {'number_of_fragments': 100, 'fragment_size': 2048}}}, 'size': 50,
+        #             'name': 'w1'}}}], 'filter': [{'term': {'lang': {'value': 0}}}]}}, 'size': 1, 'from': 0,
+        #     'aggs': {'agg_ndocs': {'cardinality': {'field': 'doc_id'}}, 'agg_nwords': {'stats': {'script': '_score'}}}}
         print(esQuery)
         if self.settings['query_timeout'] > 0:
             hits = self.es.search(index=self.name + '.sentences',
@@ -67,6 +79,7 @@ class SearchClient:
         else:
             hits = self.es.search(index=self.name + '.sentences',
                                   body=esQuery)
+        print(json.dumps(hits, ensure_ascii=False, indent=1))
         return hits
 
     def get_all_sentences(self, esQuery):

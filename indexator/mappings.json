@@ -1,51 +1,69 @@
 {
   "docs": {
     "mappings": {
-      "doc": {
-        "properties": {
-          "n_words": {
-            "type": "integer"
-          },
-          "n_sents": {
-            "type": "integer"
-          },
-          "filename": {
-            "type": "text",
-            "analyzer": "lowercase_normalizer"
-          },
-          "filename_kw": {
-            "type": "keyword"
-          },
-          "author": {
-            "type": "text",
-            "analyzer": "lowercase_normalizer"
-          },
-          "author_kw": {
-            "type": "keyword"
-          },
-          "title": {
-            "type": "text",
-            "analyzer": "lowercase_normalizer"
-          },
-          "title_kw": {
-            "type": "keyword"
-          },
-          "genre": {
-            "type": "text",
-            "analyzer": "lowercase_normalizer"
-          },
-          "genre_kw": {
-            "type": "keyword"
-          },
-          "year_from": {
-            "type": "integer"
-          },
-          "year_to": {
-            "type": "integer"
-          },
-          "year": {
-            "type": "integer"
-          }
+      "properties": {
+        "n_words": {
+          "type": "integer"
+        },
+        "n_sents": {
+          "type": "integer"
+        },
+        "n_words_beserman": {
+          "type": "integer"
+        },
+        "n_sents_beserman": {
+          "type": "integer"
+        },
+        "n_words_russian": {
+          "type": "integer"
+        },
+        "n_sents_russian": {
+          "type": "integer"
+        },
+        "filename": {
+          "type": "text",
+          "analyzer": "lowercase_normalizer"
+        },
+        "filename_kw": {
+          "type": "keyword"
+        },
+        "title": {
+          "type": "text",
+          "analyzer": "lowercase_normalizer"
+        },
+        "title_kw": {
+          "type": "keyword"
+        },
+        "author": {
+          "type": "text",
+          "analyzer": "lowercase_normalizer"
+        },
+        "author_kw": {
+          "type": "keyword"
+        },
+        "genre": {
+          "type": "text",
+          "analyzer": "lowercase_normalizer"
+        },
+        "genre_kw": {
+          "type": "keyword"
+        },
+        "year": {
+          "type": "integer"
+        },
+        "speakers": {
+          "type": "text",
+          "analyzer": "lowercase_normalizer"
+        },
+        "speakers_kw": {
+          "type": "keyword"
+        },
+        "linguists": {
+          "type": "text",
+          "analyzer": "lowercase_normalizer"
+        },
+        "linguists_kw": {
+          "type": "keyword"
         }
       }
     },
@@ -66,411 +84,310 @@
   },
   "sentences": {
     "mappings": {
-      "sentence": {
-        "properties": {
-          "prev_id": {
-            "type": "integer"
-          },
-          "next_id": {
-            "type": "integer"
-          },
-          "doc_id": {
-            "type": "integer"
-          },
-          "text": {
-            "type": "text"
-          },
-          "lang": {
-            "type": "byte"
-          },
-          "words": {
-            "type": "nested",
-            "properties": {
-              "wf": {
-                "type": "text",
-                "fielddata": true,
-                "analyzer": "wf_analyzer"
-              },
-              "wf_display": {
-                "type": "text",
-                "index": false
-              },
-              "wtype": {
-                "type": "keyword"
-              },
-              "lang": {
-                "type": "byte"
-              },
-              "sentence_index": {
-                "type": "short"
-              },
-              "sentence_index_neg": {
-                "type": "short"
-              },
-              "sids": {
-                "type": "integer",
-                "index": false
-              },
-              "n_ana": {
-                "type": "byte"
-              },
-              "ana": {
-                "type": "nested",
-                "properties": {
-                  "lex": {
-                    "type": "text",
-                    "fielddata": true,
-                    "analyzer": "wf_analyzer"
-                  },
-                  "gloss_index": {
-                    "type": "text",
-                    "analyzer": "gloss_analyzer"
-                  },
-                  "trans_ru": {
-                    "type": "text"
-                  },
-                  "trans_en": {
-                    "type": "text"
-                  },
-                  "gr.cnvF": {
-                    "type": "keyword"
-                  },
-                  "gr.tr": {
-                    "type": "keyword"
-                  },
-                  "gr.numAbs": {
-                    "type": "keyword"
-                  },
-                  "gr.nType": {
-                    "type": "keyword"
-                  },
-                  "gr.nSfx": {
-                    "type": "keyword"
-                  },
-                  "gr.persAbs": {
-                    "type": "keyword"
-                  },
-                  "gr.numType": {
-                    "type": "keyword"
-                  },
-                  "gr.n_deriv": {
-                    "type": "keyword"
-                  },
-                  "gr.vCl": {
-                    "type": "keyword"
-                  },
-                  "gr.num_deriv": {
-                    "type": "keyword"
-                  },
-                  "gr.additional": {
-                    "type": "keyword"
-                  },
-                  "gr.add": {
-                    "type": "keyword"
-                  },
-                  "gr.v_deriv": {
-                    "type": "keyword"
-                  },
-                  "gr.dir": {
-                    "type": "keyword"
-                  },
-                  "gr.clitics": {
-                    "type": "keyword"
-                  },
-                  "gr.comp": {
-                    "type": "keyword"
-                  },
-                  "gr.numeral": {
-                    "type": "keyword"
-                  },
-                  "gr.adjForm": {
-                    "type": "keyword"
-                  },
-                  "gr.inflGender": {
-                    "type": "keyword"
-                  },
-                  "gr.stem_alt": {
-                    "type": "keyword"
-                  },
-                  "gr.vSfx": {
-                    "type": "keyword"
-                  },
-                  "gr.pers": {
-                    "type": "keyword"
-                  },
-                  "gr.case": {
-                    "type": "keyword"
-                  },
-                  "gr.vType": {
-                    "type": "keyword"
-                  },
-                  "gr.vF": {
-                    "type": "keyword"
-                  },
-                  "gr.posChange": {
-                    "type": "keyword"
-                  },
-                  "gr.dyn": {
-                    "type": "keyword"
-                  },
-                  "gr.v_subcat": {
-                    "type": "keyword"
-                  },
-                  "gr.gender": {
-                    "type": "keyword"
-                  },
-                  "gr.stress": {
-                    "type": "keyword"
-                  },
-                  "gr.persErg": {
-                    "type": "keyword"
-                  },
-                  "gr.vForm": {
-                    "type": "keyword"
-                  },
-                  "gr.poss": {
-                    "type": "keyword"
-                  },
-                  "gr.cnv_form": {
-                    "type": "keyword"
-                  },
-                  "gr.ptcp_form": {
-                    "type": "keyword"
-                  },
-                  "gr.attributivizer": {
-                    "type": "keyword"
-                  },
-                  "gr.conjtype": {
-                    "type": "keyword"
-                  },
-                  "gr.adjType": {
-                    "type": "keyword"
-                  },
-                  "gr.prGov": {
-                    "type": "keyword"
-                  },
-                  "gr.g": {
-                    "type": "keyword"
-                  },
-                  "gr.nGend": {
-                    "type": "keyword"
-                  },
-                  "gr.mood": {
-                    "type": "keyword"
-                  },
-                  "gr.tense": {
-                    "type": "keyword"
-                  },
-                  "gr.persIO": {
-                    "type": "keyword"
-                  },
-                  "gr.num_type": {
-                    "type": "keyword"
-                  },
-                  "gr.numErg": {
-                    "type": "keyword"
-                  },
-                  "gr.stemAlt": {
-                    "type": "keyword"
-                  },
-                  "gr.case_c": {
-                    "type": "keyword"
-                  },
-                  "gr.attr": {
-                    "type": "keyword"
-                  },
-                  "gr.number": {
-                    "type": "keyword"
-                  },
-                  "gr.nAn": {
-                    "type": "keyword"
-                  },
-                  "gr.an": {
-                    "type": "keyword"
-                  },
-                  "gr.adjF": {
-                    "type": "keyword"
-                  },
-                  "gr.abbr": {
-                    "type": "keyword"
-                  },
-                  "gr.stemType": {
-                    "type": "keyword"
-                  },
-                  "gr.asp": {
-                    "type": "keyword"
-                  },
-                  "gr.adj_form": {
-                    "type": "keyword"
-                  },
-                  "gr.rel": {
-                    "type": "keyword"
-                  },
-                  "gr.voice": {
-                    "type": "keyword"
-                  },
-                  "gr.demType": {
-                    "type": "keyword"
-                  },
-                  "gr.numIO": {
-                    "type": "keyword"
-                  },
-                  "gr.pos": {
-                    "type": "keyword"
-                  },
-                  "gr.num": {
-                    "type": "keyword"
-                  },
-                  "gr.proType": {
-                    "type": "keyword"
-                  },
-                  "gr.v_form": {
-                    "type": "keyword"
-                  },
-                  "gr.appl": {
-                    "type": "keyword"
-                  },
-                  "gr.nDef": {
-                    "type": "keyword"
-                  },
-                  "gr.rusV": {
-                    "type": "keyword"
-                  },
-                  "gr.incorp": {
-                    "type": "keyword"
-                  }
+      "properties": {
+        "prev_id": {
+          "type": "integer"
+        },
+        "next_id": {
+          "type": "integer"
+        },
+        "doc_id": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "text"
+        },
+        "lang": {
+          "type": "byte"
+        },
+        "words": {
+          "type": "nested",
+          "properties": {
+            "wf": {
+              "type": "text",
+              "fielddata": true,
+              "analyzer": "wf_analyzer"
+            },
+            "wf_display": {
+              "type": "text",
+              "index": false
+            },
+            "wtype": {
+              "type": "keyword"
+            },
+            "lang": {
+              "type": "byte"
+            },
+            "sentence_index": {
+              "type": "short"
+            },
+            "sentence_index_neg": {
+              "type": "short"
+            },
+            "sids": {
+              "type": "integer",
+              "index": false
+            },
+            "n_ana": {
+              "type": "byte"
+            },
+            "ana": {
+              "type": "nested",
+              "properties": {
+                "lex": {
+                  "type": "text",
+                  "fielddata": true,
+                  "analyzer": "wf_analyzer"
+                },
+                "gloss_index": {
+                  "type": "text",
+                  "analyzer": "gloss_analyzer"
+                },
+                "trans_ru": {
+                  "type": "text"
+                },
+                "gr.stemType": {
+                  "type": "keyword"
+                },
+                "gr.adjF": {
+                  "type": "keyword"
+                },
+                "gr.num_deriv": {
+                  "type": "keyword"
+                },
+                "gr.cnvF": {
+                  "type": "keyword"
+                },
+                "gr.case_c": {
+                  "type": "keyword"
+                },
+                "gr.number": {
+                  "type": "keyword"
+                },
+                "gr.v_form": {
+                  "type": "keyword"
+                },
+                "gr.add": {
+                  "type": "keyword"
+                },
+                "gr.v_subcat": {
+                  "type": "keyword"
+                },
+                "gr.conjtype": {
+                  "type": "keyword"
+                },
+                "gr.mood": {
+                  "type": "keyword"
+                },
+                "gr.adjType": {
+                  "type": "keyword"
+                },
+                "gr.nType": {
+                  "type": "keyword"
+                },
+                "gr.an": {
+                  "type": "keyword"
+                },
+                "gr.vF": {
+                  "type": "keyword"
+                },
+                "gr.cnv_form": {
+                  "type": "keyword"
+                },
+                "gr.comp": {
+                  "type": "keyword"
+                },
+                "gr.asp": {
+                  "type": "keyword"
+                },
+                "gr.pers": {
+                  "type": "keyword"
+                },
+                "gr.additional": {
+                  "type": "keyword"
+                },
+                "gr.num": {
+                  "type": "keyword"
+                },
+                "gr.poss": {
+                  "type": "keyword"
+                },
+                "gr.g": {
+                  "type": "keyword"
+                },
+                "gr.attributivizer": {
+                  "type": "keyword"
+                },
+                "gr.pos": {
+                  "type": "keyword"
+                },
+                "gr.v_deriv": {
+                  "type": "keyword"
+                },
+                "gr.proType": {
+                  "type": "keyword"
+                },
+                "gr.tense": {
+                  "type": "keyword"
+                },
+                "gr.voice": {
+                  "type": "keyword"
+                },
+                "gr.n_deriv": {
+                  "type": "keyword"
+                },
+                "gr.case": {
+                  "type": "keyword"
+                },
+                "gr.ptcp_form": {
+                  "type": "keyword"
+                },
+                "gr.tr": {
+                  "type": "keyword"
                 }
-              },
-              "freq": {
-                "type": "integer"
-              },
-              "rank": {
-                "type": "keyword"
-              },
-              "rank_true": {
-                "type": "integer"
-              },
-              "n_sents": {
-                "type": "integer"
-              },
-              "n_docs": {
-                "type": "integer"
-              },
-              "w_id": {
-                "type": "integer"
-              },
-              "l_id": {
-                "type": "integer"
-              },
-              "wf_order": {
-                "type": "integer"
-              },
-              "l_order": {
-                "type": "integer"
               }
+            },
+            "freq": {
+              "type": "integer"
+            },
+            "rank": {
+              "type": "keyword"
+            },
+            "rank_true": {
+              "type": "integer"
+            },
+            "n_sents": {
+              "type": "integer"
+            },
+            "n_docs": {
+              "type": "integer"
+            },
+            "w_id": {
+              "type": "keyword"
+            },
+            "l_id": {
+              "type": "keyword"
+            },
+            "wf_order": {
+              "type": "integer"
+            },
+            "l_order": {
+              "type": "integer"
             }
-          },
-          "n_words": {
-            "type": "short"
-          },
-          "src_alignment": {
-            "type": "nested",
-            "properties": {
-              "mtype": {
-                "type": "keyword"
-              },
-              "src": {
-                "type": "keyword",
-                "index": false
-              },
-              "off_start_src": {
-                "type": "float",
-                "index": false
-              },
-              "off_start_sent": {
-                "type": "short",
-                "index": false
-              },
-              "off_end_src": {
-                "type": "float",
-                "index": false
-              },
-              "off_end_sent": {
-                "type": "short",
-                "index": false
-              },
-              "rect_src": {
-                "type": "integer",
-                "index": false
-              },
-              "src_id": {
-                "type": "keyword",
-                "index": false
-              }
+          }
+        },
+        "n_words": {
+          "type": "short"
+        },
+        "src_alignment": {
+          "type": "nested",
+          "properties": {
+            "mtype": {
+              "type": "keyword"
+            },
+            "src": {
+              "type": "keyword",
+              "index": false
+            },
+            "off_start_src": {
+              "type": "float",
+              "index": false
+            },
+            "off_start_sent": {
+              "type": "short",
+              "index": false
+            },
+            "off_end_src": {
+              "type": "float",
+              "index": false
+            },
+            "off_end_sent": {
+              "type": "short",
+              "index": false
+            },
+            "rect_src": {
+              "type": "integer",
+              "index": false
+            },
+            "src_id": {
+              "type": "keyword",
+              "index": false
             }
-          },
-          "para_ids": {
-            "type": "keyword"
-          },
-          "para_alignment": {
-            "type": "nested",
-            "properties": {
-              "off_start": {
-                "type": "short",
-                "index": false
-              },
-              "off_end": {
-                "type": "short",
-                "index": false
-              },
-              "para_id": {
-                "type": "keyword",
-                "index": false
-              },
-              "sent_ids": {
-                "type": "integer",
-                "index": false
-              }
+          }
+        },
+        "para_ids": {
+          "type": "keyword"
+        },
+        "para_alignment": {
+          "type": "nested",
+          "properties": {
+            "off_start": {
+              "type": "short",
+              "index": false
+            },
+            "off_end": {
+              "type": "short",
+              "index": false
+            },
+            "para_id": {
+              "type": "keyword",
+              "index": false
+            },
+            "sent_ids": {
+              "type": "integer",
+              "index": false
             }
-          },
-          "style_spans": {
-            "type": "nested",
-            "properties": {
-              "off_start": {
-                "type": "short",
-                "index": false
-              },
-              "off_end": {
-                "type": "short",
-                "index": false
-              },
-              "span_class": {
-                "type": "keyword",
-                "index": false
-              }
+          }
+        },
+        "style_spans": {
+          "type": "nested",
+          "properties": {
+            "off_start": {
+              "type": "short",
+              "index": false
+            },
+            "off_end": {
+              "type": "short",
+              "index": false
+            },
+            "span_class": {
+              "type": "keyword",
+              "index": false
             }
-          },
-          "segment_ids": {
-            "type": "integer",
-            "index": false
-          },
-          "meta": {
-            "properties": {
-              "sent_analyses_kw": {
-                "type": "keyword"
-              },
-              "age": {
-                "type": "text"
-              },
-              "age_kw": {
-                "type": "keyword"
-              },
-              "gender": {
-                "type": "text"
-              },
-              "gender_kw": {
-                "type": "keyword"
-              }
+          }
+        },
+        "segment_ids": {
+          "type": "integer",
+          "index": false
+        },
+        "meta": {
+          "properties": {
+            "sent_analyses_kw": {
+              "type": "keyword"
+            },
+            "speaker": {
+              "type": "text"
+            },
+            "speaker_kw": {
+              "type": "keyword"
+            },
+            "gender": {
+              "type": "text"
+            },
+            "gender_kw": {
+              "type": "keyword"
+            },
+            "birthyear": {
+              "type": "text"
+            },
+            "birthyear_kw": {
+              "type": "keyword"
+            },
+            "speaker_type": {
+              "type": "text"
+            },
+            "speaker_type_kw": {
+              "type": "keyword"
             }
           }
         }
@@ -495,298 +412,185 @@
   },
   "words": {
     "mappings": {
-      "word": {
-        "properties": {
-          "wf": {
-            "type": "text",
-            "fielddata": true,
-            "analyzer": "wf_analyzer"
-          },
-          "wf_display": {
-            "type": "text",
-            "index": false
-          },
-          "wtype": {
-            "type": "keyword"
-          },
-          "lang": {
-            "type": "byte"
-          },
-          "sentence_index": {
-            "type": "short"
-          },
-          "sentence_index_neg": {
-            "type": "short"
-          },
-          "sids": {
-            "type": "integer",
-            "index": false
-          },
-          "n_ana": {
-            "type": "byte"
-          },
-          "ana": {
-            "type": "nested",
-            "properties": {
-              "lex": {
-                "type": "text",
-                "fielddata": true,
-                "analyzer": "wf_analyzer"
-              },
-              "gloss_index": {
-                "type": "text",
-                "analyzer": "gloss_analyzer"
-              },
-              "trans_ru": {
-                "type": "text"
-              },
-              "trans_en": {
-                "type": "text"
-              },
-              "gr.cnvF": {
-                "type": "keyword"
-              },
-              "gr.tr": {
-                "type": "keyword"
-              },
-              "gr.numAbs": {
-                "type": "keyword"
-              },
-              "gr.nType": {
-                "type": "keyword"
-              },
-              "gr.nSfx": {
-                "type": "keyword"
-              },
-              "gr.persAbs": {
-                "type": "keyword"
-              },
-              "gr.numType": {
-                "type": "keyword"
-              },
-              "gr.n_deriv": {
-                "type": "keyword"
-              },
-              "gr.vCl": {
-                "type": "keyword"
-              },
-              "gr.num_deriv": {
-                "type": "keyword"
-              },
-              "gr.additional": {
-                "type": "keyword"
-              },
-              "gr.add": {
-                "type": "keyword"
-              },
-              "gr.v_deriv": {
-                "type": "keyword"
-              },
-              "gr.dir": {
-                "type": "keyword"
-              },
-              "gr.clitics": {
-                "type": "keyword"
-              },
-              "gr.comp": {
-                "type": "keyword"
-              },
-              "gr.numeral": {
-                "type": "keyword"
-              },
-              "gr.adjForm": {
-                "type": "keyword"
-              },
-              "gr.inflGender": {
-                "type": "keyword"
-              },
-              "gr.stem_alt": {
-                "type": "keyword"
-              },
-              "gr.vSfx": {
-                "type": "keyword"
-              },
-              "gr.pers": {
-                "type": "keyword"
-              },
-              "gr.case": {
-                "type": "keyword"
-              },
-              "gr.vType": {
-                "type": "keyword"
-              },
-              "gr.vF": {
-                "type": "keyword"
-              },
-              "gr.posChange": {
-                "type": "keyword"
-              },
-              "gr.dyn": {
-                "type": "keyword"
-              },
-              "gr.v_subcat": {
-                "type": "keyword"
-              },
-              "gr.gender": {
-                "type": "keyword"
-              },
-              "gr.stress": {
-                "type": "keyword"
-              },
-              "gr.persErg": {
-                "type": "keyword"
-              },
-              "gr.vForm": {
-                "type": "keyword"
-              },
-              "gr.poss": {
-                "type": "keyword"
-              },
-              "gr.cnv_form": {
-                "type": "keyword"
-              },
-              "gr.ptcp_form": {
-                "type": "keyword"
-              },
-              "gr.attributivizer": {
-                "type": "keyword"
-              },
-              "gr.conjtype": {
-                "type": "keyword"
-              },
-              "gr.adjType": {
-                "type": "keyword"
-              },
-              "gr.prGov": {
-                "type": "keyword"
-              },
-              "gr.g": {
-                "type": "keyword"
-              },
-              "gr.nGend": {
-                "type": "keyword"
-              },
-              "gr.mood": {
-                "type": "keyword"
-              },
-              "gr.tense": {
-                "type": "keyword"
-              },
-              "gr.persIO": {
-                "type": "keyword"
-              },
-              "gr.num_type": {
-                "type": "keyword"
-              },
-              "gr.numErg": {
-                "type": "keyword"
-              },
-              "gr.stemAlt": {
-                "type": "keyword"
-              },
-              "gr.case_c": {
-                "type": "keyword"
-              },
-              "gr.attr": {
-                "type": "keyword"
-              },
-              "gr.number": {
-                "type": "keyword"
-              },
-              "gr.nAn": {
-                "type": "keyword"
-              },
-              "gr.an": {
-                "type": "keyword"
-              },
-              "gr.adjF": {
-                "type": "keyword"
-              },
-              "gr.abbr": {
-                "type": "keyword"
-              },
-              "gr.stemType": {
-                "type": "keyword"
-              },
-              "gr.asp": {
-                "type": "keyword"
-              },
-              "gr.adj_form": {
-                "type": "keyword"
-              },
-              "gr.rel": {
-                "type": "keyword"
-              },
-              "gr.voice": {
-                "type": "keyword"
-              },
-              "gr.demType": {
-                "type": "keyword"
-              },
-              "gr.numIO": {
-                "type": "keyword"
-              },
-              "gr.pos": {
-                "type": "keyword"
-              },
-              "gr.num": {
-                "type": "keyword"
-              },
-              "gr.proType": {
-                "type": "keyword"
-              },
-              "gr.v_form": {
-                "type": "keyword"
-              },
-              "gr.appl": {
-                "type": "keyword"
-              },
-              "gr.nDef": {
-                "type": "keyword"
-              },
-              "gr.rusV": {
-                "type": "keyword"
-              },
-              "gr.incorp": {
-                "type": "keyword"
-              }
+      "properties": {
+        "wf": {
+          "type": "text",
+          "fielddata": true,
+          "analyzer": "wf_analyzer"
+        },
+        "wf_display": {
+          "type": "text",
+          "index": false
+        },
+        "wtype": {
+          "type": "keyword"
+        },
+        "lang": {
+          "type": "byte"
+        },
+        "sentence_index": {
+          "type": "short"
+        },
+        "sentence_index_neg": {
+          "type": "short"
+        },
+        "sids": {
+          "type": "integer",
+          "index": false
+        },
+        "n_ana": {
+          "type": "byte"
+        },
+        "ana": {
+          "type": "nested",
+          "properties": {
+            "lex": {
+              "type": "text",
+              "fielddata": true,
+              "analyzer": "wf_analyzer"
+            },
+            "gloss_index": {
+              "type": "text",
+              "analyzer": "gloss_analyzer"
+            },
+            "trans_ru": {
+              "type": "text"
+            },
+            "gr.stemType": {
+              "type": "keyword"
+            },
+            "gr.adjF": {
+              "type": "keyword"
+            },
+            "gr.num_deriv": {
+              "type": "keyword"
+            },
+            "gr.cnvF": {
+              "type": "keyword"
+            },
+            "gr.case_c": {
+              "type": "keyword"
+            },
+            "gr.number": {
+              "type": "keyword"
+            },
+            "gr.v_form": {
+              "type": "keyword"
+            },
+            "gr.add": {
+              "type": "keyword"
+            },
+            "gr.v_subcat": {
+              "type": "keyword"
+            },
+            "gr.conjtype": {
+              "type": "keyword"
+            },
+            "gr.mood": {
+              "type": "keyword"
+            },
+            "gr.adjType": {
+              "type": "keyword"
+            },
+            "gr.nType": {
+              "type": "keyword"
+            },
+            "gr.an": {
+              "type": "keyword"
+            },
+            "gr.vF": {
+              "type": "keyword"
+            },
+            "gr.cnv_form": {
+              "type": "keyword"
+            },
+            "gr.comp": {
+              "type": "keyword"
+            },
+            "gr.asp": {
+              "type": "keyword"
+            },
+            "gr.pers": {
+              "type": "keyword"
+            },
+            "gr.additional": {
+              "type": "keyword"
+            },
+            "gr.num": {
+              "type": "keyword"
+            },
+            "gr.poss": {
+              "type": "keyword"
+            },
+            "gr.g": {
+              "type": "keyword"
+            },
+            "gr.attributivizer": {
+              "type": "keyword"
+            },
+            "gr.pos": {
+              "type": "keyword"
+            },
+            "gr.v_deriv": {
+              "type": "keyword"
+            },
+            "gr.proType": {
+              "type": "keyword"
+            },
+            "gr.tense": {
+              "type": "keyword"
+            },
+            "gr.voice": {
+              "type": "keyword"
+            },
+            "gr.n_deriv": {
+              "type": "keyword"
+            },
+            "gr.case": {
+              "type": "keyword"
+            },
+            "gr.ptcp_form": {
+              "type": "keyword"
+            },
+            "gr.tr": {
+              "type": "keyword"
             }
-          },
-          "freq": {
-            "type": "integer"
-          },
-          "rank": {
-            "type": "keyword"
-          },
-          "rank_true": {
-            "type": "integer"
-          },
-          "n_sents": {
-            "type": "integer"
-          },
-          "n_docs": {
-            "type": "integer"
-          },
-          "w_id": {
-            "type": "integer"
-          },
-          "l_id": {
-            "type": "integer"
-          },
-          "wf_order": {
-            "type": "integer"
-          },
-          "l_order": {
-            "type": "integer"
-          },
-          "d_id": {
-            "type": "integer"
-          },
-          "word_join": {
-            "type": "join",
-            "relations": {
-              "word": "word_freq"
-            }
+          }
+        },
+        "freq": {
+          "type": "integer"
+        },
+        "rank": {
+          "type": "keyword"
+        },
+        "rank_true": {
+          "type": "integer"
+        },
+        "n_sents": {
+          "type": "integer"
+        },
+        "n_docs": {
+          "type": "integer"
+        },
+        "w_id": {
+          "type": "keyword"
+        },
+        "l_id": {
+          "type": "keyword"
+        },
+        "wf_order": {
+          "type": "integer"
+        },
+        "l_order": {
+          "type": "integer"
+        },
+        "d_id": {
+          "type": "integer"
+        },
+        "freq_join": {
+          "type": "join",
+          "relations": {
+            "word": "word_freq"
           }
         }
       }

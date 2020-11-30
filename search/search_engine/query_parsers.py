@@ -297,10 +297,10 @@ class InterfaceQueryParser:
             esQuery = {'nested': {'path': nestedPath,
                                   'query': {'constant_score': {'filter': query, 'boost': constantScore}},
                                   'score_mode': 'sum'}}
-        if highlightFields is not None:
+        if highlightFields is not None and len(highlightFields) > 0:
             esQuery['nested']['inner_hits'] = {'highlight':
                                                {'fields':
-                                                {f: {'number_of_fragments': 50,
+                                                {f: {'number_of_fragments': 100,
                                                      'fragment_size': 2048}
                                                  for f in highlightFields}},
                                                'size': 50}
@@ -674,7 +674,7 @@ class InterfaceQueryParser:
                 esQuery['_source'] += ['words.wtype', 'words.next_word']
         esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'doc_id'}},
                            'agg_nwords': {'stats': {'script': '_score'}}}
-        if len(queryDictTop) >= 0:
+        if len(queryDictTop) > 0:
             esQuery['highlight'] = {'fields': {f: {'number_of_fragments': 100,
                                                    'fragment_size': 2048}
                                                for f in queryDictTop}}

@@ -106,6 +106,10 @@ class PrepareData:
                     'gloss_index': {
                         'type': 'text',
                         'analyzer': 'gloss_analyzer'
+                    },
+                    'gloss': {
+                        'type': 'text',
+                        'index': False
                     }
                 }
             },
