@@ -288,14 +288,14 @@ class InterfaceQueryParser:
         if constantScore is None:
             if sortOrder != 'random':
                 esQuery = {'nested': {'path': nestedPath,
-                                      'query': {'constant_score': {'query': query, 'boost': 1}},
+                                      'query': {'constant_score': {'filter': query, 'boost': 1}},
                                       'score_mode': 'sum'}}
             else:
                 esQuery = {'nested': {'path': nestedPath,
                                       'query': query}}
         else:
             esQuery = {'nested': {'path': nestedPath,
-                                  'query': {'constant_score': {'query': query, 'boost': constantScore}},
+                                  'query': {'constant_score': {'filter': query, 'boost': constantScore}},
                                   'score_mode': 'sum'}}
         if highlightFields is not None:
             esQuery['nested']['inner_hits'] = {'highlight':
@@ -870,6 +870,12 @@ class InterfaceQueryParser:
             if searchIndex == 'sentences':
                 curPrelimQuery[pathPfx + 'wtype'] = self.make_bool_query('word',
                                                                          pathPfx + 'wtype', lang)
+            elif searchIndex == 'words':
+                curWtype = 'word'
+                if 'wtype' + strWordNum in htmlQuery:
+                    curWtype = htmlQuery['wtype' + strWordNum]
+                curPrelimQuery[pathPfx + 'wtype'] = self.make_bool_query(curWtype,
+                                                                         pathPfx + 'wtype', lang)
             for field in ['wf', 'w_id', 'l_id']:
                 if field + strWordNum in htmlQuery and len(htmlQuery[field + strWordNum]) > 0:
                     curPrelimQuery[pathPfx + field] = self.make_bool_query(htmlQuery[field + strWordNum],
@@ -940,17 +946,33 @@ class InterfaceQueryParser:
         query are ignored.
         """
         htmlQuery['n_words'] = 1
+        wfFields = False
+        # wfFields tells if the query contains fields that can
+        # have different values for different forms of the same
+        # lexeme. If it does and searchType == 'lemma', join
+        # has to be used.
         for k in [_ for _ in htmlQuery.keys()]:
             if k not in ('n_words', 'lang', 'lang1') and re.search('[^0-9]1$', k) is None:
                 del htmlQuery[k]
             elif re.search('^sentence_index', k) is not None:
                 del htmlQuery[k]
+            elif k not in ('n_words', 'lang', 'lang1', 'lex1'):
+                if k == 'n_ana1' and htmlQuery[k] in ('any', 'analyzed'):
+                    continue
+                if k == 'wf1' and htmlQuery[k] in ('*', '.*'):
+                    continue
+                wfFields = True
+        if searchType == 'word' or wfFields:
+            htmlQuery['wtype1'] = 'word'
+        else:
+            htmlQuery['wtype1'] = 'lemma'
         esQuery = self.html2es(htmlQuery, query_size=0, sortOrder='', searchOutput='words')
-        if searchType == 'lemma':
+        if searchType == 'lemma' and wfFields:
             self.lemmatize_word_query(esQuery)
         esQuery['aggs'] = {'agg_rank': {'terms': {'field': 'rank_true',
                                                   'order': {'_term': 'asc'},
                                                   'size': 10000}}}
+        print(esQuery)
         return esQuery
 
     def filter_sentences(self, iterSent, constraints, nWords=1):

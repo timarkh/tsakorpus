@@ -842,7 +842,7 @@ class SentenceViewer:
         nSents, rank = '', ''   # for now
         if 'hits' not in response or 'total' not in response['hits']:
             return '?', '?', '?', '?'
-        nDocs = str(response['hits']['total'])
+        nDocs = str(response['hits']['total']['value'])
         if 'aggregations' in response and 'agg_freq' in response['aggregations']:
             freq = str(int(response['aggregations']['agg_freq']['sum']))
         else:
@@ -964,13 +964,13 @@ class SentenceViewer:
         if keepOnlyFirst:
             for key, ih in hit['inner_hits'].items():
                 if (key in self.w1_labels
-                    and all(hit['inner_hits']['w' + str(iWord + 1) + '_' + key[3:]]['hits']['total'] > 0
+                    and all(hit['inner_hits']['w' + str(iWord + 1) + '_' + key[3:]]['hits']['total']['value'] > 0
                             for iWord in range(1, nWords)
                             if iWord + 1 not in negWords)):
                     yield key, ih
         else:
             for key, ih in hit['inner_hits'].items():
-                if (all(hit['inner_hits'][self.rxHitWordNo.sub(str(iWord + 1), key, 1)]['hits']['total'] > 0
+                if (all(hit['inner_hits'][self.rxHitWordNo.sub(str(iWord + 1), key, 1)]['hits']['total']['value'] > 0
                         for iWord in range(nWords) if iWord + 1 not in negWords)
                         or '_' not in key):
                     yield key, ih
@@ -1268,7 +1268,7 @@ class SentenceViewer:
         if 'hits' not in response or 'total' not in response['hits']:
             return result
         result['message'] = ''
-        result['n_sentences'] = response['hits']['total']
+        result['n_sentences'] = response['hits']['total']['value']
         result['contexts'] = []
         result['languages'] = []
         resultLanguages = set()
@@ -1303,10 +1303,10 @@ class SentenceViewer:
         result = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'message': 'Nothing found.'}
         if ('hits' not in response
                 or 'total' not in response['hits']
-                or response['hits']['total'] <= 0):
+                or response['hits']['total']['value'] <= 0):
             return result
         result['message'] = ''
-        result['n_occurrences'] = response['hits']['total']
+        result['n_occurrences'] = response['hits']['total']['value']
         result['n_docs'] = response['aggregations']['agg_ndocs']['value']
         result['total_freq'] = response['aggregations']['agg_freq']['value']
         result['words'] = []
@@ -1324,10 +1324,10 @@ class SentenceViewer:
                 or 'value' not in response['aggregations']['agg_freq']
                 or 'hits' not in response
                 or 'total' not in response['hits']
-                or response['hits']['total'] <= 0):
+                or response['hits']['total']['value'] <= 0):
             return result
         result['message'] = ''
-        # result['n_occurrences'] = response['hits']['total']
+        # result['n_occurrences'] = response['hits']['total']['value']
         result['n_occurrences'] = response['aggregations']['agg_noccurrences']['value']
         result['n_docs'] = response['aggregations']['agg_ndocs']['value']
         result['total_freq'] = response['aggregations']['agg_freq']['value']
@@ -1351,12 +1351,12 @@ class SentenceViewer:
                   'metafields': [field for field in self.sc.qp.docMetaFields if not field.endswith('_kw')]}
         if ('hits' not in response
                 or 'total' not in response['hits']
-                or response['hits']['total'] <= 0):
+                or response['hits']['total']['value'] <= 0):
             return result
         if corpusSize <= 0:
             corpusSize = 1
         result['message'] = ''
-        result['n_docs'] = response['hits']['total']
+        result['n_docs'] = response['hits']['total']['value']
         result['n_words'] = int(round(response['aggregations']['agg_nwords']['value'], 0))
         result['docs'] = []
         for iHit in range(len(response['hits']['hits'])):

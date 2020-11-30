@@ -23,7 +23,8 @@ class Indexator:
     """
     SETTINGS_DIR = '../conf'
 
-    def __init__(self):
+    def __init__(self, overwrite=False):
+        self.overwrite = overwrite  # whether to overwrite an existing index without asking
         fSettings = open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
                          'r', encoding='utf-8')
         self.settings = json.load(fSettings)
@@ -39,7 +40,7 @@ class Indexator:
             self.iterSent = JSONDocReader(format=self.input_format)
 
         # Make sure only commonly used word fields and those listed
-        # in corpus.json get into the database.
+        # in corpus.json get into the words index.
         self.goodWordFields = [
             'lex',          # lemma
             'wf',           # word form (for search)
@@ -72,12 +73,14 @@ class Indexator:
         self.shuffled_ids.insert(0, 0)    # id=0 is special and should not change
         self.tmpWordIDs = [{} for i in range(len(self.languages))]    # word as JSON -> its integer ID
         self.tmpLemmaIDs = [{} for i in range(len(self.languages))]   # lemma as string -> its integer ID
+        # Apart from the two dictionaries above, words and lemmata
+        # have string IDs starting with 'w' or 'l' followed by an integer
         self.word2lemma = [{} for i in range(len(self.languages))]    # word/lemma ID -> ID of its lemma (or -1, if none)
         self.wordFreqs = [{} for i in range(len(self.languages))]     # word/lemma ID -> its frequency
         self.wordSFreqs = [{} for i in range(len(self.languages))]    # word/lemma ID -> its number of sentences
-        self.wordDocFreqs = [{} for i in range(len(self.languages))]  # (word's ID, dID) -> word frequency in the document
+        self.wordDocFreqs = [{} for i in range(len(self.languages))]  # (word/lemma ID, dID) -> word frequency in the document
         # self.wordSIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of sentence IDs
-        self.wordDIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of document IDs
+        self.wordDIDs = [{} for i in range(len(self.languages))]      # word/lemma ID -> set of document IDs
         self.wfs = set()         # set of word forms (for sorting)
         self.lemmata = set()     # set of lemmata (for sorting)
         self.sID = 0          # current sentence ID for each language
@@ -98,15 +101,16 @@ class Indexator:
         say yes, remove the indices and return True. Otherwise,
         return False.
         """
-        if (self.es_ic.exists(index=self.name + '.docs')
-                or self.es_ic.exists(index=self.name + '.words')
-                or self.es_ic.exists(index=self.name + '.sentences')):
-            print('It seems a corpus named "' + self.name + '" already exists. '
-                  + 'Do you want to overwrite it? [y/n]')
-            reply = input()
-            if reply.lower() != 'y':
-                print('Indexation aborted.')
-                return False
+        if not self.overwrite:
+            if (self.es_ic.exists(index=self.name + '.docs')
+                    or self.es_ic.exists(index=self.name + '.words')
+                    or self.es_ic.exists(index=self.name + '.sentences')):
+                print('It seems a corpus named "' + self.name + '" already exists. '
+                      + 'Do you want to overwrite it? [y/n]')
+                reply = input()
+                if reply.lower() != 'y':
+                    print('Indexation aborted.')
+                    return False
         if self.es_ic.exists(index=self.name + '.docs'):
             self.es_ic.delete(index=self.name + '.docs')
         if self.es_ic.exists(index=self.name + '.words'):
@@ -440,7 +444,7 @@ class Indexator:
             }
             curAction = {
                 '_index': self.name + '.words',
-                '_id': 'l' + str(lID),
+                '_id': lID,
                 '_source': lemmaJson
             }
             iLemma += 1
@@ -449,19 +453,19 @@ class Indexator:
             for docID in self.wordDIDs[langID][lID]:
                 lfreqJson = {
                     'wtype': 'word_freq',
-                    'l_id': 'l' + str(lID),
+                    'l_id': lID,
                     'd_id': docID,
                     'l_order': lOrder,
                     'freq': self.wordDocFreqs[langID][(lID, docID)],
                     'freq_join': {
                         'name': 'word_freq',
-                        'parent': 'l' + str(lID)
+                        'parent': lID
                     }
                 }
                 curAction = {'_index': self.name + '.words',
                              '_id': 'lfreq' + str(self.lemmaFreqID),
                              '_source': lfreqJson,
-                             '_routing': 'l' + str(lID)}
+                             '_routing': lID}
                 self.lemmaFreqID += 1
                 yield curAction
 
@@ -515,7 +519,7 @@ class Indexator:
                 wJson['wtype'] = 'word'
                 curAction = {
                     '_index': self.name + '.words',
-                    '_id': 'w' + str(wID),
+                    '_id': wID,
                     '_source': wJson
                 }
                 yield curAction
@@ -523,20 +527,20 @@ class Indexator:
                 for docID in wJson['dids']:
                     wfreqJson = {
                         'wtype': 'word_freq',
-                        'w_id': 'w' + str(wID),
+                        'w_id': wID,
                         'd_id': docID,
                         'wf_order': wfOrder,
                         'l_order': lOrder,
                         'freq': self.wordDocFreqs[langID][(wID, docID)],
                         'freq_join': {
                             'name': 'word_freq',
-                            'parent': 'w' + str(wID)
+                            'parent': wID
                         }
                     }
                     curAction = {'_index': self.name + '.words',
                                  '_id': 'wfreq' + str(self.wordFreqID),
                                  '_source': wfreqJson,
-                                 '_routing': 'w' + str(wID)}
+                                 '_routing': wID}
                     self.wordFreqID += 1
                     yield curAction
                 iWord += 1
@@ -701,6 +705,7 @@ class Indexator:
         if len(self.languages) > 1:
             self.add_parallel_sids(sentences, paraIDs)
             for s in sentences:
+                # print(s)
                 yield s
 
     @staticmethod
@@ -817,5 +822,9 @@ class Indexator:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Index corpus in Elasticsearch 7.x.')
     parser.add_argument('-y', help='overwrite existing database without asking first')
-    x = Indexator()
+    args = parser.parse_args()
+    overwrite = False
+    if args.y is not None:
+        overwrite = True
+    x = Indexator(overwrite)
     x.load_corpus()

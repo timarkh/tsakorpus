@@ -25,24 +25,24 @@ class SearchClient:
 
     def get_words(self, esQuery):
         if self.settings['query_timeout'] > 0:
-            hits = self.es.search(index=self.name + '.words', doc_type='word',
+            hits = self.es.search(index=self.name + '.words',
                                   body=esQuery, request_timeout=self.settings['query_timeout'])
         else:
-            hits = self.es.search(index=self.name + '.words', doc_type='word',
+            hits = self.es.search(index=self.name + '.words',
                                   body=esQuery)
         return hits
 
     def get_lemmata(self, esQuery):
         if self.settings['query_timeout'] > 0:
-            hits = self.es.search(index=self.name + '.words', doc_type='lemma',
+            hits = self.es.search(index=self.name + '.words',
                                   body=esQuery, request_timeout=self.settings['query_timeout'])
         else:
-            hits = self.es.search(index=self.name + '.words', doc_type='lemma',
+            hits = self.es.search(index=self.name + '.words',
                                   body=esQuery)
         return hits
 
     def get_word_freqs(self, esQuery):
-        hits = self.es.search(index=self.name + '.words', doc_type='word_freq',
+        hits = self.es.search(index=self.name + '.words',
                               body=esQuery)
         return hits
 
@@ -60,11 +60,12 @@ class SearchClient:
         return iterator
 
     def get_sentences(self, esQuery):
+        print(esQuery)
         if self.settings['query_timeout'] > 0:
-            hits = self.es.search(index=self.name + '.sentences', doc_type='sentence',
+            hits = self.es.search(index=self.name + '.sentences',
                                   body=esQuery, request_timeout=self.settings['query_timeout'])
         else:
-            hits = self.es.search(index=self.name + '.sentences', doc_type='sentence',
+            hits = self.es.search(index=self.name + '.sentences',
                                   body=esQuery)
         return hits
 
@@ -73,28 +74,28 @@ class SearchClient:
         Iterate over all sentences found with the query.
         """
         if self.settings['query_timeout'] > 0:
-            iterator = helpers.scan(self.es, index=self.name + '.sentences', doc_type='sentence',
+            iterator = helpers.scan(self.es, index=self.name + '.sentences',
                                     query=esQuery, request_timeout=self.settings['query_timeout'])
         else:
-            iterator = helpers.scan(self.es, index=self.name + '.sentences', doc_type='sentence',
+            iterator = helpers.scan(self.es, index=self.name + '.sentences',
                                     query=esQuery)
         return iterator
 
     def get_sentence_by_id(self, sentId):
         esQuery = {'query': {'term': {'_id': sentId}}}
-        hits = self.es.search(index=self.name + '.sentences', doc_type='sentence',
+        hits = self.es.search(index=self.name + '.sentences',
                               body=esQuery)
         return hits
 
     def get_word_by_id(self, wordId):
         esQuery = {'query': {'term': {'_id': wordId}}}
-        hits = self.es.search(index=self.name + '.words', doc_type='word',
+        hits = self.es.search(index=self.name + '.words',
                               body=esQuery)
         return hits
 
     def get_doc_by_id(self, docId):
         esQuery = {'query': {'term': {'_id': docId}}}
-        hits = self.es.search(index=self.name + '.docs', doc_type='doc',
+        hits = self.es.search(index=self.name + '.docs',
                               body=esQuery)
         return hits
 
@@ -105,7 +106,7 @@ class SearchClient:
         aggNWords = {'agg_nwords': {'sum': {'field': 'n_words'}}}
         esQuery = {'query': {'match_all': {}}, 'from': 0, 'size': 0,
                    'aggs': aggNWords}
-        hits = self.es.search(index=self.name + '.docs', doc_type='doc',
+        hits = self.es.search(index=self.name + '.docs',
                               body=esQuery)
         return hits['aggregations']['agg_nwords']['value']
 
@@ -114,7 +115,7 @@ class SearchClient:
         Return number of words in the primary language in given document.
         """
         response = self.get_doc_by_id(docId=docId)
-        if response['hits']['total'] <= 0:
+        if response['hits']['total']['value'] <= 0:
             return 0
         return response['hits']['hits'][0]['_source']['n_words']
 
@@ -125,7 +126,7 @@ class SearchClient:
         """
         htmlQuery = {'lang': lang, 'lang1': lang, 'wf1': '*', 'n_ana1': 'any'}
         esQuery = self.qp.word_freqs_query(htmlQuery, searchType='word')
-        hits = self.es.search(index=self.name + '.words', doc_type='word',
+        hits = self.es.search(index=self.name + '.words',
                               body=esQuery)
         return hits
 
@@ -136,6 +137,6 @@ class SearchClient:
         """
         htmlQuery = {'lang': lang, 'lang1': lang, 'wf1': '*', 'n_ana1': 'any'}
         esQuery = self.qp.word_freqs_query(htmlQuery, searchType='lemma')
-        hits = self.es.search(index=self.name + '.words', doc_type='lemma',
+        hits = self.es.search(index=self.name + '.words',
                               body=esQuery)
         return hits

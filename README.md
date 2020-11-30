@@ -14,9 +14,9 @@ See ``docs/faq.md`` (or its Russian version, ``docs/faq_ru.md``) for a short FAQ
 
 Tsakorpus was tested on Windows and Ubuntu. Its dependencies are the following:
 
-* elasticsearch 5.5 or 5.6
+* elasticsearch 7.x (tested on 7.10)
 * python >= 3.5
-* python modules: elasticsearch 5.x, flask, lxml, ijson, Flask-Babel, xlsxwriter (you can use requirements.txt)
+* python modules: elasticsearch 7.x, flask, lxml, ijson, Flask-Babel, xlsxwriter (you can use requirements.txt)
 * for converting media-aligned corpora: ffmpeg
 * it is recommended to deploy tsakorpus through apache2 with wsgi
 

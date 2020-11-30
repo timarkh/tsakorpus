@@ -31,6 +31,8 @@ sc.qp.rp = sentView
 sc.qp.wr.rp = sentView
 random.seed()
 corpus_size = sc.get_n_words()  # size of the corpus in words
+print(corpus_name)
+print(corpus_size)
 word_freq_by_rank = []
 lemma_freq_by_rank = []
 for lang in settings['languages']:
@@ -484,7 +486,7 @@ def search_sent_query(page=0):
         hits = sc.get_sentences(esQuery)
         if ('hits' not in hits
                 or 'total' not in hits['hits']
-                or hits['hits']['total'] > settings['max_distance_filter']):
+                or hits['hits']['total']['value'] > settings['max_distance_filter']):
             esQuery = {}
         else:
             esQuery = sc.qp.html2es(query,
@@ -849,11 +851,11 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
                                                                            1000000)
                 newBucket['n_words'] = successRate * 1000000
                 if nWords > 1:
-                    newBucket['n_sents'] = hits['hits']['total']
+                    newBucket['n_sents'] = hits['hits']['total']['value']
                 if not bSentenceLevel:
                     newBucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / newBucket['n_docs'] * 100
                 else:
-                    newBucket['n_sents'] = hits['hits']['total'] / newBucket['n_sents'] * 100
+                    newBucket['n_sents'] = hits['hits']['total']['value'] / newBucket['n_sents'] * 100
             curWordBuckets.append(newBucket)
         results.append(curWordBuckets)
     return results
@@ -1005,6 +1007,7 @@ def count_occurrences(query, distances=None):
                             query_size=1,
                             distances=distances)
     hits = sc.get_sentences(esQuery)
+    print(hits)
     if ('aggregations' in hits
             and 'agg_nwords' in hits['aggregations']
             and hits['aggregations']['agg_nwords']['sum'] is not None):
@@ -1088,7 +1091,7 @@ def find_sentences_json(page=0):
         hits = sc.get_sentences(esQuery)
         if ('hits' not in hits
                 or 'total' not in hits['hits']
-                or hits['hits']['total'] > settings['max_distance_filter']):
+                or hits['hits']['total']['value'] > settings['max_distance_filter']):
             query = {}
         else:
             esQuery = sc.qp.html2es(query,
