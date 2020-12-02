@@ -131,6 +131,10 @@ class Indexator:
         self.wordMapping = self.pd.generate_words_mapping(wordFreqs=True)
         self.sentMapping = self.pd.generate_sentences_mapping(self.sentWordMapping)
         self.docMapping = self.pd.generate_docs_mapping()
+
+        with open('mappings.json', 'r', encoding='utf-8') as fIn:
+            self.sentMapping = json.load(fIn)
+
         self.es_ic.create(index=self.name + '.docs',
                           body=self.docMapping)
         self.es_ic.create(index=self.name + '.words',
@@ -705,7 +709,6 @@ class Indexator:
         if len(self.languages) > 1:
             self.add_parallel_sids(sentences, paraIDs)
             for s in sentences:
-                # print(s)
                 yield s
 
     @staticmethod
