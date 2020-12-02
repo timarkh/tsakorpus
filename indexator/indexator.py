@@ -132,9 +132,6 @@ class Indexator:
         self.sentMapping = self.pd.generate_sentences_mapping(self.sentWordMapping)
         self.docMapping = self.pd.generate_docs_mapping()
 
-        with open('mappings.json', 'r', encoding='utf-8') as fIn:
-            self.sentMapping = json.load(fIn)
-
         self.es_ic.create(index=self.name + '.docs',
                           body=self.docMapping)
         self.es_ic.create(index=self.name + '.words',
