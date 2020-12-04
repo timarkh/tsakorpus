@@ -427,6 +427,7 @@ def search_word_json(searchType='word', page=0):
 
     query = sc.qp.html2es(query,
                           searchOutput='words',
+                          groupBy=searchType,
                           sortOrder=sortOrder,
                           randomSeed=get_session_data('seed'),
                           query_size=get_session_data('page_size'),
@@ -435,14 +436,9 @@ def search_word_json(searchType='word', page=0):
 
     hits = []
     if searchIndex == 'words':
-        if docIDs is None:
-            if searchType == 'lemma':
-                sc.qp.lemmatize_word_query(query)
-                hits = sc.get_lemmata(query)
-            else:
-                hits = sc.get_words(query)
-        else:
-            hits = sc.get_word_freqs(query)
+        # if docIDs is None and searchType == 'lemma':
+        #     sc.qp.lemmatize_word_query(query)
+        hits = sc.get_words(query)
     elif searchIndex == 'sentences':
         iSent = 0
         for hit in sc.get_all_sentences(query):
@@ -504,29 +500,30 @@ def search_word(searchType='word', page=0):
 
     query = sc.qp.html2es(query,
                           searchOutput='words',
+                          groupBy=searchType,
                           sortOrder=sortOrder,
                           randomSeed=get_session_data('seed'),
                           query_size=get_session_data('page_size'),
                           page=get_session_data('page'),
                           distances=queryWordConstraints,
-                          includeNextWordField=constraintsTooComplex)
+                          includeNextWordField=constraintsTooComplex,
+                          after_key=cur_search_context().after_key)
 
     maxRunTime = time.time() + settings.query_timeout
     hitsProcessed = {}
     if searchIndex == 'words':
         if docIDs is None:
-            if searchType == 'lemma':
-                sc.qp.lemmatize_word_query(query)
-                hits = sc.get_lemmata(query)
-            else:
-                hits = sc.get_words(query)
-            hitsProcessed = sentView.process_word_json(hits, docIDs,
+            # if searchType == 'lemma':
+            #     sc.qp.lemmatize_word_query(query)
+            hits = sc.get_words(query)
+            hitsProcessed = sentView.process_word_json(hits,
                                                        searchType=searchType,
                                                        translit=cur_search_context().translit)
         else:
-            hits = sc.get_word_freqs(query)
-            hitsProcessed = sentView.process_word_subcorpus_json(hits, docIDs,
-                                                                 translit=cur_search_context().translit)
+            hits = sc.get_words(query)
+            print(hits)
+            hitsProcessed = sentView.process_word_buckets_json(hits,
+                                                               translit=cur_search_context().translit)
 
     elif searchIndex == 'sentences':
         hitsProcessed = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0,
@@ -645,7 +642,7 @@ def download_cur_results_csv():
     pageData = cur_search_context().page_data
     if pageData is None or len(pageData) <= 0:
         return ''
-    result = cur_search_context().prepare_results_for_download
+    result = cur_search_context().prepare_results_for_download()
     return '\n'.join(['\t'.join(s) for s in result if len(s) > 0])
 
 
@@ -659,7 +656,7 @@ def download_cur_results_xlsx():
     pageData = cur_search_context().page_data
     if pageData is None or len(pageData) <= 0:
         return ''
-    results = cur_search_context().prepare_results_for_download
+    results = cur_search_context().prepare_results_for_download()
     XLSXFilename = 'results-' + str(uuid.uuid4()) + '.xlsx'
     if not os.path.exists('tmp'):
         os.makedirs('tmp')

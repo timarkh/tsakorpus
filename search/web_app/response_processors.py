@@ -920,14 +920,22 @@ class SentenceViewer:
                                lID=wID,
                                wfSearch=wSource['wf'])
 
-    def process_word_subcorpus(self, w, nDocuments, freq, lang, translit=None):
+    def process_word_buckets(self, w, nDocuments, freq, lang, translit=None):
         """
-        Process one word taken from response['hits']['hits'] for subcorpus
+        Process one word taken from response['hits']['hits'] for subcorpus or lemma
         queries (where frequency data comes separately from the aggregations).
         """
         if '_source' not in w:
             return ''
         wSource = w['_source']
+        if freq is None:
+            # This means total frequency was not present in a subaggregation,
+            # which in turn means no subcorpus was selected. If this is the case,
+            # take the frequency from the word/lemma object itself.
+            if 'freq' in wSource:
+                freq = wSource['freq']
+            else:
+                freq = 0
         freq = str(int(round(freq, 0)))
         rank = ''
         nSents = ''
@@ -1299,7 +1307,13 @@ class SentenceViewer:
         result['languages'] += [l for l in sorted(resultLanguages)]
         return result
 
-    def process_word_json(self, response, docIDs, searchType='word', translit=None):
+    def process_word_json(self, response, searchType='word', translit=None):
+        """
+        Process hits from the words index.
+        """
+        if searchType == 'lemma':
+            return self.process_word_buckets_json(response, translit=translit)
+
         result = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'message': 'Nothing found.'}
         if ('hits' not in response
                 or 'total' not in response['hits']
@@ -1317,7 +1331,12 @@ class SentenceViewer:
                                                      lang=lang, translit=translit))
         return result
 
-    def process_word_subcorpus_json(self, response, docIDs, translit=None):
+    def process_word_buckets_json(self, response, translit=None):
+        """
+        Process hits from the words index by retrieving an object for
+        each bucket in the group_by_word aggregation. This works for
+        lemmata, as well as for any objects searched in a subcorpus.
+        """
         result = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'message': 'Nothing found.'}
         if ('aggregations' not in response
                 or 'agg_freq' not in response['aggregations']
@@ -1335,13 +1354,21 @@ class SentenceViewer:
         for iHit in range(len(response['aggregations']['group_by_word']['buckets'])):
             wordID = response['aggregations']['group_by_word']['buckets'][iHit]['key']
             docCount = response['aggregations']['group_by_word']['buckets'][iHit]['doc_count']
-            wordFreq = response['aggregations']['group_by_word']['buckets'][iHit]['subagg_freq']['value']
+            try:
+                # If this was a subcorpus search, then total frequency of
+                # found items comes from word[wtype=word_freq] objects and
+                # therefore is stored in a subaggregation.
+                # If not, it will be taken from the item itself by process_word_buckets.
+                wordFreq = response['aggregations']['group_by_word']['buckets'][iHit]['subagg_freq']['value']
+            except KeyError:
+                wordFreq = None
             hit = self.sc.get_word_by_id(wordID)
             langID, lang = self.get_lang_from_hit(hit['hits']['hits'][0])
-            result['words'].append(self.process_word_subcorpus(hit['hits']['hits'][0],
-                                                               nDocuments=docCount,
-                                                               freq=wordFreq,
-                                                               lang=lang, translit=translit))
+            result['words'].append(self.process_word_buckets(hit['hits']['hits'][0],
+                                                             nDocuments=docCount,
+                                                             freq=wordFreq,
+                                                             lang=lang,
+                                                             translit=translit))
         return result
 
     def process_docs_json(self, response, exclude=None, corpusSize=1):

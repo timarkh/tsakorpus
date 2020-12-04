@@ -529,6 +529,7 @@ class Indexator:
                     wfreqJson = {
                         'wtype': 'word_freq',
                         'w_id': wID,
+                        'l_id': lID,
                         'd_id': docID,
                         'wf_order': wfOrder,
                         'l_order': lOrder,

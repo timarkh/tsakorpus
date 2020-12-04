@@ -23,6 +23,7 @@ class SearchContext:
         self.last_sent_num = -1
         self.page_data = {}
         self.sentence_data = {}
+        self.after_key = None   # ID of the last retrieved word/lemma bucket for pagination
 
     def flush(self):
         """
@@ -31,6 +32,7 @@ class SearchContext:
         self.last_sent_num = -1
         self.page_data = {}
         self.sentence_data = {}
+        self.after_key = None
 
     def add_sent_data_for_session(self, sent, sentData):
         """

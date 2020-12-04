@@ -309,14 +309,27 @@ class InterfaceQueryParser:
         return esQuery
 
     def wrap_inner_word_query(self, innerQuery, query_from=0, query_size=10,
-                              sortOrder='random', randomSeed=None, docIDs=None):
+                              sortOrder='random', randomSeed=None, docIDs=None,
+                              groupBy='word', after_key=None):
         """
         Make a full-fledged Elasticsearch word query out of the contents
         of the "query" parameter and additional options. Specifically,
-        turn the query into a word_freq query with necessary aggregations
+        turn the query into a word[wtype=word_freq] query with necessary aggregations
         if the search is limited to a subcorpus (i.e. docIDs is not None).
         Return the Elasticsearch query.
         """
+        # TODO: Continue working on buckets and sort order
+        subAggregations = {'subagg_freq': {'sum': {'field': 'freq'}}}
+        order = {}
+        if sortOrder == 'wf':
+            subAggregations['subagg_wf'] = {'max': {'field': 'wf_order'}}
+            order = {'subagg_wf': 'asc'}
+        elif sortOrder == 'lemma':
+            subAggregations['subagg_lemma'] = {'max': {'field': 'l_order'}}
+            order = {'subagg_lemma': 'asc'}
+        elif sortOrder == 'freq':
+            order = {'subagg_freq': 'desc'}
+
         if docIDs is None:
             if sortOrder == 'random':
                 innerQuery = self.make_random(innerQuery, randomSeed=randomSeed)
@@ -324,34 +337,59 @@ class InterfaceQueryParser:
                        '_source': {'excludes': ['sids']}}
             esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'dids'}},
                                'agg_freq': {'sum': {'field': 'freq'}}}
-            if sortOrder == 'wf':
-                esQuery['sort'] = {'wf_order': {'order': 'asc'}}
-            elif sortOrder == 'lemma':
-                esQuery['sort'] = {'l_order': {'order': 'asc'}}
-            elif sortOrder == 'freq':
-                esQuery['sort'] = {'freq': {'order': 'desc'}}
+            if groupBy == 'lemma':
+                esQuery['aggs']['group_by_word'] = {
+                    'composite': {
+                        'size': query_size,
+                        'sources': [
+                            {
+                                'words': {
+                                    'terms': {
+                                        'field': 'l_id'
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+                if after_key is not None:
+                    # For pagination
+                    esQuery['aggs']['group_by_word']['composite']['after'] = after_key
+                esQuery['aggs']['agg_noccurrences'] = {'cardinality': {'field': 'l_id'}}
+                if len(order) > 0:
+                    esQuery['aggs']['group_by_word']['composite']['sources'][0]['words']['terms']['order'] = order
+            elif groupBy == 'word':
+                if sortOrder == 'wf':
+                    esQuery['sort'] = {'wf_order': {'order': 'asc'}}
+                elif sortOrder == 'lemma':
+                    esQuery['sort'] = {'l_order': {'order': 'asc'}}
+                elif sortOrder == 'freq':
+                    esQuery['sort'] = {'freq': {'order': 'desc'}}
         else:
-            # TODO: Update for use with join (Elasticsearch >= 6)
             hasParentQuery = {'parent_type': 'word', 'score': True, 'query': innerQuery}
-            innerWordFreqQuery = {'bool': {'must': [{'has_parent': hasParentQuery}],
+            innerWordFreqQuery = {'bool': {'must': [{'has_parent': hasParentQuery}, {'term': {'wtype': 'word_freq'}}],
                                            'filter': [{'terms': {'d_id': docIDs}}]}}
             if sortOrder == 'random':
                 innerWordFreqQuery = self.make_random(innerWordFreqQuery, randomSeed=randomSeed)
-            subAggregations = {'subagg_freq': {'sum': {'field': 'freq'}}}
-            order = {}
-            if sortOrder == 'wf':
-                subAggregations['subagg_wf'] = {'max': {'field': 'wf_order'}}
-                order = {'subagg_wf': 'asc'}
-            elif sortOrder == 'lemma':
-                subAggregations['subagg_lemma'] = {'max': {'field': 'l_order'}}
-                order = {'subagg_lemma': 'asc'}
-            elif sortOrder == 'freq':
-                order = {'subagg_freq': 'desc'}
-            mainAgg = {'group_by_word': {'terms': {'field': 'w_id',
-                                                   'size': query_size}},
-                       'agg_freq': {'sum': {'field': 'freq'}},
-                       'agg_noccurrences': {'cardinality': {'field': 'w_id'}},
+            mainAgg = {'agg_freq': {'sum': {'field': 'freq'}},
                        'agg_ndocs': {'cardinality': {'field': 'd_id'}}}
+            print(groupBy)
+            if groupBy == 'word':
+                mainAgg['group_by_word'] = {
+                    'terms': {
+                        'field': 'w_id',
+                        'size': query_size
+                    }
+                }
+                mainAgg['agg_noccurrences'] = {'cardinality': {'field': 'w_id'}}
+            elif groupBy == 'lemma':
+                mainAgg['group_by_word'] = {
+                    'terms': {
+                        'field': 'l_id',
+                        'size': query_size
+                    }
+                }
+                mainAgg['agg_noccurrences'] = {'cardinality': {'field': 'l_id'}}
             if len(subAggregations) > 0:
                 mainAgg['group_by_word']['aggs'] = subAggregations
             if len(order) > 0:
@@ -360,10 +398,12 @@ class InterfaceQueryParser:
         return esQuery
 
     def full_word_query(self, queryDict, query_from=0, query_size=10, sortOrder='random',
-                        randomSeed=None, lang=-1):
+                        randomSeed=None, lang=-1, groupBy='word', after_key=None):
         """
         Make a full ES query for the words index out of a dictionary
         with bool queries.
+        If groupBy == 'word', search for words (objects with wtype='word'),
+        if groupBy == 'lemma', search for lemmata.
         """
         wordAnaFields = {'ana.lex', 'ana.gr', 'ana.gloss_index'}
         for field in self.wordFields:
@@ -429,7 +469,9 @@ class InterfaceQueryParser:
         esQuery = self.wrap_inner_word_query(query, query_from=query_from,
                                              query_size=query_size, sortOrder=sortOrder,
                                              randomSeed=randomSeed,
-                                             docIDs=docIDs)
+                                             docIDs=docIDs,
+                                             groupBy=groupBy,
+                                             after_key=after_key)
         return esQuery
 
     def sentence_index_query(self, sentIndex, mustNot=False, countFromEnd=False):
@@ -827,8 +869,9 @@ class InterfaceQueryParser:
         return query_from, langID, lang, searchIndex
 
     def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
-                randomSeed=None, searchOutput='sentences', distances=None,
-                includeNextWordField=False):
+                randomSeed=None, searchOutput='sentences', groupBy='word',
+                distances=None, includeNextWordField=False,
+                after_key=None):
         """
         Make and return a ES query out of the HTML form data.
         """
@@ -926,7 +969,8 @@ class InterfaceQueryParser:
                                                  includeNextWordField=includeNextWordField)
         elif searchIndex == 'words':
             queryDict = self.full_word_query(prelimQuery, query_from, query_size, sortOrder,
-                                             randomSeed, lang=langID)
+                                             randomSeed, lang=langID, groupBy=groupBy,
+                                             after_key=after_key)
         else:
             queryDict = {'query': {'match_none': ''}}
         return queryDict
@@ -937,7 +981,7 @@ class InterfaceQueryParser:
         Change the original query, do not return anything.
         """
         childQuery = {'has_child': {'type': 'word', 'query': esQuery['query']}}
-        esQuery['query'] = {'bool': {'must': childQuery, 'must_not': {'match': {'_id': 0}}}}
+        esQuery['query'] = {'bool': {'must': childQuery, 'must_not': {'match': {'_id': 'l0'}}}}
 
     def word_freqs_query(self, htmlQuery, searchType='word'):
         """

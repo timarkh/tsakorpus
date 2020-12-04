@@ -40,7 +40,9 @@ def get_session_data(fieldName):
     initialize the parameter first.
     """
     global sessionData
-    if 'session_id' not in session or session['session_id'] not in sessionData:
+    if ('session_id' not in session
+            or session['session_id'] not in sessionData
+            or 'search_context' not in sessionData[session['session_id']]):
         initialize_session()
 
     if fieldName == 'login' and fieldName not in sessionData[session['session_id']]:
