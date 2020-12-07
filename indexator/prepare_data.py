@@ -114,6 +114,7 @@ class PrepareData:
                 }
             },
             'freq': {'type': 'integer'},
+            'lemma_freq': {'type': 'integer'},
             'rank': {'type': 'keyword'},
             'rank_true': {'type': 'integer'},
             'n_sents': {'type': 'integer'},

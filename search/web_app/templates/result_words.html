@@ -5,7 +5,12 @@
 	<p>{{ _('Search result:') }}
 	{{ data.n_occurrences }} {% if data.n_occurrences == 1 %}{{ _('unique word') }}{% elif data.n_occurrences % 10 == 1 and data.n_occurrences % 100 != 11 %}{{ _('different words_1') }}{% elif 2 <= data.n_occurrences % 10 <= 4 and not 12 <= data.n_occurrences % 100 <= 14 %}{{ _('different words_2-4') }}{% else %}{{ _('different words') }}{% endif %}
 	{{ _('in approximately') }} {{ data.n_docs }} {% if data.n_docs == 1 %}{{ _('document found,') }}{% elif data.n_docs % 10 == 1 and data.n_docs % 100 != 11 %}{{ _('documents_1 found,') }}{% elif 2 <= data.n_docs % 10 <= 4 and not 12 <= data.n_docs % 100 <= 14 %}{{ _('documents_2-4 found,') }}{% else %}{{ _('documents found,') }}{% endif %}
-	{{ _('total frequency:') }} {{ data.total_freq }}.</p>
+	{% if search_type == "word" %}
+	{{ _('total frequency:') }} {{ data.total_freq }}.
+	{% elif search_type == "lemma" %}
+	{{ _('total frequency of found word forms:') }} {{ data.total_freq|round|int }}.
+	{% endif %}
+	</p>
 	<div class="word_results">
 	<table class="words_list_table">
 	<thead>{% if search_type == "word" %}<th>{{ _('word_th_word') }}</th>{% endif %}<th>{{ _('word_th_lemma') }}</th>
@@ -19,7 +24,13 @@
 	{% if display_freq_rank %}
 	<th>{{ _('word_th_freq. rank / quantile') }}</th>
 	{% endif %}
-	<th>{{ _('word_th_# sentences') }}</th><th>{{ _('word_th_# documents') }}</th><th>{{ _('word_th_search in corpus') }}</th><th>{{ _('word_th_word stats') }}</th></thead>
+	{% if search_type == "lemma" %}
+	<th>{{ _('word_th_# forms') }}</th>
+	{% endif %}
+	<th>{{ _('word_th_# sentences') }}</th>
+	<th>{{ _('word_th_# documents') }}</th>
+	<th>{{ _('word_th_search in corpus') }}</th>
+	<th>{{ _('word_th_word stats') }}</th></thead>
 	<tbody>
 {% endif %}
 {% for w in data.words %}

@@ -308,6 +308,74 @@ class InterfaceQueryParser:
                 esQuery['nested']['inner_hits']['name'] = queryName
         return esQuery
 
+    def prepare_word_order_subquery(self, sortOrder='random',
+                                    groupBy='word', subcorpus=False):
+        """
+        Return a dictionary containing a part of a word query
+        responsible for sorting of the hits and, if needed, relevant
+        subaggregations. Different search types (lemma vs. word,
+        entire corpus vs. subcorpus) use different methods
+        (simple search, bucketing, or subaggregations) and
+        therefore require different types of ordering conditions.
+        If no ordering clause is required, return None.
+        """
+        order = None
+        subAggregations = None
+        if subcorpus:
+            subAggregations = {'subagg_freq': {'sum': {'field': 'freq'}},
+                               'subagg_nforms': {'cardinality': {'field': 'w_id'}}}
+            if sortOrder == 'wf':
+                subAggregations['subagg_wf'] = {'max': {'field': 'wf_order'}}
+                order = {'subagg_wf': 'asc'}
+            elif sortOrder == 'lemma':
+                subAggregations['subagg_lemma'] = {'max': {'field': 'l_order'}}
+                order = {'subagg_lemma': 'asc'}
+            elif sortOrder == 'freq':
+                order = {'subagg_freq': 'desc'}
+        else:
+            if groupBy == 'word':
+                if sortOrder == 'wf':
+                    order = {'wf_order': {'order': 'asc'}}
+                elif sortOrder == 'lemma':
+                    order = {'l_order': {'order': 'asc'}}
+                elif sortOrder == 'freq':
+                    order = {'freq': {'order': 'desc'}}
+            elif groupBy == 'lemma':
+                if sortOrder in ('wf', 'lemma'):
+                    order = {'l_order': {'terms': {'field': 'l_order'}}}
+                elif sortOrder == 'freq':
+                    order = {'lemma_freq': {'terms': {'field': 'lemma_freq', 'order': 'desc'}}}
+        return order, subAggregations
+
+    def composite_agg_word(self, query_size, order=None, groupBy='lemma', after_key=None):
+        """
+        Return a composite aggregation whose buckets should correspond
+        to words or lemmata. (For now, we use this only for lemma queries
+        in the entire corpus.)
+        """
+        agg = None
+        if groupBy == 'lemma':
+            agg = {
+                'composite': {
+                    'size': query_size,
+                    'sources': [
+                        {
+                            'l_id': {
+                                'terms': {
+                                    'field': 'l_id'
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+            if after_key is not None:
+                # For pagination
+                agg['composite']['after'] = after_key
+            if order is not None:
+                agg['composite']['sources'].insert(0, order)
+        return agg
+
     def wrap_inner_word_query(self, innerQuery, query_from=0, query_size=10,
                               sortOrder='random', randomSeed=None, docIDs=None,
                               groupBy='word', after_key=None):
@@ -318,64 +386,50 @@ class InterfaceQueryParser:
         if the search is limited to a subcorpus (i.e. docIDs is not None).
         Return the Elasticsearch query.
         """
-        # TODO: Continue working on buckets and sort order
-        subAggregations = {'subagg_freq': {'sum': {'field': 'freq'}}}
-        order = {}
-        if sortOrder == 'wf':
-            subAggregations['subagg_wf'] = {'max': {'field': 'wf_order'}}
-            order = {'subagg_wf': 'asc'}
-        elif sortOrder == 'lemma':
-            subAggregations['subagg_lemma'] = {'max': {'field': 'l_order'}}
-            order = {'subagg_lemma': 'asc'}
-        elif sortOrder == 'freq':
-            order = {'subagg_freq': 'desc'}
+        subcorpus = (docIDs is not None)
+        order, subAggregations = self.prepare_word_order_subquery(sortOrder, groupBy, subcorpus)
+        if subcorpus or groupBy == 'lemma':
+            # We need the buckets, not the hits
+            query_from = 0
 
-        if docIDs is None:
+        if not subcorpus:
             if sortOrder == 'random':
                 innerQuery = self.make_random(innerQuery, randomSeed=randomSeed)
-            esQuery = {'query': innerQuery, 'size': query_size, 'from': query_from,
-                       '_source': {'excludes': ['sids']}}
-            esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'dids'}},
-                               'agg_freq': {'sum': {'field': 'freq'}}}
+            esQuery = {
+                'query': innerQuery,
+                'size': query_size,
+                'from': query_from,
+                '_source': {'excludes': ['sids']}
+            }
+            esQuery['aggs'] = {
+                'agg_ndocs': {'cardinality': {'field': 'dids'}},
+                'agg_freq': {'sum': {'field': 'freq'}}
+            }
             if groupBy == 'lemma':
-                esQuery['aggs']['group_by_word'] = {
-                    'composite': {
-                        'size': query_size,
-                        'sources': [
-                            {
-                                'words': {
-                                    'terms': {
-                                        'field': 'l_id'
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                }
-                if after_key is not None:
-                    # For pagination
-                    esQuery['aggs']['group_by_word']['composite']['after'] = after_key
+                esQuery['size'] = 0
                 esQuery['aggs']['agg_noccurrences'] = {'cardinality': {'field': 'l_id'}}
-                if len(order) > 0:
-                    esQuery['aggs']['group_by_word']['composite']['sources'][0]['words']['terms']['order'] = order
-            elif groupBy == 'word':
-                if sortOrder == 'wf':
-                    esQuery['sort'] = {'wf_order': {'order': 'asc'}}
-                elif sortOrder == 'lemma':
-                    esQuery['sort'] = {'l_order': {'order': 'asc'}}
-                elif sortOrder == 'freq':
-                    esQuery['sort'] = {'freq': {'order': 'desc'}}
+                esQuery['aggs']['agg_group_by_word'] = self.composite_agg_word(query_size, order, groupBy, after_key)
+            elif groupBy == 'word' and order is not None:
+                esQuery['sort'] = order
         else:
             hasParentQuery = {'parent_type': 'word', 'score': True, 'query': innerQuery}
-            innerWordFreqQuery = {'bool': {'must': [{'has_parent': hasParentQuery}, {'term': {'wtype': 'word_freq'}}],
-                                           'filter': [{'terms': {'d_id': docIDs}}]}}
+            innerWordFreqQuery = {
+                'bool': {
+                    'must': [
+                        {'has_parent': hasParentQuery},
+                        {'term': {'wtype': 'word_freq'}}
+                    ],
+                    'filter': [{
+                        'terms': {'d_id': docIDs}
+                    }]
+                }
+            }
             if sortOrder == 'random':
                 innerWordFreqQuery = self.make_random(innerWordFreqQuery, randomSeed=randomSeed)
             mainAgg = {'agg_freq': {'sum': {'field': 'freq'}},
                        'agg_ndocs': {'cardinality': {'field': 'd_id'}}}
-            print(groupBy)
             if groupBy == 'word':
-                mainAgg['group_by_word'] = {
+                mainAgg['agg_group_by_word'] = {
                     'terms': {
                         'field': 'w_id',
                         'size': query_size
@@ -383,18 +437,19 @@ class InterfaceQueryParser:
                 }
                 mainAgg['agg_noccurrences'] = {'cardinality': {'field': 'w_id'}}
             elif groupBy == 'lemma':
-                mainAgg['group_by_word'] = {
+                mainAgg['agg_group_by_word'] = {
                     'terms': {
                         'field': 'l_id',
                         'size': query_size
                     }
                 }
                 mainAgg['agg_noccurrences'] = {'cardinality': {'field': 'l_id'}}
-            if len(subAggregations) > 0:
-                mainAgg['group_by_word']['aggs'] = subAggregations
-            if len(order) > 0:
-                mainAgg['group_by_word']['terms']['order'] = order
+            if subAggregations is not None:
+                mainAgg['agg_group_by_word']['aggs'] = subAggregations
+            if order is not None:
+                mainAgg['agg_group_by_word']['terms']['order'] = order
             esQuery = {'query': innerWordFreqQuery, 'size': 0, 'aggs': mainAgg}
+        print(esQuery)
         return esQuery
 
     def full_word_query(self, queryDict, query_from=0, query_size=10, sortOrder='random',
@@ -461,6 +516,11 @@ class InterfaceQueryParser:
                     query['bool']['must'] = [{'term': {'lang': lang}}]
                 else:
                     query['bool']['must'].append({'term': {'lang': lang}})
+            # Do not look for the empty lemma, which has an index of l0
+            if 'must_not' not in query['bool']:
+                query['bool']['must_not'] = [{'term': {'l_id': 'l0'}}]
+            else:
+                query['bool']['must_not'].append({'term': {'l_id': 'l0'}})
             # if docIDs is not None:
             #     if 'filter' not in query['bool']:
             #         query['bool']['filter'] = [{'terms': {'dids': docIDs}}]

@@ -476,6 +476,7 @@ def search_word(searchType='word', page=0):
             query['doc_ids'] = docIDs
     else:
         docIDs = query['doc_ids']
+    subcorpus = (docIDs is not None)
 
     searchIndex = 'words'
     sortOrder = get_session_data('sort')
@@ -498,12 +499,16 @@ def search_word(searchType='word', page=0):
         searchIndex = 'sentences'
         sortOrder = 'random'
 
+    querySize = get_session_data('page_size')
+    if subcorpus and page >= 2:
+        querySize = get_session_data('page_size') * page
+
     query = sc.qp.html2es(query,
                           searchOutput='words',
                           groupBy=searchType,
                           sortOrder=sortOrder,
                           randomSeed=get_session_data('seed'),
-                          query_size=get_session_data('page_size'),
+                          query_size=querySize,
                           page=get_session_data('page'),
                           distances=queryWordConstraints,
                           includeNextWordField=constraintsTooComplex,
@@ -512,18 +517,18 @@ def search_word(searchType='word', page=0):
     maxRunTime = time.time() + settings.query_timeout
     hitsProcessed = {}
     if searchIndex == 'words':
-        if docIDs is None:
-            # if searchType == 'lemma':
-            #     sc.qp.lemmatize_word_query(query)
-            hits = sc.get_words(query)
-            hitsProcessed = sentView.process_word_json(hits,
-                                                       searchType=searchType,
-                                                       translit=cur_search_context().translit)
-        else:
-            hits = sc.get_words(query)
-            print(hits)
-            hitsProcessed = sentView.process_word_buckets_json(hits,
-                                                               translit=cur_search_context().translit)
+        hits = sc.get_words(query)
+        if subcorpus:
+            # Since subcorpus word search uses non-composite buckets,
+            # the only way to paginate is to look up everything up to
+            # the current page and then leave only the current page.
+            hits['aggregations']['agg_group_by_word']['buckets'] = hits['aggregations']['agg_group_by_word']['buckets'][-get_session_data('page_size'):]
+        hitsProcessed = sentView.process_word_json(hits,
+                                                   searchType=searchType,
+                                                   subcorpus=subcorpus,
+                                                   translit=cur_search_context().translit)
+        if 'agg_group_by_word' in hits['aggregations'] and 'after_key' in hits['aggregations']['agg_group_by_word']:
+            cur_search_context().after_key = hits['aggregations']['agg_group_by_word']['after_key']
 
     elif searchIndex == 'sentences':
         hitsProcessed = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0,

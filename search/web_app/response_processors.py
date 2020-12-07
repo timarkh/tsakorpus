@@ -920,7 +920,7 @@ class SentenceViewer:
                                lID=wID,
                                wfSearch=wSource['wf'])
 
-    def process_word_buckets(self, w, nDocuments, freq, lang, translit=None):
+    def process_word_buckets(self, w, nDocuments, nForms, freq, lang, searchType='word', translit=None):
         """
         Process one word taken from response['hits']['hits'] for subcorpus or lemma
         queries (where frequency data comes separately from the aggregations).
@@ -928,6 +928,9 @@ class SentenceViewer:
         if '_source' not in w:
             return ''
         wSource = w['_source']
+        displayFreqRank = True
+        if 'display_freq_rank' in self.settings and not self.settings['display_freq_rank']:
+            displayFreqRank = False
         if freq is None:
             # This means total frequency was not present in a subaggregation,
             # which in turn means no subcorpus was selected. If this is the case,
@@ -939,20 +942,42 @@ class SentenceViewer:
         freq = str(int(round(freq, 0)))
         rank = ''
         nSents = ''
-        nDocs = str(nDocuments)
+        if 'n_docs' in wSource and nDocuments < 0:
+            nDocs = str(wSource['n_docs'])
+        else:
+            nDocs = str(nDocuments)
+        if 'n_sents' in wSource:
+            nSents = str(wSource['n_sents'])
         displayGr = True
         if 'word_search_display_gr' in self.settings and not self.settings['word_search_display_gr']:
             displayGr = False
-        return render_template('word_table_row.html',
-                               ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
-                               wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
-                               lemma=self.get_lemma(wSource),
+        if searchType == 'word':
+            return render_template('word_table_row.html',
+                                   ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
+                                   wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
+                                   lemma=self.get_lemma(wSource),
+                                   gr=self.get_gramm(wSource, lang),
+                                   word_search_display_gr=displayGr,
+                                   freq=freq,
+                                   display_freq_rank=displayFreqRank,
+                                   rank=rank,
+                                   nSents=nSents,
+                                   nDocs=nDocs,
+                                   wID=w['_id'],
+                                   wfSearch=wSource['wf'])
+        return render_template('lemma_table_row.html',
+                               ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"',
+                                                                                                        "&quot;").replace(
+                                   '<', '&lt;').replace('>', '&gt;'),
+                               lemma=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
                                gr=self.get_gramm(wSource, lang),
                                word_search_display_gr=displayGr,
                                freq=freq,
+                               display_freq_rank=displayFreqRank,
                                rank=rank,
                                nSents=nSents,
                                nDocs=nDocs,
+                               nForms=nForms,
                                wID=w['_id'],
                                wfSearch=wSource['wf'])
 
@@ -1307,12 +1332,13 @@ class SentenceViewer:
         result['languages'] += [l for l in sorted(resultLanguages)]
         return result
 
-    def process_word_json(self, response, searchType='word', translit=None):
+    def process_word_json(self, response, searchType='word', subcorpus=False, translit=None):
         """
         Process hits from the words index.
         """
-        if searchType == 'lemma':
-            return self.process_word_buckets_json(response, translit=translit)
+        if searchType == 'lemma' or subcorpus:
+            return self.process_word_buckets_json(response, searchType=searchType,
+                                                  translit=translit, subcorpus=subcorpus)
 
         result = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'message': 'Nothing found.'}
         if ('hits' not in response
@@ -1331,10 +1357,10 @@ class SentenceViewer:
                                                      lang=lang, translit=translit))
         return result
 
-    def process_word_buckets_json(self, response, translit=None):
+    def process_word_buckets_json(self, response, searchType='word', translit=None, subcorpus=True):
         """
         Process hits from the words index by retrieving an object for
-        each bucket in the group_by_word aggregation. This works for
+        each bucket in the agg_group_by_word aggregation. This works for
         lemmata, as well as for any objects searched in a subcorpus.
         """
         result = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0, 'message': 'Nothing found.'}
@@ -1351,23 +1377,32 @@ class SentenceViewer:
         result['n_docs'] = response['aggregations']['agg_ndocs']['value']
         result['total_freq'] = response['aggregations']['agg_freq']['value']
         result['words'] = []
-        for iHit in range(len(response['aggregations']['group_by_word']['buckets'])):
-            wordID = response['aggregations']['group_by_word']['buckets'][iHit]['key']
-            docCount = response['aggregations']['group_by_word']['buckets'][iHit]['doc_count']
+        # print(response['aggregations']['agg_group_by_word']['buckets'])
+        for iHit in range(len(response['aggregations']['agg_group_by_word']['buckets'])):
+            if subcorpus:
+                wordID = response['aggregations']['agg_group_by_word']['buckets'][iHit]['key']
+                nForms = response['aggregations']['agg_group_by_word']['buckets'][iHit]['subagg_nforms']['value']
+                docCount = response['aggregations']['agg_group_by_word']['buckets'][iHit]['doc_count']
+            else:
+                wordID = response['aggregations']['agg_group_by_word']['buckets'][iHit]['key']['l_id']
+                nForms = response['aggregations']['agg_group_by_word']['buckets'][iHit]['doc_count']
+                docCount = -1
             try:
                 # If this was a subcorpus search, then total frequency of
                 # found items comes from word[wtype=word_freq] objects and
                 # therefore is stored in a subaggregation.
                 # If not, it will be taken from the item itself by process_word_buckets.
-                wordFreq = response['aggregations']['group_by_word']['buckets'][iHit]['subagg_freq']['value']
+                wordFreq = response['aggregations']['agg_group_by_word']['buckets'][iHit]['subagg_freq']['value']
             except KeyError:
                 wordFreq = None
             hit = self.sc.get_word_by_id(wordID)
             langID, lang = self.get_lang_from_hit(hit['hits']['hits'][0])
             result['words'].append(self.process_word_buckets(hit['hits']['hits'][0],
                                                              nDocuments=docCount,
+                                                             nForms=nForms,
                                                              freq=wordFreq,
                                                              lang=lang,
+                                                             searchType=searchType,
                                                              translit=translit))
         return result
 

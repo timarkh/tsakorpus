@@ -106,6 +106,7 @@ def change_display_options(query):
     Remember the new display options provided in the query.
     """
     searchContext = cur_search_context()
+    searchContext.after_key = None
     if 'page_size' in query:
         try:
             ps = int(query['page_size'])

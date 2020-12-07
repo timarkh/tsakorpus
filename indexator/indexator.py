@@ -435,6 +435,7 @@ class Indexator:
                 'wtype': 'lemma',
                 'l_order': lOrder,
                 'freq': self.wordFreqs[langID][lID],
+                'lemma_freq': self.wordFreqs[langID][lID],
                 'rank_true': freqToRank[self.wordFreqs[langID][lID]],
                 'rank': self.quantile_label(self.wordFreqs[langID][lID],
                                             freqToRank[self.wordFreqs[langID][lID]],
@@ -507,7 +508,9 @@ class Indexator:
                 wJson['l_order'] = lOrder
                 wJson['l_id'] = lID
                 wordFreq = self.wordFreqs[langID][wID]
+                lemmaFreq = self.wordFreqs[langID][lID]
                 wJson['freq'] = wordFreq
+                wJson['lemma_freq'] = lemmaFreq
                 # wJson['sids'] = [sid for sid in sorted(self.wordSIDs[langID][wID])]
                 wJson['dids'] = [did for did in sorted(self.wordDIDs[langID][wID])]
                 wJson['n_sents'] = self.wordSFreqs[langID][wID]
