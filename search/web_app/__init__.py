@@ -22,7 +22,7 @@ from search_engine.client import SearchClient
 from .response_processors import SentenceViewer
 localizations = {}
 sc = SearchClient(SETTINGS_DIR, mode='test')
-sentView = SentenceViewer(SETTINGS_DIR, sc)
+sentView = SentenceViewer(settings, sc)
 sc.qp.rp = sentView
 sc.qp.wr.rp = sentView
 

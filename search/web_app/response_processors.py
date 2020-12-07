@@ -18,23 +18,19 @@ class SentenceViewer:
     rxTabs = re.compile('^\t*$')
     invisibleAnaFields = {'gloss_index'}
 
-    def __init__(self, settings_dir, search_client):
-        self.settings_dir = settings_dir
-        f = open(os.path.join(self.settings_dir, 'corpus.json'),
-                 'r', encoding='utf-8')
-        self.settings = json.loads(f.read())
-        f.close()
-        self.name = self.settings['corpus_name']
+    def __init__(self, settings, search_client):
+        self.settings = settings
+        self.name = self.settings.corpus_name
         self.sentence_props = ['text']
-        self.dictionary_categories = {lang: set() for lang in self.settings['languages']}
-        for lang in self.settings['lang_props']:
-            if 'dictionary_categories' in self.settings['lang_props'][lang]:
-                self.dictionary_categories[lang] = set(self.settings['lang_props'][lang]['dictionary_categories'])
+        self.dictionary_categories = {lang: set() for lang in self.settings.languages}
+        for lang in self.settings.lang_props:
+            if 'dictionary_categories' in self.settings.lang_props[lang]:
+                self.dictionary_categories[lang] = set(self.settings.lang_props[lang]['dictionary_categories'])
         self.authorMeta = 'author'
-        if 'author_metafield' in self.settings:
-            self.authorMeta = self.settings['author_metafield']
+        if self.settings.author_metafield is not None and len(self.settings.author_metafield) > 0:
+            self.authorMeta = self.settings.author_metafield
         self.sc = search_client
-        self.w1_labels = set(['w1'] + ['w1_' + str(i) for i in range(self.settings['max_words_in_sentence'])])
+        self.w1_labels = set(['w1'] + ['w1_' + str(i) for i in range(self.settings.max_words_in_sentence)])
 
     def differing_ana_field(self, ana1, ana2):
         """
@@ -145,11 +141,11 @@ class SentenceViewer:
         for the language specified by lang.
         """
         def key_comp(p):
-            if 'gr_fields_order' not in self.settings['lang_props'][lang]:
+            if 'gr_fields_order' not in self.settings.lang_props[lang]:
                 return -1
-            if p[0] not in self.settings['lang_props'][lang]['gr_fields_order']:
-                return len(self.settings['lang_props'][lang]['gr_fields_order'])
-            return self.settings['lang_props'][lang]['gr_fields_order'].index(p[0])
+            if p[0] not in self.settings.lang_props[lang]['gr_fields_order']:
+                return len(self.settings.lang_props[lang]['gr_fields_order'])
+            return self.settings.lang_props[lang]['gr_fields_order'].index(p[0])
 
         grAnaPart = ''
         for fv in sorted(grValues, key=key_comp):
@@ -174,10 +170,10 @@ class SentenceViewer:
         Build the contents of a div with one particular analysis.
         """
         def field_sorting_key(x):
-            if x['key'] in self.settings['lang_props'][lang]['other_fields_order']:
-                return (self.settings['lang_props'][lang]['other_fields_order'].index(x['key']),
+            if x['key'] in self.settings.lang_props[lang]['other_fields_order']:
+                return (self.settings.lang_props[lang]['other_fields_order'].index(x['key']),
                         x['key'])
-            return (len(self.settings['lang_props'][lang]['other_fields_order']),
+            return (len(self.settings.lang_props[lang]['other_fields_order']),
                     x['key'])
 
         ana4template = {'lex': '', 'pos': '', 'grdic': '', 'lex_fields': [], 'gr': '', 'other_fields': []}
@@ -197,11 +193,11 @@ class SentenceViewer:
                         grdicValues.append((field[3:], value))
                     else:
                         grValues.append((field[3:], value))
-                elif ('exclude_fields' in self.settings['lang_props'][lang]
-                      and field in self.settings['lang_props'][lang]['exclude_fields']):
+                elif ('exclude_fields' in self.settings.lang_props[lang]
+                      and field in self.settings.lang_props[lang]['exclude_fields']):
                     continue
-                elif ('lexical_fields' in self.settings['lang_props'][lang]
-                      and field in self.settings['lang_props'][lang]['lexical_fields']):
+                elif ('lexical_fields' in self.settings.lang_props[lang]
+                      and field in self.settings.lang_props[lang]['lexical_fields']):
                     # Lexical fields are displayed between the lemma+pos and the gr lines
                     ana4template['lex_fields'].append({'key': field, 'value': value})
                 else:
@@ -209,7 +205,7 @@ class SentenceViewer:
                     ana4template['other_fields'].append({'key': field, 'value': value})
         ana4template['grdic'] = self.build_gr_ana_part(grdicValues, lang, gramdic=True)
         ana4template['gr'] = self.build_gr_ana_part(grValues, lang, gramdic=False)
-        if 'other_fields_order' in self.settings['lang_props'][lang]:
+        if 'other_fields_order' in self.settings.lang_props[lang]:
             ana4template['lex_fields'].sort(key=field_sorting_key)
             ana4template['other_fields'].sort(key=field_sorting_key)
         else:
@@ -372,7 +368,7 @@ class SentenceViewer:
             else:
                 result += '<span class="ch_date">' + dateDisplayed + '</span>'
         dataMeta = ''
-        for metaField in self.settings['viewable_meta']:
+        for metaField in self.settings.viewable_meta:
             if metaField == 'filename':
                 continue
             try:
@@ -530,10 +526,10 @@ class SentenceViewer:
             mExp = rxSrcFragmentName.search(alignment['src'])
             if mExp is None or mExp.group(1) != mSrc.group(1):
                 continue
-            offsetSrc = (int(mSrc.group(3)) * self.settings['media_length']
-                         + int(mSrc.group(2)) * self.settings['media_length'] / 3)
-            offsetExp = (int(mExp.group(3)) * self.settings['media_length']
-                         + int(mExp.group(2)) * self.settings['media_length'] / 3)
+            offsetSrc = (int(mSrc.group(3)) * self.settings.media_length
+                         + int(mSrc.group(2)) * self.settings.media_length / 3)
+            offsetExp = (int(mExp.group(3)) * self.settings.media_length
+                         + int(mExp.group(2)) * self.settings.media_length / 3)
             difference = offsetExp - offsetSrc
             alignment['src'] = srcFile
             alignment['start'] = str(float(alignment['start']) + difference)
@@ -554,7 +550,7 @@ class SentenceViewer:
         return sDict['languages'][lang]['text']
 
     def transliterate_baseline(self, text, lang, translit=None):
-        if translit is None or lang not in self.settings['languages']:
+        if translit is None or lang not in self.settings.languages:
             return text
         spans = self.rxTextSpans.findall(text)
         translitFuncName = 'trans_' + translit + '_baseline'
@@ -729,9 +725,9 @@ class SentenceViewer:
         text = self.view_sentence_meta(sSource, format) +\
                self.transliterate_baseline(''.join(chars), lang=lang, translit=translit)
         langViewContents = {'text': text, 'highlighted_text': highlightedText}
-        if 'images' in self.settings and self.settings['images'] and 'img' in sSource['meta']:
+        if self.settings.images and 'img' in sSource['meta']:
             langViewContents['img'] = sSource['meta']['img']
-        if 'rtl_languages' in self.settings and langView in self.settings['rtl_languages']:
+        if langView in self.settings.rtl_languages:
             langViewContents['rtl'] = True
         return {'header': header, 'languages': {langView: langViewContents},
                 'toggled_on': relationsSatisfied,
@@ -746,11 +742,11 @@ class SentenceViewer:
         linguistic paper.
         """
         def key_comp(p):
-            if 'gr_fields_order' not in self.settings['lang_props'][lang]:
+            if 'gr_fields_order' not in self.settings.lang_props[lang]:
                 return -1
-            if p[0] not in self.settings['lang_props'][lang]['gr_fields_order']:
-                return len(self.settings['lang_props'][lang]['gr_fields_order'])
-            return self.settings['lang_props'][lang]['gr_fields_order'].index(p[0])
+            if p[0] not in self.settings.lang_props[lang]['gr_fields_order']:
+                return len(self.settings.lang_props[lang]['gr_fields_order'])
+            return self.settings.lang_props[lang]['gr_fields_order'].index(p[0])
 
         def get_ana_gramm(ana):
             grAnaPart = ''
@@ -880,12 +876,6 @@ class SentenceViewer:
             wID = w['w_id']
         else:
             wID = w['_id']
-        displayFreqRank = True
-        if 'display_freq_rank' in self.settings and not self.settings['display_freq_rank']:
-            displayFreqRank = False
-        displayGr = True
-        if 'word_search_display_gr' in self.settings and not self.settings['word_search_display_gr']:
-            displayGr = False
         if searchType == 'word':
             return render_template('word_table_row.html',
                                    ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
@@ -893,10 +883,10 @@ class SentenceViewer:
                                    wf_display=wfDisplay,
                                    lemma=lemma,
                                    gr=gr,
-                                   word_search_display_gr=displayGr,
+                                   word_search_display_gr=self.settings.word_search_display_gr,
                                    other_fields=otherFields,
                                    freq=freq,
-                                   display_freq_rank=displayFreqRank,
+                                   display_freq_rank=self.settings.display_freq_rank,
                                    rank=rank,
                                    nSents=nSents,
                                    nDocs=nDocs,
@@ -910,10 +900,10 @@ class SentenceViewer:
                                wf_display=wfDisplay,
                                lemma=lemma,
                                gr=gr,
-                               word_search_display_gr=displayGr,
+                               word_search_display_gr=self.settings.word_search_display_gr,
                                other_fields=otherFields,
                                freq=freq,
-                               display_freq_rank=displayFreqRank,
+                               display_freq_rank=self.settings.display_freq_rank,
                                rank=rank,
                                nSents=nSents,
                                nDocs=nDocs,
@@ -928,9 +918,6 @@ class SentenceViewer:
         if '_source' not in w:
             return ''
         wSource = w['_source']
-        displayFreqRank = True
-        if 'display_freq_rank' in self.settings and not self.settings['display_freq_rank']:
-            displayFreqRank = False
         if freq is None:
             # This means total frequency was not present in a subaggregation,
             # which in turn means no subcorpus was selected. If this is the case,
@@ -948,18 +935,16 @@ class SentenceViewer:
             nDocs = str(nDocuments)
         if 'n_sents' in wSource:
             nSents = str(wSource['n_sents'])
-        displayGr = True
-        if 'word_search_display_gr' in self.settings and not self.settings['word_search_display_gr']:
-            displayGr = False
+
         if searchType == 'word':
             return render_template('word_table_row.html',
                                    ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
                                    wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
                                    lemma=self.get_lemma(wSource),
                                    gr=self.get_gramm(wSource, lang),
-                                   word_search_display_gr=displayGr,
+                                   word_search_display_gr=self.settings.word_search_display_gr,
                                    freq=freq,
-                                   display_freq_rank=displayFreqRank,
+                                   display_freq_rank=self.settings.display_freq_rank,
                                    rank=rank,
                                    nSents=nSents,
                                    nDocs=nDocs,
@@ -971,9 +956,9 @@ class SentenceViewer:
                                    '<', '&lt;').replace('>', '&gt;'),
                                lemma=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
                                gr=self.get_gramm(wSource, lang),
-                               word_search_display_gr=displayGr,
+                               word_search_display_gr=self.settings.word_search_display_gr,
                                freq=freq,
-                               display_freq_rank=displayFreqRank,
+                               display_freq_rank=self.settings.display_freq_rank,
                                rank=rank,
                                nSents=nSents,
                                nDocs=nDocs,
@@ -1060,7 +1045,7 @@ class SentenceViewer:
         """
         if 'ana' not in word:
             return ''
-        if 'keep_lemma_order' not in self.settings or not self.settings['keep_lemma_order']:
+        if not self.settings.keep_lemma_order:
             curLemmata = set()
             for ana in word['ana']:
                 if 'lex' in ana:
@@ -1087,7 +1072,7 @@ class SentenceViewer:
         """
         if 'ana' not in word:
             return ''
-        if 'keep_lemma_order' not in self.settings or not self.settings['keep_lemma_order']:
+        if not self.settings.keep_lemma_order:
             curGramm = set()
             simplifiedAnas, simpleMatchingAnalyses = self.simplify_ana(word['ana'], [])
             for ana in simplifiedAnas:
@@ -1121,10 +1106,8 @@ class SentenceViewer:
         Return a list with values of fields that have to be displayed
         in a word search hits table, along with wordform and lemma.
         """
-        if 'word_table_fields' not in self.settings:
-            return []
         wordTableValues = []
-        for field in self.settings['word_table_fields']:
+        for field in self.settings.word_table_fields:
             if field in ['lex', 'wf']:
                 continue
             curValues = set()
@@ -1170,7 +1153,7 @@ class SentenceViewer:
             wordSource = self.sc.get_word_by_id(word['w_id'])['hits']['hits'][0]['_source']
             wordSource.update(word['_source'])
             word['_source'] = wordSource
-            processedWords.append(self.process_word(word, lang=self.settings['languages'][word['_source']['lang']]))
+            processedWords.append(self.process_word(word, lang=self.settings.languages[word['_source']['lang']]))
         hitsProcessed['words'] = processedWords
 
     def calculate_ranks(self, hitsProcessed):
@@ -1289,15 +1272,14 @@ class SentenceViewer:
             langID = hit['_source']['lang']
         else:
             langID = 0
-        lang = self.settings['languages'][langID]
+        lang = self.settings.languages[langID]
         return langID, lang
 
     def process_sent_json(self, response, translit=None):
         result = {'n_occurrences': 0, 'n_sentences': 0,
                   'n_docs': 0, 'page': 1,
                   'message': 'Nothing found.'}
-        if 'context_header_rtl' in self.settings and self.settings['context_header_rtl']:
-            result['context_header_rtl'] = True
+        result['context_header_rtl'] = self.settings.context_header_rtl
         if 'hits' not in response or 'total' not in response['hits']:
             return result
         result['message'] = ''

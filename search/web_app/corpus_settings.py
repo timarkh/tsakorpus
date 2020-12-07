@@ -30,6 +30,7 @@ class CorpusSettings:
         self.word_fields = []
         self.search_meta = {'columns': [], 'stat_options': []}
         self.ambiguous_analyses = True
+        self.keep_lemma_order = False
 
         # Search options
         self.debug = False
@@ -49,6 +50,7 @@ class CorpusSettings:
         self.transliterations = None
         self.input_methods = None
         self.generate_dictionary = False
+        self.author_metafield = None
         self.word_fields_by_tier = {}
         self.auto_switch_tiers = {}
         self.line_plot_meta = ['year']    # metadata fields whose statistics can be displayed on a line plot
@@ -64,6 +66,8 @@ class CorpusSettings:
 
         # Languages and their properties
         self.languages = []
+        self.rtl_languages = []
+        self.context_header_rtl = False
         self.categories = {}
         self.lang_props = {}
 
