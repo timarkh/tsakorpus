@@ -246,11 +246,12 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
                 curHtmlQuery['doc_ids'] = subcorpus_ids(curHtmlQuery)
             query = sc.qp.html2es(curHtmlQuery,
                                   searchOutput=searchIndex,
+                                  searchType='words',
                                   sortOrder='',
                                   query_size=1,
                                   distances=queryWordConstraints)
             if searchIndex == 'words' and newBucket['n_words'] > 0:
-                hits = sc.get_word_freqs(query)
+                hits = sc.get_words(query)
                 if ('aggregations' not in hits
                     or 'agg_freq' not in hits['aggregations']
                     or 'agg_ndocs' not in hits['aggregations']
@@ -345,7 +346,7 @@ def count_occurrences(query, distances=None):
                             query_size=1,
                             distances=distances)
     hits = sc.get_sentences(esQuery)
-    print(hits)
+    # print(hits)
     if ('aggregations' in hits
             and 'agg_nwords' in hits['aggregations']
             and hits['aggregations']['agg_nwords']['sum'] is not None):
