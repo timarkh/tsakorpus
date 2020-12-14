@@ -24,7 +24,7 @@ The problem with the ELAN XML format is that the same data may be represented by
 
   * ``aligned_tiers`` is an array with the names of translation/comment/transcription tiers that have a main tier as their parent.
 
-  * ``analysis_tiers`` (optional) is a dictionary describing which ELAN tiers correspond to which word-level analysis fields. The keys are the tier names (or regexes), and the possible values are currently ``word`` (tokens), ``lemma``, ``pos`` (part of speech), ``gramm`` (any number of comma-separated grammatical tags; may include part of speech as well), ``parts`` (morpheme segmentation) and ``gloss`` (glosses).
+  * ``analysis_tiers`` (optional) is a dictionary describing which ELAN tiers correspond to which word-level analysis fields. The keys are the tier names (or regexes), and the values are the names of the analysis fields where the annotations from those tiers should end up. Pre-defined values, i.e. field names, include ``word`` (tokens), ``lemma``, ``pos`` (part of speech), ``gramm`` (any number of comma-separated grammatical tags; may include part of speech as well), ``parts`` (morpheme segmentation) and ``gloss`` (glosses). Annotations that belong to these tiers are processed in a special way (e.g. grammatical tags are sorted by category). Any other value (e.g. ``trans_en``) will be added to the analyses as an eponymous field, and the annotations will be tranfered there without change.
 
   * ``tier_languages`` is a dictionary where keys are the names of the tier types (listed in ``main_tiers`` and ``analysis_tiers``) and the values are the names of their languages.
 

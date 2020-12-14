@@ -27,6 +27,7 @@ class Eaf2JSON(Txt2JSON):
         '>': re.compile('<[^ >]*$'),
         '}': re.compile('\\{[^ \\}]*$'),
     }
+    standardAnaTiers = ['pos', 'gramm', 'lemma', 'parts', 'gloss']
 
     def __init__(self, settingsDir='conf_conversion'):
         Txt2JSON.__init__(self, settingsDir=settingsDir)
@@ -41,6 +42,7 @@ class Eaf2JSON(Txt2JSON):
         self.segmentChildren = {}  # (aID, child tier type) -> [child aID]
         self.spanAnnoTiers = {}    # span annotation tier type -> {tier ID -> [(tli1, tli2, contents)}
         self.alignedSpanAnnoTiers = {}   # aID of a segment -> {span annotation tier ID -> contents}
+        self.additionalWordFields = []   # names of additional word-level fields associated with some analysis tiers
         self.rxIgnoreTokens = None
         self.set_ignore_tokens()
         self.usedMediaFiles = set() # filenames of media fragments referenced in the JSONs
@@ -147,9 +149,11 @@ class Eaf2JSON(Txt2JSON):
                     if (rxTierID.search(tierNode.attrib['TIER_ID']) is not None
                         or rxTierID.search(tierNode.attrib['LINGUISTIC_TYPE_REF']) is not None):
                         tierType = v
+                        if tierType not in self.standardAnaTiers:
+                            self.additionalWordFields.append(tierType)
                         break
                 except:
-                    print('Except')
+                    print('Something is wrong with an analysis tier regex: ' + k)
         for segNode in tierNode.xpath('ANNOTATION/REF_ANNOTATION | ANNOTATION/ALIGNABLE_ANNOTATION'):
             if 'ANNOTATION_ID' not in segNode.attrib:
                 continue
@@ -279,7 +283,7 @@ class Eaf2JSON(Txt2JSON):
         """
         analyses = []
         analysisTiers = []
-        for tierType in ['pos', 'gramm', 'lemma', 'parts', 'gloss']:
+        for tierType in set(self.standardAnaTiers) | set(self.additionalWordFields):
             if (aID, tierType) not in self.segmentChildren:
                 continue
             analysisTiers.append([])
@@ -299,6 +303,8 @@ class Eaf2JSON(Txt2JSON):
                     elif tierType == 'gramm':
                         grJSON = self.tp.parser.transform_gramm_str(contents, lang=lang)
                         ana.update(grJSON)
+                    elif tierType in self.additionalWordFields:
+                        ana[tierType] = contents
                     analysisTiers[-1].append(ana)
             analysisTiers[-1] = [ana for ana in analysisTiers[-1] if len(ana) > 0]
         if len(analysisTiers) <= 0:
