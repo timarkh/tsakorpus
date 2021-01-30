@@ -449,7 +449,7 @@ class InterfaceQueryParser:
             if order is not None:
                 mainAgg['agg_group_by_word']['terms']['order'] = order
             esQuery = {'query': innerWordFreqQuery, 'size': 0, 'aggs': mainAgg}
-        print(esQuery)
+        # print(esQuery)
         return esQuery
 
     def full_word_query(self, queryDict, query_from=0, query_size=10, sortOrder='random',
@@ -1074,9 +1074,9 @@ class InterfaceQueryParser:
         if searchType == 'lemma' and wfFields:
             self.lemmatize_word_query(esQuery)
         esQuery['aggs'] = {'agg_rank': {'terms': {'field': 'rank_true',
-                                                  'order': {'_term': 'asc'},
+                                                  'order': {'_key': 'asc'},
                                                   'size': 10000}}}
-        print(esQuery)
+        # print(esQuery)
         return esQuery
 
     def filter_sentences(self, iterSent, constraints, nWords=1):

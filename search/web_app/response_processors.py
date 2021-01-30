@@ -1,6 +1,7 @@
 import json
 import html
 import os
+import copy
 import math
 from flask import render_template
 from .transliteration import *
@@ -1130,31 +1131,41 @@ class SentenceViewer:
             wordTableValues.append('/'.join(v for v in sorted(curValues)))
         return wordTableValues
 
-    def process_words_collected_from_sentences(self, hitsProcessed, sortOrder='freq', pageSize=10):
+    def process_words_collected_from_sentences(self, hitsProcessedAll,
+                                               sortOrder='freq',
+                                               startFrom=0, pageSize=10):
         """
-        Process all words collected from the sentences with a multi-word query.
+        Process all words collected from the sentences with a multi-word query. Modify
+        hitsProcessedAll so that hitsProcessedAll['words'] stores data about all
+        words found in the sentences index. Leave only those currently requested
+        in hitsProcessed and return it.
         """
-        for wID, freqData in hitsProcessed['word_ids'].items():
-            word = {'w_id': wID, '_source': {'wf': freqData['wf']}}
-            word['_source']['freq'] = freqData['n_occurrences']
-            word['_source']['rank'] = ''
-            word['_source']['n_sents'] = freqData['n_sents']
-            word['_source']['n_docs'] = len(freqData['doc_ids'])
-            hitsProcessed['words'].append(word)
-        del hitsProcessed['word_ids']
-        self.calculate_ranks(hitsProcessed)
-        if sortOrder == 'freq':
-            hitsProcessed['words'].sort(key=lambda w: (-w['_source']['freq'], w['_source']['wf']))
-        elif sortOrder == 'wf':
-            hitsProcessed['words'].sort(key=lambda w: w['_source']['wf'])
+        if len(hitsProcessedAll['words']) <= 0:
+            # If this is the first time we process these hits, fill
+            # hitsProcessed['words'] based on hitsProcessed['word_ids']
+            for wID, freqData in hitsProcessedAll['word_ids'].items():
+                word = {'w_id': wID, '_source': {'wf': freqData['wf']}}
+                word['_source']['freq'] = freqData['n_occurrences']
+                word['_source']['rank'] = ''
+                word['_source']['n_sents'] = freqData['n_sents']
+                word['_source']['n_docs'] = len(freqData['doc_ids'])
+                hitsProcessedAll['words'].append(word)
+            del hitsProcessedAll['word_ids']
+            self.calculate_ranks(hitsProcessedAll)
+            if sortOrder == 'freq':
+                hitsProcessedAll['words'].sort(key=lambda w: (-w['_source']['freq'], w['_source']['wf']))
+            elif sortOrder == 'wf':
+                hitsProcessedAll['words'].sort(key=lambda w: w['_source']['wf'])
         processedWords = []
-        for i in range(min(len(hitsProcessed['words']), pageSize)):
-            word = hitsProcessed['words'][i]
+        for i in range(startFrom, min(len(hitsProcessedAll['words']), startFrom + pageSize)):
+            word = hitsProcessedAll['words'][i]
             wordSource = self.sc.get_word_by_id(word['w_id'])['hits']['hits'][0]['_source']
             wordSource.update(word['_source'])
             word['_source'] = wordSource
             processedWords.append(self.process_word(word, lang=self.settings.languages[word['_source']['lang']]))
+        hitsProcessed = copy.deepcopy(hitsProcessedAll)
         hitsProcessed['words'] = processedWords
+        return hitsProcessed
 
     def calculate_ranks(self, hitsProcessed):
         """

@@ -4,6 +4,9 @@ import random
 
 SETTINGS_DIR = '../conf'
 MAX_PAGE_SIZE = 100     # maximum number of sentences per page
+MIN_TOTAL_FREQ_WORD_QUERY = 2000  # minimal number of processed tokens after which
+                                  # the word/lemma search involving multiple words
+                                  # may be stopped due to timeout
 sessionData = {}        # session key -> dictionary with the data for current session
 random.seed()
 
@@ -21,7 +24,7 @@ settings.load_settings(os.path.join(SETTINGS_DIR, 'corpus.json'),
 from search_engine.client import SearchClient
 from .response_processors import SentenceViewer
 localizations = {}
-sc = SearchClient(SETTINGS_DIR, mode='test')
+sc = SearchClient(SETTINGS_DIR)
 sentView = SentenceViewer(settings, sc)
 sc.qp.rp = sentView
 sc.qp.wr.rp = sentView

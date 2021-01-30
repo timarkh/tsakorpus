@@ -11,9 +11,8 @@ class SearchClient:
     Contains methods for querying the corpus database.
     """
 
-    def __init__(self, settings_dir, mode='production'):
+    def __init__(self, settings_dir):
         self.settings_dir = settings_dir
-        self.mode = mode
         f = open(os.path.join(self.settings_dir, 'corpus.json'),
                  'r', encoding='utf-8')
         self.settings = json.loads(f.read())

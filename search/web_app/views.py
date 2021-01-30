@@ -11,7 +11,7 @@ import time
 import os
 import uuid
 import xlsxwriter
-from . import app, settings, sc, sentView
+from . import app, settings, sc, sentView, MIN_TOTAL_FREQ_WORD_QUERY
 from .session_management import get_locale, get_session_data, change_display_options, set_session_data
 from .auxiliary_functions import jsonp, gzipped, nocache, lang_sorting_key, copy_request_args,\
     distance_constraints_too_complex, remove_sensitive_data
@@ -458,7 +458,10 @@ def search_lemma(page=0):
 
 @app.route('/search_word/<int:page>')
 @app.route('/search_word')
-def search_word(searchType='word', page=0):
+def search_word(searchType='word', page=-1):
+    if page < 0:
+        cur_search_context().flush()
+        page = 0
     set_session_data('progress', 0)
     if request.args and page <= 0:
         query = copy_request_args()
@@ -485,6 +488,9 @@ def search_word(searchType='word', page=0):
     constraintsTooComplex = False
     nWords = 1
     if 'n_words' in query and int(query['n_words']) > 1:
+        # Multi-word search: instead of looking in the words index,
+        # first find all occurrences in the sentences and then
+        # aggregate the first search term
         nWords = int(query['n_words'])
         searchIndex = 'sentences'
         sortOrder = 'random'    # in this case, the words are sorted after the search
@@ -517,6 +523,7 @@ def search_word(searchType='word', page=0):
     maxRunTime = time.time() + settings.query_timeout
     hitsProcessed = {}
     if searchIndex == 'words':
+        # One-word search (easy)
         hits = sc.get_words(query)
         if subcorpus:
             # Since subcorpus word search uses non-composite buckets,
@@ -531,22 +538,47 @@ def search_word(searchType='word', page=0):
             cur_search_context().after_key = hits['aggregations']['agg_group_by_word']['after_key']
 
     elif searchIndex == 'sentences':
-        hitsProcessed = {'n_occurrences': 0, 'n_sentences': 0, 'n_docs': 0,
-                         'total_freq': 0,
-                         'words': [], 'doc_ids': set(), 'word_ids': {}}
-        for hit in sc.get_all_sentences(query):
-            if constraintsTooComplex:
-                if not sc.qp.wr.check_sentence(hit, wordConstraints, nWords=nWords):
-                    continue
-            sentView.add_word_from_sentence(hitsProcessed, hit, nWords=nWords)
-            if hitsProcessed['total_freq'] >= 2000 and time.time() > maxRunTime:
-                hitsProcessed['timeout'] = True
-                break
-        hitsProcessed['n_docs'] = len(hitsProcessed['doc_ids'])
-        if hitsProcessed['n_docs'] > 0:
-            sentView.process_words_collected_from_sentences(hitsProcessed,
-                                                            sortOrder=get_session_data('sort'),
-                                                            pageSize=get_session_data('page_size'))
+        # Multi-word search (complicated)
+        query['size'] = 0
+        query['from'] = 0
+        if len(cur_search_context().processed_words) <= 0:
+            # cur_search_context().processed_words contains processed hits
+            # if the same query has already been run
+
+            # We will get actual hits in a loop below
+            hitsProcessedAll = {
+                'n_occurrences': 0,
+                'n_sentences': 0,
+                'n_docs': 0,
+                'total_freq': 0,
+                'words': [],
+                'doc_ids': set(),
+                'word_ids': {}
+            }
+            # print(query)
+            for hit in sc.get_all_sentences(query):
+                if constraintsTooComplex:
+                    if not sc.qp.wr.check_sentence(hit, wordConstraints, nWords=nWords):
+                        continue
+                sentView.add_word_from_sentence(hitsProcessedAll, hit, nWords=nWords)
+                if hitsProcessedAll['total_freq'] >= MIN_TOTAL_FREQ_WORD_QUERY and time.time() > maxRunTime:
+                    hitsProcessedAll['timeout'] = True
+                    break
+            hitsProcessedAll['n_docs'] = len(hitsProcessedAll['doc_ids'])
+        else:
+            hitsProcessedAll = cur_search_context().processed_words
+        if hitsProcessedAll['n_docs'] > 0:
+            hitsProcessed = sentView.process_words_collected_from_sentences(hitsProcessedAll,
+                                                                            sortOrder=get_session_data('sort'),
+                                                                            startFrom=(get_session_data('page') - 1) * get_session_data('page_size'),
+                                                                            pageSize=get_session_data('page_size'))
+            if len(cur_search_context().processed_words) <= 0:
+                # hitsProcessed were further changed by process_words_collected_from_sentences()
+                # We store them for later use: if the user clicks on "Download more",
+                # we won't have to look for the same sentences again
+                cur_search_context().processed_words = hitsProcessedAll
+        else:
+            hitsProcessed = hitsProcessedAll
 
     hitsProcessed['media'] = settings.media
     hitsProcessed['images'] = settings.images
