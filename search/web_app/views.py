@@ -11,7 +11,7 @@ import time
 import os
 import uuid
 import xlsxwriter
-from . import app, settings, sc, sentView, MIN_TOTAL_FREQ_WORD_QUERY
+from . import app, settings, sc, sentView
 from .session_management import get_locale, get_session_data, change_display_options, set_session_data
 from .auxiliary_functions import jsonp, gzipped, nocache, lang_sorting_key, copy_request_args,\
     distance_constraints_too_complex, remove_sensitive_data
@@ -58,51 +58,119 @@ def search_page():
 @app.route('/search_sent_query/<int:page>')
 @app.route('/search_sent_query')
 @jsonp
-def search_sent_query(page=0):
+def search_sent_query(page=-1):
+    """
+    Return list of all ES queries made when searching for sentences.
+    """
     if not settings.debug:
         return jsonify({})
-    if request.args and page <= 0:
-        query = copy_request_args()
-        page = 1
-        change_display_options(query)
-        set_session_data('last_query', query)
-    else:
-        query = get_session_data('last_query')
-    set_session_data('page', page)
-    wordConstraints = sc.qp.wr.get_constraints(query)
-    # wordConstraintsPrint = {str(k): v for k, v in wordConstraints.items()}
+    sc.start_query_logging()
+    search_sent(page=page)
+    queryLog = sc.stop_logging()
+    return jsonify(queryLog)
 
-    if 'para_ids' not in query:
-        query, paraIDs = para_ids(query)
-        if paraIDs is not None:
-            query['para_ids'] = list(paraIDs)
 
-    if (len(wordConstraints) > 0
-            and get_session_data('distance_strict')
-            and 'sent_ids' not in query
-            and distance_constraints_too_complex(wordConstraints)):
-        esQuery = sc.qp.html2es(query,
-                                searchOutput='sentences',
-                                query_size=1,
-                                distances=wordConstraints)
-        hits = sc.get_sentences(esQuery)
-        if ('hits' not in hits
-                or 'total' not in hits['hits']
-                or hits['hits']['total']['value'] > settings.max_distance_filter):
-            esQuery = {}
-        else:
-            esQuery = sc.qp.html2es(query,
-                                    searchOutput='sentences',
-                                    distances=wordConstraints)
-    else:
-        esQuery = sc.qp.html2es(query,
-                                searchOutput='sentences',
-                                sortOrder=get_session_data('sort'),
-                                randomSeed=get_session_data('seed'),
-                                query_size=get_session_data('page_size'),
-                                page=get_session_data('page'),
-                                distances=wordConstraints)
-    return jsonify(esQuery)
+@app.route('/search_lemma_query/<int:page>')
+@app.route('/search_lemma_query')
+@jsonp
+def search_lemma_query(page=-1):
+    """
+    Return list of all ES queries made when searching for lemmata.
+    """
+    if not settings.debug:
+        return jsonify({})
+    sc.start_query_logging()
+    search_lemma(page=page)
+    queryLog = sc.stop_logging()
+    return jsonify(queryLog)
+
+
+@app.route('/search_word_query/<int:page>')
+@app.route('/search_word_query')
+@jsonp
+def search_word_query(page=-1):
+    """
+    Return list of all ES queries made when searching for words.
+    """
+    if not settings.debug:
+        return jsonify({})
+    sc.start_query_logging()
+    search_word(page=page)
+    queryLog = sc.stop_logging()
+    return jsonify(queryLog)
+
+
+@app.route('/search_doc_query')
+@jsonp
+def search_doc_query():
+    """
+    Return list of all ES queries made when searching for subcorpus documents.
+    """
+    if not settings.debug:
+        return jsonify({})
+    sc.start_query_logging()
+    search_doc()
+    queryLog = sc.stop_logging()
+    return jsonify(queryLog)
+
+
+@app.route('/search_sent_json/<int:page>')
+@app.route('/search_sent_json')
+@jsonp
+def search_sent_json(page=-1):
+    """
+    Return list of all ES responses made when searching for sentences, except for iterators.
+    """
+    if not settings.debug:
+        return jsonify({})
+    sc.start_hits_logging()
+    search_sent(page=page)
+    hitsLog = sc.stop_logging()
+    return jsonify(hitsLog)
+
+
+@app.route('/search_lemma_json/<int:page>')
+@app.route('/search_lemma_json')
+@jsonp
+def search_lemma_json(page=-1):
+    """
+    Return list of all ES responses made when searching for lemmata, except for iterators.
+    """
+    if not settings.debug:
+        return jsonify({})
+    sc.start_hits_logging()
+    search_lemma(page=page)
+    hitsLog = sc.stop_logging()
+    return jsonify(hitsLog)
+
+
+@app.route('/search_word_json/<int:page>')
+@app.route('/search_word_json')
+@jsonp
+def search_word_json(page=-1):
+    """
+    Return list of all ES responses made when searching for words, except for iterators.
+    """
+    if not settings.debug:
+        return jsonify({})
+    sc.start_hits_logging()
+    search_word(page=page)
+    hitsLog = sc.stop_logging()
+    return jsonify(hitsLog)
+
+
+@app.route('/search_doc_json')
+@jsonp
+def search_doc_json():
+    """
+    Return list of all ES responses made when searching for subcorpus documents, except for iterators.
+    """
+    if not settings.debug:
+        return jsonify({})
+    sc.start_hits_logging()
+    search_doc()
+    hitsLog = sc.stop_logging()
+    return jsonify(hitsLog)
 
 
 @app.route('/doc_stats/<metaField>')
@@ -234,18 +302,6 @@ def get_word_stats(searchType, metaField):
     return jsonify(results)
 
 
-@app.route('/search_sent_json/<int:page>')
-@app.route('/search_sent_json')
-@jsonp
-def search_sent_json(page=-1):
-    if page < 0:
-        cur_search_context().flush()
-        page = 0
-    hits = find_sentences_json(page=page)
-    remove_sensitive_data(hits)
-    return jsonify(hits)
-
-
 @app.route('/search_sent/<int:page>')
 @app.route('/search_sent')
 @gzipped
@@ -341,115 +397,6 @@ def get_sent_context(n):
     return jsonify(context)
 
 
-@app.route('/search_lemma_query')
-@jsonp
-def search_lemma_query():
-    return search_word_query(searchType='lemma')
-
-
-@app.route('/search_word_query')
-@jsonp
-def search_word_query(searchType='word'):
-    if not settings.debug:
-        return jsonify({})
-    query = copy_request_args()
-    change_display_options(query)
-    if 'doc_ids' not in query:
-        docIDs = subcorpus_ids(query)
-        if docIDs is not None:
-            query['doc_ids'] = docIDs
-    else:
-        docIDs = query['doc_ids']
-
-    searchIndex = 'words'
-    sortOrder = get_session_data('sort')
-    queryWordConstraints = None
-    nWords = 1
-    if 'n_words' in query and int(query['n_words']) > 1:
-        nWords = int(query['n_words'])
-        searchIndex = 'sentences'
-        sortOrder = 'random'  # in this case, the words are sorted after the search
-        wordConstraints = sc.qp.wr.get_constraints(query)
-        set_session_data('word_constraints', wordConstraints)
-        if (len(wordConstraints) > 0
-            and get_session_data('distance_strict')):
-            queryWordConstraints = wordConstraints
-
-    query = sc.qp.html2es(query,
-                          searchOutput='words',
-                          sortOrder=sortOrder,
-                          randomSeed=get_session_data('seed'),
-                          query_size=get_session_data('page_size'),
-                          distances=queryWordConstraints)
-    if searchType == 'lemma':
-        sc.qp.lemmatize_word_query(query)
-    return jsonify(query)
-
-
-@app.route('/search_lemma_json')
-@jsonp
-def search_lemma_json():
-    return search_word_json(searchType='lemma')
-
-
-@app.route('/search_word_json/<int:page>')
-@app.route('/search_word_json')
-@jsonp
-def search_word_json(searchType='word', page=0):
-    query = copy_request_args()
-    change_display_options(query)
-    if page <= 0:
-        page = 1
-        set_session_data('page', page)
-    if 'doc_ids' not in query:
-        docIDs = subcorpus_ids(query)
-        if docIDs is not None:
-            query['doc_ids'] = docIDs
-    else:
-        docIDs = query['doc_ids']
-
-    searchIndex = 'words'
-    sortOrder = get_session_data('sort')
-    queryWordConstraints = None
-    nWords = 1
-    if 'n_words' in query and int(query['n_words']) > 1:
-        nWords = int(query['n_words'])
-        searchIndex = 'sentences'
-        sortOrder = 'random'  # in this case, the words are sorted after the search
-        wordConstraints = sc.qp.wr.get_constraints(query)
-        set_session_data('word_constraints', wordConstraints)
-        if (len(wordConstraints) > 0
-                and get_session_data('distance_strict')):
-            queryWordConstraints = wordConstraints
-    elif 'sentence_index1' in query and len(query['sentence_index1']) > 0:
-        searchIndex = 'sentences'
-        sortOrder = 'random'
-
-    query = sc.qp.html2es(query,
-                          searchOutput='words',
-                          groupBy=searchType,
-                          sortOrder=sortOrder,
-                          randomSeed=get_session_data('seed'),
-                          query_size=get_session_data('page_size'),
-                          page=get_session_data('page'),
-                          distances=queryWordConstraints)
-
-    hits = []
-    if searchIndex == 'words':
-        # if docIDs is None and searchType == 'lemma':
-        #     sc.qp.lemmatize_word_query(query)
-        hits = sc.get_words(query)
-    elif searchIndex == 'sentences':
-        iSent = 0
-        for hit in sc.get_all_sentences(query):
-            if iSent >= 5:
-                break
-            iSent += 1
-            hits.append(hit)
-
-    return jsonify(hits)
-
-
 @app.route('/search_lemma/<int:page>')
 @app.route('/search_lemma')
 def search_lemma(page=-1):
@@ -474,31 +421,6 @@ def search_word(searchType='word', page=-1):
                            search_type=searchType,
                            page=get_session_data('page'),
                            show_next=bShowNextButton)
-
-
-@app.route('/search_doc_query')
-@jsonp
-def search_doc_query():
-    if not settings.debug:
-        return jsonify({})
-    query = copy_request_args()
-    change_display_options(query)
-    query = sc.qp.subcorpus_query(query,
-                                  sortOrder=get_session_data('sort'),
-                                  query_size=settings.max_docs_retrieve)
-    return jsonify(query)
-
-
-@app.route('/search_doc_json')
-@jsonp
-def search_doc_json():
-    query = copy_request_args()
-    change_display_options(query)
-    query = sc.qp.subcorpus_query(query,
-                                  sortOrder=get_session_data('sort'),
-                                  query_size=settings.max_docs_retrieve)
-    hits = sc.get_docs(query)
-    return jsonify(hits)
 
 
 @app.route('/search_doc')
@@ -540,6 +462,7 @@ def send_media(path):
     Return the requested media file.
     """
     return send_from_directory(os.path.join('../media', settings.corpus_name), path)
+
 
 @app.route('/img/<path:path>')
 def send_image(path):

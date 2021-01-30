@@ -6,6 +6,20 @@ import time
 from .query_parsers import InterfaceQueryParser
 
 
+def log_if_needed(f):
+    """
+    A decorator used to log the query if logging is on.
+    """
+    def f_decorated(self, esQuery):
+        if self.logging == 'query':
+            self.query_log.append(esQuery)
+        hits = f(self, esQuery)
+        if self.logging == 'hits' and type(hits) == dict:
+            self.query_log.append(hits)
+        return hits
+    return f_decorated
+
+
 class SearchClient:
     """
     Contains methods for querying the corpus database.
@@ -21,11 +35,39 @@ class SearchClient:
         self.es = Elasticsearch()
         self.es_ic = IndicesClient(self.es)
         self.qp = InterfaceQueryParser(self.settings_dir)
+        self.logging = 'none'   # none|query|hits
+        self.query_log = []
+        # Logging is only switched temporarily when the user clicks on
+        # "show query" or "show response" buttons in debug mode.
 
+    def start_query_logging(self):
+        """
+        Start temporarily logging queries to a list.
+        """
+        self.query_log = []
+        self.logging = 'query'
+
+    def start_hits_logging(self):
+        """
+        Start temporarily logging ES response JSONs to a list.
+        """
+        self.query_log = []
+        self.logging = 'hits'
+
+    def stop_logging(self):
+        """
+        Stop logging queries. Return query log.
+        """
+        queryLog = self.query_log
+        self.query_log = []
+        self.logging = 'none'
+        return queryLog
+
+    @log_if_needed
     def get_words(self, esQuery):
         """
         Retrieve hits from the words index. This includes
-        word forms, lemmata and word_freq and lemma_freq objects
+        words, lemmata and word_freq and lemma_freq objects
         used to count the number of occurrences in a particular
         subcorpus.
         """
@@ -37,11 +79,13 @@ class SearchClient:
                                   body=esQuery)
         return hits
 
+    @log_if_needed
     def get_docs(self, esQuery):
         hits = self.es.search(index=self.name + '.docs',
                               body=esQuery)
         return hits
 
+    @log_if_needed
     def get_all_docs(self, esQuery):
         """
         Iterate over all documents found with the query.
@@ -50,8 +94,8 @@ class SearchClient:
                                 query=esQuery)
         return iterator
 
+    @log_if_needed
     def get_sentences(self, esQuery):
-        # print(esQuery)
         if self.settings['query_timeout'] > 0:
             hits = self.es.search(index=self.name + '.sentences',
                                   body=esQuery, request_timeout=self.settings['query_timeout'])
@@ -61,6 +105,7 @@ class SearchClient:
         # print(json.dumps(hits, ensure_ascii=False, indent=1))
         return hits
 
+    @log_if_needed
     def get_all_sentences(self, esQuery):
         """
         Iterate over all sentences found with the query.
