@@ -352,6 +352,10 @@
 	margin-top: 0 !important;
 }
 
+#header {
+	max-height: 2em;
+}
+
 #res_p {
 	font-size: 16px;
 	font-family: "Segoe UI", "Lucida Grande", sans-serif;
@@ -423,9 +427,19 @@
 	color: #2664c9;
 }
 
+@keyframes blinkHelp {
+  0%   { opacity:0; font-size: 20px; }
+  10%   { opacity:0.2; font-size: 20px; }
+  50%  { opacity:0.7; font-size: 45px; }
+  60%  { opacity:0.8; font-size: 45px; }
+  100% { opacity:1; font-size: 20px; }
+}
+
 #show_help {
 	color: darkorange;
 	font-size: 20px;
+	animation: blinkHelp 1.5s;
+	vertical-align: top;
 }
 
 #show_dictionary {
@@ -969,6 +983,7 @@ hr.separator {
 #corpus_title {
 	font-size: 1.3em;
 	color: #526e99;
+	vertical-align: top;
 }
 
 .options_column {
