@@ -93,7 +93,7 @@ def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=
         return {}
     innerQuery = {'match_all': {}}
     if docIDs is not None:
-        innerQuery = {'ids': {'type': 'doc', 'values': list(docIDs)}}
+        innerQuery = {'ids': {'values': list(docIDs)}}
     if not fieldName.startswith('year'):
         queryFieldName = fieldName + '_kw'
     else:
@@ -155,7 +155,7 @@ def get_buckets_for_sent_metafield(fieldName, langID=-1, docIDs=None, maxBuckets
     else:
         innerQuery = {'match_all': {}}
     if docIDs is not None:
-        innerQuery = {'ids': {'type': 'doc', 'values': list(docIDs)}}
+        innerQuery = {'filter': [{'terms': {'d_id': docIDs}}]}
     # if not fieldName.startswith('year'):
     #     queryFieldName = fieldName + '_kw'
     # else:
@@ -247,7 +247,7 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
                 curHtmlQuery['doc_ids'] = subcorpus_ids(curHtmlQuery)
             query = sc.qp.html2es(curHtmlQuery,
                                   searchOutput=searchIndex,
-                                  searchType='words',
+                                  groupBy='word',
                                   sortOrder='',
                                   query_size=1,
                                   distances=queryWordConstraints)
