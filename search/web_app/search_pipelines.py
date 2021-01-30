@@ -500,11 +500,17 @@ def find_words_json(searchType='word', page=0):
     queryWordConstraints = None
     constraintsTooComplex = False
     nWords = 1
-    if 'n_words' in query and int(query['n_words']) > 1:
+    if 'n_words' in query:
+        nWords = int(query['n_words'])
+    negWords = []
+    if nWords > 0:
+        for iQueryWord in range(1, nWords + 1):
+            if 'negq' + str(iQueryWord) in query and query['negq' + str(iQueryWord)] == 'on':
+                negWords.append(iQueryWord)
+    if nWords > 1:
         # Multi-word search: instead of looking in the words index,
         # first find all occurrences in the sentences and then
         # aggregate the first search term
-        nWords = int(query['n_words'])
         searchIndex = 'sentences'
         sortOrder = 'random'  # in this case, the words are sorted after the search
         wordConstraints = sc.qp.wr.get_constraints(query)
@@ -574,7 +580,7 @@ def find_words_json(searchType='word', page=0):
                 if constraintsTooComplex:
                     if not sc.qp.wr.check_sentence(hit, wordConstraints, nWords=nWords):
                         continue
-                sentView.add_word_from_sentence(hitsProcessedAll, hit, nWords=nWords)
+                sentView.add_word_from_sentence(hitsProcessedAll, hit, nWords=nWords, negWords=negWords)
                 if hitsProcessedAll['total_freq'] >= MIN_TOTAL_FREQ_WORD_QUERY and time.time() > maxRunTime:
                     hitsProcessedAll['timeout'] = True
                     break

@@ -896,6 +896,20 @@ class InterfaceQueryParser:
         esQuery['_source'] = 'para_ids'
         return esQuery
 
+    def remove_nonsense(self, htmlQuery):
+        """
+        Remove parameters that are logically impossible in the given context.
+        """
+        # No distance requirements for negative word queries
+        for iWord in range(int(htmlQuery['n_words'])):
+            strWordNum = str(iWord + 1)
+            if 'negq' + strWordNum in htmlQuery:
+                for k in [_ for _ in htmlQuery.keys()]:
+                    if k.startswith(('word_rel_' + strWordNum + '_',
+                                     'word_dist_from_' + strWordNum + '_',
+                                     'word_dist_to_' + strWordNum + '_')):
+                        del htmlQuery[k]
+
     def check_html_parameters(self, htmlQuery, page=1, query_size=10, searchOutput='sentences'):
         """
         Check if HTML query is valid. If so, calculate and return a number
@@ -939,6 +953,9 @@ class InterfaceQueryParser:
             self.check_html_parameters(htmlQuery, page, query_size, searchOutput)
         if query_from is None:
             return {'query': {'match_none': ''}}
+
+        self.remove_nonsense(htmlQuery)
+        # print(htmlQuery)
 
         prelimQuery = {'words': []}
         if searchIndex == 'sentences':

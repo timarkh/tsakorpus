@@ -996,7 +996,7 @@ class SentenceViewer:
 
     def filter_multi_word_highlight(self, hit, nWords=1, negWords=None, keepOnlyFirst=False):
         """
-        Non-iterative version of filter_multi_word_highlight_iter whic
+        Non-iterative version of filter_multi_word_highlight_iter which
         replaces hits['inner_hits'] dictionary.
         """
         if 'inner_hits' not in hit or nWords <= 1:
@@ -1005,10 +1005,12 @@ class SentenceViewer:
                                                                                           negWords=negWords,
                                                                                           keepOnlyFirst=keepOnlyFirst)}
 
-    def add_word_from_sentence(self, hitsProcessed, hit, nWords=1):
+    def add_word_from_sentence(self, hitsProcessed, hit, nWords=1, negWords=None):
         """
         Extract word data from the highlighted w1 in the sentence and
         add it to the dictionary hitsProcessed.
+        negWords is a list that contains numbers of words in the query
+        whose query was negative.
         """
         if '_source' not in hit or 'inner_hits' not in hit:
             return
@@ -1016,7 +1018,8 @@ class SentenceViewer:
         bRelevantWordExists = False
         # self.filter_multi_word_highlight(hit, nWords=nWords, keepOnlyFirst=True)
 
-        for innerHitKey, innerHit in self.filter_multi_word_highlight_iter(hit, nWords=nWords, keepOnlyFirst=True):
+        for innerHitKey, innerHit in self.filter_multi_word_highlight_iter(hit, nWords=nWords,
+                                                                           keepOnlyFirst=True, negWords=negWords):
             # if innerHitKey not in self.w1_labels:
             #     continue
             bRelevantWordExists = True
