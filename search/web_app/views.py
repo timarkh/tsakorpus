@@ -452,7 +452,7 @@ def search_word_json(searchType='word', page=0):
 
 @app.route('/search_lemma/<int:page>')
 @app.route('/search_lemma')
-def search_lemma(page=0):
+def search_lemma(page=-1):
     return search_word(searchType='lemma', page=page)
 
 

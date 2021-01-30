@@ -856,6 +856,7 @@ class SentenceViewer:
         freq = str(wSource['freq'])
         rank = str(wSource['rank'])
         nDocs = str(wSource['n_docs'])
+        nForms = 1
         otherFields = []
         if searchType == 'word':
             nSents = str(wSource['n_sents'])
@@ -868,11 +869,13 @@ class SentenceViewer:
             otherFields = self.get_word_table_fields(wSource)
         else:
             nSents = 0
+            if 'n_sents' in wSource:
+                nSents = str(wSource['n_sents'])
             wf = wfDisplay = ''
             otherFields = []
             lemma = self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit)
             gr = ''
-        wID = -1
+            nForms = str(wSource['n_forms'])
         if 'w_id' in w:
             wID = w['w_id']
         else:
@@ -908,6 +911,7 @@ class SentenceViewer:
                                rank=rank,
                                nSents=nSents,
                                nDocs=nDocs,
+                               nForms=nForms,
                                lID=wID,
                                wfSearch=wSource['wf'])
 
@@ -1005,12 +1009,13 @@ class SentenceViewer:
                                                                                           negWords=negWords,
                                                                                           keepOnlyFirst=keepOnlyFirst)}
 
-    def add_word_from_sentence(self, hitsProcessed, hit, nWords=1, negWords=None):
+    def add_word_from_sentence(self, hitsProcessed, hit, nWords=1, negWords=None, searchType='word'):
         """
         Extract word data from the highlighted w1 in the sentence and
         add it to the dictionary hitsProcessed.
         negWords is a list that contains numbers of words in the query
         whose query was negative.
+        searchType can equal 'word' or 'lemma'.
         """
         if '_source' not in hit or 'inner_hits' not in hit:
             return
@@ -1026,18 +1031,33 @@ class SentenceViewer:
             for word in innerHit['hits']['hits']:
                 hitsProcessed['total_freq'] += 1
                 word['_source']['lang'] = lang
-                wID = word['_source']['w_id']
-                wf = word['_source']['wf'].lower()
+                if searchType == 'word':
+                    wID = word['_source']['w_id']
+                    wf = word['_source']['wf'].lower()
+                elif searchType == 'lemma':
+                    wID = word['_source']['l_id']
+                    wf = self.get_lemma(word['_source'])
+                else:
+                    wID = 'w0'
+                    wf = ''
                 try:
                     hitsProcessed['word_ids'][wID]['n_occurrences'] += 1
-                    hitsProcessed['word_ids'][wID]['n_sents'] += 1
-                    hitsProcessed['word_ids'][wID]['doc_ids'].add(hit['_source']['doc_id'])
+                    hitsProcessed['word_ids'][wID]['sents'].add(hit['_id'])
+                    hitsProcessed['word_ids'][wID]['docs'].add(hit['_source']['doc_id'])
+                    if searchType == 'lemma':
+                        hitsProcessed['word_ids'][wID]['forms'].add(word['_source']['w_id'])
                 except KeyError:
                     hitsProcessed['n_occurrences'] += 1
-                    hitsProcessed['word_ids'][wID] = {'n_occurrences': 1,
-                                                      'n_sents': 1,
-                                                      'doc_ids': {hit['_source']['doc_id']},
-                                                      'wf': wf}
+                    hitsProcessed['word_ids'][wID] = {
+                        'n_occurrences': 1,
+                        'sents': {hit['_id']},
+                        'docs': {hit['_source']['doc_id']},
+                        'wf': wf
+                    }
+                    if searchType == 'lemma':
+                        hitsProcessed['word_ids'][wID]['forms'] = {word['_source']['w_id']}
+                    elif searchType == 'word':
+                        hitsProcessed['word_ids'][wID]['lemma'] = self.get_lemma(word['_source'])
         if bRelevantWordExists:
             hitsProcessed['n_sentences'] += 1
             hitsProcessed['doc_ids'].add(hit['_source']['doc_id'])
@@ -1135,13 +1155,14 @@ class SentenceViewer:
         return wordTableValues
 
     def process_words_collected_from_sentences(self, hitsProcessedAll,
-                                               sortOrder='freq',
+                                               sortOrder='freq', searchType='word',
                                                startFrom=0, pageSize=10):
         """
         Process all words collected from the sentences with a multi-word query. Modify
         hitsProcessedAll so that hitsProcessedAll['words'] stores data about all
         words found in the sentences index. Leave only those currently requested
         in hitsProcessed and return it.
+        searchType can equal 'word' or 'lemma'.
         """
         if len(hitsProcessedAll['words']) <= 0:
             # If this is the first time we process these hits, fill
@@ -1150,22 +1171,29 @@ class SentenceViewer:
                 word = {'w_id': wID, '_source': {'wf': freqData['wf']}}
                 word['_source']['freq'] = freqData['n_occurrences']
                 word['_source']['rank'] = ''
-                word['_source']['n_sents'] = freqData['n_sents']
-                word['_source']['n_docs'] = len(freqData['doc_ids'])
+                word['_source']['n_sents'] = len(freqData['sents'])
+                word['_source']['n_docs'] = len(freqData['docs'])
+                if searchType == 'lemma':
+                    word['_source']['n_forms'] = len(freqData['forms'])
+                elif searchType == 'word':
+                    word['_source']['lemma'] = freqData['lemma']
                 hitsProcessedAll['words'].append(word)
             del hitsProcessedAll['word_ids']
             self.calculate_ranks(hitsProcessedAll)
             if sortOrder == 'freq':
                 hitsProcessedAll['words'].sort(key=lambda w: (-w['_source']['freq'], w['_source']['wf']))
-            elif sortOrder == 'wf':
+            elif sortOrder == 'wf' or (searchType == 'lemma' and sortOrder in ('wf', 'lemma')):
                 hitsProcessedAll['words'].sort(key=lambda w: w['_source']['wf'])
+            elif sortOrder == 'lemma' and searchType == 'word':
+                hitsProcessedAll['words'].sort(key=lambda w: w['_source']['lemma'])
         processedWords = []
         for i in range(startFrom, min(len(hitsProcessedAll['words']), startFrom + pageSize)):
             word = hitsProcessedAll['words'][i]
             wordSource = self.sc.get_word_by_id(word['w_id'])['hits']['hits'][0]['_source']
             wordSource.update(word['_source'])
             word['_source'] = wordSource
-            processedWords.append(self.process_word(word, lang=self.settings.languages[word['_source']['lang']]))
+            processedWords.append(self.process_word(word, lang=self.settings.languages[word['_source']['lang']],
+                                                    searchType=searchType))
         hitsProcessed = copy.deepcopy(hitsProcessedAll)
         hitsProcessed['words'] = processedWords
         return hitsProcessed

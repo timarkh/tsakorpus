@@ -433,6 +433,7 @@ class Indexator:
             lemmaJson = {
                 'wf': l,
                 'wtype': 'lemma',
+                'lang': langID,
                 'l_order': lOrder,
                 'freq': self.wordFreqs[langID][lID],
                 'lemma_freq': self.wordFreqs[langID][lID],

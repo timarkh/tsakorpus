@@ -503,10 +503,9 @@ def find_words_json(searchType='word', page=0):
     if 'n_words' in query:
         nWords = int(query['n_words'])
     negWords = []
-    if nWords > 0:
-        for iQueryWord in range(1, nWords + 1):
-            if 'negq' + str(iQueryWord) in query and query['negq' + str(iQueryWord)] == 'on':
-                negWords.append(iQueryWord)
+    for iQueryWord in range(1, nWords + 1):
+        if 'negq' + str(iQueryWord) in query and query['negq' + str(iQueryWord)] == 'on':
+            negWords.append(iQueryWord)
     if nWords > 1:
         # Multi-word search: instead of looking in the words index,
         # first find all occurrences in the sentences and then
@@ -580,7 +579,8 @@ def find_words_json(searchType='word', page=0):
                 if constraintsTooComplex:
                     if not sc.qp.wr.check_sentence(hit, wordConstraints, nWords=nWords):
                         continue
-                sentView.add_word_from_sentence(hitsProcessedAll, hit, nWords=nWords, negWords=negWords)
+                sentView.add_word_from_sentence(hitsProcessedAll, hit, nWords=nWords,
+                                                negWords=negWords, searchType=searchType)
                 if hitsProcessedAll['total_freq'] >= MIN_TOTAL_FREQ_WORD_QUERY and time.time() > maxRunTime:
                     hitsProcessedAll['timeout'] = True
                     break
@@ -593,7 +593,8 @@ def find_words_json(searchType='word', page=0):
                                                                             startFrom=(get_session_data(
                                                                                 'page') - 1) * get_session_data(
                                                                                 'page_size'),
-                                                                            pageSize=get_session_data('page_size'))
+                                                                            pageSize=get_session_data('page_size'),
+                                                                            searchType=searchType)
             if len(cur_search_context().processed_words) <= 0:
                 # hitsProcessed were further changed by process_words_collected_from_sentences()
                 # We store them for later use: if the user clicks on "Download more",
