@@ -272,9 +272,10 @@ class SentenceViewer:
         if 'word' in curClass:
             dataAna = self.prepare_analyses(sentSrc['words'], curWords,
                                             lang, matchWordOffsets,
-                                            translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
+                                            translit=translit)
         else:
             dataAna = ''
+        dataAna = html.escape(dataAna)
 
         def highlightClass(nWord):
             if nWord in matchWordOffsets:
@@ -584,10 +585,10 @@ class SentenceViewer:
             if k.endswith('_kw'):
                 continue
             if format == 'csv':
-                metaSpan += (k + ': ' + str(v)).replace('<', '&lt;').replace('<', '&gt;')
+                metaSpan += k + ': ' + str(v)
                 metaSpan += '; '
             else:
-                metaSpan += k + ': ' + str(v)
+                metaSpan += html.escape(k + ': ' + str(v))
                 metaSpan += '<br>'
         if format == 'csv':
             metaSpan = metaSpan.strip('; ') + '] '
@@ -877,12 +878,12 @@ class SentenceViewer:
             gr = ''
             nForms = str(wSource['n_forms'])
         if 'w_id' in w:
-            wID = w['w_id']
+            wID = w['w_id']  # word or lemma found in the sentences index
         else:
-            wID = w['_id']
+            wID = w['_id']  # word or lemma found in the words index
         if searchType == 'word':
             return render_template('word_table_row.html',
-                                   ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
+                                   ana_popup=html.escape(self.build_ana_popup(wSource, lang, translit=translit)),
                                    wf=wf,
                                    wf_display=wfDisplay,
                                    lemma=lemma,
@@ -897,9 +898,7 @@ class SentenceViewer:
                                    wID=wID,
                                    wfSearch=wSource['wf'])
         return render_template('lemma_table_row.html',
-                               ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"',
-                                                                                                        "&quot;").replace(
-                                   '<', '&lt;').replace('>', '&gt;'),
+                               ana_popup=html.escape(self.build_ana_popup(wSource, lang, translit=translit)),
                                wf=wf,
                                wf_display=wfDisplay,
                                lemma=lemma,
@@ -943,7 +942,7 @@ class SentenceViewer:
 
         if searchType == 'word':
             return render_template('word_table_row.html',
-                                   ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;'),
+                                   ana_popup=html.escape(self.build_ana_popup(wSource, lang, translit=translit)),
                                    wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
                                    lemma=self.get_lemma(wSource),
                                    gr=self.get_gramm(wSource, lang),
@@ -956,9 +955,7 @@ class SentenceViewer:
                                    wID=w['_id'],
                                    wfSearch=wSource['wf'])
         return render_template('lemma_table_row.html',
-                               ana_popup=self.build_ana_popup(wSource, lang, translit=translit).replace('"',
-                                                                                                        "&quot;").replace(
-                                   '<', '&lt;').replace('>', '&gt;'),
+                               ana_popup=html.escape(self.build_ana_popup(wSource, lang, translit=translit)),
                                lemma=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
                                gr=self.get_gramm(wSource, lang),
                                word_search_display_gr=self.settings.word_search_display_gr,
@@ -968,7 +965,7 @@ class SentenceViewer:
                                nSents=nSents,
                                nDocs=nDocs,
                                nForms=nForms,
-                               wID=w['_id'],
+                               lID=w['_id'],
                                wfSearch=wSource['wf'])
 
     def filter_multi_word_highlight_iter(self, hit, nWords=1, negWords=None, keepOnlyFirst=False):
