@@ -462,127 +462,7 @@ def search_word(searchType='word', page=-1):
     if page < 0:
         cur_search_context().flush()
         page = 0
-    set_session_data('progress', 0)
-    if request.args and page <= 0:
-        query = copy_request_args()
-        page = 1
-        change_display_options(query)
-        if get_session_data('sort') not in ('random', 'freq', 'wf', 'lemma'):
-            set_session_data('sort', 'random')
-        set_session_data('last_query', query)
-    else:
-        query = get_session_data('last_query')
-    set_session_data('page', page)
-    if 'doc_ids' not in query:
-        docIDs = subcorpus_ids(query)
-        if docIDs is not None:
-            query['doc_ids'] = docIDs
-    else:
-        docIDs = query['doc_ids']
-    subcorpus = (docIDs is not None)
-
-    searchIndex = 'words'
-    sortOrder = get_session_data('sort')
-    wordConstraints = None
-    queryWordConstraints = None
-    constraintsTooComplex = False
-    nWords = 1
-    if 'n_words' in query and int(query['n_words']) > 1:
-        # Multi-word search: instead of looking in the words index,
-        # first find all occurrences in the sentences and then
-        # aggregate the first search term
-        nWords = int(query['n_words'])
-        searchIndex = 'sentences'
-        sortOrder = 'random'    # in this case, the words are sorted after the search
-        wordConstraints = sc.qp.wr.get_constraints(query)
-        set_session_data('word_constraints', wordConstraints)
-        if (len(wordConstraints) > 0
-                and get_session_data('distance_strict')):
-            queryWordConstraints = wordConstraints
-            if distance_constraints_too_complex(wordConstraints):
-                constraintsTooComplex = True
-    elif 'sentence_index1' in query and len(query['sentence_index1']) > 0:
-        searchIndex = 'sentences'
-        sortOrder = 'random'
-
-    querySize = get_session_data('page_size')
-    if subcorpus and page >= 2:
-        querySize = get_session_data('page_size') * page
-
-    query = sc.qp.html2es(query,
-                          searchOutput='words',
-                          groupBy=searchType,
-                          sortOrder=sortOrder,
-                          randomSeed=get_session_data('seed'),
-                          query_size=querySize,
-                          page=get_session_data('page'),
-                          distances=queryWordConstraints,
-                          includeNextWordField=constraintsTooComplex,
-                          after_key=cur_search_context().after_key)
-
-    maxRunTime = time.time() + settings.query_timeout
-    hitsProcessed = {}
-    if searchIndex == 'words':
-        # One-word search (easy)
-        hits = sc.get_words(query)
-        if subcorpus:
-            # Since subcorpus word search uses non-composite buckets,
-            # the only way to paginate is to look up everything up to
-            # the current page and then leave only the current page.
-            hits['aggregations']['agg_group_by_word']['buckets'] = hits['aggregations']['agg_group_by_word']['buckets'][-get_session_data('page_size'):]
-        hitsProcessed = sentView.process_word_json(hits,
-                                                   searchType=searchType,
-                                                   subcorpus=subcorpus,
-                                                   translit=cur_search_context().translit)
-        if 'agg_group_by_word' in hits['aggregations'] and 'after_key' in hits['aggregations']['agg_group_by_word']:
-            cur_search_context().after_key = hits['aggregations']['agg_group_by_word']['after_key']
-
-    elif searchIndex == 'sentences':
-        # Multi-word search (complicated)
-        query['size'] = 0
-        query['from'] = 0
-        if len(cur_search_context().processed_words) <= 0:
-            # cur_search_context().processed_words contains processed hits
-            # if the same query has already been run
-
-            # We will get actual hits in a loop below
-            hitsProcessedAll = {
-                'n_occurrences': 0,
-                'n_sentences': 0,
-                'n_docs': 0,
-                'total_freq': 0,
-                'words': [],
-                'doc_ids': set(),
-                'word_ids': {}
-            }
-            # print(query)
-            for hit in sc.get_all_sentences(query):
-                if constraintsTooComplex:
-                    if not sc.qp.wr.check_sentence(hit, wordConstraints, nWords=nWords):
-                        continue
-                sentView.add_word_from_sentence(hitsProcessedAll, hit, nWords=nWords)
-                if hitsProcessedAll['total_freq'] >= MIN_TOTAL_FREQ_WORD_QUERY and time.time() > maxRunTime:
-                    hitsProcessedAll['timeout'] = True
-                    break
-            hitsProcessedAll['n_docs'] = len(hitsProcessedAll['doc_ids'])
-        else:
-            hitsProcessedAll = cur_search_context().processed_words
-        if hitsProcessedAll['n_docs'] > 0:
-            hitsProcessed = sentView.process_words_collected_from_sentences(hitsProcessedAll,
-                                                                            sortOrder=get_session_data('sort'),
-                                                                            startFrom=(get_session_data('page') - 1) * get_session_data('page_size'),
-                                                                            pageSize=get_session_data('page_size'))
-            if len(cur_search_context().processed_words) <= 0:
-                # hitsProcessed were further changed by process_words_collected_from_sentences()
-                # We store them for later use: if the user clicks on "Download more",
-                # we won't have to look for the same sentences again
-                cur_search_context().processed_words = hitsProcessedAll
-        else:
-            hitsProcessed = hitsProcessedAll
-
-    hitsProcessed['media'] = settings.media
-    hitsProcessed['images'] = settings.images
-    set_session_data('progress', 100)
+    hitsProcessed = find_words_json(searchType=searchType, page=page)
     bShowNextButton = True
     if 'words' not in hitsProcessed or len(hitsProcessed['words']) != get_session_data('page_size'):
         bShowNextButton = False
@@ -592,7 +472,7 @@ def search_word(searchType='word', page=-1):
                            word_search_display_gr=settings.word_search_display_gr,
                            display_freq_rank=settings.display_freq_rank,
                            search_type=searchType,
-                           page=page,
+                           page=get_session_data('page'),
                            show_next=bShowNextButton)
 
 
