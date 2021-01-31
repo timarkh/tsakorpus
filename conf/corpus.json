@@ -1,7 +1,7 @@
 {
   "corpus_name": "beserman_multimedia",
   "input_format": "json",
-  "debug": true,
+  "debug": false,
   "media": true,
   "media_length": 60,
   "max_context_expand": 10,

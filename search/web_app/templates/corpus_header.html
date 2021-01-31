@@ -1,0 +1,31 @@
+<header id="corpus_header">
+	<h1 id="corpus_title">
+		{% if start_page_url %}
+			<a href="{{ start_page_url }}">{{ _('corpus_title') }}</a>
+		{% else %}
+			{{ _('corpus_title') }}
+		{% endif %}
+	</h1>
+	{% if debug %}{{ _('Corpus name') }}: {{ corpus_name }}.{% endif %}
+
+	{% if locales|length > 1 %}
+		&nbsp;&nbsp;
+		{% for l_code in locales %}
+			<a class="locale {% if locale == l_code %}locale-selected{% endif %}" title="{{ locales[l_code] }}">{{ l_code|upper }}</a>&nbsp;
+			{% if not last %}
+				|&nbsp;
+			{% else %}
+				|&nbsp;&nbsp;
+			{% endif %}
+		{% endfor %}
+	{% else %}
+		<span style="padding-right: 70px;">&nbsp;</span>
+	{% endif %}
+	{% if generate_dictionary %}
+		<a id="show_dictionary" class="glyphicon glyphicon-book" aria-hidden="true"><span class="tooltip_prompt">{{ _('Show dictionary') }}</span></a>
+	{% endif %}
+	<a id="show_help" class="glyphicon glyphicon-question-sign" aria-hidden="true"><span class="tooltip_prompt">{{ _('Show help') }}</span></a>
+	{% if citation %}
+		<a id="cite_corpus"><span class="tooltip_prompt">{{ _('How to cite') }}</span><img id="cite_corpus_img" src="static/img/cite.png"></a>
+	{% endif %}
+</header>

@@ -1,72 +1,48 @@
 ﻿<!DOCTYPE html>
 <html lang="{{ locale }}">
 <head>
-<title>{{ _('corpus_title') }} - {{ _('Corpus search page') }}</title>
-<link rel="stylesheet" type="text/css" href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="static/css/search.css">
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script type='text/javascript' src='static/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
-<script type='text/javascript' src='static/js/result_parser.js'></script>
-<script type='text/javascript' src='static/js/json_loaders.js'></script>
-<script type='text/javascript' src='static/js/query_share_load.js'></script>
-<script type='text/javascript'>
-var max_request_time={{ max_request_time }};
-var moreFieldsCaption = "{{ _('more_fields') }}";
-var lessFieldsCaption = "{{ _('less_fields') }}";
-var addDistCaption = "{{ _('add_distance') }}";
-var removeWordCaption = "{{ _('remove_word') }}";
-var distToWordCaption = "{{ _(' Distance to word #') }}";
-var fromCaption = "{{ _('from ') }}";
-var toCaption = "{{ _('to ') }}";
-var selectGrammTagsCaption = "{{ _('Select combinations of tags') }}";
-var selectGlossCaption = "{{ _('Select glosses') }}";
-var forTheQueryCaption = "{{ _('the query') }}";
-var nothingFoundCaption = "{{ _('Nothing found.') }}";
-var autoSwitchTiers = {{ auto_switch_tiers|safe }};
-var wordFieldsByTier = {{ word_fields_by_tier|safe }};
-</script>
-<!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,400i" rel="stylesheet"> -->
-{% if media %}
-<link href="https://vjs.zencdn.net/5.19.2/video-js.css" rel="stylesheet">
-<link href="static/css/videojs.markers.min.css" rel="stylesheet">
-<script src="https://vjs.zencdn.net/5.19.2/video.js"></script>
-<script src="static/js/videojs-markers.js"></script>
-{% if youtube %}
-<script src="static/js/videojs-youtube.js"></script>
-{% endif %}
-{% endif %}
-{% include "head_add.html" ignore missing %}
+	<title>{{ _('corpus_title') }} - {{ _('Corpus search page') }}</title>
+	<link rel="stylesheet" type="text/css" href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="static/css/search.css">
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script type='text/javascript' src='static/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
+	<script type='text/javascript' src='static/js/result_parser.js'></script>
+	<script type='text/javascript' src='static/js/json_loaders.js'></script>
+	<script type='text/javascript' src='static/js/query_share_load.js'></script>
+	<script type='text/javascript'>
+	var max_request_time={{ max_request_time }};
+	var moreFieldsCaption = "{{ _('more_fields') }}";
+	var lessFieldsCaption = "{{ _('less_fields') }}";
+	var addDistCaption = "{{ _('add_distance') }}";
+	var removeWordCaption = "{{ _('remove_word') }}";
+	var distToWordCaption = "{{ _(' Distance to word #') }}";
+	var fromCaption = "{{ _('from ') }}";
+	var toCaption = "{{ _('to ') }}";
+	var selectGrammTagsCaption = "{{ _('Select combinations of tags') }}";
+	var selectGlossCaption = "{{ _('Select glosses') }}";
+	var forTheQueryCaption = "{{ _('the query') }}";
+	var nothingFoundCaption = "{{ _('Nothing found.') }}";
+	var autoSwitchTiers = {{ auto_switch_tiers|safe }};
+	var wordFieldsByTier = {{ word_fields_by_tier|safe }};
+	</script>
+	<!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,400i" rel="stylesheet"> -->
+	{% if media %}
+	<link href="https://vjs.zencdn.net/5.19.2/video-js.css" rel="stylesheet">
+	<link href="static/css/videojs.markers.min.css" rel="stylesheet">
+	<script src="https://vjs.zencdn.net/5.19.2/video.js"></script>
+	<script src="static/js/videojs-markers.js"></script>
+	{% if youtube %}
+	<script src="static/js/videojs-youtube.js"></script>
+	{% endif %}
+	{% endif %}
+	{% include "head_add.html" ignore missing %}
 </head>
 <body>
-{% include "header.html" ignore missing %}
-<p id="header"><span id="corpus_title">
-{% if start_page_url %}<a href="{{ start_page_url }}">{% endif %}
-{{ _('corpus_title') }}
-{% if start_page_url %}</a>{% endif %}
-</span> {% if debug %}{{ _('Corpus name') }}: {{ corpus_name }}.{% endif %}
-{% if locales|length > 1 %}
-&nbsp;&nbsp;
-{% for l_code in locales %}
-	<span class="locale" title="{{ locales[l_code] }}">{{ l_code|upper }}</span>&nbsp;
-	{% if not last %}
-		|&nbsp;
-	{% else %}
-		|&nbsp;&nbsp;
-	{% endif %}
-{% endfor %}
-{% else %}
-<span style="padding-right: 70px;">&nbsp;</span>
-{% endif %}
-{% if generate_dictionary %}
-<span id="show_dictionary" class="glyphicon glyphicon-book" aria-hidden="true"><span class="tooltip_prompt">{{ _('Show dictionary') }}</span></span>
-{% endif %}
-<span id="show_help" class="glyphicon glyphicon-question-sign" aria-hidden="true"><span class="tooltip_prompt">{{ _('Show help') }}</span></span>
-{% if citation %}
-<span id="cite_corpus"><span class="tooltip_prompt">{{ _('How to cite') }}</span><img id="cite_corpus_img" src="static/img/cite.png"></span>
-{% endif %}
-</p>
+{% include "header.html" ignore missing %} <!-- user-defined header, if any -->
+{% include "corpus_header.html" %} <!-- tsakorpus header: corpus name, interface langauges, help link -->
+
 <div id="search_div" class="transitions init-hidden">
 	<div class="show-hide">
 	<div class="query_slide">

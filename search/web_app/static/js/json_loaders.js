@@ -3,7 +3,7 @@ $(function() {
 	$("#search_sent").click(get_sentences);
 	
 	$("#search_sent_json").click(function() {
-		//$("#header").html( $("#search_main").serialize() );
+		//$("#corpus_header").html( $("#search_main").serialize() );
 		$.ajax({
 			url: "search_sent_json",
 			data: $("#search_main").serialize(),
@@ -18,7 +18,7 @@ $(function() {
 	});
 	
 	$("#search_sent_query").click(function() {
-		//$("#header").html( $("#search_main").serialize() );
+		//$("#corpus_header").html( $("#search_main").serialize() );
 		$.ajax({
 			url: "search_sent_query",
 			data: $("#search_main").serialize(),
@@ -310,7 +310,7 @@ function assign_input_events() {
 	$("#show_dictionary").unbind('click');
 	$("#cite_corpus").unbind('click');
 	$("#show_word_stat").unbind('click');
-	$("span.locale").unbind('click');
+	$("a.locale").unbind('click');
 	$(".search_input").unbind('on');
 	$("#viewing_mode").unbind('change');
 	$('#share_query').unbind('click');
@@ -330,7 +330,7 @@ function assign_input_events() {
 	$("#show_dictionary").click(show_dictionary);
 	$("#cite_corpus").click(show_citation);
 	$("#show_word_stat").click(show_word_stats);
-	$("span.locale").click(change_locale);
+	$("a.locale").click(change_locale);
 	$(".search_input").on("keydown", search_if_enter);
 	$("#viewing_mode").change(toggle_interlinear);
 	$('#share_query').click(share_query);
