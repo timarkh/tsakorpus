@@ -1,0 +1,147 @@
+<div id="search_div" class="transitions init-hidden">
+	<div class="show-hide">
+	<div class="query_slide">
+		<form id="search_main">
+		<input type="hidden" name="n_words" id="n_words" value="1">
+		<input type="hidden" name="random_seed" id="random_seed" value={{ random_seed }}>
+		<div class="vertical_nav_tabs">
+            <ul class="nav nav-tabs tabs-left vertical-text">
+                <li class="active" id="word_search_li"><a href="#word_search_tab" data-toggle="tab">{{ _('Query') }}</a></li>
+                <li><a href="#display_options_tab" data-toggle="tab"><span class="glyphicon glyphicon-cog" title="Options"></span></a></li>
+            </ul>
+        </div>
+		<!-- <div> -->
+            <!-- Tab panes -->
+            <div class="tab-content">
+				<div class="tab-pane active" id="word_search_tab">
+					<div class="words_search">
+						<div class="word_search" id="first_word">
+							<div class="word_search_l">
+								<div class="query_word_header"><div class="circle circle_w1"></div>{{ _('Word_header') }} {{ _('Number_sign') }}1</div>
+								<span id="_label_wf1" class="search_label">{{ _('Word:') }}</span> <input type="text" class="search_input" name="wf1" id="wf1"><br>
+								<span id="_label_lex1" class="search_label">{{ _('Lemma:') }}</span> <input type="text" class="search_input" name="lex1" id="lex1"><br>
+								<span id="_label_gr1" class="search_label">{{ _('Grammar:') }}</span> <input type="text" class="search_input gram_selector_input" name="gr1" id="gr1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gr" data-nword="1"></span><br>
+								<input type="hidden" class="search_input" name="w_id1" id="w_id1">
+								<input type="hidden" class="search_input" name="l_id1" id="l_id1">
+								{% if gloss_search_enabled %}
+								<span id="_label_gloss1" class="search_label">{{ _('Gloss:') }}</span> <input type="text" class="search_input gram_selector_input" name="gloss_index1" id="gloss_index1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gloss_index" data-nword="1"></span><br>
+								{% endif %}
+								<hr class="separator">
+								<div class="add_word_fields"></div>
+								{% if languages|length > 1 %}
+									{{ _('Language/tier:') }} <select name="lang1" id="lang1" class="tier_select search_input">
+									{% for lang in languages %}
+									<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
+									{% endfor %}
+									{% if all_lang_search %}
+									<option value="all">{{ _('langname_all') }}</option>
+									{% endif %}
+									</select>
+								{% else %}
+									<select name="lang1" id="lang1" style="display: none; visibility: hidden; height: 0px">
+									{% for lang in languages %}
+									<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
+									{% endfor %}
+									</select>
+								{% endif %}
+							</div>
+							<div class="word_search_r">
+								{% if negative_search_enabled %}
+								<span class="neg_query glyphicon glyphicon-off" aria-label="{{ _('negative_query') }}" aria-hidden="true"><span class="tooltip_prompt">{{ _('negative_query') }}</span></span><br>
+								{% endif %}
+								<span class="word_plus glyphicon glyphicon-plus-sign" aria-label="{{ _('add_word') }}" aria-hidden="true"><span class="tooltip_prompt">{{ _('add_word') }}</span></span><br>
+								<span class="add_minus_stub"></span>
+								<span class="add_distance_stub"></span>
+								<span class="word_expand glyphicon glyphicon-chevron-down" aria-label="{{ _('more_fields') }}" aria-hidden="true"><span class="tooltip_prompt">{{ _('more_fields') }}</span></span><br>
+								<input type="checkbox" class="hidden_input neg_query_checkbox" name="negq1" id="negq1" onclick="negative_query();">
+							</div>
+						</div>
+					</div>
+					<br>
+{% if fulltext_search_enabled %}
+					{{ _('Full-text search:') }} <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise" id="precise"> {{ _('Precise match') }}<br>
+{% endif %}
+				</div>
+		
+				<div class="tab-pane" id="display_options_tab">
+					<div class="options_div">
+						<h3 id="h3_options">{{ _('Additional search and display options') }}</h3>
+						<div class="options_column">
+							{{ _('Results per page:') }} <input type="number" name="page_size" id="page_size" value="10" class="search_input distance_input"><br>
+							{{ _('Sorting:') }} <select name="sort" id="sort" class="search_input">
+								<option value="random" selected>{{ _('random') }}</option>
+								<option value="wf">{{ _('by word (word queries)') }}</option>
+								<option value="lemma">{{ _('by lemma (word queries)') }}</option>
+								<option value="freq">{{ _('by frequency') }}</option>
+								{% if year_sort_enabled %}
+								<option value="year">{{ _('by year (decreasing; sentence queries)') }}</option>
+								{% endif %}
+								{% if debug %}
+								<option value="">{{ _('no sorting') }}</option>
+								{% endif %}
+							</select><br>
+							<input type="checkbox" name="distance_strict" id="distance_strict" checked> {{ _('Word distance requirements are strict') }}<br>
+						</div>
+						<div class="options_column">
+						{{ _('Viewing mode:') }} <select name="viewing_mode" id="viewing_mode" class="search_input">
+							<option value="standard">{{ _('view_standard') }}</option>
+							<option value="glossed">{{ _('view_glossed') }}</option>
+						</select><br>
+						{% if transliterations and transliterations|length > 1 %}
+							{{ _('Transliteration: ') }}<select name="translit" id="translit" class="search_input">
+							{% for tr in transliterations %}
+							<option value="{{ tr }}">{{ _('translitname_' + tr) }}</option>
+							{% endfor %}
+							</select><br>
+						{% endif %}
+						{% if input_methods and input_methods|length > 1 %}
+							{{ _('Character input method: ') }}<select name="input_method" id="input_method" class="search_input">
+							{% for im in input_methods %}
+							<option value="{{ im }}">{{ _('inputmethod_' + im) }}</option>
+							{% endfor %}
+							</select>
+						{% endif %}
+						</div>
+						<div class="options_column_leftalign">
+						{{ _('Annotation layers in glossed mode:') }}<br>
+						<input type="checkbox" name="toggle_lemma" data="lex" class="toggle_glossed_layer" id="toggle_lemma" checked> {{ _('Lemma') }}<br>
+						<input type="checkbox" name="toggle_grammar" data="gramm" class="toggle_glossed_layer" id="toggle_grammar" checked> {{ _('Grammar') }}<br>
+{% if gloss_search_enabled %}
+						<input type="checkbox" name="toggle_gloss" data="gloss" class="toggle_glossed_layer" id="toggle_gloss" checked> {{ _('Gloss') }}<br>
+{% endif %}
+						<input type="checkbox" name="toggle_additional_ana_fields" data="field_ana_other" class="toggle_glossed_layer" id="toggle_additional_ana_fields" checked> {{ _('Additional fields') }}<br>
+						</div>
+					</div>
+				</div>
+			</div>
+		<!-- </div> -->
+		</form>
+		<br>
+		<div class="search_buttons">
+			<div class="btn-group">
+			<button type="button" class="btn btn-default btn-primary" aria-label="{{ _('Search sentences') }}" value="{{ _('Search sentences') }}" id="search_sent">{{ _('Search sentences') }}</button>
+			<button type="button" class="btn btn-default btn-primary" aria-label="{{ _('Search words') }}" value="{{ _('Search words') }}" id="search_word" style="padding-right: 5px;">{{ _('Search words') }}</button>
+			<button type="button" class="btn btn-default btn-primary" aria-label="{{ _('Search lemmata') }}" value="{{ _('Search lemmata') }}" id="search_lemma" style="padding-left: 5px;">{{ _('Search lemmata') }}</button>
+			<button type="button" class="btn btn-default btn-primary" aria-label="{{ _('Words statistics') }}" value="{{ _('Words statistics') }}" id="show_word_stat"><span class="stat_w glyphicon glyphicon-stats"> </span></button>
+			</div>
+			<button type="button" class="btn btn-default btn-info" aria-label="{{ _('Select subcorpus') }}" value="{{ _('Select subcorpus') }}" id="search_doc"><span class="subcorpus_selector_link">{{ _('Select subcorpus') }}</span></button>
+			<div class="btn-group">
+			<button type="button" class="btn btn-default" aria-label="{{ _('Share this query') }}" value="{{ _('Share this query') }}" id="share_query"><span class="glyphicon glyphicon-send"><span class="tooltip_prompt">{{ _('Share this query') }}</span></span></button>
+			<button type="button" class="btn btn-default" aria-label="{{ _('Load external query') }}" value="{{ _('Load external query') }}" id="load_query"><span class="glyphicon glyphicon-download"><span class="tooltip_prompt">{{ _('Load external query') }}</span></span></button>
+			</div>
+			{% if debug %}
+				<br>
+				<button value="Search sentences (q)" id="search_sent_query" style="width:200px;">Search sentences (show query)</button>
+				<button value="Search words (q)" id="search_word_query" style="width:200px;">Search words (show query)</button>
+				<button value="Search lemmata (q)" id="search_lemma_query" style="width:200px;">Search lemmata (show query)</button>
+				<button value="Search documents (q)" id="search_doc_query" style="width:200px;">Search documents (show query)</button><br>
+				<button value="Search sentences (r)" id="search_sent_json" style="width:200px;">Search sentences (show JSON response)</button>
+				<button value="Search words (r)" id="search_word_json" style="width:200px;">Search words (show JSON response)</button>
+				<button value="Search lemmata (r)" id="search_lemma_json" style="width:200px;">Search lemmata (show JSON response)</button>
+				<button value="Search documents (r)" id="search_doc_json" style="width:200px;">Search documents (show JSON response)</button>
+			{% endif %}
+		</div>
+	</div>
+<div class="hide_query_button" align="center"><a href="#" rel="toggle-query_slide"><img src="static/img/arrow_up.png" class="img-swap" /><span id="hide_query_caption">{{ _('Back to search') }}</span></a></div>
+</div>
+</div>

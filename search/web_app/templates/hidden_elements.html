@@ -1,0 +1,72 @@
+<div id="analysis"></div>
+
+<div class="modal fade" id="gram_selector" tabindex="-1" role="dialog" aria-labelledby="gram_sel_header" aria-hidden="true" data-field="gr1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="gram_sel_header">Grammar selection header</h4>
+			</div>
+			<div class="modal-body" id="gram_sel_body">
+			<p>Grammar selection body</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="help_dialogue" tabindex="-1" role="dialog" aria-labelledby="help_dialogue_header" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="help_dialogue_header">{{ _('Help') }}</h4>
+			</div>
+			<div class="modal-body" id="help_dialogue_body">
+			<p>The help text should be loaded here.</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="dictionary_dialogue" tabindex="-1" role="dialog" aria-labelledby="dictionary_dialogue_header" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="dictionary_dialogue_header">{{ _('Dictionary_header') }}</h4>
+			</div>
+			<div class="modal-body" id="dictionary_dialogue_body">
+			<p>The dictionary text should be loaded here.</p>
+			</div>
+		</div>
+	</div>
+</div>
+{% if citation %}
+<div class="modal fade" id="citation_dialogue" tabindex="-1" role="dialog" aria-labelledby="citation_dialogue_header" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="citation_dialogue_header">{{ _('How to cite') }}</h4>
+			</div>
+			<div class="modal-body" id="citation_dialogue_body">
+			<p>{{ citation | safe }}</p>
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
+{% if images %}
+<div class="modal fade" id="full_image" tabindex="-1" role="dialog" aria-labelledby="full_image_header" aria-hidden="true" data-field="gr1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			</div>
+			<div class="modal-body" id="full_image_body">
+			<img id="img_fullres" src="">
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
