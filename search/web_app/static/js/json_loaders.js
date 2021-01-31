@@ -299,14 +299,14 @@ function get_sentences_page(page) {
 }
 
 function assign_input_events() {
-	$("span.word_plus").unbind('click');
-	$("span.word_minus").unbind('click');
-	$("span.word_expand").unbind('click');
-	$("span.add_rel").unbind('click');
-	$("span.gram_selector_link").unbind('click');
+	$(".word_plus").unbind('click');
+	$(".word_minus").unbind('click');
+	$(".word_expand").unbind('click');
+	$(".add_rel").unbind('click');
+	$(".gram_selector_link").unbind('click');
 	$("#search_doc").unbind('click');
 	//$("neg_query_checkbox").unbind('change');
-	$("span.neg_query").unbind('click');
+	$(".neg_query").unbind('click');
 	$("#show_help").unbind('click');
 	$("#show_dictionary").unbind('click');
 	$("#cite_corpus").unbind('click');
@@ -319,14 +319,14 @@ function assign_input_events() {
 	$('#query_load_ok').unbind('click');
 	$('.toggle_glossed_layer').unbind('click');
 	$(".tier_select").unbind('change');
-	$("span.word_plus").click(add_word_inputs);
-	$("span.word_minus").click(del_word_inputs);
-	$("span.word_expand").click(expand_word_input);
-	$("span.add_rel").click(add_word_relations);
-	$("span.gram_selector_link").click(choose_tags);
+	$(".word_plus").click(add_word_inputs);
+	$(".word_minus").click(del_word_inputs);
+	$(".word_expand").click(expand_word_input);
+	$(".add_rel").click(add_word_relations);
+	$(".gram_selector_link").click(choose_tags);
 	$("#search_doc").click(select_subcorpus);
 	//$("neg_query_checkbox").change(negative_query);
-	$("span.neg_query").click(negative_query_span);
+	$(".neg_query").click(negative_query_span);
 	$("#show_help").click(show_help);
 	$("#show_dictionary").click(show_dictionary);
 	$("#cite_corpus").click(show_citation);
@@ -344,7 +344,7 @@ function assign_input_events() {
 
 function assign_tooltips() {
 	$("[data-tooltip=tooltip]").tooltip({
-		trigger: 'hover focus manual',
+		trigger: 'hover manual',
 		delay: { "show": 150, "hide": 0 }
 	});	
 }
@@ -384,6 +384,7 @@ function assign_show_hide() {
 function negative_query(e, thisSpan) {
 	var word_div = $(thisSpan).parent().parent();
 	var word_r_div = $(thisSpan).parent();
+	word_r_div.toggleClass('negated');
 	if (word_div.css("background-color") != "rgb(20, 20, 20)") {
 		word_div.css({"background-color": "rgb(20, 20, 20)", "color": "#fff"});
 		word_r_div.css({"background-color": "rgb(60, 50, 60)", "color": "#fff"});
@@ -401,13 +402,14 @@ function negative_query_span(e) {
 }
 
 function add_word_inputs(e) {
+	hide_tooltips();
 	var new_word_num = parseInt($("#n_words").attr('value'));
 	if (new_word_num <= 0) { return; }
 	new_word_num += 1;
 	word_div_html = '<div class="word_search" id="wsearch_' + new_word_num + '">\n' + $('#first_word').html();
 	word_div_html = word_div_html.replace(/1/g, new_word_num)
-	word_div_html = word_div_html.replace('<span class="add_minus_stub">', '<span class="word_minus glyphicon glyphicon-minus-sign" data-nword="' + new_word_num + '"><span class="tooltip_prompt">' + removeWordCaption + '</span></span><br>');
-	word_div_html = word_div_html.replace('<span class="add_distance_stub">', '<span class="add_rel glyphicon glyphicon-resize-full" data-nword="' + new_word_num + '" data-nrels="0"><span class="tooltip_prompt">' + addDistCaption + '</span></span><br>');
+	word_div_html = word_div_html.replace('<a class="add_minus_stub">', '<a class="word_minus bi bi-dash-circle-fill" data-nword="' + new_word_num + '" data-tooltip="tooltip" data-placement="right" title="' + removeWordCaption + '"></a><br>');
+	word_div_html = word_div_html.replace('<a class="add_distance_stub">', '<a class="add_rel bi bi-arrows-angle-expand" data-nword="' + new_word_num + '" data-nrels="0" data-tooltip="tooltip" data-placement="right" title="' + addDistCaption + '"></a><br>');
 	word_div_html += '</div>';
 	word_div = $.parseHTML(word_div_html);
 	$("div.words_search").append(word_div);

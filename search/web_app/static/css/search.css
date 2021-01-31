@@ -384,34 +384,17 @@
 	padding-right: 5px;
 }
 
-.add_rel {
-	margin-top: 5px;
+.add_rel, .word_plus, .word_minus, .word_expand, .neg_query {
+	margin-bottom: 3px;
 	margin-left: 5px;
-	font-size: 20px;
+	margin-right: 5px;
+	font-size: 22px;
+	color: #333;
+	display: inline-block;
 }
 
-.word_plus {
-	margin-top: 5px;
-	margin-left: 5px;
-	font-size: 20px;
-}
-
-.word_minus {
-	margin-top: 5px;
-	margin-left: 5px;
-	font-size: 20px;
-}
-
-.word_expand {
-	margin-top: 5px;
-	margin-left: 5px;
-	font-size: 20px;
-}
-
-.neg_query {
-	margin-top: 5px;
-	margin-left: 5px;
-	font-size: 20px;
+.negated .add_rel, .negated .word_plus, .negated .word_minus, .negated .word_expand, .negated .neg_query  {
+	color: #fff;
 }
 
 .word_plus:hover {
@@ -483,35 +466,6 @@
 	font-size: 16px;
 	opacity: 0.85;
 	font-family: Helvetica, sans-serif;
-}
-
-/* Show the tooltip text when you mouse over the tooltip container */
-.add_rel:hover .tooltip_prompt {
-    visibility: visible;
-}
-
-.word_plus:hover .tooltip_prompt {
-    visibility: visible;
-}
-
-.word_minus:hover .tooltip_prompt {
-    visibility: visible;
-}
-
-.word_expand:hover .tooltip_prompt {
-    visibility: visible;
-}
-
-.neg_query:hover .tooltip_prompt {
-    visibility: visible;
-}
-
-#show_help:hover .tooltip_prompt {
-    visibility: visible;
-}
-
-#show_dictionary:hover .tooltip_prompt {
-    visibility: visible;
 }
 
 .btn:hover .tooltip_prompt {
@@ -874,14 +828,22 @@ hr.separator {
 .tabs-left>li.active>a:focus {
   border-bottom-color: #ccc;
   border-right-color: transparent;
-  color: #51360b;
-  font-size: 1.3em;
+  color: #bf8b11;
+  margin-left: 0;
+  padding: 20px 1em;
+  margin-right: -1px;
 }
 
 .tabs-left>li>a {
+  border-color: #ccc transparent #ccc #ccc;
   border-radius: 4px 0 0 4px;
-  padding: 1em 15px;
+  padding: 20px 1em 20px 0.6em;
+  line-height: 1;
+  font-size: 1.3em;
+  color: #53687a;
+  background-color: #f7f7f7;
   display: block;
+  margin-left: 0.3em;
 }
 
 .vertical-text {

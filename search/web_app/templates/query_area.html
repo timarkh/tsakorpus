@@ -47,12 +47,12 @@
 							</div>
 							<div class="word_search_r">
 								{% if negative_search_enabled %}
-								<span class="neg_query glyphicon glyphicon-off" aria-label="{{ _('negative_query') }}" aria-hidden="true"><span class="tooltip_prompt">{{ _('negative_query') }}</span></span><br>
+								<a class="neg_query bi bi-cart-x-fill" data-tooltip="tooltip" data-placement="right" title="{{ _('negative_query') }}"></a><br>
 								{% endif %}
-								<span class="word_plus glyphicon glyphicon-plus-sign" aria-label="{{ _('add_word') }}" aria-hidden="true"><span class="tooltip_prompt">{{ _('add_word') }}</span></span><br>
-								<span class="add_minus_stub"></span>
-								<span class="add_distance_stub"></span>
-								<span class="word_expand glyphicon glyphicon-chevron-down" aria-label="{{ _('more_fields') }}" aria-hidden="true"><span class="tooltip_prompt">{{ _('more_fields') }}</span></span><br>
+								<a class="word_plus bi bi-plus-circle-fill" data-tooltip="tooltip" data-placement="right" title="{{ _('add_word') }}"></a><br>
+								<a class="add_minus_stub"></a>
+								<a class="add_distance_stub"></a>
+								<a class="word_expand bi bi-box-arrow-down" data-tooltip="tooltip" data-placement="right" title="{{ _('more_fields') }}"></a><br>
 								<input type="checkbox" class="hidden_input neg_query_checkbox" name="negq1" id="negq1" onclick="negative_query();">
 							</div>
 						</div>
