@@ -5,9 +5,9 @@
 		<input type="hidden" name="n_words" id="n_words" value="1">
 		<input type="hidden" name="random_seed" id="random_seed" value={{ random_seed }}>
 		<div class="vertical_nav_tabs">
-            <ul class="nav nav-tabs tabs-left vertical-text">
-                <li class="active" id="word_search_li"><a href="#word_search_tab" data-toggle="tab">{{ _('Query') }}</a></li>
-                <li><a href="#display_options_tab" data-toggle="tab"><span class="glyphicon glyphicon-cog" title="Options"></span></a></li>
+            <ul class="nav nav-tabs tabs-left">
+                <li class="active" id="word_search_li"><a href="#word_search_tab" data-toggle="tab" class="bi bi-search" data-tooltip="tooltip" data-placement="top" title="{{ _('Query') }}"></a></li>
+                <li><a href="#display_options_tab" data-toggle="tab" class="bi bi-gear-fill" data-tooltip="tooltip" data-placement="top" title="{{ _('Options') }}"></a></li>
             </ul>
         </div>
 		<!-- <div> -->

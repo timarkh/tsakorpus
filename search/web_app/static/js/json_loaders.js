@@ -1,4 +1,5 @@
 $(function() {
+	$("[data-toggle=tab]").click(hide_tooltips);
 	
 	$("#search_sent").click(get_sentences);
 	
@@ -338,6 +339,18 @@ function assign_input_events() {
 	$('#query_load_ok').click(load_query);
 	$('.toggle_glossed_layer').click(toggle_glossed_layer);
 	$(".tier_select").change(change_tier);
+	assign_tooltips();
+}
+
+function assign_tooltips() {
+	$("[data-tooltip=tooltip]").tooltip({
+		trigger: 'hover focus manual',
+		delay: { "show": 150, "hide": 0 }
+	});	
+}
+
+function hide_tooltips() {
+	$("[data-tooltip=tooltip]").tooltip('hide');
 }
 
 function assign_show_hide() {

@@ -22,10 +22,10 @@
 		<span style="padding-right: 70px;">&nbsp;</span>
 	{% endif %}
 	{% if generate_dictionary %}
-		<a id="show_dictionary" class="glyphicon glyphicon-book" aria-hidden="true"><span class="tooltip_prompt">{{ _('Show dictionary') }}</span></a>
+		<a id="show_dictionary" class="bi bi-journal-bookmark-fill" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Show dictionary') }}"></a>
 	{% endif %}
-	<a id="show_help" class="glyphicon glyphicon-question-sign" aria-hidden="true"><span class="tooltip_prompt">{{ _('Show help') }}</span></a>
+	<a id="show_help" class="bi bi-question-circle-fill" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Show help') }}"></a>
 	{% if citation %}
-		<a id="cite_corpus"><span class="tooltip_prompt">{{ _('How to cite') }}</span><img id="cite_corpus_img" src="static/img/cite.png"></a>
+		<a id="cite_corpus" class="bi bi-chat-quote" data-tooltip="tooltip" data-placement="bottom" title="{{ _('How to cite') }}"></a>
 	{% endif %}
 </header>

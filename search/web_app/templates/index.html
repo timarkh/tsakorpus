@@ -4,7 +4,8 @@
 	<title>{{ _('corpus_title') }} - {{ _('Corpus search page') }}</title>
 	<link rel="stylesheet" type="text/css" href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="static/css/search.css">
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script type='text/javascript' src='static/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
@@ -51,7 +52,7 @@
 {% include "subcorpus_selection.html" %}
 {% include "word_stats.html" %}
 
-{% include "footer.html" ignore missing %}
+{% include "footer.html" ignore missing %} <!-- user-defined footer, if any -->
 <script type='text/javascript' src='static/js/select_subcorpus.js'></script>
 </body>
 {% if media %}

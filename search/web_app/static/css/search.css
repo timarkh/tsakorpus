@@ -473,22 +473,15 @@
 	color: #2664c9;
 }
 
-.tooltip_prompt {
-    visibility: hidden;
+.tooltip-inner {
     background-color: white;
     color: #333;
     text-align: center;
     padding: 5px 15px;
-	margin-left: -35%;
-	margin-top: 5px;
-	top: 100%;
-	left: 50%;
     border-radius: 6px;
 	border: 1px solid gray;
-    position: absolute;
-    z-index: 1;
-	opacity: 0.75;
 	font-size: 16px;
+	opacity: 0.85;
 	font-family: Helvetica, sans-serif;
 }
 
@@ -870,7 +863,6 @@ hr.separator {
 
 .tabs-left>li {
   float: none;
-  margin-bottom: 2px;
 }
 
 .tabs-left>li {
@@ -883,12 +875,12 @@ hr.separator {
   border-bottom-color: #ccc;
   border-right-color: transparent;
   color: #51360b;
-  font-size: 1.1em;
+  font-size: 1.3em;
 }
 
 .tabs-left>li>a {
   border-radius: 4px 0 0 4px;
-  margin-right: 0;
+  padding: 1em 15px;
   display: block;
 }
 
@@ -944,7 +936,7 @@ hr.separator {
 
 .vertical_nav_tabs {
 	padding-left: 10px;
-	width: 40px;
+	width: 4em;
 	position: relative;
 	float: left;
 }
