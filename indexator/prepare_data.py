@@ -242,7 +242,8 @@ class PrepareData:
                         'type': 'keyword',
                         'index': False
                     },
-                }},
+                }
+            },
             'para_ids': {'type': 'keyword'},
             'para_alignment': {
                 'type': 'nested',
@@ -280,7 +281,8 @@ class PrepareData:
                         'type': 'keyword',
                         'index': False
                     }
-                }},
+                }
+            },
             'segment_ids': {
                 'type': 'integer',
                 'index': False

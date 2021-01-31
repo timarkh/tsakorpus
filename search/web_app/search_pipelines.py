@@ -390,8 +390,11 @@ def find_sentences_json(page=0):
         change_display_options(query)
         sortOrder = get_session_data('sort')
         if (sortOrder not in ('random', 'freq', 'year')
-                or sortOrder == 'year' and not settings.year_sort_enabled):
+                or sortOrder == 'year' and not settings.year_sort_enabled
+                or sortOrder == '' and not settings.debug):
             set_session_data('sort', 'random')
+        elif sortOrder == '':
+            set_session_data('sort', 'no')
         set_session_data('last_query', query)
         wordConstraints = sc.qp.wr.get_constraints(query)
         set_session_data('word_constraints', wordConstraints)
@@ -457,7 +460,7 @@ def find_sentences_json(page=0):
         queryWordConstraints = wordConstraints
 
     nOccurrences = 0
-    if (get_session_data('sort') in ('random', 'freq')
+    if (get_session_data('sort') in ('random', 'freq', 'year')
             and (nWords == 1
                  or len(wordConstraints) <= 0
                  or not distance_constraints_too_complex(wordConstraints))):

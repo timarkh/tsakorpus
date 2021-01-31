@@ -1323,6 +1323,7 @@ class SentenceViewer:
             return result
         result['message'] = ''
         result['n_sentences'] = response['hits']['total']['value']
+        # response['hits']['total']['value'] is limited by 10,000 now, so we'll try to take this value from elsewhere
         result['contexts'] = []
         result['languages'] = []
         resultLanguages = set()
@@ -1332,6 +1333,7 @@ class SentenceViewer:
                 result['n_docs'] = int(response['aggregations']['agg_ndocs']['value'])
             if result['n_docs'] > 0 and 'agg_nwords' in response['aggregations']:
                 result['n_occurrences'] = int(math.floor(response['aggregations']['agg_nwords']['sum']))
+                result['n_sentences'] = int(math.floor(response['aggregations']['agg_nwords']['count']))
         for iHit in range(len(response['hits']['hits'])):
             langID, lang = self.get_lang_from_hit(response['hits']['hits'][iHit])
             langView = lang
@@ -1367,9 +1369,11 @@ class SentenceViewer:
                 or response['hits']['total']['value'] <= 0):
             return result
         result['message'] = ''
-        result['n_occurrences'] = response['hits']['total']['value']
+        # result['n_occurrences'] = response['hits']['total']['value']
+        # response['hits']['total']['value'] is limited by 10,000
+        result['n_occurrences'] = response['aggregations']['agg_noccurrences']['value']
         result['n_docs'] = response['aggregations']['agg_ndocs']['value']
-        result['total_freq'] = response['aggregations']['agg_freq']['value']
+        result['total_freq'] = int(round(response['aggregations']['agg_freq']['value']))
         result['words'] = []
         for iHit in range(len(response['hits']['hits'])):
             langID, lang = self.get_lang_from_hit(response['hits']['hits'][iHit])

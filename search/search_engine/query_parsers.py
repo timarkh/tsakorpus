@@ -403,7 +403,8 @@ class InterfaceQueryParser:
             }
             esQuery['aggs'] = {
                 'agg_ndocs': {'cardinality': {'field': 'dids'}},
-                'agg_freq': {'sum': {'field': 'freq'}}
+                'agg_freq': {'sum': {'field': 'freq'}},
+                'agg_noccurrences': {'value_count': {'field': '_id'}}
             }
             if groupBy == 'lemma':
                 esQuery['size'] = 0
@@ -516,11 +517,16 @@ class InterfaceQueryParser:
                     query['bool']['must'] = [{'term': {'lang': lang}}]
                 else:
                     query['bool']['must'].append({'term': {'lang': lang}})
-            # Do not look for the empty lemma, which has an index of l0
+            # Do not look for the empty word or empty lemma, which have indexes of w0 and l0
+            emptyItem = 'w0'    # for words
+            idField = 'w_id'
+            if groupBy == 'lemma':
+                emptyItem = 'l0'
+                idField = 'l_id'
             if 'must_not' not in query['bool']:
-                query['bool']['must_not'] = [{'term': {'l_id': 'l0'}}]
+                query['bool']['must_not'] = [{'term': {idField: emptyItem}}]
             else:
-                query['bool']['must_not'].append({'term': {'l_id': 'l0'}})
+                query['bool']['must_not'].append({'term': {idField: emptyItem}})
             # if docIDs is not None:
             #     if 'filter' not in query['bool']:
             #         query['bool']['filter'] = [{'terms': {'dids': docIDs}}]
@@ -767,7 +773,7 @@ class InterfaceQueryParser:
 
         if sortOrder in ('random', 'year'):
             query = self.make_random(query, randomSeed)
-        else:
+        elif sortOrder != 'no':
             query = self.make_half_random(query, randomSeed)
 
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
@@ -800,6 +806,7 @@ class InterfaceQueryParser:
         query = {'function_score': {'query': query,
                                     'boost_mode': 'replace',
                                     'random_score': {}}}
+
         if randomSeed is not None:
             query['function_score']['random_score']['seed'] = str(randomSeed)
         return query

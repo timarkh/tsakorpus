@@ -689,7 +689,10 @@ msgstr "Загрузить как XLSX"
 
 #: templates/result_words.html:1
 msgid "Search result:"
-msgstr "Результат поиска: найдено"
+msgid_plural "Search result:"
+msgstr[0] "Результат поиска: найдена"
+msgstr[1] "Результат поиска: найдены"
+msgstr[2] "Результат поиска: найдено"
 
 #: templates/result_words.html:1
 msgid "unique word"
@@ -819,22 +822,22 @@ msgid "The search was not finished due to the query timeout. You only see partia
 msgstr "Поиск не был завершён, потому что истекло время ожидания. Показаны не все результаты."
 
 msgid "occurrence"
-msgstr "словоформа"
+msgid_plural "occurrences"
+msgstr[0] "словоформа"
+msgstr[1] "словоформы"
+msgstr[2] "словоформ"
 
-msgid "occurrence_1"
-msgstr "словоформа"
+msgid "sentence found in approximately"
+msgid_plural "sentences found in approximately"
+msgstr[0] "предложение примерно в"
+msgstr[1] "предложения примерно в"
+msgstr[2] "предложений примерно в"
 
-msgid "occurrences_2-4"
-msgstr "словоформы"
-
-msgid "occurrences"
-msgstr "словоформ"
-
-msgid "sentence(s) found in approximately"
-msgstr "предложений примерно в"
-
-msgid "document(s)"
-msgstr "документах"
+msgid "in_document"
+msgid_plural "in_documents"
+msgstr[0] "документе"
+msgstr[1] "документах"
+msgstr[2] "документах"
 
 msgid "Viewing mode:"
 msgstr "Выдача:"

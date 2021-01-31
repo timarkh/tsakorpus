@@ -4,11 +4,10 @@
 {% if data.subcorpus_enabled %}
 <p class="message">{{ _('You are searching in a subcorpus.') }}</p>
 {% endif %}
-<p>{{ _('Search result:') }}
-{% if data.n_occurrences > 0 %}
-{{ data.n_occurrences }} {% if data.n_occurrences == 1 %}{{ _('occurrence') }}{% elif data.n_occurrences % 10 == 1 and data.n_occurrences % 100 != 11 %}{{ _('occurrence_1') }}{% elif 2 <= data.n_occurrences % 10 <= 4 and not 12 <= data.n_occurrences % 100 <= 14 %}{{ _('occurrences_2-4') }}{% else %}{{ _('occurrences') }}{% endif %},
-{% endif %}
-{{ data.n_sentences }} {{ _('sentence(s) found in approximately') }} {{ data.n_docs }} {{ _('document(s)') }}.</p>
+<p>{{ ngettext('Search result:', 'Search result:', data.n_occurrences) }}
+{{ data.n_occurrences }} {{ ngettext('occurrence', 'occurrences', data.n_occurrences) }},
+{{ data.n_sentences }} {{ ngettext('sentence found in approximately', 'sentences found in approximately', data.n_sentences) }}
+{{ data.n_docs }} {{ ngettext('in_document', 'in_documents', data.n_docs) }}.</p>
 
 <div class="sent_results">
 {% for c in data.contexts %}
@@ -45,18 +44,23 @@ var srcAlignments = {{ data.src_alignment | safe }};
 
 {% if data.contexts|length > 0 %}
 	<div class="pages">
-	{% for i_page in range(-5, 6) %}
-		{% if (data.page + i_page > 0) and (data.page + i_page < data.n_sentences / data.page_size + 1) %}
-		{% if i_page == 0 %}
-		<span class="cur_page">{{ data.page + i_page }}</span>&nbsp;
-		{% else %}
-		<span class="page_link" data-page="{{ data.page + i_page }}">{{ data.page + i_page }}</span>&nbsp;
+		{% if data.page - 6 > 0 %}
+		<span class="page_link" data-page="1">1</span>&nbsp;
+		...&nbsp;
 		{% endif %}
+		{% for i_page in range(-5, 6) %}
+			{% if (data.page + i_page > 0) and (data.page + i_page < data.n_sentences / data.page_size + 1) %}
+			{% if i_page == 0 %}
+			<span class="cur_page">{{ data.page + i_page }}</span>&nbsp;
+			{% else %}
+			<span class="page_link" data-page="{{ data.page + i_page }}">{{ data.page + i_page }}</span>&nbsp;
+			{% endif %}
+			{% endif %}
+		{% endfor %}
+		{% if data.page + 7 < data.n_sentences / data.page_size + 1 %}
+		<span class="page_link">...</span>&nbsp;
+		<span class="page_link" data-page="{{ (data.n_sentences - 1) // data.page_size + 1 }}">{{ (data.n_sentences - 1) // data.page_size + 1 }}</span>&nbsp;
 		{% endif %}
-	{% endfor %}
-	{% if data.page + 7 < data.n_sentences / data.page_size + 1 %}
-	<span class="page_link">...</span>&nbsp;
-	{% endif %}
 	</div>
 	<a href="download_cur_results_csv" download="results-{{ data.page }}.csv">{{ _('download as CSV') }}</a>
 	<a href="download_cur_results_xlsx" download="results-{{ data.page }}.xlsx">{{ _('download as XLSX') }}</a>
