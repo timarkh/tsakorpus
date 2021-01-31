@@ -49,7 +49,7 @@ var srcAlignments = {{ data.src_alignment | safe }};
 		...&nbsp;
 		{% endif %}
 		{% for i_page in range(-5, 6) %}
-			{% if (data.page + i_page > 0) and (data.page + i_page < data.n_sentences / data.page_size + 1) %}
+			{% if (data.page + i_page > 0) and (data.page + i_page <= max_page_number) %}
 			{% if i_page == 0 %}
 			<span class="cur_page">{{ data.page + i_page }}</span>&nbsp;
 			{% else %}
@@ -57,9 +57,11 @@ var srcAlignments = {{ data.src_alignment | safe }};
 			{% endif %}
 			{% endif %}
 		{% endfor %}
-		{% if data.page + 7 < data.n_sentences / data.page_size + 1 %}
-		<span class="page_link">...</span>&nbsp;
-		<span class="page_link" data-page="{{ (data.n_sentences - 1) // data.page_size + 1 }}">{{ (data.n_sentences - 1) // data.page_size + 1 }}</span>&nbsp;
+		{% if data.page + 7 <= max_page_number %}
+		...&nbsp;
+		{% endif %}
+		{% if data.page + 6 <= max_page_number %}
+		<span class="page_link" data-page="{{ max_page_number }}">{{ max_page_number }}</span>&nbsp;
 		{% endif %}
 	</div>
 	<a href="download_cur_results_csv" download="results-{{ data.page }}.csv">{{ _('download as CSV') }}</a>

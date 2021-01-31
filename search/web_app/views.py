@@ -329,8 +329,12 @@ def search_sent(page=-1):
     if 'subcorpus_enabled' in hits:
         hitsProcessed['subcorpus_enabled'] = True
     cur_search_context().sync_page_data(hitsProcessed['page'], hitsProcessed)
+    maxPageNumber = (min(hitsProcessed['n_sentences'], settings.max_hits_retrieve) - 1) \
+                    // hitsProcessed['page_size'] + 1
 
-    return render_template('result_sentences.html', data=hitsProcessed)
+    return render_template('result_sentences.html',
+                           data=hitsProcessed,
+                           max_page_number=maxPageNumber)
 
 
 @app.route('/get_sent_context/<int:n>')

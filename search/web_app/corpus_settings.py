@@ -43,6 +43,7 @@ class CorpusSettings:
         self.max_words_in_sentence = 40
         self.max_context_expand = 5
         self.max_distance_filter = 200000
+        self.max_hits_retrieve = 10000
         self.query_timeout = 60
 
         # Interface options and tools
