@@ -1,12 +1,12 @@
-# English translations for PROJECT.
-# Copyright (C) 2017 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+# English translations for Tsakorpus.
+# Copyright (C) 2017-2021 Timofey Arkhangelskiy
+# This file is distributed under the same license as the Tsakorpus project.
+# Timofey Arkhangelskiy <timarkh@gmail.com>, 2017-2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"Report-Msgid-Bugs-To: timarkh@gmail.com\n"
 "POT-Creation-Date: 2017-09-20 17:03+0200\n"
 "PO-Revision-Date: 2017-09-20 17:03+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
@@ -650,29 +650,15 @@ msgstr "Filter result:"
 
 #: templates/result_docs.html:1
 msgid "document with"
-msgstr "document with"
-
-msgid "documents_1 with"
-msgstr "documents with"
-
-msgid "documents_2-4 with"
-msgstr "documents with"
-
-msgid "documents with"
-msgstr "documents with"
+msgid_plural "documents with"
+msgstr[0] "document with"
+msgstr[1] "documents with"
 
 #: templates/result_docs.html:1
 msgid "word found,"
-msgstr "word found,"
-
-msgid "words_1 found,"
-msgstr "words found,"
-
-msgid "words_2-4 found,"
-msgstr "words found,"
-
-msgid "words found,"
-msgstr "words found,"
+msgid_plural "words found,"
+msgstr[0] "word found,"
+msgstr[1] "words found,"
 
 #: templates/result_docs.html:1
 msgid "of the entire corpus."
@@ -694,36 +680,30 @@ msgstr[1] "Search result:"
 
 #: templates/result_words.html:1
 msgid "unique word"
-msgstr "unique word"
+msgid_plural "different words"
+msgstr[0] "unique word"
+msgstr[1] "different words"
 
-msgid "different words_1"
-msgstr "different words"
-
-msgid "different words_2-4"
-msgstr "different words"
-
-msgid "different words"
-msgstr "different words"
+msgid "unique lemma"
+msgid_plural "different lemmata"
+msgstr[0] "unique lemma"
+msgstr[1] "different lemmata"
 
 msgid "in approximately"
 msgstr "in approximately"
 
 #: templates/result_words.html:1
 msgid "document found,"
-msgstr "document found,"
-
-msgid "documents_1 found,"
-msgstr "documents found,"
-
-msgid "documents_2-4 found,"
-msgstr "documents found,"
-
-msgid "documents found,"
-msgstr "documents found,"
+msgid_plural "documents found,"
+msgstr[0] "document found,"
+msgstr[1] "documents found,"
 
 #: templates/result_words.html:1
 msgid "total frequency:"
 msgstr "total frequency:"
+
+msgid "total frequency of found word forms:"
+msgstr "total frequency of found word forms:"
 
 msgid "Dictionary_header"
 msgstr "Dictionary"

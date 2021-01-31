@@ -2,9 +2,13 @@
 	{% if data.timeout %}
 	<p class="message">{{ _('The search was not finished due to the query timeout. You only see partial results.') }}</p>
 	{% endif %}
-	<p>{{ _('Search result:') }}
-	{{ data.n_occurrences }} {% if data.n_occurrences == 1 %}{{ _('unique word') }}{% elif data.n_occurrences % 10 == 1 and data.n_occurrences % 100 != 11 %}{{ _('different words_1') }}{% elif 2 <= data.n_occurrences % 10 <= 4 and not 12 <= data.n_occurrences % 100 <= 14 %}{{ _('different words_2-4') }}{% else %}{{ _('different words') }}{% endif %}
-	{{ _('in approximately') }} {{ data.n_docs }} {% if data.n_docs == 1 %}{{ _('document found,') }}{% elif data.n_docs % 10 == 1 and data.n_docs % 100 != 11 %}{{ _('documents_1 found,') }}{% elif 2 <= data.n_docs % 10 <= 4 and not 12 <= data.n_docs % 100 <= 14 %}{{ _('documents_2-4 found,') }}{% else %}{{ _('documents found,') }}{% endif %}
+	<p>{{ ngettext('Search result:', 'Search result:', data.n_occurrences) }}
+	{% if search_type == "word" %}
+	{{ data.n_occurrences }} {{ ngettext('unique word', 'different words', data.n_occurrences) }} 
+	{% elif search_type == "lemma" %}
+	{{ data.n_occurrences }} {{ ngettext('unique lemma', 'different lemmata', data.n_occurrences) }} 
+	{% endif %}
+	{{ _('in approximately') }} {{ data.n_docs }} {{ ngettext('document found,', 'documents found,', data.n_docs) }}
 	{% if search_type == "word" %}
 	{{ _('total frequency:') }} {{ data.total_freq }}.
 	{% elif search_type == "lemma" %}

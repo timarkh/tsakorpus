@@ -1,12 +1,12 @@
-# Russian translations for PROJECT.
-# Copyright (C) 2017 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+# Russian translations for Tsakorpus.
+# Copyright (C) 2017-2021 Timofey Arkhangelskiy
+# This file is distributed under the same license as the Tsakorpus project.
+# Timofey Arkhangelskiy <timarkh@gmail.com>, 2017-2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"Report-Msgid-Bugs-To: timarkh@gmail.com\n"
 "POT-Creation-Date: 2017-09-20 17:03+0200\n"
 "PO-Revision-Date: 2017-09-20 17:03+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
@@ -651,29 +651,17 @@ msgstr "Результаты отбора:"
 
 #: templates/result_docs.html:1
 msgid "document with"
-msgstr "документ с"
-
-msgid "documents_1 with"
-msgstr "документ с"
-
-msgid "documents_2-4 with"
-msgstr "документа с"
-
-msgid "documents with"
-msgstr "документов с"
+msgid_plural "documents with"
+msgstr[0] "документ с"
+msgstr[1] "документа с"
+msgstr[2] "документов с"
 
 #: templates/result_docs.html:1
 msgid "word found,"
-msgstr "словом,"
-
-msgid "words_1 found,"
-msgstr "словом,"
-
-msgid "words_2-4 found,"
-msgstr "словами,"
-
-msgid "words found,"
-msgstr "словами,"
+msgid_plural "words found,"
+msgstr[0] "словом,"
+msgstr[1] "словами,"
+msgstr[2] "словами,"
 
 #: templates/result_docs.html:1
 msgid "of the entire corpus."
@@ -696,36 +684,33 @@ msgstr[2] "Результат поиска: найдено"
 
 #: templates/result_words.html:1
 msgid "unique word"
-msgstr "уникальная словоформа"
+msgid_plural "different words"
+msgstr[0] "уникальная словоформа"
+msgstr[1] "разных словоформы"
+msgstr[2] "разных словоформ"
 
-msgid "different words_1"
-msgstr "уникальная словоформа"
-
-msgid "different words_2-4"
-msgstr "разных словоформы"
-
-msgid "different words"
-msgstr "разных словоформ"
+msgid "unique lemma"
+msgid_plural "different lemmata"
+msgstr[0] "уникальная лемма"
+msgstr[1] "разных леммы"
+msgstr[2] "разных лемм"
 
 msgid "in approximately"
 msgstr "примерно в"
 
 #: templates/result_words.html:1
 msgid "document found,"
-msgstr "документе,"
-
-msgid "documents_1 found,"
-msgstr "документе,"
-
-msgid "documents_2-4 found,"
-msgstr "документах,"
-
-msgid "documents found,"
-msgstr "документах,"
+msgid_plural "documents found,"
+msgstr[0] "документе,"
+msgstr[1] "документах,"
+msgstr[2] "документах,"
 
 #: templates/result_words.html:1
 msgid "total frequency:"
 msgstr "суммарная частотность:"
+
+msgid "total frequency of found word forms:"
+msgstr "суммарная частотность их словоформ:"
 
 msgid "Dictionary_header"
 msgstr "Словарь"
