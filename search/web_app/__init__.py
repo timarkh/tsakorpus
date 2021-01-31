@@ -1,5 +1,6 @@
 from flask import Flask
 import os
+import re
 import random
 
 SETTINGS_DIR = '../conf'
@@ -9,6 +10,8 @@ MIN_TOTAL_FREQ_WORD_QUERY = 2000  # minimal number of processed tokens after whi
                                   # may be stopped due to timeout
 sessionData = {}        # session key -> dictionary with the data for current session
 random.seed()
+
+rxIndexAtEnd = re.compile('_[0-9]+$')
 
 # Read settings before we import anything else. Many modules
 # imported after this point reference the settings object,

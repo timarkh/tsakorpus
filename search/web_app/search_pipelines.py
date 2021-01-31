@@ -9,7 +9,7 @@ import copy
 import math
 import time
 from flask import request
-from . import sc, sentView, settings, MIN_TOTAL_FREQ_WORD_QUERY
+from . import sc, sentView, settings, MIN_TOTAL_FREQ_WORD_QUERY, rxIndexAtEnd
 from .session_management import set_session_data, get_session_data, get_locale, change_display_options, cur_search_context
 from .auxiliary_functions import jsonp, gzipped, nocache, lang_sorting_key, copy_request_args,\
     wilson_confidence_interval, distance_constraints_too_complex
@@ -104,17 +104,30 @@ def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=
     else:
         nWordsFieldName = 'n_words_' + settings.languages[langID]
         nSentsFieldName = 'n_sents_' + settings.languages[langID]
-    esQuery = {'query': innerQuery,
-               'size': 0,
-               'aggs': {'metafield':
-                            {'terms':
-                                 {'field': queryFieldName, 'size': maxBuckets},
-                             'aggs':
-                                 {'subagg_n_words': {'sum': {'field': nWordsFieldName}},
-                                  'subagg_n_sents': {'sum': {'field': nSentsFieldName}}}
-                             }
+    esQuery = {
+        'query': innerQuery,
+        'size': 0,
+        'aggs': {
+            'metafield': {
+                'terms': {
+                    'field': queryFieldName,
+                    'size': maxBuckets
+                },
+                'aggs': {
+                    'subagg_n_words': {
+                        'sum': {
+                            'field': nWordsFieldName
                         }
-               }
+                    },
+                    'subagg_n_sents': {
+                        'sum': {
+                            'field': nSentsFieldName
+                        }
+                    }
+                }
+            }
+        }
+    }
     hits = sc.get_docs(esQuery)
     if 'aggregations' not in hits or 'metafield' not in hits['aggregations']:
         return {}
@@ -166,24 +179,35 @@ def get_buckets_for_sent_metafield(fieldName, langID=-1, docIDs=None, maxBuckets
         queryFieldName = fieldName
     if not queryFieldName.startswith('meta.year'):
         queryFieldName += '_kw'
-    esQuery = {'query': innerQuery,
-               'size': 0,
-               'aggs': {'metafield':
-                            {'terms':
-                                 {'field': queryFieldName, 'size': maxBuckets},
-                             'aggs':
-                                 {'subagg_n_words': {'sum': {'field': 'n_words'}}}
-                             }
+    esQuery = {
+        'query': innerQuery,
+        'size': 0,
+        'aggs': {
+            'metafield': {
+                'terms': {
+                    'field': queryFieldName,
+                    'size': maxBuckets
+                },
+                'aggs': {
+                    'subagg_n_words': {
+                        'sum': {
+                            'field': 'n_words'
                         }
-               }
+                    }
+                }
+            }
+        }
+    }
     hits = sc.get_sentences(esQuery)
     if 'aggregations' not in hits or 'metafield' not in hits['aggregations']:
         return {}
     buckets = []
     for bucket in hits['aggregations']['metafield']['buckets']:
-        bucketListItem = {'name': bucket['key'],
-                          'n_sents': bucket['doc_count'],
-                          'n_words': bucket['subagg_n_words']['value']}
+        bucketListItem = {
+            'name': bucket['key'],
+            'n_sents': bucket['doc_count'],
+            'n_words': bucket['subagg_n_words']['value']
+        }
         buckets.append(bucketListItem)
     if not fieldName.startswith(('year', 'byear', 'birth_year')):
         buckets.sort(key=lambda b: (-b['n_words'], -b['n_sents'], b['name']))
@@ -607,3 +631,57 @@ def find_words_json(searchType='word', page=0):
     hitsProcessed['images'] = settings.images
     set_session_data('progress', 100)
     return hitsProcessed
+
+
+def find_sent_context(curSentData, n):
+    """
+    Find sentences adjacent to the one described by curSentData (which
+    is taken from the current search context). Return the context data
+    and IDs of the sentences adjacent to the found ones.
+    """
+    context = {'n': n, 'languages': {lang: {} for lang in curSentData['languages']},
+               'src_alignment': {}}
+    adjacentIDs = {lang: {'next': -1, 'prev': -1} for lang in curSentData['languages']}
+    for lang in curSentData['languages']:
+        try:
+            langID = settings.languages.index(lang)
+        except:
+            # Language + number of the translation version: chop off the number
+            langID = settings.languages.index(rxIndexAtEnd.sub('', lang))
+        for side in ['next', 'prev']:
+            curCxLang = context['languages'][lang]
+            if side + '_id' in curSentData['languages'][lang]:
+                curCxLang[side] = sc.get_sentence_by_id(curSentData['languages'][lang][side + '_id'])
+            if (side in curCxLang
+                    and len(curCxLang[side]) > 0
+                    and 'hits' in curCxLang[side]
+                    and 'hits' in curCxLang[side]['hits']
+                    and len(curCxLang[side]['hits']['hits']) > 0):
+                lastSentNum = cur_search_context().last_sent_num + 1
+                curSent = curCxLang[side]['hits']['hits'][0]
+                if '_source' in curSent and 'lang' not in curSent['_source']:
+                    curCxLang[side] = ''
+                    continue
+                langReal = lang
+                # lang is an identifier of the tier for parallel corpora, i.e.
+                # the language of the original unexpanded sentence.
+                # langReal is the real language of the expanded context.
+                # lang and langReal can be different if there are tiers that
+                # contain sentences in more than one language.
+                if '_source' in curSent and curSent['_source']['lang'] != langID:
+                    langReal = settings.languages[curSent['_source']['lang']]
+                if '_source' in curSent and side + '_id' in curSent['_source']:
+                    adjacentIDs[lang][side] = curSent['_source'][side + '_id']
+                expandedContext = sentView.process_sentence(curSent,
+                                                            numSent=lastSentNum,
+                                                            getHeader=False,
+                                                            lang=langReal,
+                                                            translit=cur_search_context().translit)
+                curCxLang[side] = expandedContext['languages'][langReal]['text']
+                if settings.media:
+                    sentView.relativize_src_alignment(expandedContext, curSentData['src_alignment_files'])
+                    context['src_alignment'].update(expandedContext['src_alignment'])
+                cur_search_context().last_sent_num = lastSentNum
+            else:
+                curCxLang[side] = ''
+    return context, adjacentIDs

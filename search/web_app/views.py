@@ -253,7 +253,7 @@ def get_word_stats(searchType, metaField):
     of a particular word form by values of one metafield. This function
     can be used to visualise word distributions across genres etc.
     If searchType == 'context', take into account the whole query.
-    If searchType == 'compare', treat the query as several sepearate
+    If searchType == 'compare', treat the query as several separate
     one-word queries. If, in this case, the data is to be displayed
     on a bar plot, process only the first word of the query.
     Otherwise, return a list which contains results for each
@@ -344,56 +344,13 @@ def get_sent_context(n):
     if n < 0:
         return jsonify({})
     sentData = cur_search_context().sentence_data
-    # return jsonify({"l": len(sentData), "i": sentData[n]})
     if sentData is None or n >= len(sentData) or 'languages' not in sentData[n]:
         return jsonify({})
     curSentData = sentData[n]
     if curSentData['times_expanded'] >= settings.max_context_expand >= 0:
         return jsonify({})
-    context = {'n': n, 'languages': {lang: {} for lang in curSentData['languages']},
-               'src_alignment': {}}
-    neighboringIDs = {lang: {'next': -1, 'prev': -1} for lang in curSentData['languages']}
-    for lang in curSentData['languages']:
-        try:
-            langID = settings.languages.index(lang)
-        except:
-            # Language + number of the translation version: chop off the number
-            langID = settings.languages.index(re.sub('_[0-9]+$', '', lang))
-        for side in ['next', 'prev']:
-            curCxLang = context['languages'][lang]
-            if side + '_id' in curSentData['languages'][lang]:
-                curCxLang[side] = sc.get_sentence_by_id(curSentData['languages'][lang][side + '_id'])
-            if (side in curCxLang
-                    and len(curCxLang[side]) > 0
-                    and 'hits' in curCxLang[side]
-                    and 'hits' in curCxLang[side]['hits']
-                    and len(curCxLang[side]['hits']['hits']) > 0):
-                lastSentNum = cur_search_context().last_sent_num + 1
-                curSent = curCxLang[side]['hits']['hits'][0]
-                if '_source' in curSent and 'lang' not in curSent['_source']:
-                    curCxLang[side] = ''
-                    continue
-                langReal = lang
-                # lang is an identifier of the tier for parallel corpora, i.e.
-                # the language of the original unexpanded sentence.
-                # langReal is the real language of the expanded context.
-                if '_source' in curSent and curSent['_source']['lang'] != langID:
-                    langReal = settings.languages[curSent['_source']['lang']]
-                if '_source' in curSent and side + '_id' in curSent['_source']:
-                    neighboringIDs[lang][side] = curSent['_source'][side + '_id']
-                expandedContext = sentView.process_sentence(curSent,
-                                                            numSent=lastSentNum,
-                                                            getHeader=False,
-                                                            lang=langReal,
-                                                            translit=cur_search_context().translit)
-                curCxLang[side] = expandedContext['languages'][langReal]['text']
-                if settings.media:
-                    sentView.relativize_src_alignment(expandedContext, curSentData['src_alignment_files'])
-                    context['src_alignment'].update(expandedContext['src_alignment'])
-                cur_search_context().last_sent_num = lastSentNum
-            else:
-                curCxLang[side] = ''
-    cur_search_context().update_expanded_contexts(context, neighboringIDs)
+    context, adjacentIDs = find_sent_context(curSentData, n)
+    cur_search_context().update_expanded_contexts(context, adjacentIDs)
     return jsonify(context)
 
 
