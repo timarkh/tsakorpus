@@ -290,6 +290,9 @@ class PrepareData:
         sentMetaDict = {
             'sent_analyses_kw': {
                 'type': 'keyword'
+            },
+            'year': {
+                'type': 'integer'
             }
         }
         for meta in self.settings['sentence_meta']:

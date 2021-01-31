@@ -40,6 +40,7 @@ def search_page():
                            gloss_search_enabled=settings.gloss_search_enabled,
                            negative_search_enabled=settings.negative_search_enabled,
                            fulltext_search_enabled=settings.fulltext_search_enabled,
+                           year_sort_enabled=settings.year_sort_enabled,
                            debug=settings.debug,
                            subcorpus_selection=settings.search_meta,
                            word_fields_by_tier=json.dumps(settings.word_fields_by_tier,

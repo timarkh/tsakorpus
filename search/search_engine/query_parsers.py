@@ -765,11 +765,21 @@ class InterfaceQueryParser:
             # Combine the query with the filters:
             query = {'bool': {'must': query, 'filter': queryFilter}}
 
-        if sortOrder == 'random':
+        if sortOrder in ('random', 'year'):
             query = self.make_random(query, randomSeed)
-        elif sortOrder == 'freq':
+        else:
             query = self.make_half_random(query, randomSeed)
+
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
+        if sortOrder == 'year':
+            esQuery['sort'] = [
+                {
+                    'meta.year': {
+                        "order": "desc"
+                    }
+                },
+                '_score'
+            ]
         if searchOutput == 'words':
             esQuery['_source'] = ['doc_id', 'lang']
             if includeNextWordField:

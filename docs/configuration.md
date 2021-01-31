@@ -84,6 +84,8 @@ The following parameters (dictionary keys) are recognized in corpus.json:
 
 * ``negative_search_enabled`` (optional) -- boolean value that determines if the negative search button should be present in the word query form. Defaults to true.
 
+* ``year_sort_enabled`` (optional) -- boolean value that determines if the "sort by year" option is enabled in sentence search. Defaults to false. If enabled, sentences can be sorted by the ``year_from`` field (or just ``year``, if there is no ``year_from``) of their document in the decreasing order. Only makes sense if all documents are dated.
+
 * ``ambiguous_analyses`` -- boolean value that has to be set to true if there are tokens in the corpus which have multiple (ambiguous) analyses. In this case, the user can select if they want to search only among unambiguously analyzed words.
 
 * ``lang_props`` -- dictionary where keys are the names of the languages and values are dictionaries with language-specific properties (see below).

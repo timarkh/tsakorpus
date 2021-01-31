@@ -47,7 +47,6 @@ class JSONDocReader:
         if os.stat(fname).st_size > self.filesize_limit > 0:
             return
         if fname == self.lastFileName and self.lastDocMeta is not None:
-            self.insert_meta_year(self.lastDocMeta)
             return self.lastDocMeta
         self.lastFileName = fname
         if self.format == 'json':
@@ -71,6 +70,20 @@ class JSONDocReader:
         self.insert_meta_year(metadata)
         return metadata
 
+    def insert_doc_level_meta(self, sentence):
+        """
+        Copy some document-level metadata into the sentence-level
+        metadata dictionary, if it is not already there. This is
+        needed for sorting. At the moment, this includes year_from.
+        """
+        if self.lastDocMeta is None or 'year_from' not in self.lastDocMeta:
+            return
+        if 'meta' not in sentence:
+            sentence['meta'] = {}
+        if 'year' in sentence['meta']:
+            return
+        sentence['meta']['year'] = self.lastDocMeta['year_from']
+
     def get_sentences(self, fname):
         """
         If the file is not too large, iterate through its
@@ -78,7 +91,7 @@ class JSONDocReader:
         """
         if os.stat(fname).st_size > self.filesize_limit > 0:
             return
-        self.lastFileName = fname
+        self.get_metadata(fname)
         if self.format == 'json':
             fIn = open(fname, 'r', encoding='utf-8-sig')
         elif self.format == 'json-gzip':
@@ -87,9 +100,9 @@ class JSONDocReader:
             return {}, True
         try:
             doc = json.load(fIn)
-            self.lastDocMeta = doc['meta']
             fIn.close()
             for i in range(len(doc['sentences'])):
+                self.insert_doc_level_meta(doc['sentences'][i])
                 if i < len(doc['sentences']) - 1:
                     yield doc['sentences'][i], False
                 else:
@@ -98,7 +111,6 @@ class JSONDocReader:
         except MemoryError:
             print('Memory error when reading', fname, ', trying iterative JSON parser (will work slowly).')
             fIn.close()
-            self.lastDocMeta = None
             if self.format == 'json':
                 fIn = open(fname, 'r', encoding='utf-8-sig')
             elif self.format == 'json-gzip':
@@ -107,6 +119,7 @@ class JSONDocReader:
                 return {}, True
             prevSent = {}
             for sentence in ijson.items(fIn, 'sentences.item'):
+                self.insert_doc_level_meta(sentence)
                 if prevSent != {}:
                     yield prevSent, False
                 prevSent = sentence

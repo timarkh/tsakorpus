@@ -9,6 +9,7 @@
   "max_docs_retrieve": 9999,
   "max_words_in_sentence": 40,
   "query_timeout": 60,
+  "year_sort_enabled": true,
   "viewable_meta": [
     "filename",
     "title",

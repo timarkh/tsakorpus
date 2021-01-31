@@ -142,6 +142,9 @@ var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 								<option value="wf">{{ _('by word (word queries)') }}</option>
 								<option value="lemma">{{ _('by lemma (word queries)') }}</option>
 								<option value="freq">{{ _('by frequency') }}</option>
+								{% if year_sort_enabled %}
+								<option value="year">{{ _('by year (decreasing; sentence queries)') }}</option>
+								{% endif %}
 								{% if debug %}
 								<option value="">{{ _('no sorting') }}</option>
 								{% endif %}

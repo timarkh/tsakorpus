@@ -388,7 +388,9 @@ def find_sentences_json(page=0):
         query = copy_request_args()
         page = 1
         change_display_options(query)
-        if get_session_data('sort') not in ('random', 'freq'):
+        sortOrder = get_session_data('sort')
+        if (sortOrder not in ('random', 'freq', 'year')
+                or sortOrder == 'year' and not settings.year_sort_enabled):
             set_session_data('sort', 'random')
         set_session_data('last_query', query)
         wordConstraints = sc.qp.wr.get_constraints(query)
