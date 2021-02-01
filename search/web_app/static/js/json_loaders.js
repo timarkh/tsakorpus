@@ -309,6 +309,7 @@ function assign_input_events() {
 	$(".neg_query").unbind('click');
 	$("#show_help").unbind('click');
 	$("#show_dictionary").unbind('click');
+	$("#show_settings").unbind('click');
 	$("#cite_corpus").unbind('click');
 	$("#show_word_stat").unbind('click');
 	$("a.locale").unbind('click');
@@ -317,6 +318,7 @@ function assign_input_events() {
 	$('#share_query').unbind('click');
 	$('#load_query').unbind('click');
 	$('#query_load_ok').unbind('click');
+	$('#display_settings_ok').unbind('click');
 	$('.toggle_glossed_layer').unbind('click');
 	$(".tier_select").unbind('change');
 	$(".word_plus").click(add_word_inputs);
@@ -329,6 +331,7 @@ function assign_input_events() {
 	$(".neg_query").click(negative_query_span);
 	$("#show_help").click(show_help);
 	$("#show_dictionary").click(show_dictionary);
+	$("#show_settings").click(show_settings);
 	$("#cite_corpus").click(show_citation);
 	$("#show_word_stat").click(show_word_stats);
 	$("a.locale").click(change_locale);
@@ -337,6 +340,7 @@ function assign_input_events() {
 	$('#share_query').click(share_query);
 	$('#load_query').click(show_load_query);
 	$('#query_load_ok').click(load_query);
+	$('#display_settings_ok').click(hide_settings);
 	$('.toggle_glossed_layer').click(toggle_glossed_layer);
 	$(".tier_select").change(change_tier);
 	assign_tooltips();
@@ -554,6 +558,14 @@ function show_dictionary(e) {
 			error: function(errorThrown) {
 			}
 		});
+}
+
+function hide_settings(e) {
+	$('#display_settings').modal('hide');
+}
+
+function show_settings(e) {
+	$('#display_settings').modal('show');
 }
 
 function show_citation(e) {

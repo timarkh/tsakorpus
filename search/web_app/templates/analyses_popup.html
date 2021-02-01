@@ -5,6 +5,6 @@
 <span class="popup_wf">{{ data.wf_display|safe }}</span>
 {% endif %}
 {% for ana in data.analyses %}
-<div class="popup_ana{% if ana.match %} popup_match{% endif %}">{% if data.analyses|length > 1 %}{{ loop.index }}. {% endif %}{{ ana.ana_div }}</div>
+<div class="popup_ana{% if ana.match %} popup_match{% endif %}">{% if data.analyses|length > 1 %}{{ loop.index }}. {% endif %}{{ ana.ana_div | safe }}</div>
 {% endfor %}
 </div>

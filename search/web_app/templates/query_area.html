@@ -66,51 +66,7 @@
 				<div class="tab-pane" id="display_options_tab">
 					<div class="options_div">
 						<h3 id="h3_options">{{ _('Additional search and display options') }}</h3>
-						<div class="options_column">
-							{{ _('Results per page:') }} <input type="number" name="page_size" id="page_size" value="10" class="search_input distance_input"><br>
-							{{ _('Sorting:') }} <select name="sort" id="sort" class="search_input">
-								<option value="random" selected>{{ _('random') }}</option>
-								<option value="wf">{{ _('by word (word queries)') }}</option>
-								<option value="lemma">{{ _('by lemma (word queries)') }}</option>
-								<option value="freq">{{ _('by frequency') }}</option>
-								{% if year_sort_enabled %}
-								<option value="year">{{ _('by year (decreasing; sentence queries)') }}</option>
-								{% endif %}
-								{% if debug %}
-								<option value="">{{ _('no sorting') }}</option>
-								{% endif %}
-							</select><br>
-							<input type="checkbox" name="distance_strict" id="distance_strict" checked> {{ _('Word distance requirements are strict') }}<br>
-						</div>
-						<div class="options_column">
-						{{ _('Viewing mode:') }} <select name="viewing_mode" id="viewing_mode" class="search_input">
-							<option value="standard">{{ _('view_standard') }}</option>
-							<option value="glossed">{{ _('view_glossed') }}</option>
-						</select><br>
-						{% if transliterations and transliterations|length > 1 %}
-							{{ _('Transliteration: ') }}<select name="translit" id="translit" class="search_input">
-							{% for tr in transliterations %}
-							<option value="{{ tr }}">{{ _('translitname_' + tr) }}</option>
-							{% endfor %}
-							</select><br>
-						{% endif %}
-						{% if input_methods and input_methods|length > 1 %}
-							{{ _('Character input method: ') }}<select name="input_method" id="input_method" class="search_input">
-							{% for im in input_methods %}
-							<option value="{{ im }}">{{ _('inputmethod_' + im) }}</option>
-							{% endfor %}
-							</select>
-						{% endif %}
-						</div>
-						<div class="options_column_leftalign">
-						{{ _('Annotation layers in glossed mode:') }}<br>
-						<input type="checkbox" name="toggle_lemma" data="lex" class="toggle_glossed_layer" id="toggle_lemma" checked> {{ _('Lemma') }}<br>
-						<input type="checkbox" name="toggle_grammar" data="gramm" class="toggle_glossed_layer" id="toggle_grammar" checked> {{ _('Grammar') }}<br>
-{% if gloss_search_enabled %}
-						<input type="checkbox" name="toggle_gloss" data="gloss" class="toggle_glossed_layer" id="toggle_gloss" checked> {{ _('Gloss') }}<br>
-{% endif %}
-						<input type="checkbox" name="toggle_additional_ana_fields" data="field_ana_other" class="toggle_glossed_layer" id="toggle_additional_ana_fields" checked> {{ _('Additional fields') }}<br>
-						</div>
+						
 					</div>
 				</div>
 			</div>

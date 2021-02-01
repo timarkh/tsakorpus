@@ -1,5 +1,4 @@
 ﻿body {
-	margin: 5px;
 	margin-bottom: 10px;
 	font-family: Lato, sans-serif;
 }
@@ -236,7 +235,7 @@
 	width: 90%;
 }
 
-.options_div {
+.settings_div {
 	overflow-x: auto;
 	overflow-y: hidden;
 	padding-bottom: 3px;
@@ -354,6 +353,8 @@
 
 #corpus_header {
 	height: 2.5em;
+	padding-bottom: 5px;
+	margin: 5px;
 }
 
 #corpus_title {
@@ -425,27 +426,33 @@
   100% { opacity:1; font-size: 20px; }
 }
 
+#corpus_header a.bi {
+	font-size: 20px;
+	padding-right: 10px;
+	vertical-align: top;
+	cursor: pointer;
+	line-height: 1;
+}
+
+#corpus_header a.bi:hover {
+	color: #2664c9;
+}
+
+#show_setting {
+
+}
+
 #show_help {
 	color: darkorange;
-	font-size: 20px;
 	animation: blinkHelp 1.5s;
-	vertical-align: top;
 }
 
 #show_dictionary {
 	color: darkred;
-	font-size: 20px;
-	padding-right: 10px;
 }
 
 #cite_corpus {
 	display: inline-block;
-	vertical-align: top;
-}
-
-#cite_corpus_img {
-	max-height: 24px;
-	margin-left: 20px;
 }
 
 #show_help:hover {
@@ -941,7 +948,7 @@ hr.separator {
 	font-size: 1.4em;
 }
 
-.options_column {
+.settings_column {
 	float: left;
 	text-align: right;
 	max-width: 375px;
@@ -951,7 +958,7 @@ hr.separator {
 	padding: 10px 15px;
 }
 
-.options_column_leftalign {
+.settings_column_leftalign {
 	float: left;
 	text-align: left;
 	max-width: 375px;
