@@ -57,7 +57,7 @@ function assign_word_events() {
 	$("span.search_l").unbind('click');
 	$("span.stat_w").unbind('click');
 	$("span.stat_l").unbind('click');
-	$("span.page_link").unbind('click');
+	$(".page_link").unbind('click');
 	$(".cx_toggle_chk").unbind('change');
 	$(".sent_lang").unbind('change');
 	$("#td_load_more_words").unbind('click');
@@ -70,7 +70,7 @@ function assign_word_events() {
 	$('span.search_l').click(search_lemma_from_list);
 	$('span.stat_w').click(show_word_stats);
 	$('span.stat_l').click(show_lemma_stats);
-	$("span.page_link").click(page_click);
+	$(".page_link").click(page_click);
 	$(".cx_toggle_chk").change(context_toggle);
 	$('.sent_lang').click(show_sentence_img);
 	$("#td_load_more_words").click(load_more_words);

@@ -1,6 +1,21 @@
 ﻿body {
-	margin-bottom: 10px;
 	font-family: Lato, sans-serif;
+	height: 100%;
+	margin: 0;
+}
+
+.box_column {
+	height: calc(100vh - 50px);
+	display: flex;
+	flex-flow: column;
+}
+
+.row_section_fixed {
+	flex: 0 1 0;
+}
+
+.row_section_expand {
+	flex: 1 1 0;
 }
 
 .word:hover {
@@ -167,7 +182,7 @@
 }
 
 .sent_results {
-	max-height: 80vh;
+	/* max-height: calc(100vh - 310px); */
 	overflow-y: auto;
 }
 
@@ -214,16 +229,32 @@
 
 .page_link {
 	cursor: pointer;
+	background-color: inherit;
+	border: 0;
 }
 
 .cur_page {
-	padding: 20px;
+	padding: 15px 20px;
 	font-size: 18px;
+	border-radius: 4px;
+	background-color: white;
+	opacity: 0.6;
+	border: 1px solid;
 }
 
-.pages {
-	margin-top: 30px;
-	margin-bottom: 20px;
+.after_hits {
+	margin: 18px 20px 5px 0px;
+}
+
+.download_results, .pages {
+	float: left;
+	margin: 0 20px 0px 0px;
+	padding: 10px 20px 10px 20px;
+	border-radius: 4px;
+}
+
+.download_results {
+	font-size: 22px;
 }
 
 .words_search {
@@ -356,9 +387,9 @@ label {
 }
 
 #corpus_header {
-	height: 2.5em;
-	padding-bottom: 5px;
-	margin: 5px;
+	height: 3em;
+	margin-bottom: 5px;
+	padding: 5px;
 }
 
 #corpus_title {
@@ -373,11 +404,16 @@ label {
 	font-family: "Segoe UI", "Lucida Grande", sans-serif;
 	line-height: 22px;
 	float: none;
-	display: inline-block;
-	width: 100%;
+	display: flex;
+	flex-flow: column;
+	height: 100%;
 	max-width: 1100px;
 	min-width: 400px;
 	margin-left: 3px;
+}
+
+#res_p > * {
+	height: 100%;
 }
 
 .word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .stat_w, .search_l, .stat_l, #show_help, #show_dictionary, #cite_corpus {
@@ -636,7 +672,8 @@ hr.separator {
 }
 
 #lower_part {
-	display: inline-block;
+	/* display: inline-block; */
+	height: 100%;
 }
 
 .subcorpus_column {

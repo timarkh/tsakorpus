@@ -41,19 +41,29 @@
 	{% include "head_add.html" ignore missing %}
 </head>
 <body>
-{% include "header.html" ignore missing %} <!-- user-defined header, if any -->
-{% include "corpus_header.html" %} <!-- tsakorpus header: corpus name, interface langauges, help link -->
-{% include "query_area.html" %} <!-- query area: boxes for word search, settings, search buttons -->
-{% include "results_area.html" %} <!-- area where the results are displayed -->
-{% include "hidden_elements.html" %} <!-- modal windows, analysis tooltip etc. -->
-
-{% include "query_share_load.html" %}
-<script src="https://d3js.org/d3.v4.min.js"></script>
-{% include "subcorpus_selection.html" %}
-{% include "word_stats.html" %}
-
-{% include "footer.html" ignore missing %} <!-- user-defined footer, if any -->
-<script type='text/javascript' src='static/js/select_subcorpus.js'></script>
+	<div class="box_column">
+		<div class="row_section_fixed">
+			{% include "header.html" ignore missing %} <!-- user-defined header, if any -->
+		</div>
+		<div class="row_section_fixed">
+			{% include "corpus_header.html" %} <!-- tsakorpus header: corpus name, interface langauges, help link -->
+		</div>
+		<div class="row_section_fixed">
+			{% include "query_area.html" %} <!-- query area: boxes for word search, settings, search buttons -->
+		</div>
+		<div class="row_section_expand">
+			{% include "results_area.html" %} <!-- area where the results are displayed -->
+		</div>
+		<div class="row_section_fixed">
+			{% include "footer.html" ignore missing %} <!-- user-defined footer, if any -->
+		</div>
+	</div>
+	{% include "hidden_elements.html" %} <!-- modal windows, analysis tooltip etc. -->
+	{% include "query_share_load.html" %}
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	{% include "subcorpus_selection.html" %}
+	{% include "word_stats.html" %}
+	<script type='text/javascript' src='static/js/select_subcorpus.js'></script>
 </body>
 {% if media %}
 	<script>

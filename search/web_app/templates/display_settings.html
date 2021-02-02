@@ -10,7 +10,7 @@
 					<div class="settings_column">
 						<div class="row">
 							<label for="page_size">{{ _('Results per page:') }}</label> 
-							<input form="search_main" type="number" name="page_size" id="page_size" value="10" class="search_input distance_input">
+							<input form="search_main" type="number" name="page_size" id="page_size" value="10" min="1" max="{{ max_page_size }}" class="search_input distance_input">
 						</div>
 						<div class="row">
 							<label for="sort">{{ _('Sorting:') }}</label>

@@ -11,7 +11,7 @@ import time
 import os
 import uuid
 import xlsxwriter
-from . import app, settings, sc, sentView
+from . import app, settings, sc, sentView, MAX_PAGE_SIZE
 from .session_management import get_locale, get_session_data, change_display_options, set_session_data
 from .auxiliary_functions import jsonp, gzipped, nocache, lang_sorting_key, copy_request_args,\
     distance_constraints_too_complex, remove_sensitive_data
@@ -51,6 +51,7 @@ def search_page():
                            citation=settings.citation,
                            start_page_url=settings.start_page_url,
                            max_request_time=settings.query_timeout + 1,
+                           max_page_size=MAX_PAGE_SIZE,
                            locales=settings.interface_languages,
                            random_seed=get_session_data('seed'),
                            query_string=queryString)
@@ -598,6 +599,7 @@ def help_dialogue():
 
 
 @app.route('/dictionary/<lang>')
+@gzipped
 def get_dictionary(lang):
     if not settings.generate_dictionary:
         return 'No dictionary available for this language.'
