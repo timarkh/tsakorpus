@@ -1,0 +1,28 @@
+<link rel="stylesheet" type="text/css" href="static/css/gramm_gloss_selection.css">
+<div id="gramm_query_viewer"> </div><br>
+
+<div class="gloss_choice_panel">
+{% for col in tag_table.columns %}
+	<div class="gloss_column">
+	{% for tag in col %}
+	{% if tag.type == "gramm" or tag.type == "tag" %}
+		<div class="switchable_gramm" data-cat="{{ tag.category|safe }}" data-grammtag="{{ tag.value|safe }}">{{ tag.value|safe }}
+		{% if tag.tooltip %}
+			<span class="tooltip_prompt">{{ tag.tooltip|safe }}</span>
+		{% endif %}
+		</div>
+	{% elif tag.type == "separator" %}
+		<hr class="separator gloss_separator">
+	{% elif tag.type == "header" %}
+		<div class="gloss_header">{{ tag.value|safe }}</div>
+	{% endif %}
+	{% endfor %}
+	</div>
+{% endfor %}
+</div>
+
+<div class="selector_buttons">
+<button type="button" class="btn btn-default btn-success" aria-label="Left Align" id="gramm_selector_ok">OK</button> <button type="button" class="btn btn-default btn-danger" aria-label="Left Align" id="gramm_selector_cancel">{{ _('Cancel') }}</button>
+</div>
+
+<script type='text/javascript' src='static/js/select_gramm.js'></script>

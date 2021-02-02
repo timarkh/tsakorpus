@@ -1,0 +1,48 @@
+<div class="modal fade" id="word_stats" tabindex="-1" role="dialog" aria-labelledby="word_stats_header" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" id="button_close_word_stats"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="word_stats_header">{{ _('Word statistics header') }}</h4>
+			</div>
+			<div class="modal-body" id="word_stats_body">
+				<ul class="nav nav-tabs">
+					<li class="active"><a data-toggle="tab" href="#word_stats_by_meta" id="load_word_meta_stats">{{ _('By metadata values') }}</a></li>
+					<li><a data-toggle="tab" href="#word_stats_by_freq" id="load_word_freq_stats">{{ _('By frequency') }}</a></li>
+				</ul>
+				<div class="tab-content">
+					<div id="word_stats_by_meta" class="tab-pane fade in active">
+						<h4>{{ _('Word statistics for ') }}<span id="word_stats_wf"></span></h4>
+						{{ _('Parameter: ') }}<select name="select_meta_word_stat" id="select_meta_word_stat" class="search_input">
+						{% for stat_option in subcorpus_selection.stat_options %}
+							<option value="{{ stat_option }}">{{ _('metafield_' + stat_option) }}</option>
+						{% endfor %}
+						</select>&nbsp;
+						{{ _('Query type: ') }}<select name="select_meta_query_type" id="select_meta_query_type" class="search_input">
+							<option value="context" selected>{{ _('search the whole query') }}</option>
+							<option value="compare">{{ _('compare words in the query') }}</option>
+						</select>
+						<div id="word_stats_plot">{{ _('(please wait for the plot to load)') }}</div>
+					</div>
+					<div id="word_stats_by_freq" class="tab-pane fade">
+						<h4>{{ _('Distribution by frequency rank') }}</h4>
+						{{ _('Explanation for frequency distributions') }}
+						<select name="select_freq_stat_type" id="select_freq_stat_type" class="search_input">
+							<option value="word" selected>{{ _('words') }}</option>
+							<option value="lemma">{{ _('lemmata') }}</option>
+						</select>&nbsp;
+						{{ _('Scale of the x axis: ') }}<select name="select_x_axis_scale" id="select_x_axis_scale" class="search_input">
+							<option value="linear" selected>{{ _('linear') }}</option>
+							<option value="logarithmic">{{ _('logarithmic') }}</option>
+						</select>
+						<div id="word_freq_rank_stats_plot">{{ _('(please wait for the plot to load)') }}</div>
+					</div>
+				</div>
+				<div class="selector_buttons">
+					<button type="button" class="btn btn-default btn-success" aria-label="Left Align" id="word_stats_ok">OK</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type='text/javascript' src='static/js/word_stats.js'></script>

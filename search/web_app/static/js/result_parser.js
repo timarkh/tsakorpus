@@ -4,7 +4,7 @@ var excludeDocs = [];
 
 function print_json(results) {
 	//alert("success" + JSON.stringify(results));
-	$('.progress').css('visibility', 'hidden');
+	$('.progress').css('display', 'none');
 	$('#analysis').css('display', 'none');
 	$('#w_id1').val('');
 	$('#l_id1').val('');
@@ -13,7 +13,7 @@ function print_json(results) {
 
 function print_html(results) {
 	//alert("success" + JSON.stringify(results));
-	$('.progress').css('visibility', 'hidden');
+	$('.progress').css('display', 'none');
 	$('#analysis').css('display', 'none');
 	$('#w_id1').val('');
 	$('#l_id1').val('');
@@ -22,7 +22,7 @@ function print_html(results) {
 }
 
 function update_wordlist(results) {
-	$('.progress').css('visibility', 'hidden');
+	$('.progress').css('display', 'none');
 	$('#analysis').css('display', 'none');
 	$('#w_id1').val('');
 	$('#l_id1').val('');
@@ -553,7 +553,7 @@ function load_more_words(e) {
 		//complete: stop_progress_bar,
 		success: update_wordlist,
 		error: function(errorThrown) {
-			$('.progress').css('visibility', 'hidden');
+			$('.progress').css('display', 'none');
 			alert( JSON.stringify(errorThrown) );
 		}
 	});

@@ -1,0 +1,41 @@
+<link rel="stylesheet" type="text/css" href="static/css/gramm_gloss_selection.css">
+<div class="gloss_choice_panel" id="generic_gloss_placeholders">
+<div class="draggable" class="ui-state-highlight">#<span class="tooltip_prompt">word&nbsp;boundary</span></div>
+<div class="draggable" class="ui-state-highlight">*<span class="tooltip_prompt">any&nbsp;number of&nbsp;morphs</span></div>
+<div class="draggable" class="ui-state-highlight">+<span class="tooltip_prompt">any&nbsp;positive&nbsp;number of&nbsp;morphs</span></div>
+<div class="draggable" class="ui-state-highlight">?<span class="tooltip_prompt">any&nbsp;morph</span></div>
+<div class="draggable" class="ui-state-highlight">STEM</div>
+</div>
+ 
+<div id="gloss_sort_panel">
+<div id="sortable">
+  <div class="ui-state-default">STEM</div>
+</div>
+</div>
+<br>
+
+<div class="gloss_choice_panel">
+{% for col in glosses.columns %}
+	<div class="gloss_column">
+	{% for gl in col %}
+	{% if gl.type == "gloss" %}
+		<div class="draggable" class="ui-state-highlight">{{ gl.value|safe }}
+		{% if gl.tooltip %}
+			<span class="tooltip_prompt">{{ gl.tooltip|safe }}</span>
+		{% endif %}
+		</div>
+	{% elif gl.type == "separator" %}
+		<hr class="separator gloss_separator">
+	{% elif gl.type == "header" %}
+		<div class="gloss_header">{{ gl.value|safe }}</div>
+	{% endif %}
+	{% endfor %}
+	</div>
+{% endfor %}
+</div>
+
+<div class="selector_buttons">
+<button type="button" class="btn btn-default btn-success" aria-label="Left Align" id="gloss_selector_ok">OK</button> <button type="button" class="btn btn-default btn-danger" aria-label="Left Align" id="gloss_selector_cancel">{{ _('Cancel') }}</button>
+</div>
+
+<script type='text/javascript' src='static/js/select_gloss.js'></script>

@@ -46,23 +46,26 @@
 			{% include "header.html" ignore missing %} <!-- user-defined header, if any -->
 		</div>
 		<div class="row_section_fixed">
-			{% include "corpus_header.html" %} <!-- tsakorpus header: corpus name, interface langauges, help link -->
+			{% include "index/corpus_header.html" %} <!-- tsakorpus header: corpus name, interface langauges, help link -->
 		</div>
 		<div class="row_section_fixed">
-			{% include "query_area.html" %} <!-- query area: boxes for word search, settings, search buttons -->
+			{% include "index/query_area.html" %} <!-- query area: boxes for word search, settings, search buttons -->
+		</div>
+		<div class="row_section_fixed">
+			{% include "index/progress.html" %} <!-- progress bar and mokey GIF -->
 		</div>
 		<div class="row_section_expand">
-			{% include "results_area.html" %} <!-- area where the results are displayed -->
+			{% include "index/results_area.html" %} <!-- area where the results are displayed -->
 		</div>
 		<div class="row_section_fixed">
 			{% include "footer.html" ignore missing %} <!-- user-defined footer, if any -->
 		</div>
 	</div>
-	{% include "hidden_elements.html" %} <!-- modal windows, analysis tooltip etc. -->
-	{% include "query_share_load.html" %}
+	{% include "index/hidden_elements.html" %} <!-- modal windows, analysis tooltip etc. -->
+	{% include "modals/query_share_load.html" %}
 	<script src="https://d3js.org/d3.v4.min.js"></script>
-	{% include "subcorpus_selection.html" %}
-	{% include "word_stats.html" %}
+	{% include "modals/subcorpus_selection.html" %}
+	{% include "modals/word_stats.html" %}
 	<script type='text/javascript' src='static/js/select_subcorpus.js'></script>
 </body>
 {% if media %}

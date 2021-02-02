@@ -12,7 +12,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
-				$('.progress').css('visibility', 'hidden');
+				$('.progress').css('display', 'none');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -27,7 +27,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
-				$('.progress').css('visibility', 'hidden');
+				$('.progress').css('display', 'none');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -43,7 +43,7 @@ $(function() {
 			complete: stop_progress_bar,
 			success: print_html,
 			error: function(errorThrown) {
-				$('.progress').css('visibility', 'hidden');
+				$('.progress').css('display', 'none');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -59,7 +59,7 @@ $(function() {
 			complete: stop_progress_bar,
 			success: print_html,
 			error: function(errorThrown) {
-				$('.progress').css('visibility', 'hidden');
+				$('.progress').css('display', 'none');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -88,7 +88,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
-				$('.progress').css('visibility', 'hidden');
+				$('.progress').css('display', 'none');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -103,7 +103,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
-				$('.progress').css('visibility', 'hidden');
+				$('.progress').css('display', 'none');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -118,7 +118,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
-				$('.progress').css('visibility', 'hidden');
+				$('.progress').css('display', 'none');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -133,7 +133,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
-				$('.progress').css('visibility', 'hidden');
+				$('.progress').css('display', 'none');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -148,7 +148,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
-				$('.progress').css('visibility', 'hidden');
+				$('.progress').css('display', 'none');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -163,7 +163,7 @@ $(function() {
 			dataType : "json",
 			success: print_json,
 			error: function(errorThrown) {
-				$('.progress').css('visibility', 'hidden');
+				$('.progress').css('display', 'none');
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
@@ -176,9 +176,9 @@ $(function() {
 });
 
 function start_progress_bar() {
-	progressHtml = '<img src="static/img/search_in_progress.gif" style="visibility: hidden;" id="progress_gif" /><br>'
-	progressHtml += '<p id="seconds_elapsed" style="visibility: hidden;">0</p>'
-	$('#res_p').html(progressHtml);
+	// progressHtml = '<img src="static/img/search_in_progress.gif" style="visibility: hidden;" id="progress_gif" /><br>'
+	// progressHtml += '<p id="seconds_elapsed" style="visibility: hidden;">0</p>'
+	$('#res_p').html("");
 	$('#res_p').addClass('in_progress');
 	continue_progress_bar();
 }
@@ -196,10 +196,10 @@ function continue_progress_bar() {
 					hide_player();
 					hide_img();
 					hide_query_panel();
-					$('.progress').css('visibility', 'visible');
+					$('.progress').css('display', 'block');
 				}
 				else if (secElapsed == 3) {
-					$('#progress_gif').css('visibility', 'visible');
+					$('#progress_gif').css('display', 'block');
 				}
 			}
 			continue_progress_bar();
@@ -208,7 +208,10 @@ function continue_progress_bar() {
 }
 
 function stop_progress_bar() {
+	$('#progress_gif').css('display', 'none');
 	$('#res_p').removeClass('in_progress');
+	$('.progress-bar').attr('aria-valuenow', max_request_time);
+	$('#seconds_elapsed').html("0");
 }
 
 function load_expanded_context(n_sent) {

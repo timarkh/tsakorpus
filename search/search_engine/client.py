@@ -32,7 +32,7 @@ class SearchClient:
         self.settings = json.loads(f.read())
         f.close()
         self.name = self.settings['corpus_name']
-        self.es = Elasticsearch()
+        self.es = Elasticsearch(timeout=max(20, self.settings['query_timeout']))
         self.es_ic = IndicesClient(self.es)
         self.qp = InterfaceQueryParser(self.settings_dir)
         self.logging = 'none'   # none|query|hits

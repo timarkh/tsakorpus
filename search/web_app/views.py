@@ -314,7 +314,7 @@ def search_sent(page=-1):
     # try:
     hits = find_sentences_json(page=page)
     # except:
-    #     return render_template('result_sentences.html', message='Request timeout.')
+    #     return render_template('search_results/result_sentences.html', message='Request timeout.')
     cur_search_context().add_sent_to_session(hits)
     hitsProcessed = sentView.process_sent_json(hits,
                                                translit=cur_search_context().translit)
@@ -333,7 +333,7 @@ def search_sent(page=-1):
     maxPageNumber = (min(hitsProcessed['n_sentences'], settings.max_hits_retrieve) - 1) \
                     // hitsProcessed['page_size'] + 1
 
-    return render_template('result_sentences.html',
+    return render_template('search_results/result_sentences.html',
                            data=hitsProcessed,
                            max_page_number=maxPageNumber)
 
@@ -376,7 +376,7 @@ def search_word(searchType='word', page=-1):
     bShowNextButton = True
     if 'words' not in hitsProcessed or len(hitsProcessed['words']) != get_session_data('page_size'):
         bShowNextButton = False
-    return render_template('result_words.html',
+    return render_template('search_results/result_words.html',
                            data=hitsProcessed,
                            word_table_fields=settings.word_table_fields,
                            word_search_display_gr=settings.word_search_display_gr,
@@ -400,7 +400,7 @@ def search_doc():
                                                corpusSize=settings.corpus_size)
     hitsProcessed['media'] = settings.media
     hitsProcessed['images'] = settings.images
-    return render_template('result_docs.html', data=hitsProcessed)
+    return render_template('search_results/result_docs.html', data=hitsProcessed)
 
 
 @app.route('/get_word_fields')
@@ -409,7 +409,7 @@ def get_word_fields():
     Return HTML with form inputs representing all additional
     word-level annotation fields.
     """
-    return render_template('common_additional_search_fields.html',
+    return render_template('index/common_additional_search_fields.html',
                            word_fields=settings.word_fields,
                            sentence_meta=settings.sentence_meta,
                            multiple_choice_fields=settings.multiple_choice_fields,
@@ -528,7 +528,7 @@ def get_gramm_selector(lang=''):
     if lang not in settings.lang_props or 'gramm_selection' not in settings.lang_props[lang]:
         return ''
     grammSelection = settings.lang_props[lang]['gramm_selection']
-    return render_template('select_gramm.html', tag_table=grammSelection)
+    return render_template('modals/select_gramm.html', tag_table=grammSelection)
 
 
 @app.route('/get_add_field_selector/<field>')
@@ -539,7 +539,7 @@ def get_add_field_selector(field=''):
     if field not in settings.multiple_choice_fields:
         return ''
     tagSelection = settings.multiple_choice_fields[field]
-    return render_template('select_gramm.html', tag_table=tagSelection)
+    return render_template('modals/select_gramm.html', tag_table=tagSelection)
 
 
 @app.route('/get_gloss_selector/<lang>')
@@ -550,7 +550,7 @@ def get_gloss_selector(lang=''):
     if lang not in settings.lang_props or 'gloss_selection' not in settings.lang_props[lang]:
         return ''
     glossSelection = settings.lang_props[lang]['gloss_selection']
-    return render_template('select_gloss.html', glosses=glossSelection)
+    return render_template('modals/select_gloss.html', glosses=glossSelection)
 
 
 @app.route('/get_glossed_sentence/<int:n>')
@@ -593,7 +593,7 @@ def set_locale(lang=''):
 @app.route('/help_dialogue')
 def help_dialogue():
     l = get_locale()
-    return render_template('help_dialogue_' + l + '.html',
+    return render_template('modals/help_dialogue_' + l + '.html',
                            media=settings.media,
                            gloss_search_enabled=settings.gloss_search_enabled)
 
@@ -603,7 +603,7 @@ def help_dialogue():
 def get_dictionary(lang):
     if not settings.generate_dictionary:
         return 'No dictionary available for this language.'
-    dictFilename = 'dictionary_' + settings.corpus_name + '_' + lang + '.html'
+    dictFilename = 'dictionaries/dictionary_' + settings.corpus_name + '_' + lang + '.html'
     try:
         return render_template(dictFilename)
     except:

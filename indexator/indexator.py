@@ -598,7 +598,9 @@ class Indexator:
             if len(lexFreqs) <= 0:
                 continue
 
-            fOut = open(os.path.join('../search/web_app/templates', 'dictionary_' + self.settings['corpus_name']
+            if not os.path.exists('../search/web_app/templates/dictionaries'):
+                os.makedirs('../search/web_app/templates/dictionaries')
+            fOut = open(os.path.join('../search/web_app/templates/dictionaries', 'dictionary_' + self.settings['corpus_name']
                                      + '_' + self.languages[langID] + '.html'), 'w', encoding='utf-8')
             fOut.write('<h1 class="dictionary_header"> {{ _(\'Dictionary_header\') }} '
                        '({{ _(\'langname_' + self.languages[langID] + '\') }})</h1>\n')

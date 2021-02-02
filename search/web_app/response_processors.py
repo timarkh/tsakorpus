@@ -163,8 +163,8 @@ class SentenceViewer:
         """
         grAnaPart = self.build_gr_ana_part_text(grValues, lang)
         if not gramdic:
-            return render_template('grammar_popup.html', grAnaPart=grAnaPart).strip()
-        return render_template('gramdic_popup.html', grAnaPart=grAnaPart).strip()
+            return render_template('search_results/grammar_popup.html', grAnaPart=grAnaPart).strip()
+        return render_template('search_results/gramdic_popup.html', grAnaPart=grAnaPart).strip()
 
     def build_ana_div(self, ana, lang, translit=None):
         """
@@ -213,7 +213,7 @@ class SentenceViewer:
             # Order analysis fields alphabetically
             ana4template['lex_fields'].sort(key=lambda x: x['key'])
             ana4template['other_fields'].sort(key=lambda x: x['key'])
-        return render_template('analysis_div.html', ana=ana4template).strip()
+        return render_template('search_results/analysis_div.html', ana=ana4template).strip()
 
     def build_ana_popup(self, word, lang, matchingAnalyses=None, translit=None):
         """
@@ -232,7 +232,7 @@ class SentenceViewer:
                 ana4template = {'match': iAna in simpleMatchingAnalyses,
                                 'ana_div': self.build_ana_div(simplifiedAnas[iAna], lang, translit=translit)}
                 data4template['analyses'].append(ana4template)
-        return render_template('analyses_popup.html', data=data4template)
+        return render_template('search_results/analyses_popup.html', data=data4template)
 
     def prepare_analyses(self, words, indexes, lang, matchWordOffsets=None, translit=None):
         """
@@ -882,7 +882,7 @@ class SentenceViewer:
         else:
             wID = w['_id']  # word or lemma found in the words index
         if searchType == 'word':
-            return render_template('word_table_row.html',
+            return render_template('search_results/word_table_row.html',
                                    ana_popup=html.escape(self.build_ana_popup(wSource, lang, translit=translit)),
                                    wf=wf,
                                    wf_display=wfDisplay,
@@ -897,7 +897,7 @@ class SentenceViewer:
                                    nDocs=nDocs,
                                    wID=wID,
                                    wfSearch=wSource['wf'])
-        return render_template('lemma_table_row.html',
+        return render_template('search_results/lemma_table_row.html',
                                ana_popup=html.escape(self.build_ana_popup(wSource, lang, translit=translit)),
                                wf=wf,
                                wf_display=wfDisplay,
@@ -941,7 +941,7 @@ class SentenceViewer:
             nSents = str(wSource['n_sents'])
 
         if searchType == 'word':
-            return render_template('word_table_row.html',
+            return render_template('search_results/word_table_row.html',
                                    ana_popup=html.escape(self.build_ana_popup(wSource, lang, translit=translit)),
                                    wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
                                    lemma=self.get_lemma(wSource),
@@ -954,7 +954,7 @@ class SentenceViewer:
                                    nDocs=nDocs,
                                    wID=w['_id'],
                                    wfSearch=wSource['wf'])
-        return render_template('lemma_table_row.html',
+        return render_template('search_results/lemma_table_row.html',
                                ana_popup=html.escape(self.build_ana_popup(wSource, lang, translit=translit)),
                                lemma=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
                                gr=self.get_gramm(wSource, lang),

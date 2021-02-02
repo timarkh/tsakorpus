@@ -5,7 +5,7 @@
 }
 
 .box_column {
-	height: calc(100vh - 50px);
+	height: 100vh;
 	display: flex;
 	flex-flow: column;
 }
@@ -26,6 +26,11 @@
 	font-weight: bold;
 	padding-left: 2px;
 	padding-right: 2px;
+}
+
+.progress, #seconds_elapsed, #progress_gif {
+	display: none;
+	max-width: 800px;
 }
 
 .wmatch_w1 {
@@ -243,7 +248,8 @@
 }
 
 .after_hits {
-	margin: 18px 20px 5px 0px;
+	margin: 18px 10px 5px 0px;
+	padding-bottom: 10px;
 }
 
 .download_results, .pages {

@@ -1,0 +1,27 @@
+﻿<p>{{ _('Filter result:') }}
+<span id="subcorpus_ndocs">{{ data.n_docs }}</span> {{ ngettext('document with', 'documents with', data.n_docs) }} 
+<span id="subcorpus_nwords">{{ data.n_words }}</span> {{ ngettext('word found,', 'words found,', data.n_words) }}
+<span id="subcorpus_size_percent">{{ data.size_percent }}%</span> {{ _('of the entire corpus.') }}</p>
+<div class="documents_list">
+	<table class="documents_list_table">
+		<thead>
+			<th>&nbsp;</th>
+			{% for f in data.metafields %}
+				<th>{{ _('metafield_' + f) }}</th>
+			{% endfor %}
+		</thead>
+		<tbody>
+			{% for doc in data.docs %}
+				<tr id="doc{{ doc.id }}" {% if doc.excluded %} class="context_off" {% endif %}>
+				<td><input type="checkbox" class="doc_toggle_chk" {% if not doc.excluded %}checked{% endif %}></td>
+				{% for field in doc.fields %}
+					<td>{{ field|safe }}</td>
+				{% endfor %}
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% if data.message %}
+<p class="message">{{ data.message }}</p>
+{% endif %}

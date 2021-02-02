@@ -1,0 +1,102 @@
+﻿<div id="results_info" class="row_section_fixed">
+	<p>{{ ngettext('Search result:', 'Search result:', data.n_occurrences) }}
+	{{ data.n_occurrences }} {{ ngettext('occurrence', 'occurrences', data.n_occurrences) }},
+	{{ data.n_sentences }} {{ ngettext('sentence found in approximately', 'sentences found in approximately', data.n_sentences) }}
+	{{ data.n_docs }} {{ ngettext('in_document', 'in_documents', data.n_docs) }}.</p>
+
+	{% if data.timeout %}
+	<div class="alert alert-warning" role="alert">
+	<span class="bi bi-exclamation-triangle-fill" aria-hidden="true"></span> {{ _('The search was not finished due to the query timeout. You only see partial results.') }}
+	</div>
+	{% endif %}
+	{% if data.message %}
+	<div class="alert alert-danger" role="alert">
+	<span class="bi bi-exclamation-triangle" aria-hidden="true"></span> {{ data.message }}
+	</div>
+	{% endif %}
+	{% if data.subcorpus_enabled %}
+	<div class="alert alert-warning" role="alert">
+	<span class="bi bi-exclamation-triangle" aria-hidden="true"></span> {{ _('You are searching in a subcorpus.') }}
+	</div>
+	{% endif %}
+</div>
+<div class="sent_results row_section_expand">
+{% for c in data.contexts %}
+	{% set context_loop = loop %}
+	<div class="context {% if not c.toggled_on %} context_off{% endif %}" id='div_res{{ loop.index - 1 }}'>
+	<span class="ch_container"{% if data.context_header_rtl %} dir="rtl"{% endif %}>{{ c.header | safe }}</span>
+	<div class="cx_main">
+	<div class="cx_toggle_div"><input type="checkbox" class="cx_toggle_chk" {% if c.toggled_on %} checked{% endif %}></div>
+	<span class="get_glossed_copy" data-nsent="{{ loop.index - 1 }}"><span class="glyph_copy glyphicon glyphicon-copy" aria-hidden="true"></span></span>
+	<span class="sentence" id='res{{ loop.index - 1 }}'>
+	{% for lang in data.languages %}
+		{% if lang in c.languages %}
+		<span class="sent_lang sent_lang_{{ lang }}" id='res{{ context_loop.index - 1 }}_{{ lang }}' {% if c.languages[lang].img %}data-img="{{ c.languages[lang].img }}"{% endif %}{% if c.languages[lang].rtl %} dir="rtl"{% endif %}>
+		{{ c.languages[lang].text | safe }}
+		</span>
+		{% if not loop.last %}{% endif %}
+		{% endif %}
+	{% endfor %}
+	</span>
+	<span class='expand' data-nsent="{{ loop.index - 1 }}"><span class="glyph_expand glyphicon glyphicon-resize-horizontal" aria-hidden="true"></span></span>
+	</div>
+	</div>
+{% endfor %}
+</div>
+
+{% if data.src_alignment %}
+<script type='text/javascript'>
+var srcAlignments = {{ data.src_alignment | safe }};
+</script>
+{% endif %}
+<div class="after_hits row_section_fixed">
+	<div class="download_results alert-secondary">
+		<a href="download_cur_results_csv" download="results-{{ data.page }}.csv" class="bi bi-file-earmark-ruled-fill" data-tooltip="tooltip" data-placement="top" title="{{ _('download as CSV') }}"></a>
+		<a href="download_cur_results_xlsx" download="results-{{ data.page }}.xlsx" class="bi bi-file-earmark-excel-fill" data-tooltip="tooltip" data-placement="top" title="{{ _('download as XLSX') }}"></a>
+	</div>
+	{% if data.contexts|length > 0 %}
+		<div class="pages alert-info">
+			{% if data.page - 4 > 0 %}
+			<button class="page_link" data-page="1">1</button>&nbsp;
+			...&nbsp;
+			{% endif %}
+			{% for i_page in range(-3, 4) %}
+				{% if (data.page + i_page > 0) and (data.page + i_page <= max_page_number) %}
+				{% if i_page == 0 %}
+				<span class="cur_page">{{ data.page + i_page }}</span>&nbsp;
+				{% else %}
+				<button class="page_link" data-page="{{ data.page + i_page }}">{{ data.page + i_page }}</button>&nbsp;
+				{% endif %}
+				{% endif %}
+			{% endfor %}
+			{% if data.page + 5 <= max_page_number %}
+			...&nbsp;
+			{% endif %}
+			{% if data.page + 4 <= max_page_number %}
+			<button class="page_link" data-page="{{ max_page_number }}">{{ max_page_number }}</button>&nbsp;
+			{% endif %}
+		</div>
+	{% endif %}
+</div>
+
+{% if data.contexts|length > 0 %}
+	<script type='text/javascript'>assign_word_events(); hide_query_panel();</script>
+	{% if data.media %}
+	<script type='text/javascript'>
+	show_player();
+	</script>
+	{% endif %}
+	<script type='text/javascript'>searchType = 'sentences';</script>
+{% else %}
+	<script type='text/javascript'>
+	{% if data.media %}
+	hide_player();
+	{% endif %}
+	{% if data.images %}
+	hide_img();
+	{% endif %}
+	show_query_panel();
+	searchType = 'none';
+	</script>
+{% endif %}
+

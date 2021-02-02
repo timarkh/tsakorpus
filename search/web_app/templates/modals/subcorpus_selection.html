@@ -1,0 +1,56 @@
+<div class="modal fade" id="subcorpus_selector" tabindex="-1" role="dialog" aria-labelledby="subcorpus_sel_header" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="subcorpus_sel_header">{{ _('Select subcorpus') }}</h4>
+			</div>
+			<div class="modal-body" id="subcorpus_sel_body">
+				<ul class="nav nav-tabs">
+					<li class="active"><a data-toggle="tab" href="#select_subcorpus_parameters">{{ _('Specify parameters') }}</a></li>
+					<li><a data-toggle="tab" href="#select_subcorpus_documents" id="load_documents_link">{{ _('Choose from a list') }}</a></li>
+					<li><a data-toggle="tab" href="#subcorpus_stats" id="subcorpus_stats_link">{{ _('Subcorpus statistics') }}</a></li>
+				</ul>
+				<div class="tab-content">
+					<div id="select_subcorpus_parameters" class="tab-pane fade in active">
+						<h4>{{ _('Select parameters') }}</h4>
+						{% for col in subcorpus_selection.columns %}
+							<div class="subcorpus_column">
+							{% for option in col %}
+								{% if option.type == "input_text" %}
+									<input type="text" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) | capitalize }}" title="{{ _('metafield_' + option.name) | capitalize }}">
+								{% elif option.type == "input_number" %}
+									<input type="number" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) | capitalize }}" title="{{ _('metafield_' + option.name) | capitalize }}">
+								{% elif option.type == "option" %}
+									<div class="switchable_subcorpus_option" data-name="{{ option.name|safe }}" data-value="{{ option.value|safe }}">{{ _(option.text)|safe }}
+									</div>
+								{% elif option.type == "separator" %}
+									<hr class="separator subcorpus_separator">
+								{% elif option.type == "header" %}
+									<div class="subcorpus_header">{{ _(option.value)|safe }}</div>
+								{% endif %}
+							{% endfor %}
+							</div>
+						{% endfor %}
+					</div>
+					<div id="select_subcorpus_documents" class="tab-pane fade">
+						<h4>{{ _('Select documents') }}</h4>
+						<div id="subcorpus_documents">{{ _('(please wait for the document list to load)') }}</div>
+					</div>
+					<div id="subcorpus_stats" class="tab-pane fade">
+						<h4>{{ _('Selected subcorpus composition') }}</h4>
+						<select name="select_meta_stat" id="select_meta_stat" class="search_input">
+						{% for stat_option in subcorpus_selection.stat_options %}
+							<option value="{{ stat_option }}">{{ _('metafield_' + stat_option) }}</option>
+						{% endfor %}
+						</select>
+						<div id="subcorpus_stats_plot">{{ _('(please wait for the plot to load)') }}</div>
+					</div>
+				</div>
+				<div class="selector_buttons">
+					<button type="button" class="btn btn-default btn-success" aria-label="Left Align" id="subcorpus_selector_ok">OK</button> <button type="button" class="btn btn-default btn-danger" aria-label="Left Align" id="subcorpus_selector_clear">{{ _('Clear subcorpus') }}</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

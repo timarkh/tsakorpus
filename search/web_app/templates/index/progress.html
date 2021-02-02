@@ -1,0 +1,8 @@
+
+<img src="static/img/search_in_progress.gif" id="progress_gif" />
+<div class="progress">
+	<p id="seconds_elapsed">0</p>
+	<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{ max_request_time }}" aria-valuemin="0" aria-valuemax="{{ max_request_time }}" style="width:100%">
+		<span>{{ _('Max seconds left: ') }}<span id="progress_bar_seconds">{{ max_request_time }}</span></span>
+		</div>
+</div>

@@ -1,0 +1,86 @@
+{% if page <= 1 %}
+	<div id="results_info" class="row_section_fixed">
+		<p>{{ ngettext('Search result:', 'Search result:', data.n_occurrences) }}
+		{% if search_type == "word" %}
+		{{ data.n_occurrences }} {{ ngettext('unique word', 'different words', data.n_occurrences) }} 
+		{% elif search_type == "lemma" %}
+		{{ data.n_occurrences }} {{ ngettext('unique lemma', 'different lemmata', data.n_occurrences) }} 
+		{% endif %}
+		{{ _('in approximately') }} {{ data.n_docs }} {{ ngettext('document found,', 'documents found,', data.n_docs) }}
+		{% if search_type == "word" %}
+		{{ _('total frequency:') }} {{ data.total_freq }}.
+		{% elif search_type == "lemma" %}
+		{{ _('total frequency of found word forms:') }} {{ data.total_freq|round|int }}.
+		{% endif %}
+		</p>
+		{% if data.timeout %}
+		<div class="alert alert-warning" role="alert">
+		<span class="bi bi-exclamation-triangle-fill" aria-hidden="true"></span> {{ _('The search was not finished due to the query timeout. You only see partial results.') }}
+		</div>
+		{% endif %}
+		{% if data.message %}
+		<div class="alert alert-danger" role="alert">
+		<span class="bi bi-exclamation-triangle" aria-hidden="true"></span> {{ data.message }}
+		</div>
+		{% endif %}
+		{% if data.subcorpus_enabled %}
+		<div class="alert alert-warning" role="alert">
+		<span class="bi bi-exclamation-triangle" aria-hidden="true"></span> {{ _('You are searching in a subcorpus.') }}
+		</div>
+		{% endif %}
+	</div>
+	<div class="word_results row_section_expand">
+		<table class="words_list_table">
+			<thead>{% if search_type == "word" %}<th>{{ _('word_th_word') }}</th>{% endif %}<th>{{ _('word_th_lemma') }}</th>
+			{% if word_search_display_gr %}
+			<th>{{ _('word_th_gr') }}</th>
+			{% endif %}
+			{% for item in word_table_fields %}
+			<th>{{ _('word_th_' + item) }}</th>
+			{% endfor %}
+			<th>{{ _('word_th_frequency') }}</th>
+			{% if display_freq_rank %}
+			<th>{{ _('word_th_freq. rank / quantile') }}</th>
+			{% endif %}
+			{% if search_type == "lemma" %}
+			<th>{{ _('word_th_# forms') }}</th>
+			{% endif %}
+			<th>{{ _('word_th_# sentences') }}</th>
+			<th>{{ _('word_th_# documents') }}</th>
+			<th>{{ _('word_th_search in corpus') }}</th>
+			<th>{{ _('word_th_word stats') }}</th></thead>
+			<tbody>
+{% endif %}
+
+{% for w in data.words %}
+{{ w | safe }}
+{% endfor %}
+
+{% if show_next and not data.timeout %}
+	<tr id="td_load_more_words" data-page="{{ page+1 }}" data-searchtype="{{ search_type }}"><td colspan="100"><span class="glyphicon glyphicon-triangle-bottom" title="Load more"></span></td></tr>
+{% endif %}
+<script type='text/javascript'>assign_word_events(); make_sortable();</script>
+
+{% if page <= 1 %}
+			</tbody>
+		</table>
+	</div>
+
+	{% if data.media %}
+	<script type='text/javascript'>hide_player();</script>
+	{% endif %}
+	{% if data.images %}
+	<script type='text/javascript'>hide_img();</script>
+	{% endif %}
+	{% if data.n_occurrences > 0 %}
+	<script type='text/javascript'>
+		searchType = 'words';
+		hide_query_panel();
+	</script>
+	{% else %}
+	<script type='text/javascript'>
+		show_query_panel();
+		searchType = 'none';
+	</script>
+	{% endif %}
+{% endif %}
