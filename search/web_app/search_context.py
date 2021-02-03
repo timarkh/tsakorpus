@@ -107,7 +107,6 @@ class SearchContext:
             self.add_sent_data_for_session(sent, curSentID)
             curSentIDs.append(curSentID)
         self.sentence_data = curSentIDs
-        print(len(self.sentence_data))
 
     def get_page_data(self, hitsProcessed):
         """
