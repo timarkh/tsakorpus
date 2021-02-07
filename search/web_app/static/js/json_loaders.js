@@ -263,6 +263,7 @@ function hide_query_panel() {
 	if (!$(".img-swap").hasClass('on')) {
 		$(".img-swap").click();
 	}
+	$('#search_div').removeClass('centered');
 }
 
 function show_query_panel() {

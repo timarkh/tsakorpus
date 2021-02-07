@@ -270,7 +270,7 @@
 	overflow-y: hidden;
 	padding-bottom: 3px;
 	padding-left: 10px;
-	width: 90%;
+	max-width: 80vw;
 }
 
 .settings_div {
@@ -967,6 +967,7 @@ hr.separator {
 	width: 99%;
 	float: left;
 	margin-bottom: 5px;
+	white-space: nowrap;
 }
 
 .search_buttons button {
@@ -1186,4 +1187,15 @@ in different styles) */
 
 .sent_lang_english_note {
 	color: #444444;
+}
+
+.tab-content {
+	float: left;
+}
+
+.centered {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }
