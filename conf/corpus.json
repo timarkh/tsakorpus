@@ -1,5 +1,6 @@
 {
   "corpus_name": "beserman_multimedia",
+  "citation": "Beserman corpus.",
   "input_format": "json",
   "debug": false,
   "media": true,
