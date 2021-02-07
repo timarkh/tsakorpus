@@ -2,75 +2,64 @@
 	<div class="show-hide">
 	<div class="query_slide">
 		<form id="search_main">
-		<input type="hidden" name="n_words" id="n_words" value="1">
-		<input type="hidden" name="random_seed" id="random_seed" value={{ random_seed }}>
-		<div class="vertical_nav_tabs">
-            <ul class="nav nav-tabs tabs-left">
-                <li class="active" id="word_search_li"><a href="#word_search_tab" data-toggle="tab" class="bi bi-search" data-tooltip="tooltip" data-placement="top" title="{{ _('Query') }}"></a></li>
-                <li><a href="#display_options_tab" data-toggle="tab" class="bi bi-gear-fill" data-tooltip="tooltip" data-placement="top" title="{{ _('Options') }}"></a></li>
-            </ul>
-        </div>
-		<!-- <div> -->
-            <!-- Tab panes -->
-            <div class="tab-content">
-				<div class="tab-pane active" id="word_search_tab">
-					<div class="words_search">
-						<div class="word_search" id="first_word">
-							<div class="word_search_l">
-								<div class="query_word_header"><div class="circle circle_w1"></div>{{ _('Word_header') }} {{ _('Number_sign') }}1</div>
-								<span id="_label_wf1" class="search_label">{{ _('Word:') }}</span> <input type="text" class="search_input" name="wf1" id="wf1"><br>
-								<span id="_label_lex1" class="search_label">{{ _('Lemma:') }}</span> <input type="text" class="search_input" name="lex1" id="lex1"><br>
-								<span id="_label_gr1" class="search_label">{{ _('Grammar:') }}</span> <input type="text" class="search_input gram_selector_input" name="gr1" id="gr1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gr" data-nword="1"></span><br>
-								<input type="hidden" class="search_input" name="w_id1" id="w_id1">
-								<input type="hidden" class="search_input" name="l_id1" id="l_id1">
-								{% if gloss_search_enabled %}
-								<span id="_label_gloss1" class="search_label">{{ _('Gloss:') }}</span> <input type="text" class="search_input gram_selector_input" name="gloss_index1" id="gloss_index1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gloss_index" data-nword="1"></span><br>
+			<input type="hidden" name="n_words" id="n_words" value="1">
+			<input type="hidden" name="random_seed" id="random_seed" value={{ random_seed }}>
+			<div class="vertical_settings_pane">
+				<a id="show_settings" class="bi bi-gear-fill link_icon" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Options') }}"></a>
+				{% if generate_dictionary %}
+					<a id="show_dictionary" class="bi bi-journal-bookmark-fill link_icon" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Show dictionary') }}"></a>
+				{% endif %}
+	        </div>
+	        <!-- Tab panes -->
+	        <div class="tab-content">
+				<div class="words_search">
+					<div class="word_search" id="first_word">
+						<div class="word_search_l">
+							<div class="query_word_header"><div class="circle circle_w1"></div>{{ _('Word_header') }} {{ _('Number_sign') }}1</div>
+							<span id="_label_wf1" class="search_label">{{ _('Word:') }}</span> <input type="text" class="search_input" name="wf1" id="wf1"><br>
+							<span id="_label_lex1" class="search_label">{{ _('Lemma:') }}</span> <input type="text" class="search_input" name="lex1" id="lex1"><br>
+							<span id="_label_gr1" class="search_label">{{ _('Grammar:') }}</span> <input type="text" class="search_input gram_selector_input" name="gr1" id="gr1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gr" data-nword="1"></span><br>
+							<input type="hidden" class="search_input" name="w_id1" id="w_id1">
+							<input type="hidden" class="search_input" name="l_id1" id="l_id1">
+							{% if gloss_search_enabled %}
+							<span id="_label_gloss1" class="search_label">{{ _('Gloss:') }}</span> <input type="text" class="search_input gram_selector_input" name="gloss_index1" id="gloss_index1"><span class="gram_selector_link glyphicon glyphicon-edit" data-field="gloss_index" data-nword="1"></span><br>
+							{% endif %}
+							<hr class="separator">
+							<div class="add_word_fields"></div>
+							{% if languages|length > 1 %}
+								{{ _('Language/tier:') }} <select name="lang1" id="lang1" class="tier_select search_input">
+								{% for lang in languages %}
+								<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
+								{% endfor %}
+								{% if all_lang_search %}
+								<option value="all">{{ _('langname_all') }}</option>
 								{% endif %}
-								<hr class="separator">
-								<div class="add_word_fields"></div>
-								{% if languages|length > 1 %}
-									{{ _('Language/tier:') }} <select name="lang1" id="lang1" class="tier_select search_input">
-									{% for lang in languages %}
-									<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
-									{% endfor %}
-									{% if all_lang_search %}
-									<option value="all">{{ _('langname_all') }}</option>
-									{% endif %}
-									</select>
-								{% else %}
-									<select name="lang1" id="lang1" style="display: none; visibility: hidden; height: 0px">
-									{% for lang in languages %}
-									<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
-									{% endfor %}
-									</select>
-								{% endif %}
-							</div>
-							<div class="word_search_r">
-								{% if negative_search_enabled %}
-								<a class="neg_query bi bi-cart-x-fill" data-tooltip="tooltip" data-placement="right" title="{{ _('negative_query') }}"></a><br>
-								{% endif %}
-								<a class="word_plus bi bi-plus-circle-fill" data-tooltip="tooltip" data-placement="right" title="{{ _('add_word') }}"></a><br>
-								<a class="add_minus_stub"></a>
-								<a class="add_distance_stub"></a>
-								<a class="word_expand bi bi-box-arrow-down" data-tooltip="tooltip" data-placement="right" title="{{ _('more_fields') }}"></a><br>
-								<input type="checkbox" class="hidden_input neg_query_checkbox" name="negq1" id="negq1" onclick="negative_query();">
-							</div>
+								</select>
+							{% else %}
+								<select name="lang1" id="lang1" style="display: none; visibility: hidden; height: 0px">
+								{% for lang in languages %}
+								<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
+								{% endfor %}
+								</select>
+							{% endif %}
+						</div>
+						<div class="word_search_r">
+							{% if negative_search_enabled %}
+							<a class="neg_query bi bi-cart-x-fill" data-tooltip="tooltip" data-placement="right" title="{{ _('negative_query') }}"></a><br>
+							{% endif %}
+							<a class="word_plus bi bi-plus-circle-fill" data-tooltip="tooltip" data-placement="right" title="{{ _('add_word') }}"></a><br>
+							<a class="add_minus_stub"></a>
+							<a class="add_distance_stub"></a>
+							<a class="word_expand bi bi-box-arrow-down" data-tooltip="tooltip" data-placement="right" title="{{ _('more_fields') }}"></a><br>
+							<input type="checkbox" class="hidden_input neg_query_checkbox" name="negq1" id="negq1" onclick="negative_query();">
 						</div>
 					</div>
-					<br>
-{% if fulltext_search_enabled %}
-					{{ _('Full-text search:') }} <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise" id="precise"> {{ _('Precise match') }}<br>
-{% endif %}
 				</div>
-		
-				<div class="tab-pane" id="display_options_tab">
-					<div class="options_div">
-						<h3 id="h3_options">{{ _('Additional search and display options') }}</h3>
-						
-					</div>
-				</div>
+				<br>
+	{% if fulltext_search_enabled %}
+				{{ _('Full-text search:') }} <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise" id="precise"> {{ _('Precise match') }}<br>
+	{% endif %}
 			</div>
-		<!-- </div> -->
 		</form>
 		<br>
 		<div class="search_buttons">

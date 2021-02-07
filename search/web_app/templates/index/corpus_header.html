@@ -21,10 +21,7 @@
 	{% else %}
 		<span style="padding-right: 70px;">&nbsp;</span>
 	{% endif %}
-	<a id="show_settings" class="bi bi-gear-fill" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Options') }}"></a>
-	{% if generate_dictionary %}
-		<a id="show_dictionary" class="bi bi-journal-bookmark-fill" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Show dictionary') }}"></a>
-	{% endif %}
+	
 	<a id="show_help" class="bi bi-question-circle-fill" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Show help') }}"></a>
 	{% if citation %}
 		<a id="cite_corpus" class="bi bi-chat-quote" data-tooltip="tooltip" data-placement="bottom" title="{{ _('How to cite') }}"></a>

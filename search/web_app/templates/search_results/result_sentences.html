@@ -51,8 +51,8 @@ var srcAlignments = {{ data.src_alignment | safe }};
 {% endif %}
 <div class="after_hits row_section_fixed">
 	<div class="download_results alert-secondary">
-		<a href="download_cur_results_csv" download="results-{{ data.page }}.csv" class="bi bi-file-earmark-ruled-fill" data-tooltip="tooltip" data-placement="top" title="{{ _('download as CSV') }}"></a>
-		<a href="download_cur_results_xlsx" download="results-{{ data.page }}.xlsx" class="bi bi-file-earmark-excel-fill" data-tooltip="tooltip" data-placement="top" title="{{ _('download as XLSX') }}"></a>
+		<a href="download_cur_results_csv" download="results-{{ data.page }}.csv" class="bi bi-file-earmark-ruled-fill link_icon" data-tooltip="tooltip" data-placement="top" title="{{ _('download as CSV') }}"></a>
+		<a href="download_cur_results_xlsx" download="results-{{ data.page }}.xlsx" class="bi bi-file-earmark-excel-fill link_icon" data-tooltip="tooltip" data-placement="top" title="{{ _('download as XLSX') }}"></a>
 	</div>
 	{% if data.contexts|length > 0 %}
 		<div class="pages alert-info">

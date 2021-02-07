@@ -261,6 +261,7 @@
 
 .download_results {
 	font-size: 22px;
+	padding: 5px 15px 5px 15px;
 }
 
 .words_search {
@@ -422,7 +423,7 @@ label {
 	height: 100%;
 }
 
-.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .stat_w, .search_l, .stat_l, #show_help, #show_dictionary, #cite_corpus {
+.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .stat_w, .search_l, .stat_l, #show_help, #cite_corpus {
 	cursor: pointer;
 }
 
@@ -484,17 +485,9 @@ label {
 	color: #2664c9;
 }
 
-#show_setting {
-
-}
-
 #show_help {
 	color: darkorange;
 	animation: blinkHelp 1.5s;
-}
-
-#show_dictionary {
-	color: darkred;
 }
 
 #cite_corpus {
@@ -502,10 +495,6 @@ label {
 }
 
 #show_help:hover {
-	color: #2664c9;
-}
-
-#show_dictionary:hover {
 	color: #2664c9;
 }
 
@@ -950,11 +939,28 @@ hr.separator {
   transform: rotate(-90deg);
 }
 
-.vertical_nav_tabs {
+.vertical_settings_pane {
 	padding-left: 10px;
-	width: 4em;
+	width: 2em;
 	position: relative;
 	float: left;
+	font-size: 2em;
+	text-align: center;
+}
+
+.link_icon {
+	display: inline-flex;
+	text-align: center;
+	border-radius: 4px;
+	color: steelblue;
+	cursor: pointer;
+	padding: 6px;
+}
+
+.link_icon:hover {
+	color: white;
+	background-color: #6b6f75;
+	text-decoration: none;
 }
 
 .search_buttons {
