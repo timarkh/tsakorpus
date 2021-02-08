@@ -1,6 +1,6 @@
 {% if word_fields %}
 	{% for field in word_fields %}
-		<span id="_label_{{ field }}1" class="search_label">{{ _('wordfield_' + field) | capitalize }}:</span> <input type="text" class="search_input" name="{{ field }}1" id="{{ field }}1">{% if multiple_choice_fields and field in multiple_choice_fields %}<span class="gram_selector_link glyphicon glyphicon-edit" data-field="{{ field }}" data-nword="1"></span>{% endif %}<br>
+		<span id="_label_{{ field }}1" class="search_label">{{ _('wordfield_' + field) | capitalize }}:</span> <input type="text" class="search_input" name="{{ field }}1" id="{{ field }}1">{% if multiple_choice_fields and field in multiple_choice_fields %}<span class="gram_selector_link bi bi-table" data-field="{{ field }}" data-nword="1"></span>{% endif %}<br>
 	{% endfor %}
 {% endif %}
 {% if sentence_meta and sentence_meta|length > 0 %}

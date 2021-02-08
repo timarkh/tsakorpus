@@ -5,7 +5,8 @@
 }
 
 .box_column {
-	height: 100vh;
+	height: 97vh;
+	width: 99vw;
 	display: flex;
 	flex-flow: column;
 }
@@ -141,32 +142,42 @@
 	padding-right: 3px;
 }
 
-.glyph_expand {
-	width: 25px;
-	font-size: 26px;
+.bi-arrows-fullscreen {
+	width: 22px;
+	font-size: 22px;
 	color: #48724d;
 	cursor: pointer;
 	margin: auto;
-	margin-left: 10px;
-	margin-right: 5px;
+	margin-right: 3px;
 	text-align: center;
-	display: inline-grid;
+	display: inline-table;
+	padding: 4px;
+	border-radius: 4px;
 }
 
-.glyph_copy {
-	width: 20px;
-	font-size: 20px;
+.bi-clipboard-check {
+	width: 22px;
+	font-size: 22px;
 	color: #1667aa;
 	cursor: pointer;
 	margin: auto;
 	margin-left: 5px;
 	margin-right: 5px;
 	text-align: center;
-	display: inline-grid;
+	display: inline-table;
+	padding: 4px;
+	border-radius: 4px;
 }
 
-.glyph_expand:hover {
-	color: #20A030;
+.bi-arrows-fullscreen:hover {
+	background-color: #20A030;
+	color: white;
+	animation: blinkExpand 1s;
+}
+
+.bi-clipboard-check:hover {
+	background-color: #1667aa;
+	color: white;
 }
 
 .sentence {
@@ -270,7 +281,7 @@
 	overflow-y: hidden;
 	padding-bottom: 3px;
 	padding-left: 10px;
-	max-width: 80vw;
+	max-width: 90vw;
 }
 
 .settings_div {
@@ -406,7 +417,7 @@ label {
 	margin: 0 20px 0 0;
 }
 
-#res_p {
+#search_results {
 	font-size: 16px;
 	font-family: "Segoe UI", "Lucida Grande", sans-serif;
 	line-height: 22px;
@@ -419,7 +430,7 @@ label {
 	margin-left: 3px;
 }
 
-#res_p > * {
+#search_results > * {
 	height: 100%;
 }
 
@@ -467,10 +478,17 @@ label {
 
 @keyframes blinkHelp {
   0%   { opacity:0; font-size: 20px; }
-  10%   { opacity:0.2; font-size: 20px; }
+  10%  { opacity:0.2; font-size: 20px; }
   50%  { opacity:0.7; font-size: 45px; }
   60%  { opacity:0.8; font-size: 45px; }
   100% { opacity:1; font-size: 20px; }
+}
+
+@keyframes blinkExpand {
+  0%   { font-size: 22px; }
+  40%  { font-size: 28px; }
+  60%  { font-size: 28px; }
+  100% { font-size: 22px; }
 }
 
 #corpus_header a.bi {
@@ -506,7 +524,7 @@ label {
     border-radius: 6px;
 	border: 1px solid gray;
 	font-size: 16px;
-	opacity: 0.85;
+	opacity: 1;
 	font-family: Helvetica, sans-serif;
 }
 
@@ -562,10 +580,11 @@ hr.separator {
 }
 
 .gram_selector_link {
-	margin-left: -18px;
-	width: 18px;
+	margin-left: -20px;
+	width: 20px;
 	padding-right: 4px;
 	color: #333;
+	cursor: pointer;
 }
 
 .gram_selector_input {
@@ -955,6 +974,7 @@ hr.separator {
 	color: steelblue;
 	cursor: pointer;
 	padding: 6px;
+	text-decoration: none;
 }
 
 .link_icon:hover {
@@ -964,10 +984,13 @@ hr.separator {
 }
 
 .search_buttons {
-	width: 99%;
-	float: left;
-	margin-bottom: 5px;
-	white-space: nowrap;
+	margin: 15px 2px 10px 2px;
+	display: inline-block;
+	width: 100%;
+}
+
+@media screen and (min-width: 790px) {
+    white-space: nowrap;
 }
 
 .search_buttons button {
@@ -976,9 +999,13 @@ hr.separator {
 	font-size: 1.2em;
 }
 
-.hide_query_button {
-	width: 99%;
+#hide_query_button {
+	width: 100%;
+	min-width: 400px;
 	float: left;
+	border-top: 0;
+	border-left: 0;
+	border-right: 0;
 	border-bottom: 1px dotted gray;
 	border-radius: 0px 0px 10px 10px;
 	background-color: #eef;
@@ -986,6 +1013,11 @@ hr.separator {
 	margin-bottom: 7px;
 	background: linear-gradient(#fefefe, #eef);
 	padding-bottom: 3px;
+	display: none; /* only before first search */
+}
+
+#hide_query_button:focus {
+    outline: none;
 }
 
 #hide_query_caption {
@@ -994,6 +1026,7 @@ hr.separator {
 	padding-top: 5px;
 	color: #555;
 	font-size: 1.2em;
+	text-decoration: none;
 }
 
 #h3_options {
@@ -1035,6 +1068,11 @@ hr.separator {
 	font-size: 1.2em;
 	cursor: pointer;
 	color: #212224;
+	text-decoration: none;
+}
+
+.locale:hover {
+	text-decoration: underline;
 }
 
 .locale-selected {
@@ -1195,7 +1233,12 @@ in different styles) */
 
 .centered {
 	position: fixed;
-	top: 50%;
+	top: 45%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+	min-inline-size: fit-content;
+}
+
+.btn-test {
+    max-width: 250px;
 }

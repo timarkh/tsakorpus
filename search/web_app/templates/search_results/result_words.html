@@ -57,7 +57,7 @@
 {% endfor %}
 
 {% if show_next and not data.timeout %}
-	<tr id="td_load_more_words" data-page="{{ page+1 }}" data-searchtype="{{ search_type }}"><td colspan="100"><span class="glyphicon glyphicon-triangle-bottom" title="Load more"></span></td></tr>
+	<tr id="td_load_more_words" data-page="{{ page+1 }}" data-searchtype="{{ search_type }}"><td colspan="100"><i class="bi bi-caret-down-fill" title="Load more"></i></td></tr>
 {% endif %}
 <script type='text/javascript'>assign_word_events(); make_sortable();</script>
 

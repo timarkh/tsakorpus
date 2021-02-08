@@ -24,22 +24,22 @@
 {% for c in data.contexts %}
 	{% set context_loop = loop %}
 	<div class="context {% if not c.toggled_on %} context_off{% endif %}" id='div_res{{ loop.index - 1 }}'>
-	<span class="ch_container"{% if data.context_header_rtl %} dir="rtl"{% endif %}>{{ c.header | safe }}</span>
-	<div class="cx_main">
-	<div class="cx_toggle_div"><input type="checkbox" class="cx_toggle_chk" {% if c.toggled_on %} checked{% endif %}></div>
-	<span class="get_glossed_copy" data-nsent="{{ loop.index - 1 }}"><span class="glyph_copy glyphicon glyphicon-copy" aria-hidden="true"></span></span>
-	<span class="sentence" id='res{{ loop.index - 1 }}'>
-	{% for lang in data.languages %}
-		{% if lang in c.languages %}
-		<span class="sent_lang sent_lang_{{ lang }}" id='res{{ context_loop.index - 1 }}_{{ lang }}' {% if c.languages[lang].img %}data-img="{{ c.languages[lang].img }}"{% endif %}{% if c.languages[lang].rtl %} dir="rtl"{% endif %}>
-		{{ c.languages[lang].text | safe }}
+		<span class="ch_container"{% if data.context_header_rtl %} dir="rtl"{% endif %}>{{ c.header | safe }}</span>
+		<div class="cx_main">
+		<div class="cx_toggle_div"><input type="checkbox" class="cx_toggle_chk" {% if c.toggled_on %} checked{% endif %}></div>
+		<span class="sentence" id='res{{ loop.index - 1 }}'>
+		{% for lang in data.languages %}
+			{% if lang in c.languages %}
+			<span class="sent_lang sent_lang_{{ lang }}" id='res{{ context_loop.index - 1 }}_{{ lang }}' {% if c.languages[lang].img %}data-img="{{ c.languages[lang].img }}"{% endif %}{% if c.languages[lang].rtl %} dir="rtl"{% endif %}>
+			{{ c.languages[lang].text | safe }}
+			</span>
+			{% if not loop.last %}{% endif %}
+			{% endif %}
+		{% endfor %}
 		</span>
-		{% if not loop.last %}{% endif %}
-		{% endif %}
-	{% endfor %}
-	</span>
-	<span class='expand' data-nsent="{{ loop.index - 1 }}"><span class="glyph_expand glyphicon glyphicon-resize-horizontal" aria-hidden="true"></span></span>
-	</div>
+		<span class="get_glossed_copy bi bi-clipboard-check" title="{{ _('Copy example to clipboard') }}" data-nsent="{{ loop.index - 1 }}"></span>
+		<span class='expand bi bi-arrows-fullscreen' title="{{ _('Expand context') }}" data-nsent="{{ loop.index - 1 }}"></span>
+		</div>
 	</div>
 {% endfor %}
 </div>
@@ -50,7 +50,7 @@ var srcAlignments = {{ data.src_alignment | safe }};
 </script>
 {% endif %}
 <div class="after_hits row_section_fixed">
-	<div class="download_results alert-secondary">
+	<div class="download_results alert-light">
 		<a href="download_cur_results_csv" download="results-{{ data.page }}.csv" class="bi bi-file-earmark-ruled-fill link_icon" data-tooltip="tooltip" data-placement="top" title="{{ _('download as CSV') }}"></a>
 		<a href="download_cur_results_xlsx" download="results-{{ data.page }}.xlsx" class="bi bi-file-earmark-excel-fill link_icon" data-tooltip="tooltip" data-placement="top" title="{{ _('download as XLSX') }}"></a>
 	</div>

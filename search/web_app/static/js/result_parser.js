@@ -3,12 +3,13 @@ var searchType = 'none';
 var excludeDocs = [];
 
 function print_json(results) {
-	//alert("success" + JSON.stringify(results));
+    hide_query_panel();
 	$('.progress').css('display', 'none');
 	$('#analysis').css('display', 'none');
 	$('#w_id1').val('');
 	$('#l_id1').val('');
-	$("#res_p").html( "<p style=\"font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;\">Success!<hr>" + JSON.stringify(results, null, 2).replace(/\n/g, "<br>").replace(/ /g, "&nbsp;") ) + "</p>";
+	$("#search_results").html('<pre><code id="debug_code">' + JSON.stringify(results, null, 2) + '</code></pre>');
+	//alert("success" + JSON.stringify(results));
 }
 
 function print_html(results) {
@@ -17,7 +18,7 @@ function print_html(results) {
 	$('#analysis').css('display', 'none');
 	$('#w_id1').val('');
 	$('#l_id1').val('');
-	$("#res_p").html(results);
+	$("#search_results").html(results);
 	toggle_interlinear();
 }
 
@@ -490,6 +491,12 @@ function make_sortable() {
 function row_comparer(index) {
     return function(a, b) {
         var valA = getCellValue(a, index), valB = getCellValue(b, index);
+        if (valA == undefined) {
+            return 1;
+        }
+        if (valB == undefined) {
+            return -1;
+        }
         return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
     }
 }

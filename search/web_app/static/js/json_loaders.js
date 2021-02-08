@@ -1,6 +1,4 @@
 $(function() {
-	$("[data-toggle=tab]").click(hide_tooltips);
-	
 	$("#search_sent").click(get_sentences);
 	
 	$("#search_sent_json").click(function() {
@@ -10,6 +8,8 @@ $(function() {
 			data: $("#search_main").serialize(),
 			type: "GET",
 			dataType : "json",
+			beforeSend: start_progress_bar,
+			complete: stop_progress_bar,
 			success: print_json,
 			error: function(errorThrown) {
 				$('.progress').css('display', 'none');
@@ -25,6 +25,8 @@ $(function() {
 			data: $("#search_main").serialize(),
 			type: "GET",
 			dataType : "json",
+			beforeSend: start_progress_bar,
+			complete: stop_progress_bar,
 			success: print_json,
 			error: function(errorThrown) {
 				$('.progress').css('display', 'none');
@@ -86,6 +88,8 @@ $(function() {
 			data: $("#search_main").serialize(),
 			type: "GET",
 			dataType : "json",
+			beforeSend: start_progress_bar,
+			complete: stop_progress_bar,
 			success: print_json,
 			error: function(errorThrown) {
 				$('.progress').css('display', 'none');
@@ -101,6 +105,8 @@ $(function() {
 			data: $("#search_main").serialize(),
 			type: "GET",
 			dataType : "json",
+			beforeSend: start_progress_bar,
+			complete: stop_progress_bar,
 			success: print_json,
 			error: function(errorThrown) {
 				$('.progress').css('display', 'none');
@@ -116,6 +122,8 @@ $(function() {
 			data: $("#search_main").serialize(),
 			type: "GET",
 			dataType : "json",
+			beforeSend: start_progress_bar,
+			complete: stop_progress_bar,
 			success: print_json,
 			error: function(errorThrown) {
 				$('.progress').css('display', 'none');
@@ -131,6 +139,8 @@ $(function() {
 			data: $("#search_main").serialize(),
 			type: "GET",
 			dataType : "json",
+			beforeSend: start_progress_bar,
+			complete: stop_progress_bar,
 			success: print_json,
 			error: function(errorThrown) {
 				$('.progress').css('display', 'none');
@@ -146,6 +156,8 @@ $(function() {
 			data: $("#search_main").serialize(),
 			type: "GET",
 			dataType : "json",
+			beforeSend: start_progress_bar,
+			complete: stop_progress_bar,
 			success: print_json,
 			error: function(errorThrown) {
 				$('.progress').css('display', 'none');
@@ -161,6 +173,8 @@ $(function() {
 			data: $("#search_main").serialize(),
 			type: "GET",
 			dataType : "json",
+			beforeSend: start_progress_bar,
+			complete: stop_progress_bar,
 			success: print_json,
 			error: function(errorThrown) {
 				$('.progress').css('display', 'none');
@@ -178,14 +192,14 @@ $(function() {
 function start_progress_bar() {
 	// progressHtml = '<img src="static/img/search_in_progress.gif" style="visibility: hidden;" id="progress_gif" /><br>'
 	// progressHtml += '<p id="seconds_elapsed" style="visibility: hidden;">0</p>'
-	$('#res_p').html("");
-	$('#res_p').addClass('in_progress');
+	$('#search_results').html("");
+	$('#search_results').addClass('in_progress');
 	continue_progress_bar();
 }
 
 function continue_progress_bar() {
 	setTimeout(function () {
-		if ($('#res_p').hasClass('in_progress')) {
+		if ($('#search_results').hasClass('in_progress')) {
 			secElapsed = parseInt($('#seconds_elapsed').html().replace(/[^0-9]/g, '')) + 1;
 			if (secElapsed > 0) {
 				$('#seconds_elapsed').html(secElapsed);
@@ -209,7 +223,7 @@ function continue_progress_bar() {
 
 function stop_progress_bar() {
 	$('#progress_gif').css('display', 'none');
-	$('#res_p').removeClass('in_progress');
+	$('#search_results').removeClass('in_progress');
 	$('.progress-bar').attr('aria-valuenow', max_request_time);
 	$('#seconds_elapsed').html("0");
 }
@@ -260,8 +274,10 @@ function load_additional_word_fields() {
 }
 
 function hide_query_panel() {
-	if (!$(".img-swap").hasClass('on')) {
-		$(".img-swap").click();
+    $("#hide_query_button").show();
+    $("#greeting").hide();
+	if ($("#hide_query_icon").hasClass('bi-arrow-bar-up')) {
+		$("#hide_query_button").click();
 	}
 	$('#search_div').removeClass('centered');
 }
@@ -359,10 +375,12 @@ function assign_tooltips() {
 
 function hide_tooltips() {
 	$("[data-tooltip=tooltip]").tooltip('hide');
+	$(".tooltip").hide();
 }
 
 function assign_show_hide() {
-	$(".show-hide a").click(function(e){
+    $("#hide_query_button").unbind('click');
+	$("#hide_query_button").click(function(e){
 		e.preventDefault();
 		var $this=$(this),
 				rel=$this.attr("rel"),
@@ -372,15 +390,10 @@ function assign_show_hide() {
 		switch(rel){
 			case "toggle-query_slide":
 				if(!el.is(":animated")){
-					imgSwap = $('.img-swap');
-					if (imgSwap.attr("class") == "img-swap") {
-						imgSwap.attr('src', imgSwap.attr('src').replace("_up","_down"));
-						$('#hide_query_caption').css('display', 'inline');
-					} else {
-						imgSwap.attr('src', imgSwap.attr('src').replace("_down","_up"));
-						$('#hide_query_caption').css('display', 'none');
-					}
-					imgSwap.toggleClass("on");
+					iconSwap = $('#hide_query_icon');
+					iconSwap.toggleClass('bi-arrow-bar-down');
+					iconSwap.toggleClass('bi-arrow-bar-up');
+					$('#hide_query_caption').toggle();
 					wrapper.removeClass("transitions");
 					el.slideToggle(dur,function(){wrapper.addClass("transitions");});
 				}
@@ -437,6 +450,7 @@ function del_word_inputs(e) {
 		$('#wsearch_' + i).attr('id', 'wsearch_' + (i - 1));
 	}
 	assign_input_events();
+	hide_tooltips();
 }
 
 function expand_word_input(e) {
@@ -457,8 +471,8 @@ function expand_word_input(e) {
 	else {
 		return;
 	}
-	$(e.target).toggleClass('glyphicon-chevron-down');
-	$(e.target).toggleClass('glyphicon-chevron-up');
+	$(e.target).toggleClass('bi-box-arrow-down');
+	$(e.target).toggleClass('bi-box-arrow-up');
 }
 
 function add_word_relations(e) {

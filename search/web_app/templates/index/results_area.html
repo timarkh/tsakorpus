@@ -12,7 +12,10 @@
 	<div id="image_div" style="display: none">
 	</div>
 	{% endif %}
-	<div id="res_p">
-		<p style="font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;">{{ _('(Place for results)') }}</p>
+	<div id="search_results">
+		{% if debug %}
+			<pre><code id="debug_code">
+			</code></pre>
+		{% endif %}
 	</div>
 </div>
