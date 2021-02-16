@@ -229,7 +229,7 @@
 	font-size: 18px;
 	padding-right: 20px;
 	font-weight: bold;
-	color: #3a537a;
+	color: #363e8f;
 }
 
 .ch_author {
@@ -764,7 +764,7 @@ hr.separator {
 }
 
 .modal-dialog {
-	width: 60vw;
+	max-width: 60vw;
 }
 
 .documents_list_table {
@@ -1296,4 +1296,8 @@ in different styles) */
 
 #hide_query_icon {
 	font-size: 28px;
+}
+
+#video_prompt {
+	margin: -170px 35px auto 5px;
 }

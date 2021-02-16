@@ -6,6 +6,10 @@
 		To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
 		</p>
 		</video>
+		<div id="video_prompt" class="alert alert-warning alert-dismissible fade show" role="alert">
+			<p>{{ _('Click on an example to see video.') }}</p>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Close') }}"></button>
+		</div>
 	</div>
 	{% endif %}
 	{% if images %}

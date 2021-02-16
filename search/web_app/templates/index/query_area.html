@@ -94,7 +94,7 @@
 <button id="hide_query_button" title={{ _('Back to search') }} rel="toggle-query_slide"><i id="hide_query_icon" class="bi bi-arrow-bar-up"></i><span id="hide_query_caption">{{ _('Back to search') }}</span></button>
 <div class="alert alert-warning alert-dismissible fade show" role="alert" id="greeting">
 	{% include "index/greeting_" + locale + ".html" ignore missing %}
-	<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Close') }}"></button>
 </div>
 </div>
 </div>

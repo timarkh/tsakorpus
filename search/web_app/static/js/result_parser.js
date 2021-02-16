@@ -19,6 +19,7 @@ function print_html(results) {
 	$('#w_id1').val('');
 	$('#l_id1').val('');
 	$("#search_results").html(results);
+	$('#video_prompt').show();
 	toggle_interlinear();
 }
 
@@ -198,6 +199,7 @@ function make_player_markers(objContext, curFragment) {
 
 function src_align_span(item, i) {
 	if (!item.startsWith("src") || item == "src" || item.includes('highlighted')) return;
+	$('#video_prompt').hide();
 	var alignmentInfo = srcAlignments[item];
 	var srcPlayer = videojs('src_player');
 	var realSrc = alignmentInfo.src;

@@ -2,21 +2,25 @@
 
 {% include "modals/display_settings.html" %} <!-- results per page, sorting, transliteration, etc. -->
 
-<div class="modal fade" id="gram_selector" tabindex="-1" role="dialog" aria-labelledby="gram_sel_header" aria-hidden="true" data-field="gr1">
+<div class="modal fade modal-dialog-scrollable" id="gram_selector" tabindex="-1" role="dialog" aria-labelledby="gram_sel_header" aria-hidden="true" data-field="gr1">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="gram_sel_header">Grammar selection header</h4>
+				<h5 class="modal-title" id="gram_sel_header">Grammar selection header</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
 			</div>
 			<div class="modal-body" id="gram_sel_body">
-			<p>Grammar selection body</p>
+				<p>Grammar selection body</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default btn-success" aria-label="OK" id="gramm_selector_ok">OK</button>
+				<button type="button" class="btn btn-default btn-danger" aria-label="{{ _('Cancel') }}" id="gramm_selector_cancel" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
 			</div>
 		</div>
 	</div>
 </div>
 
-<div class="modal fade" id="help_dialogue" tabindex="-1" role="dialog" aria-labelledby="help_dialogue_header" aria-hidden="true">
+<div class="modal fade modal-dialog-scrollable" id="help_dialogue" tabindex="-1" role="dialog" aria-labelledby="help_dialogue_header" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
