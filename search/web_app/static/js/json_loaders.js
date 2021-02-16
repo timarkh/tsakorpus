@@ -405,15 +405,8 @@ function assign_show_hide() {
 function negative_query(e, thisSpan) {
 	var word_div = $(thisSpan).parent().parent();
 	var word_r_div = $(thisSpan).parent();
+	word_div.toggleClass('negated');
 	word_r_div.toggleClass('negated');
-	if (word_div.css("background-color") != "rgb(20, 20, 20)") {
-		word_div.css({"background-color": "rgb(20, 20, 20)", "color": "#fff"});
-		word_r_div.css({"background-color": "rgb(60, 50, 60)", "color": "#fff"});
-	}
-	else {
-		word_div.css({"background-color": "#fff", "color": "black"});
-		word_r_div.css({"background-color": "#e1e9ef", "color": "black"});
-	}
 }
 
 function negative_query_span(e) {
@@ -434,8 +427,10 @@ function add_word_inputs(e) {
 	word_div_html += '</div>';
 	word_div = $.parseHTML(word_div_html);
 	$("div.words_search").append(word_div);
-	$(word_div).find('.word_search_r').css({"background-color": "#e1e9ef", "color": "black"});
+	$(word_div).removeClass('negated');
+	$(word_div).find('.word_search_r').removeClass('negated');
 	$("#n_words").attr('value', new_word_num);
+	$('#search_div').removeClass('centered');
 	assign_input_events();
 }
 
@@ -454,6 +449,7 @@ function del_word_inputs(e) {
 }
 
 function expand_word_input(e) {
+	$('#search_div').removeClass('centered');
 	var div_extra_fields = $(e.target).parent().parent().find('.add_word_fields');
 	div_extra_fields.finish();
 	if (div_extra_fields.css('max-height') == '0px') {
