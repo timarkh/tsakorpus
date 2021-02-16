@@ -40,15 +40,15 @@
 			{% endfor %}
 			<th>{{ _('word_th_frequency') }}</th>
 			{% if display_freq_rank %}
-			<th>{{ _('word_th_freq. rank / quantile') }}</th>
+			<th><i class="bi bi-list-ol" data-tooltip="tooltip" data-placement="top" title="{{ _('word_th_freq. rank / quantile') }}"></i></th>
 			{% endif %}
 			{% if search_type == "lemma" %}
-			<th>{{ _('word_th_# forms') }}</th>
+			<th><i class="bi bi-diagram-3" data-tooltip="tooltip" data-placement="top" title="{{ _('word_th_# forms') }}"></i></th>
 			{% endif %}
-			<th>{{ _('word_th_# sentences') }}</th>
-			<th>{{ _('word_th_# documents') }}</th>
-			<th>{{ _('word_th_search in corpus') }}</th>
-			<th>{{ _('word_th_word stats') }}</th></thead>
+			<th><i class="bi bi-layout-text-sidebar-reverse" data-tooltip="tooltip" data-placement="top" title="{{ _('word_th_# sentences') }}"></i></th>
+			<th><i class="bi bi-file-earmark-text" data-tooltip="tooltip" data-placement="top" title="{{ _('word_th_# documents') }}"></i></th>
+			<th><i class="bi bi-search" data-tooltip="tooltip" data-placement="top" title="{{ _('word_th_search in corpus') }}"></i></th>
+			<th><i class="bi bi-bar-chart-line-fill" data-tooltip="tooltip" data-placement="top" title="{{ _('word_th_word stats') }}"></i></th></thead>
 			<tbody>
 {% endif %}
 

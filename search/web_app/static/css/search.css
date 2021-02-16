@@ -21,7 +21,7 @@
 }
 
 .btn-primary {
-	background-color: #3a89fc;
+	background-color: #5193f5;
 }
 
 .word:hover {
@@ -798,22 +798,22 @@ hr.separator {
 	border: solid 1px gray;
 	border-radius: 4px;
 	margin: auto;
-	margin-left: 5px;
+	margin-left: 15px;
 	margin-bottom: 15px;
 	border-spacing: 0;
 	border-collapse: separate;
 }
 
 .words_list_table tr:nth-child(odd) {
-	background-color: #f0f6ff; 
+	background-color: #f5f9ff; 
 }
 
 .words_list_table tr:nth-child(even) {
-	background-color: #cce0ff;
+	background-color: #dbe9ff;
 }
 
 .words_list_table th {
-	padding: 3px 5px;
+	padding: 5px;
 	color: #f7fdff;
 	min-width: 35px;
 	background-color: #0065a3;
@@ -821,6 +821,12 @@ hr.separator {
 	border-top: none;
 	border-bottom: none;
 	cursor: pointer;
+	text-align: center;
+}
+
+.words_list_table th i {
+	font-size: 28px;
+	padding: 5px;
 }
 
 .words_list_table th:first-of-type {
@@ -836,7 +842,10 @@ hr.separator {
 	border: 1px dotted #bfcad6;
 	border-top: none;
 	border-bottom: none;
+	max-width: 340px;
 }
+
+
 
 .words_list_table td:first-of-type {
 	border-left:none;
@@ -1026,6 +1035,7 @@ hr.separator {
 	margin: 15px 2px 10px 2px;
 	display: inline-block;
 	width: 100%;
+	padding-left: 15px;
 }
 
 @media screen and (min-width: 790px) {
