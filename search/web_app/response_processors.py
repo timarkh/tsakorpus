@@ -1315,17 +1315,22 @@ class SentenceViewer:
         return langID, lang
 
     def process_sent_json(self, response, translit=None):
-        result = {'n_occurrences': 0, 'n_sentences': 0,
-                  'n_docs': 0, 'page': 1,
-                  'message': 'Nothing found.'}
+        result = {
+            'n_occurrences': 0,
+            'n_sentences': 0,
+            'n_docs': 0,
+            'page': 1,
+            'message': 'Nothing found.',
+            'contexts': [],
+            'languages': []
+        }
         result['context_header_rtl'] = self.settings.context_header_rtl
-        if 'hits' not in response or 'total' not in response['hits']:
+        if ('hits' not in response or 'total' not in response['hits']
+                or response['hits']['total']['value'] <= 0):
             return result
         result['message'] = ''
         result['n_sentences'] = response['hits']['total']['value']
         # response['hits']['total']['value'] is limited by 10,000 now, so we'll try to take this value from elsewhere
-        result['contexts'] = []
-        result['languages'] = []
         resultLanguages = set()
         srcAlignmentInfo = {}
         if 'aggregations' in response:
@@ -1367,6 +1372,7 @@ class SentenceViewer:
         if ('hits' not in response
                 or 'total' not in response['hits']
                 or response['hits']['total']['value'] <= 0):
+            result['total_freq'] = 0
             return result
         result['message'] = ''
         # result['n_occurrences'] = response['hits']['total']['value']
@@ -1395,6 +1401,7 @@ class SentenceViewer:
                 or 'hits' not in response
                 or 'total' not in response['hits']
                 or response['hits']['total']['value'] <= 0):
+            result['total_freq'] = 0
             return result
         result['message'] = ''
         # result['n_occurrences'] = response['hits']['total']['value']
