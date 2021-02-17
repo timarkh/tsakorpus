@@ -1,4 +1,6 @@
 $(function() {
+	$('.gloss_choice_panel').scrollLeft();
+
 	function assign_gramm_events() {
 		$('.switchable_gramm').unbind('click');
 		$('.switchable_gramm').click(toggle_gramm);
@@ -7,23 +9,23 @@ $(function() {
 	function toggle_gramm(e) {
 		$(this).toggleClass('gramm_enabled');
 		var new_formula = build_formula();
-		$('#gramm_query_viewer').text(new_formula);
+		$('#gramm_gloss_query_viewer').text(new_formula);
 	}
 	
 	function parse_initial_value() {
-		var rx_grammtags = /[a-zA-Z0-9_.]+/g;
-		var grammtags = [], found;
-		while (grammtag = rx_grammtags.exec($('#gramm_query_viewer').text())) {
-			grammtags.push(grammtag[0]);
-			rx_grammtags.lastIndex = grammtag.index+1;
-		}
+		var rx_grammtags = /[^ ,()|*+~?]+/g;
+		let matches = Array.from($('#gramm_gloss_query_viewer').text().matchAll(rx_grammtags));
+        var grammtags = [];
+        matches.forEach(function (m) {
+            grammtags.push(m[0]);
+        })
 		$('.switchable_gramm').each(function (index) {
 			if (grammtags.includes($(this).attr('data-grammtag')) && !$(this).hasClass('gramm_enabled')) {
 				$(this).toggleClass('gramm_enabled');
 			}
 		});
 		var new_formula = build_formula();
-		$('#gramm_query_viewer').text(new_formula);
+		$('#gramm_gloss_query_viewer').text(new_formula);
 	}
 
 	function build_formula() {

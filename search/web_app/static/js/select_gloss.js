@@ -1,24 +1,49 @@
 $(function() {
-    $( "#sortable" ).sortable({
-		over: function (event, ui) {
-            remove_item = false;
-        },
-        out: function (event, ui) {
-            remove_item = true;
-        },
-        beforeStop: function (event, ui) {
-			var siblings = ui.item.siblings();
-			var n_siblings = siblings.length;
-			if (remove_item && n_siblings > 1) {
-                ui.item.hide();
-                ui.item.remove();
+    function assign_gloss_events() {
+        $('.switchable_gramm').unbind('click');
+        $('.switchable_gramm').click(toggle_gloss);
+    }
+
+    function toggle_gloss(e) {
+        var gloss = $(this).attr('data-gloss');
+        var add_gloss = (($(this).hasClass('gramm_enabled')) ? false : true);
+        $(this).toggleClass('gramm_enabled');
+        var new_glosses = build_glosses(gloss, add_gloss);
+        $('#gramm_gloss_query_viewer').text(new_glosses);
+    }
+    
+    function parse_initial_value() {
+        var rx_glosses = /[^ ,()|*+~#{}?-]+/g;
+        let matches = Array.from($('#gramm_gloss_query_viewer').text().matchAll(rx_glosses));
+        var glosses = [];
+        matches.forEach(function (m) {
+            glosses.push(m[0]);
+        })
+        $('.switchable_gramm').each(function (index) {
+            if (glosses.includes($(this).attr('data-gloss')) && !$(this).hasClass('gramm_enabled')) {
+                $(this).toggleClass('gramm_enabled');
             }
+        });
+    }
+
+    function build_glosses(gloss, add_gloss) {
+        var old_text = $('#gramm_gloss_query_viewer').text();
+        if (add_gloss) {
+            if (gloss.search("#") < 0) {
+                return (old_text + '-' + gloss).replace(/^-|-$/g, '');
+            }
+            return (old_text + gloss).replace(/^-|-$/g, '');
         }
-	});
-    $( "#sortable" ).disableSelection();
-	$( ".draggable" ).draggable({
-      connectToSortable: "#sortable",
-      helper: "clone",
-      revert: "invalid"
-    });
+        else {
+            if (gloss.search("#") < 0) {
+                var gloss2remove = '^' + gloss + '-|-' + gloss + '-|-' + gloss + '$|^' + gloss + '$';
+                var rx_gloss2remove = new RegExp(gloss2remove, 'g');
+                return old_text.replace(rx_gloss2remove, '').replace(/^-|-$/g, '');
+            }
+            return old_text.replace(gloss, '').replace(/^-|-$/g, '');
+        }
+    }
+
+    assign_gloss_events();
+    parse_initial_value();
 });

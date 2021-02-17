@@ -24,6 +24,16 @@
 	position: relative;
 }
 
+.gloss_row {
+	display: block;
+	margin: 1px;
+	border-radius: 3px;
+	background-color: #effce1;
+	padding: 6px;
+	white-space: normal;
+	position: relative;
+}
+
 .gloss_separator {
 	width: 90%;
 }
@@ -36,19 +46,6 @@
 	min-width: 130px;
 	text-align: center;
 	white-space: normal;
-}
-
-.draggable {
-	margin: 0 0 3px 0;
-	padding: 4px 10px;
-	display: inline-block;
-	cursor: move;
-	border: 1px solid #eee;
-	border-radius: 3px;
-	background-color: #fff9b2;
-	transition: font-size 0.5s, height 0.5s, background-color 0.5s;
-	min-width: 50px;
-	text-align: center;
 }
 
 .switchable_gramm {
@@ -67,17 +64,17 @@
 	background-color: #fff9b2;
 }
 
-.switchable_gramm .tooltip_prompt, .draggable .tooltip_prompt {
+.switchable_gramm .tooltip_prompt {
 	left: initial;
-	margin-left: -15%;
-	margin-top: 15%;
+	margin-left: -25px;
+	margin-top: 20px;
 	max-width: 400px;
 	visibility: hidden;
 	z-index: 100;
 	position: absolute;
 }
 
-.switchable_gramm:hover .tooltip_prompt, .draggable:hover .tooltip_prompt {
+.switchable_gramm:hover .tooltip_prompt {
     visibility: visible;
 }
 
@@ -90,7 +87,7 @@
 	border: 2px solid #c4d7ef;
 }
 
-#gramm_query_viewer {
+#gramm_gloss_query_viewer {
 	margin: 5px 3%;
 	width: 65%;
 	float: left;
@@ -102,25 +99,3 @@
 	padding: 5px 15px;
 	min-height: 3em;
 }
-
-#sortable {
-	list-style-type: none;
-	margin: 5px auto;
-	display: table;
-	font-size: 1.2em;
-	min-width: 55px;
-}
-
-#sortable div {
-	margin: 0 3px 3px 3px;
-	padding: 5px 10px;
-	min-height: 30px;
-	max-height: 40px;
-	display:inline-block;
-	float: left;
-	border: 1px solid gray;
-	background-color: #eee;
-	border-radius: 3px;
-	cursor: move;
-}
-

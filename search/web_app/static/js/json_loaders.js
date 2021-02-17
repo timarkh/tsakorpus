@@ -496,9 +496,9 @@ function choose_tags(e) {
 			url: "get_gramm_selector/" + lang,
 			type: "GET",
 			success: function(result) {
-				gramm_selector_loaded(result);
+				gramm_gloss_selector_loaded(result);
 				$('#gram_selector').modal('show');
-				$('#gramm_query_viewer').text($('#' + field).val());
+				$('#gramm_gloss_query_viewer').text($('#' + field).val());
 			},
 			error: function(errorThrown) {
 				alert( JSON.stringify(errorThrown) );
@@ -515,8 +515,9 @@ function choose_tags(e) {
 					alert('No glosses are available for this language.');
 					return;
 				}
-				gloss_selector_loaded(result);
+				gramm_gloss_selector_loaded(result);
 				$('#gram_selector').modal('show');
+				$('#gramm_gloss_query_viewer').text($('#' + field).val());
 			},
 			error: function(errorThrown) {
 				alert( JSON.stringify(errorThrown) );
@@ -530,9 +531,9 @@ function choose_tags(e) {
 			url: "get_add_field_selector/" + field_type,
 			type: "GET",
 			success: function(result) {
-				gramm_selector_loaded(result);
+				gramm_gloss_selector_loaded(result);
 				$('#gram_selector').modal('show');
-				$('#gramm_query_viewer').text($('#' + field).val());
+				$('#gramm_gloss_query_viewer').text($('#' + field).val());
 			},
 			error: function(errorThrown) {
 				alert( JSON.stringify(errorThrown) );
@@ -586,20 +587,10 @@ function show_citation(e) {
 	$('#citation_dialogue').modal('show');
 }
 
-function gramm_selector_loaded(result) {
+function gramm_gloss_selector_loaded(result) {
 	$("#gram_sel_body").html(result);
 	$("#gramm_selector_ok").unbind('click');
 	$("#gramm_selector_ok").click(gram_selector_ok);
-	$("#gramm_selector_cancel").unbind('click');
-	$("#gramm_selector_cancel").click(function() {$('#gram_selector').modal('toggle');});
-}
-
-function gloss_selector_loaded(result) {
-	$("#gram_sel_body").html(result);
-	$("#gloss_selector_ok").unbind('click');
-	$("#gloss_selector_ok").click(gloss_selector_ok);
-	$("#gloss_selector_cancel").unbind('click');
-	$("#gloss_selector_cancel").click(function() {$('#gram_selector').modal('toggle');});
 }
 
 function assign_dictionary_events(){
@@ -615,24 +606,7 @@ function input_lemma(e) {
 
 function gram_selector_ok(e) {
 	var field = '#' + $('#gram_selector').attr('data-field');
-	$(field).val($('#gramm_query_viewer').text());
-	$('#gram_selector').modal('toggle');
-}
-
-function gloss_selector_ok(e) {
-	var field = '#' + $('#gram_selector').attr('data-field');
-	var gloss_divs = $('#sortable > div');
-	var gloss_field_val = '';
-	gloss_divs.each(function (index) {
-		var t = $(this).contents().get(0).nodeValue.replace(/[\r\n\t ]/g, '');
-		if (t.length > 0) {
-			gloss_field_val += t + '-';
-		}
-	});
-	gloss_field_val = gloss_field_val.replace(/^[* -]*|[* -]$/g, '');
-	gloss_field_val = gloss_field_val.replace(/-?#-?/g, '#');
-	gloss_field_val = gloss_field_val.replace(/(\*-)(\*-)+/g, '*-');
-	$(field).val(gloss_field_val);
+	$(field).val($('#gramm_gloss_query_viewer').text());
 	$('#gram_selector').modal('toggle');
 }
 
