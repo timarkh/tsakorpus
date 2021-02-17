@@ -8,17 +8,20 @@
 	font-size: 1em;
 	overflow: auto;
 	white-space: nowrap;
+	min-height: 50vh;
 }
 
 .gloss_column {
-	display: inline-block;
-	max-width: 150px;
+	display: inline-table;
+	max-width: 200px;
+	min-width: 100px;
 	margin: 1px;
 	margin-right: 2px;
 	border-radius: 3px;
-	background-color: #f6f7e1;
-	display: inline-grid;
-	padding: 4px;
+	background-color: #effce1;
+	padding: 6px;
+	white-space: normal;
+	position: relative;
 }
 
 .gloss_separator {
@@ -26,21 +29,19 @@
 }
 
 .gloss_header {
-	background-color: #f7f0a0;
-	margin: 0 3px 3px 3px;
+	background-color: #b8e884;
+	margin: 3px 0 6px 0;
 	padding: 4px 10px;
-	display:inline-block;
-	float: left;
 	border-radius: 3px;
-	min-width: 50px;
+	min-width: 130px;
 	text-align: center;
+	white-space: normal;
 }
 
 .draggable {
-	margin: 0 3px 3px 3px;
+	margin: 0 0 3px 0;
 	padding: 4px 10px;
-	display:inline-block;
-	float: left;
+	display: inline-block;
 	cursor: move;
 	border: 1px solid #eee;
 	border-radius: 3px;
@@ -50,27 +51,14 @@
 	text-align: center;
 }
 
-.draggable .tooltip_prompt {
-	top: 15px;
-	right: 20px;
-	left: initial;
-	margin-left: -30%;
-	max-width: 250px;
-}
-
-.draggable:hover .tooltip_prompt {
-    visibility: visible;
-}
-
 .switchable_gramm {
-	margin: 0 3px 3px 3px;
+	margin: 0 0 3px 0;
 	padding: 4px 8px;
-	display:inline-block;
-	float: left;
+	display: inline-block;
 	cursor: pointer;
 	border: 1px solid #eee;
 	border-radius: 3px;
-	background-color: #fffae2;
+	background-color: #ddf2c7;
 	min-width: 50px;
 	text-align: center;
 }
@@ -79,15 +67,17 @@
 	background-color: #fff9b2;
 }
 
-.switchable_gramm .tooltip_prompt {
-	top: 15px;
-	right: 20px;
+.switchable_gramm .tooltip_prompt, .draggable .tooltip_prompt {
 	left: initial;
-	margin-left: -30%;
-	max-width: 250px;
+	margin-left: -15%;
+	margin-top: 15%;
+	max-width: 400px;
+	visibility: hidden;
+	z-index: 100;
+	position: absolute;
 }
 
-.switchable_gramm:hover .tooltip_prompt {
+.switchable_gramm:hover .tooltip_prompt, .draggable:hover .tooltip_prompt {
     visibility: visible;
 }
 
@@ -104,10 +94,10 @@
 	margin: 5px 3%;
 	width: 65%;
 	float: left;
-	background-color: #e8f1fc;
-	color: #19477f;
+	background-color: #effce1;
+	color: #254207;
 	border-radius: 5px;
-	border: 2px solid #c4d7ef;
+	border: 2px solid #ddf2c7;
 	text-align: center;
 	padding: 5px 15px;
 	min-height: 3em;

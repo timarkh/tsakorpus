@@ -21,7 +21,13 @@
 }
 
 .btn-primary {
-	background-color: #5193f5;
+	background-color: #238eeb;
+	border-color: #0f77d1;
+}
+
+.alert-info {
+	background-color: #b3ddff;
+	border-color: #6bace3;
 }
 
 .word:hover {
@@ -229,13 +235,13 @@
 	font-size: 18px;
 	padding-right: 20px;
 	font-weight: bold;
-	color: #363e8f;
+	color: #1f6099;
 }
 
 .ch_author {
 	font-size: 18px;
 	padding-right: 40px;
-	color: #0470a5;
+	color: #0b6cbf;
 }
 
 .ch_date {
@@ -416,7 +422,7 @@ label {
 
 #corpus_title {
 	font-size: 1.3em;
-	color: #526e99;
+	color: #085da6;
 	display: inline-flex;
 	margin: 0 20px 0 0;
 }
@@ -1019,7 +1025,7 @@ hr.separator {
 	display: inline-flex;
 	text-align: center;
 	border-radius: 4px;
-	color: #416ee8;
+	color: #0f77d1;
 	cursor: pointer;
 	padding: 6px;
 	text-decoration: none;
@@ -1027,7 +1033,8 @@ hr.separator {
 
 .link_icon:hover {
 	color: white;
-	background-color: #6b6f75;
+	/* background-color: #6b6f75; */
+	background-color: #085da6;
 	text-decoration: none;
 }
 
@@ -1280,10 +1287,10 @@ in different styles) */
 	float: left;
 }
 
-@media (min-height: 720px) and (orientation:landscape) {
+@media (min-height: 700px) and (orientation:landscape) {
 	.centered {
 		position: fixed;
-		top: 45%;
+		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
 		min-inline-size: fit-content;
