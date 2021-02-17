@@ -24,8 +24,8 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="help_dialogue_header">{{ _('Help') }}</h4>
+				<h5 class="modal-title" id="help_dialogue_header">{{ _('Help') }}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
 			</div>
 			<div class="modal-body" id="help_dialogue_body">
 			<p>The help text should be loaded here.</p>
@@ -38,8 +38,8 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="dictionary_dialogue_header">{{ _('Dictionary_header') }}</h4>
+				<h5 class="modal-title" id="dictionary_dialogue_header">{{ _('Dictionary_header') }}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
 			</div>
 			<div class="modal-body" id="dictionary_dialogue_body">
 			<p>The dictionary text should be loaded here.</p>
@@ -52,8 +52,8 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="citation_dialogue_header">{{ _('How to cite') }}</h4>
+				<h5 class="modal-title" id="citation_dialogue_header">{{ _('How to cite') }}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
 			</div>
 			<div class="modal-body" id="citation_dialogue_body">
 			<p>{{ citation | safe }}</p>
@@ -67,7 +67,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
 			</div>
 			<div class="modal-body" id="full_image_body">
 			<img id="img_fullres" src="">

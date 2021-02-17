@@ -2,8 +2,8 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="bi bi-x" aria-hidden="true"></span></button>
-				<h4 class="modal-title" id="display_settings_header">{{ _('Additional search and display options') }}</h4>
+				<h5 class="modal-title" id="display_settings_header">{{ _('Additional search and display options') }}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
 			</div>
 			<div class="modal-body" id="display_settings_body">
 				<div class="settings_div">
@@ -83,9 +83,9 @@
 						</div>
 					</div>
 				</div>
-				<div class="selector_buttons">
-					<button type="button" class="btn btn-default btn-success" id="display_settings_ok">OK</button>
-				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default btn-success" aria-label="OK" id="display_settings_ok">OK</button>
 			</div>
 		</div>
 	</div>
