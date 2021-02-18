@@ -1110,7 +1110,7 @@ class InterfaceQueryParser:
         esQuery['aggs'] = {'agg_rank': {'terms': {'field': 'rank_true',
                                                   'order': {'_key': 'asc'},
                                                   'size': 10000}}}
-        # print(esQuery)
+        print(esQuery)
         return esQuery
 
     def filter_sentences(self, iterSent, constraints, nWords=1):

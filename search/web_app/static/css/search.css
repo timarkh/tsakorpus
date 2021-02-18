@@ -34,6 +34,10 @@
 	border-color: #6bace3;
 }
 
+.tab-content > .active {
+	padding: 20px 10px 5px 10px;
+}
+
 .word:hover {
 	border-bottom: 1px gray dotted;
 }
@@ -304,7 +308,7 @@
 	overflow-y: hidden;
 	padding-bottom: 3px;
 	padding-left: 10px;
-	width: 90%;
+	display: inline-block;
 }
 
 .word_search {
@@ -836,7 +840,7 @@ hr.separator {
 
 .words_list_table th i {
 	font-size: 28px;
-	padding: 5px;
+	padding: 7px;
 }
 
 .words_list_table th:first-of-type {

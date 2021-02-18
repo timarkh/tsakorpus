@@ -223,11 +223,8 @@ def get_word_freq_stats(searchType='word'):
         htmlQuery['lang' + str(iWord)] = htmlQuery['lang1']
         partHtmlQuery = sc.qp.swap_query_words(1, iWord, copy.deepcopy(htmlQuery))
         esQuery = sc.qp.word_freqs_query(partHtmlQuery, searchType=searchType)
-        # return jsonify(esQuery)
-        if searchType == 'word':
-            hits = sc.get_words(esQuery)
-        else:
-            hits = sc.get_lemmata(esQuery)
+        # print(esQuery)
+        hits = sc.get_words(esQuery)
         # return jsonify(hits)
         curFreqByRank = sentView.extract_cumulative_freq_by_rank(hits)
         buckets = []
