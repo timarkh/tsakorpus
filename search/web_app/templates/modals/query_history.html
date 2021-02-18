@@ -1,0 +1,34 @@
+<div class="modal fade modal-dialog-scrollable" id="query_history" tabindex="-1" role="dialog" aria-labelledby="query_history_header" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="query_history_header">{{ _('Query history')}}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+			</div>
+			<div class="modal-body" id="query_history_body">
+				<div class="alert alert-warning" role="alert">
+					<i class="bi bi-info-circle info_icon" aria-hidden="true"></i> {{ _('Click on a repeat button next to the query to load it into the query fields.') }}
+				</div>
+				<div class="alert alert-danger" role="alert" id="no_queries_alert">
+					<i class="bi bi-cart-x-fill info_icon" aria-hidden="true"></i> {{ _('You have not made any queries yet.') }}
+				</div>
+				<table class="table table-hover">
+					<thead>
+						<th>{{ _('Word') }}</th>
+						<th>{{ _('Lemma') }}</th>
+						<th>{{ _('Grammar') }}</th>
+						<th>{{ _('Subcorpus') }}</th>
+						<th>{{ _('Search type') }}</th>
+						<th>{{ _('Time') }}</th>
+						<th><i id="repeat_query_header" class="bi bi-arrow-repeat info_icon" data-tooltip="tooltip" data-placement="top" title="{{ _('Repeat query') }}"></i></th>
+					</thead>
+					<tbody id="query_history_table_body">
+					</tbody>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default btn-success" aria-label="OK" data-bs-dismiss="modal">OK</button>
+			</div>
+		</div>
+	</div>
+</div>

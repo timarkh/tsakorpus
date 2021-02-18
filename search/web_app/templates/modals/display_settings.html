@@ -9,11 +9,11 @@
 				<div class="settings_div">
 					<div class="settings_column">
 						<div class="row">
-							<label for="page_size">{{ _('Results per page:') }}</label> 
+							<label for="page_size" class="col-sm-6 col-form-label">{{ _('Results per page:') }}</label>
 							<input form="search_main" type="number" name="page_size" id="page_size" value="10" min="1" max="{{ max_page_size }}" class="search_input distance_input">
 						</div>
 						<div class="row">
-							<label for="sort">{{ _('Sorting:') }}</label>
+							<label for="sort" class="col-sm-6 col-form-label">{{ _('Sorting:') }}</label>
 							<select form="search_main" name="sort" id="sort" class="search_input">
 								<option value="random" selected>{{ _('random') }}</option>
 								<option value="wf">{{ _('by word (word queries)') }}</option>
@@ -28,13 +28,13 @@
 							</select>
 						</div>
 						<div class="row">
-							<input form="search_main" type="checkbox" name="distance_strict" id="distance_strict" checked>
-							<label for="distance_strict">{{ _('Word distance requirements are strict') }}</label>
+							<input form="search_main" type="checkbox" name="distance_strict" id="distance_strict" class="row_checkbox" checked>
+							<label for="distance_strict" class="">{{ _('Word distance requirements are strict') }}</label>
 						</div>
 					</div>
 					<div class="settings_column">
 						<div class="row">
-							<label for="viewing_mode">{{ _('Viewing mode:') }}</label>
+							<label for="viewing_mode" class="col-sm-6 col-form-label">{{ _('Viewing mode:') }}</label>
 							<select name="viewing_mode" id="viewing_mode" class="search_input">
 								<option value="standard">{{ _('view_standard') }}</option>
 								<option value="glossed">{{ _('view_glossed') }}</option>
@@ -42,7 +42,7 @@
 						</div>
 						{% if transliterations and transliterations|length > 1 %}
 						<div class="row">
-							<label for="translit">{{ _('Transliteration: ') }}</label>
+							<label for="translit" class="col-sm-6 col-form-label">{{ _('Transliteration: ') }}</label>
 							<select form="search_main" name="translit" id="translit" class="search_input">
 							{% for tr in transliterations %}
 								<option value="{{ tr }}">{{ _('translitname_' + tr) }}</option>
@@ -52,7 +52,7 @@
 						{% endif %}
 						{% if input_methods and input_methods|length > 1 %}
 						<div class="row">
-							<label for="input_method">{{ _('Character input method: ') }}</label>
+							<label for="input_method" class="col-sm-6 col-form-label">{{ _('Character input method: ') }}</label>
 							<select form="search_main" name="input_method" id="input_method" class="search_input">
 							{% for im in input_methods %}
 								<option value="{{ im }}">{{ _('inputmethod_' + im) }}</option>
@@ -64,22 +64,22 @@
 					<div class="settings_column_leftalign">
 						<h5>{{ _('Annotation layers in glossed mode:') }}</h5>
 						<div class="row">
-							<input type="checkbox" name="toggle_lemma" data="lex" class="toggle_glossed_layer" id="toggle_lemma" checked>
-							<label for="toggle_lemma">{{ _('Lemma') }}</label>
+							<input type="checkbox" name="toggle_lemma" data="lex" class="toggle_glossed_layer row_checkbox" id="toggle_lemma" checked>
+							<label for="toggle_lemma" class="col-sm-6">{{ _('Lemma') }}</label>
 						</div>
 						<div class="row">
-							<input type="checkbox" name="toggle_grammar" data="gramm" class="toggle_glossed_layer" id="toggle_grammar" checked>
-							<label for="toggle_grammar">{{ _('Grammar') }}</label>
+							<input type="checkbox" name="toggle_grammar" data="gramm" class="toggle_glossed_layer row_checkbox" id="toggle_grammar" checked>
+							<label for="toggle_grammar" class="col-sm-6">{{ _('Grammar') }}</label>
 						</div>
 						{% if gloss_search_enabled %}
 						<div class="row">
-							<input type="checkbox" name="toggle_gloss" data="gloss" class="toggle_glossed_layer" id="toggle_gloss" checked>
-							<label for="toggle_gloss">{{ _('Gloss') }}</label>
+							<input type="checkbox" name="toggle_gloss" data="gloss" class="toggle_glossed_layer row_checkbox" id="toggle_gloss" checked>
+							<label for="toggle_gloss" class="col-sm-6">{{ _('Gloss') }}</label>
 						</div>
 						{% endif %}
 						<div class="row">
-							<input type="checkbox" name="toggle_additional_ana_fields" data="field_ana_other" class="toggle_glossed_layer" id="toggle_additional_ana_fields" checked>
-							<label for="toggle_additional_ana_fields">{{ _('Additional fields') }}</label>
+							<input type="checkbox" name="toggle_additional_ana_fields" data="field_ana_other" class="toggle_glossed_layer row_checkbox" id="toggle_additional_ana_fields" checked>
+							<label for="toggle_additional_ana_fields" class="col-sm-6">{{ _('Additional fields') }}</label>
 						</div>
 					</div>
 				</div>

@@ -6,6 +6,7 @@
 			<input type="hidden" name="random_seed" id="random_seed" value={{ random_seed }}>
 			<div class="vertical_settings_pane">
 				<a id="show_settings" class="bi bi-gear-fill link_icon" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Options') }}"></a>
+				<a id="show_history" class="bi bi-clock-history link_icon" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Query history') }}"></a>
 				{% if generate_dictionary %}
 					<a id="show_dictionary" class="bi bi-journal-bookmark-fill link_icon" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Show dictionary') }}"></a>
 				{% endif %}
@@ -57,7 +58,9 @@
 				</div>
 				<br>
 	{% if fulltext_search_enabled %}
-				{{ _('Full-text search:') }} <input type="text" class="search_input" name="txt" id="txt"> <input type="checkbox" name="precise" id="precise"> {{ _('Precise match') }}<br>
+				<label for="txt">{{ _('Full-text search:') }}</label>
+				<input type="text" class="search_input" name="txt" id="txt">
+				<input type="checkbox" name="precise" id="precise" checked> <label for="precise">{{ _('Precise match') }}</label><br>
 	{% endif %}
 			</div>
 		</form>

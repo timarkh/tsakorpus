@@ -37,6 +37,7 @@ $(function() {
 	
 	$("#search_word").click(function() {
 		//$("#query").html( $("#search_main").serialize() );
+		remember_query('word');
 		$.ajax({
 			url: "search_word",
 			data: $("#search_main").serialize(),
@@ -53,6 +54,7 @@ $(function() {
 		
 	$("#search_lemma").click(function() {
 		//$("#query").html( $("#search_main").serialize() );
+		remember_query('lemma');
 		$.ajax({
 			url: "search_lemma",
 			data: $("#search_main").serialize(),
@@ -294,6 +296,7 @@ function get_sentences() {
 
 function get_sentences_page(page) {
 	if (page < 0) {
+		remember_query('sentence');
 		$.ajax({
 			url: "search_sent",
 			data: $("#search_main").serialize(),
@@ -330,10 +333,11 @@ function assign_input_events() {
 	$("#show_help").unbind('click');
 	$("#show_dictionary").unbind('click');
 	$("#show_settings").unbind('click');
+	$("#show_history").unbind('click');
 	$("#cite_corpus").unbind('click');
 	$("#show_word_stat").unbind('click');
 	$("a.locale").unbind('click');
-	$(".search_input").unbind('on');
+	$(".search_input").unbind('keydown');
 	$("#viewing_mode").unbind('change');
 	$('#share_query').unbind('click');
 	$('#load_query').unbind('click');
@@ -352,6 +356,7 @@ function assign_input_events() {
 	$("#show_help").click(show_help);
 	$("#show_dictionary").click(show_dictionary);
 	$("#show_settings").click(show_settings);
+	$("#show_history").click(show_history);
 	$("#cite_corpus").click(show_citation);
 	$("#show_word_stat").click(show_word_stats);
 	$("a.locale").click(change_locale);
@@ -581,6 +586,10 @@ function hide_settings(e) {
 
 function show_settings(e) {
 	$('#display_settings').modal('show');
+}
+
+function show_history(e) {
+	$('#query_history').modal('show');
 }
 
 function show_citation(e) {

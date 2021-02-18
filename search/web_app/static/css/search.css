@@ -20,6 +20,10 @@
 	flex: 1 1 0;
 }
 
+.row {
+	flex-wrap: nowrap;
+}
+
 .btn-primary {
 	background-color: #238eeb;
 	border-color: #0f77d1;
@@ -1307,4 +1311,18 @@ in different styles) */
 
 #video_prompt {
 	margin: -170px 35px auto 5px;
+}
+
+.info_icon {
+	font-size: 22px;
+	padding: 5px;
+	line-height: 1;
+}
+
+.row_checkbox {
+	width: 0.5em;
+}
+
+.repeat_query_link {
+	cursor: pointer;
 }

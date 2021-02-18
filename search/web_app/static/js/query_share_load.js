@@ -1,10 +1,15 @@
 function share_query() {
+	var query = share_query_str();
+	$('#query_to_share').html(query);
+	$('#query_share_dialogue').modal('toggle');
+}
+
+function share_query_str() {
 	var query = $("#search_main").serialize().replace(/[^=?&]+=(&|$)/g, '');
 	if (excludeDocs.length > 0) {
 		query += 'exclude_docs=' + excludeDocs.join();
 	}
-	$('#query_to_share').html(query);
-	$('#query_share_dialogue').modal('toggle');
+	return query;
 }
 
 function show_load_query() {
@@ -21,6 +26,10 @@ function clear_all_search_fields() {
 function load_query() {
 	var query = $('#query_to_load').val().trim();
 	$('#query_load_dialogue').modal('hide');
+	load_query_str(query);
+}
+
+function load_query_str(query) {
 	if (query.length <= 0) { return; }
 	var pairs = query.split('&');
 	var dictFields = {};
@@ -83,4 +92,102 @@ function load_query() {
 	$.each(docs2exclude, function (i, docID) {
 		exclude_doc(docID);
 	});
+}
+
+function get_param(query, key) {
+    key = key.replace(/[\[\]]/g, '\\$&');
+    var rx_key = new RegExp('[?&]' + key + '(=([^&#]*)|&|#|$)'),
+        results = rx_key.exec(query);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+function remember_query(query_type) {
+	var query = share_query_str();
+	var word = '';
+	var lemma = '';
+	var gramm = '';
+	var subcorpus = '';
+	for (i = 1; i <= 10; ++i) {
+		cur_wf = get_param(query, 'wf' + i);
+		if (cur_wf != null) {
+			if (word.length > 0) {
+				word += ' + ';
+			}
+			word += cur_wf;
+		}
+		cur_lemma = get_param(query, 'lex' + i);
+		if (cur_lemma != null) {
+			if (lemma.length > 0) {
+				lemma += ' + ';
+			}
+			lemma += cur_lemma;
+		}
+		cur_gramm = get_param(query, 'gr' + i);
+		if (cur_gramm != null) {
+			if (gramm.length > 0) {
+				gramm += ' + ';
+			}
+			gramm += cur_gramm;
+		}
+	}
+	if (word.length <= 0) {
+		word = '*';
+	}
+	if (lemma.length <= 0) {
+		lemma = '*';
+	}
+	if (gramm.length <= 0) {
+		gramm = '*';
+	}
+
+	if (get_param(query, 'exclude_docs') != null) {
+		subcorpus = 'yes';
+	}
+	$('.subcorpus_input').each(function (index) {
+		var attr_name = $(this).attr('name');
+		if (attr_name == null || attr_name.length <= 0) {
+			attr_name = $(this).attr('data-name');
+		}
+		if (attr_name != null && attr_name.length > 0 && get_param(query, attr_name) != null) {
+			subcorpus = 'yes';
+		}
+	})
+	if (subcorpus.length > 0) {
+		subcorpus = '<i class="bi bi-check-circle-fill info_icon"></i>';
+	}
+
+	var curTime = new Date().toLocaleTimeString('en-US', { hour12: false, 
+                                             hour: "numeric", 
+                                             minute: "numeric"});
+	var tr = '<tr>';
+	tr += '<td>' + word + '</td>';
+	tr += '<td>' + lemma + '</td>';
+	tr += '<td>' + gramm + '</td>';
+	tr += '<td>' + subcorpus + '</td>';
+	tr += '<td>' + query_type + '</td>';
+	tr += '<td>' + curTime + '</td>';
+	tr += '<td><a class="repeat_query_link"><i class="bi bi-arrow-repeat info_icon" data-tooltip="tooltip" data-placement="top" title="' + $('#repeat_query_header').attr('title') + '" data-query="' + query + '" data-query-type="' + query_type +'"></i></a></td>';
+	tr += '</tr>\n';
+	$('#query_history_table_body').html(tr + $('#query_history_table_body').html());
+	$('#no_queries_alert').hide();
+	$(".repeat_query_link").unbind('click');
+	$(".repeat_query_link").click(repeat_query);
+}
+
+function repeat_query(e) {
+	var query = $(e.target).attr('data-query');
+	var search_type = $(e.target).attr('data-query-type');
+	load_query_str(query);
+	$('#query_history').modal('toggle');
+	if (search_type == 'sentence') {
+		$('#search_sent').click();
+	}
+	else if (search_type == 'word') {
+		$('#search_word').click();
+	}
+	else if (search_type == 'lemma') {
+		$('#search_lemma').click();
+	}
 }
