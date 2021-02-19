@@ -1106,7 +1106,9 @@ class InterfaceQueryParser:
             htmlQuery['wtype1'] = 'lemma'
         esQuery = self.html2es(htmlQuery, query_size=0, sortOrder='', searchOutput='words')
         if searchType == 'lemma' and wfFields:
+            print('Before lemmatizing', esQuery)
             self.lemmatize_word_query(esQuery)
+            print('After lemmatizing', esQuery)
         esQuery['aggs'] = {'agg_rank': {'terms': {'field': 'rank_true',
                                                   'order': {'_key': 'asc'},
                                                   'size': 10000}}}
