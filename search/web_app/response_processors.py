@@ -1463,7 +1463,7 @@ class SentenceViewer:
 
     def extract_cumulative_freq_by_rank(self, hits):
         """
-        Process search results that contain buckets with frequency rank. Each
+        Process search results that contain buckets with word frequency rank. Each
         bucket contains the total frequency of a word of a given frequency rank.
         Buckets should be ordered by frequency rank.
         Return a dictionary of the kind {frequency rank: total frequency of the words
@@ -1476,6 +1476,10 @@ class SentenceViewer:
         cumulFreq = 0
         freqByRank = {}
         for bucket in hits['aggregations']['agg_rank']['buckets']:
-            cumulFreq += bucket['doc_count']
+            if 'subagg_nlemmata' in bucket:
+                # Subaggregation for word-based lemma frequency search
+                cumulFreq += bucket['subagg_nlemmata']['value']
+            else:
+                cumulFreq += bucket['doc_count']
             freqByRank[bucket['key']] = cumulFreq
         return freqByRank

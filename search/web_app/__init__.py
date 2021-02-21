@@ -38,6 +38,8 @@ for lang in settings.languages:
     settings.word_freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_word_freq_by_rank(lang)))
     # number of lemmata for each frequency rank
     settings.lemma_freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_lemma_freq_by_rank(lang)))
+sc.qp.maxFreqRank = max(max(len(settings.word_freq_by_rank[i]), len(settings.lemma_freq_by_rank[i]))
+                        for i in range(len(settings.languages))) + 1
 
 
 app = Flask(__name__)

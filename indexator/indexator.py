@@ -423,7 +423,7 @@ class Indexator:
                         for itemID in self.wordFreqs[langID]
                         if itemID.startswith('l')]
         lFreqsSorted.sort(reverse=True)
-        freqToRank, quantiles = self.get_freq_ranks(lFreqsSorted)
+        lemmaFreqToRank, quantiles = self.get_freq_ranks(lFreqsSorted)
         iLemma = 0
         for l, lID in self.tmpLemmaIDs[langID].items():
             lID = 'l' + str(lID)
@@ -437,9 +437,9 @@ class Indexator:
                 'l_order': lOrder,
                 'freq': self.wordFreqs[langID][lID],
                 'lemma_freq': self.wordFreqs[langID][lID],
-                'rank_true': freqToRank[self.wordFreqs[langID][lID]],
+                'rank_true': lemmaFreqToRank[self.wordFreqs[langID][lID]],
                 'rank': self.quantile_label(self.wordFreqs[langID][lID],
-                                            freqToRank[self.wordFreqs[langID][lID]],
+                                            lemmaFreqToRank[self.wordFreqs[langID][lID]],
                                             quantiles),
                 'n_sents': self.wordSFreqs[langID][lID],
                 'n_docs': len(self.wordDIDs[langID][lID]),
@@ -484,11 +484,19 @@ class Indexator:
             wfsSorted, lemmataSorted = self.sort_words(self.languages[langID])
             iWord = 0
             print('Processing words in ' + self.languages[langID] + '...')
+
             wFreqsSorted = [self.wordFreqs[langID][itemID]
                             for itemID in self.wordFreqs[langID]
                             if itemID.startswith('w')]
             wFreqsSorted.sort(reverse=True)
-            freqToRank, quantiles = self.get_freq_ranks(wFreqsSorted)
+            wordFreqToRank, quantiles = self.get_freq_ranks(wFreqsSorted)
+
+            lFreqsSorted = [self.wordFreqs[langID][itemID]
+                            for itemID in self.wordFreqs[langID]
+                            if itemID.startswith('l')]
+            lFreqsSorted.sort(reverse=True)
+            lemmaFreqToRank, lemmaQuantiles = self.get_freq_ranks(lFreqsSorted)
+
             # for wID in self.wordFreqs[langID]:
             for w, wID in self.tmpWordIDs[langID].items():
                 wID = 'w' + str(wID)
@@ -516,7 +524,8 @@ class Indexator:
                 wJson['dids'] = [did for did in sorted(self.wordDIDs[langID][wID])]
                 wJson['n_sents'] = self.wordSFreqs[langID][wID]
                 wJson['n_docs'] = len(wJson['dids'])
-                wJson['rank_true'] = freqToRank[wJson['freq']]  # for the calculations
+                wJson['rank_true'] = wordFreqToRank[wJson['freq']]  # for the calculations
+                wJson['lemma_rank_true'] = lemmaFreqToRank[self.wordFreqs[langID][lID]]  # for the calculations
                 wJson['rank'] = self.quantile_label(wJson['freq'],
                                                     wJson['rank_true'],
                                                     quantiles)  # for the user

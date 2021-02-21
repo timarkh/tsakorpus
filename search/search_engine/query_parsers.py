@@ -51,6 +51,8 @@ class InterfaceQueryParser:
         # for g in self.gramDict:
         #     self.gramDict[g] = 'ana.gr.' + self.gramDict[g]
 
+        self.maxFreqRank = 10000    # Number of buckets for queries with rank aggregation
+
     @staticmethod
     def find_operator(strQuery, start=0, end=-1, glossField=False):
         if end == -1:
@@ -1069,14 +1071,6 @@ class InterfaceQueryParser:
             queryDict = {'query': {'match_none': ''}}
         return queryDict
 
-    def lemmatize_word_query(self, esQuery):
-        """
-        Make a lemma query out of a word query.
-        Change the original query, do not return anything.
-        """
-        childQuery = {'has_child': {'type': 'word', 'query': esQuery['query']}}
-        esQuery['query'] = {'bool': {'must': childQuery, 'must_not': {'match': {'_id': 'l0'}}}}
-
     def word_freqs_query(self, htmlQuery, searchType='word'):
         """
         Make an ES query for obtaining the frequency data bucketed
@@ -1105,14 +1099,32 @@ class InterfaceQueryParser:
         else:
             htmlQuery['wtype1'] = 'lemma'
         esQuery = self.html2es(htmlQuery, query_size=0, sortOrder='', searchOutput='words')
+        esQuery['query']['bool']['must_not'].append({'term': {'l_id': 'l0'}})
         if searchType == 'lemma' and wfFields:
-            print('Before lemmatizing', esQuery)
-            self.lemmatize_word_query(esQuery)
-            print('After lemmatizing', esQuery)
-        esQuery['aggs'] = {'agg_rank': {'terms': {'field': 'rank_true',
-                                                  'order': {'_key': 'asc'},
-                                                  'size': 10000}}}
-        print(esQuery)
+            esQuery['aggs'] = {
+                'agg_rank': {
+                    'terms': {
+                        'field': 'lemma_rank_true',
+                        'order': {'_key': 'asc'},
+                        'size': self.maxFreqRank
+                    },
+                    'aggs': {
+                        'subagg_nlemmata': {
+                            'cardinality': {'field': 'l_id'}
+                        }
+                    }
+                }
+            }
+        else:
+            esQuery['aggs'] = {
+                'agg_rank': {
+                    'terms': {
+                        'field': 'rank_true',
+                        'order': {'_key': 'asc'},
+                        'size': self.maxFreqRank
+                    }
+                }
+            }
         return esQuery
 
     def filter_sentences(self, iterSent, constraints, nWords=1):
