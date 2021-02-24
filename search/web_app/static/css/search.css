@@ -129,6 +129,31 @@
 	stroke: #40b78f;
 }
 
+.plot_circle_w1 {
+	stroke: #932d01;
+}
+.plot_circle_w2 {
+	stroke: #380584;
+}
+.plot_circle_w3 {
+	stroke: #074d70;
+}
+.plot_circle_w4 {
+	stroke: #335b17;
+}
+.plot_circle_w5 {
+	stroke: #969218;
+}
+.plot_circle_w6 {
+	stroke: #8e0f79;
+}
+.plot_circle_w7 {
+	stroke: #bc2326;
+}
+.plot_circle_w8 {
+	stroke: #40b78f;
+}
+
 
 .circle {
     display: inline-block;
@@ -777,6 +802,10 @@ hr.separator {
 	max-height: 50vh;
 }
 
+.modal {
+	z-index: 9999999;  /* Dirty trick for dealing with wide third-party headers */
+}
+
 .modal-dialog {
 	max-width: 60vw;
 }
@@ -1150,6 +1179,10 @@ hr.separator {
   fill: steelblue;
 }
 
+.bar:hover {
+	fill: #1b5c93;
+}
+
 .axis text {
   font: 11px sans-serif;
   color: #333;
@@ -1180,9 +1213,9 @@ hr.separator {
   stroke: #c66d00;
 }
 
-.conf_int {
+.conf_int, .conf_int_cap_top, .conf_int_cap_bottom {
   fill: none;
-  stroke-width: 1px;
+  stroke-width: 0.5px;
   stroke: #222;
 }
 
@@ -1329,4 +1362,19 @@ in different styles) */
 
 .repeat_query_link {
 	cursor: pointer;
+}
+
+.word_meta_plot {
+	min-height: 50vh;
+}
+
+@media only screen and (max-height: 600px) {
+	.word_meta_plot {
+		min-height: 300px;
+	}
+}
+
+#word_stats_plot {
+	max-height: 60vh;
+	overflow-y: auto;
 }
