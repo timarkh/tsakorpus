@@ -1209,8 +1209,22 @@ hr.separator {
   stroke-width: 2px;
 }
 
+.plot_line:hover {
+    stroke-width: 3px;
+}
+
 .plot_line_basic {
   stroke: #c66d00;
+}
+
+.grid line {
+  stroke: lightgrey;
+  stroke-opacity: 0.6;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
 }
 
 .conf_int, .conf_int_cap_top, .conf_int_cap_bottom {

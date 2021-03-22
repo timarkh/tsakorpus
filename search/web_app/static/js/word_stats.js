@@ -11,6 +11,11 @@ var svg = null;
 var bar = null;
 var data = null;
 
+function vw(v) {
+    var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    return (v * w) / 100;
+}
+
 $(function() {
 	function assign_word_stats_events() {
 		$('#select_meta_word_stat').unbind('change');
@@ -44,10 +49,33 @@ $(function() {
 	}
 
 	function resize_svg() {
-		$(".word_meta_plot").attr("viewBox", "0 0 1000 " + (40 + $(".word_meta_plot>g")[0].getBBox()["height"]));
+	    var viewBoxY = (40 + $(".word_meta_plot>g")[0].getBBox()["height"]);
+	    var viewBoxX = 600;
+		$(".word_meta_plot").attr("viewBox", "0 0 " + viewBoxX + " " + viewBoxY);
 		$(".word_meta_plot").css("min-height", Math.max(300, $(".word_meta_plot>g")[0].getBBox()["height"]));
-		$(".word_meta_plot>g").attr("transform", "translate(" + $("#y_axis")[0].getBBox()["width"] + "," + margin["top"] + ")");
+		$(".word_meta_plot").css("min-width", vw(50));
+		try {
+		    var yAxisWidth = $("#y_axis")[0].getBBox()["width"];
+		    $(".word_meta_plot>g").attr("transform", "translate(" + yAxisWidth + "," + margin["top"] + ")");
+		}
+		catch (e) {
+		    setTimeout(1000, function() {
+		        yAxisWidth = $("#y_axis")[0].getBBox()["width"];
+		        $(".word_meta_plot>g").attr("transform", "translate(" + yAxisWidth + "," + margin["top"] + ")");
+		    })
+		}
 	}
+
+	function make_x_gridlines() {
+        return d3.axisBottom(x)
+            .ticks(5)
+    }
+
+    // gridlines in y axis function
+    function make_y_gridlines() {
+        return d3.axisLeft(y)
+            .ticks(5)
+    }
 
 	function load_word_stats(e) {
 		clear_word_stats_plots();
@@ -136,6 +164,13 @@ $(function() {
 		    .attr("class", "y axis")
 		    .attr("id", "y_axis")
 		    .call(yAxis);
+		chart.append("g")
+          .attr("class", "grid")
+          .call(make_y_gridlines()
+              .tickSize(-500)
+              .tickFormat("")
+          );
+
 		bar = chart.selectAll(".bar")
 		    .data(results)
 		  .enter().append("rect")
@@ -147,6 +182,10 @@ $(function() {
 			.transition().duration(1200)
 		    .attr("y", v => y(v.n_words))
 		    .attr("height", v => 200 - y(v.n_words));
+		chart.selectAll(".bar")
+		    .data(results)
+		  .append("title")
+		    .text(v => Math.round(v.n_words) + " ipm [" + Math.round(v.n_words_conf_int[0]) + ", " + Math.round(v.n_words_conf_int[1]) + "]");
 		chart.selectAll(".conf_int_new")
 		    .data(results)
 		  .enter().append("line")
@@ -180,7 +219,8 @@ $(function() {
 			.transition().duration(1200)
 		    .attr("y1", v => y(v.n_words_conf_int[1]))
 		    .attr("y2", v => y(v.n_words_conf_int[1]));
-		setTimeout(resize_svg, 400);
+
+		setTimeout(resize_svg, 300);
 	}
 	
 	function show_line_plot(results, maxHeight, multiplier, yLabel) {
@@ -226,6 +266,21 @@ $(function() {
 	    gy = chart.append("g")
 		    .attr("class", "y axis")
 		    .call(yAxis);
+
+		chart.append("g")
+          .attr("class", "grid")
+          .attr("transform", "translate(0,200)")
+          .call(make_x_gridlines()
+              .tickSize(-200)
+              .tickFormat("")
+          );
+
+        chart.append("g")
+          .attr("class", "grid")
+          .call(make_y_gridlines()
+              .tickSize(-500)
+              .tickFormat("")
+          );
 		
 		for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {	
 			var valueline = d3.line()
@@ -254,6 +309,11 @@ $(function() {
 				.attr("cy", v => y(v.n_words * multiplier));
 
 			if ('n_words_conf_int' in results[iQueryWord][0]) {
+			    chart.selectAll(".plot_circle_w" + (iQueryWord + 1))
+		            .data(results[iQueryWord])
+		          .append("title")
+		            .text(v => Math.round(v.n_words) + " ipm [" + Math.round(v.n_words_conf_int[0]) + ", " + Math.round(v.n_words_conf_int[1]) + "]");
+
 				chart.selectAll(".conf_int_new")
 				    .data(results[iQueryWord])
 				  .enter().append("line")
@@ -289,8 +349,18 @@ $(function() {
 				    .attr("y2", v => y(v.n_words_conf_int[1] * multiplier));
 			}
 		}
-
-		setTimeout(resize_svg, 400);
+		chart.selectAll(".plot_circle")
+		    .on('mouseover', function (d, i) {
+                d3.select(this).transition()
+                .duration('300')
+                .attr('r', '7');
+            })
+            .on('mouseout', function (d, i) {
+                d3.select(this).transition()
+                .duration('300')
+                .attr('r', '3.5');
+            });
+		setTimeout(resize_svg, 300);
 	}
 	
 	function display_word_stats_plot(results) {
@@ -320,7 +390,7 @@ $(function() {
 		}
 		svg = d3.create("svg");
       	plotObj.append(svg);
-      	plotObj.find('svg').addClass('word_meta_plot').attr("viewBox", "0 0 1000 450");
+      	plotObj.find('svg').addClass('word_meta_plot').attr("viewBox", "0 0 600 350");
 		if (metaField.startsWith('year')) {
 			show_line_plot(results, maxHeight, 1, ' ipm');
 		}
@@ -352,7 +422,7 @@ $(function() {
 		}
 		svg = d3.create("svg");
       	plotObj.append(svg);
-      	plotObj.find('svg').addClass('word_meta_plot').attr("viewBox", "0 0 1000 450");
+      	plotObj.find('svg').addClass('word_meta_plot').attr("viewBox", "0 0 600 350");
 		show_line_plot(results, maxHeight, 100, '%');
 	}
 
