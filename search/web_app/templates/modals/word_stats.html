@@ -25,6 +25,22 @@
 							<option value="compare">{{ _('compare words in the query') }}</option>
 						</select>
 						<div id="word_stats_plot"></div>
+						<table id="word_stats_table" class="table table-hover">
+							<thead>
+								<tr id="word_stats_table_header">
+									<th></th>
+									<th colspan="2">{{ _('Query word ') }} 1</th>
+								</tr>
+								<tr>
+									<th>{{ _('value') }}</th>
+									<th>{{ _('frequency (ipm)') }}</th>
+									<th>{{ _('95%% confidence interval ') }}</th>
+								</tr>
+							</thead>
+							<tbody>
+
+							</tbody>
+						</table>
 						<div id="word_stats_wait" class="alert alert-warning" role="alert">
 							<span class="bi bi-exclamation-triangle-fill" aria-hidden="true"></span> {{ _('please wait for the plot to load') }}
 						</div>

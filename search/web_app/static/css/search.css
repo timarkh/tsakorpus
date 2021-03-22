@@ -1233,6 +1233,10 @@ hr.separator {
   stroke: #222;
 }
 
+.conf_int_span {
+    font-size: 0.7em;
+}
+
 svg circle {
 	fill: white;
 	stroke: #aaa;

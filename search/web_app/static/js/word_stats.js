@@ -362,9 +362,36 @@ $(function() {
             });
 		setTimeout(resize_svg, 300);
 	}
+
+	function clear_table() {
+	    $('#word_stats_table tbody').html("");
+	    $('#word_stats_table_header').html("<th></th>");
+	}
+
+	function fill_table(results) {
+	    var tableBody = $('#word_stats_table tbody');
+	    var tableHeader = $('#word_stats_table_header');
+	    clear_table();
+	    if (results == null) {
+			return;
+		}
+		for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {
+		    tableHeader.html(tableHeader.html() + "<th colspan=\"2\">" + queryWordCaption + " " + (iQueryWord + 1) + "</th>")
+		    for (iRes = 0; iRes < results[iQueryWord].length; iRes++) {
+		        v = results[iQueryWord][iRes];
+                var tr = "<tr>";
+                tr += "<td>" + v.name + "</td>";
+                tr += "<td>" + Math.round(v.n_words) + "</td>"
+                tr += "<td class=\"conf_int_span\"> [" + Math.round(v.n_words_conf_int[0]) + ", " + Math.round(v.n_words_conf_int[1]) + "]</td>";
+                tr += "</tr>";
+                tableBody.html(tr + tableBody.html());
+            }
+		}
+	}
 	
 	function display_word_stats_plot(results) {
 		clear_word_stats_plots();
+		clear_table();
 		$('#word_stats_wait').fadeOut();
 
 		data = results;
@@ -382,12 +409,13 @@ $(function() {
 			return;
 		}
 		var maxHeight = 1
-		for (iRes = 0; iRes < results.length; iRes++) {
-			var curMaxHeight = d3.max(results[iRes], v => v.n_words);
+		for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {
+			var curMaxHeight = d3.max(results[iQueryWord], v => v.n_words);
 			if (curMaxHeight > maxHeight) {
 				maxHeight = curMaxHeight;
 			}
 		}
+		fill_table(results);
 		svg = d3.create("svg");
       	plotObj.append(svg);
       	plotObj.find('svg').addClass('word_meta_plot').attr("viewBox", "0 0 600 350");
@@ -402,6 +430,7 @@ $(function() {
 	
 	function display_word_freq_stats_plot(results) {
 		clear_word_stats_plots();
+		clear_table();
 		$('#word_stats_wait').fadeOut();
 		if (results == null) {
 			$('#word_stats_nothing_found').show();
