@@ -103,6 +103,39 @@
 	background: #40b78f;
 }
 
+.bar_w1 {
+	fill: #932d01;
+	opacity: 0.7;
+}
+.bar_w2 {
+	fill: #380584;
+	opacity: 0.7;
+}
+.bar_w3 {
+	fill: #074d70;
+	opacity: 0.7;
+}
+.bar_w4 {
+	fill: #335b17;
+	opacity: 0.7;
+}
+.bar_w5 {
+	fill: #969218;
+	opacity: 0.7;
+}
+.bar_w6 {
+	fill: #8e0f79;
+	opacity: 0.7;
+}
+.bar_w7 {
+	fill: #bc2326;
+	opacity: 0.7;
+}
+.bar_w8 {
+	fill: #40b78f;
+	opacity: 0.7;
+}
+
 
 .plot_line_w1 {
 	stroke: #932d01;
@@ -1175,12 +1208,13 @@ hr.separator {
 .meta_plot {
 }
 
-.bar {
+.bar_default {
   fill: steelblue;
+  opacity: 0.7;
 }
 
 .bar:hover {
-	fill: #1b5c93;
+	opacity: 1;
 }
 
 .axis text {
@@ -1395,4 +1429,8 @@ in different styles) */
 #word_stats_plot {
 	max-height: 60vh;
 	overflow-y: auto;
+}
+
+.hidden {
+    display: none;
 }

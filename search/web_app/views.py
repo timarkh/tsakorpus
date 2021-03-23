@@ -281,8 +281,8 @@ def get_word_stats(searchType, metaField):
         if searchType == 'compare':
             if nWords > 10:
                 nWords = 10
-            if metaField not in settings.line_plot_meta:
-                nWords = 1
+            # if metaField not in settings.line_plot_meta:
+            #     nWords = 1
 
     searchIndex = 'words'
     queryWordConstraints = None

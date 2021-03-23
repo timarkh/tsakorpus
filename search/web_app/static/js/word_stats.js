@@ -22,6 +22,7 @@ $(function() {
 		$('#select_meta_query_type').unbind('change');
 		$('#select_freq_stat_type').unbind('change');
 		$('#select_x_axis_scale').unbind('change');
+		$('#select_max_y').unbind('change');
 		$('#word_stats_ok').unbind('click');
 		$('#button_close_word_stats').unbind('click');
 		$('#load_word_meta_stats').unbind('click');
@@ -30,6 +31,7 @@ $(function() {
 		$('#select_meta_query_type').change(load_word_stats);
 		$('#select_freq_stat_type').change(load_freq_stats);
 		$('#select_x_axis_scale').change(function () {display_word_freq_stats_plot(lastFreqData);});
+		$('#select_max_y').change(function () {display_word_freq_stats_plot(lastFreqData);});
 		$('#word_stats_ok').click(close_word_stats);
 		$('#button_close_word_stats').click(close_word_stats);
 		$('#load_word_meta_stats').click(load_word_stats);
@@ -122,7 +124,7 @@ $(function() {
 	}
 	
 	function show_bar_chart(results, maxHeight) {
-		var nResults = results.length;
+		var nResults = results[0].length;
 		var barWidth = 20;
 		var maxBars = 25;
 		var nBars = nResults;
@@ -137,6 +139,8 @@ $(function() {
 
 		xAxis = d3.axisBottom().scale(x);
 		yAxis = d3.axisLeft().scale(y).tickFormat(function (d) { return d + ' ipm'; });
+
+		var queryType = $('#select_meta_query_type option:selected').val();
 /*
 		var chart = d3.select(".word_meta_plot")
 			.attr("width", barWidth * nBars + margin.left + margin.right)
@@ -148,7 +152,7 @@ $(function() {
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 		
 		y.domain([0, maxHeight]);
-		x.domain(results.map(function(v) { return v.name; }));
+		x.domain(results[0].map(function(v) { return v.name; }));
 		
 		gx = chart.append("g")
 		    .attr("class", "x axis")
@@ -171,54 +175,79 @@ $(function() {
               .tickFormat("")
           );
 
-		bar = chart.selectAll(".bar")
-		    .data(results)
-		  .enter().append("rect")
-		    .attr("class", "bar")
-		    .attr("x", v => x(v.name))
-			.attr("width", x.bandwidth())
-			.attr("y", 200)
-			.attr("height", 0)
-			.transition().duration(1200)
-		    .attr("y", v => y(v.n_words))
-		    .attr("height", v => 200 - y(v.n_words));
-		chart.selectAll(".bar")
-		    .data(results)
-		  .append("title")
-		    .text(v => Math.round(v.n_words) + " ipm [" + Math.round(v.n_words_conf_int[0]) + ", " + Math.round(v.n_words_conf_int[1]) + "]");
-		chart.selectAll(".conf_int_new")
-		    .data(results)
-		  .enter().append("line")
-		    .attr("class", "conf_int")
-		    .attr("x1", v => x(v.name) + barWidth / 2)
-			.attr("x2", v => x(v.name) + barWidth / 2)
-			.attr("y1", 200)
-			.attr("y2", 200)
-			.transition().duration(1200)
-		    .attr("y1", v => y(v.n_words_conf_int[0]))
-		    .attr("y2", v => y(v.n_words_conf_int[1]));
-		chart.selectAll(".conf_int_cap_top_new")
-		    .data(results)
-		  .enter().append("line")
-		    .attr("class", "conf_int_cap_top")
-		    .attr("x1", v => x(v.name) + barWidth / 2 - 3)
-			.attr("x2", v => x(v.name) + barWidth / 2 + 3)
-			.attr("y1", 200)
-			.attr("y2", 200)
-			.transition().duration(1200)
-		    .attr("y1", v => y(v.n_words_conf_int[0]))
-		    .attr("y2", v => y(v.n_words_conf_int[0]));
-		chart.selectAll(".conf_int_cap_bottom_new")
-		    .data(results)
-		  .enter().append("line")
-		    .attr("class", "conf_int_cap_bottom")
-		    .attr("x1", v => x(v.name) + barWidth / 2 - 3)
-			.attr("x2", v => x(v.name) + barWidth / 2 + 3)
-			.attr("y1", 200)
-			.attr("y2", 200)
-			.transition().duration(1200)
-		    .attr("y1", v => y(v.n_words_conf_int[1]))
-		    .attr("y2", v => y(v.n_words_conf_int[1]));
+        var dataResorted = [];
+        for (iRes = 0; iRes < results[0].length; iRes++) {
+            dataResorted.push([]);
+        }
+        for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {
+            for (iRes = 0; iRes < results[iQueryWord].length; iRes++) {
+                dataResorted[iRes].push(results[iQueryWord][iRes]);
+                dataResorted[iRes][iQueryWord].n_query_word = iQueryWord;
+            }
+        }
+        for (iRes = 0; iRes < dataResorted.length; iRes++) {
+            dataResorted[iRes].sort((a,b) => (a.n_words > b.n_words) ? -1 : ((b.n_words > a.n_words) ? 1 : 0));
+        }
+        for (iRes = 0; iRes < dataResorted.length; iRes++) {
+            for (iQueryWord = 0; iQueryWord < dataResorted[iRes].length; iQueryWord++) {
+                results[iQueryWord][iRes] = dataResorted[iRes][iQueryWord];
+            }
+        }
+
+        for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {
+            var barClass = "bar bar_default"
+            if (queryType == "compare") {
+                barClass = "bar bar_w" + (iQueryWord + 1);
+            }
+            bar = chart.selectAll(".bar_new")
+                .data(results[iQueryWord])
+              .enter().append("rect")
+                .attr("class", v => "bar bar_w" + (v.n_query_word + 1))
+                .attr("x", v => x(v.name))
+                .attr("width", x.bandwidth())
+                .attr("y", 200)
+                .attr("height", 0)
+                .transition().duration(1200)
+                .attr("y", v => y(v.n_words))
+                .attr("height", v => 200 - y(v.n_words));
+            chart.selectAll(".bar")
+                .data(results[iQueryWord])
+              .append("title")
+                .text(v => Math.round(v.n_words) + " ipm [" + Math.round(v.n_words_conf_int[0]) + ", " + Math.round(v.n_words_conf_int[1]) + "]");
+            chart.selectAll(".conf_int_new")
+                .data(results[iQueryWord])
+              .enter().append("line")
+                .attr("class", "conf_int")
+                .attr("x1", v => x(v.name) + barWidth / 2)
+                .attr("x2", v => x(v.name) + barWidth / 2)
+                .attr("y1", 200)
+                .attr("y2", 200)
+                .transition().duration(1200)
+                .attr("y1", v => y(v.n_words_conf_int[0]))
+                .attr("y2", v => y(v.n_words_conf_int[1]));
+            chart.selectAll(".conf_int_cap_top_new")
+                .data(results[iQueryWord])
+              .enter().append("line")
+                .attr("class", "conf_int_cap_top")
+                .attr("x1", v => x(v.name) + barWidth / 2 - 3)
+                .attr("x2", v => x(v.name) + barWidth / 2 + 3)
+                .attr("y1", 200)
+                .attr("y2", 200)
+                .transition().duration(1200)
+                .attr("y1", v => y(v.n_words_conf_int[0]))
+                .attr("y2", v => y(v.n_words_conf_int[0]));
+            chart.selectAll(".conf_int_cap_bottom_new")
+                .data(results[iQueryWord])
+              .enter().append("line")
+                .attr("class", "conf_int_cap_bottom")
+                .attr("x1", v => x(v.name) + barWidth / 2 - 3)
+                .attr("x2", v => x(v.name) + barWidth / 2 + 3)
+                .attr("y1", 200)
+                .attr("y2", 200)
+                .transition().duration(1200)
+                .attr("y1", v => y(v.n_words_conf_int[1]))
+                .attr("y2", v => y(v.n_words_conf_int[1]));
+        }
 
 		setTimeout(resize_svg, 300);
 	}
@@ -282,7 +311,7 @@ $(function() {
               .tickFormat("")
           );
 		
-		for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {	
+		for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {
 			var valueline = d3.line()
 				.x(v => x(xTransform(v)))
 				.y(v => y(v.n_words * multiplier))
@@ -365,26 +394,39 @@ $(function() {
 
 	function clear_table() {
 	    $('#word_stats_table tbody').html("");
-	    $('#word_stats_table_header').html("<th></th>");
+	    $('#word_stats_table_header_top').html("<th></th>");
+	    $('#word_stats_table_header_bottom').html("");
 	}
 
 	function fill_table(results) {
 	    var tableBody = $('#word_stats_table tbody');
-	    var tableHeader = $('#word_stats_table_header');
+	    var tableHeaderTop = $('#word_stats_table_header_top');
+	    var tableHeaderBottom = $('#word_stats_table_header_bottom');
 	    clear_table();
 	    if (results == null) {
 			return;
 		}
+		tableHeaderBottom.html(tableHeaderBottom.html() + $('#header_template_start').html());
 		for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {
-		    tableHeader.html(tableHeader.html() + "<th colspan=\"2\">" + queryWordCaption + " " + (iQueryWord + 1) + "</th>")
+		    tableHeaderTop.html(tableHeaderTop.html() + "<th colspan=\"2\">"
+		                        + "<div class=\"circle circle_w" + (iQueryWord + 1) + "\"></div>"
+		                        + queryWordCaption + " " + (iQueryWord + 1) + "</th>");
+            tableHeaderBottom.html(tableHeaderBottom.html() + $('#header_template_end').html());
 		    for (iRes = 0; iRes < results[iQueryWord].length; iRes++) {
 		        v = results[iQueryWord][iRes];
-                var tr = "<tr>";
-                tr += "<td>" + v.name + "</td>";
-                tr += "<td>" + Math.round(v.n_words) + "</td>"
-                tr += "<td class=\"conf_int_span\"> [" + Math.round(v.n_words_conf_int[0]) + ", " + Math.round(v.n_words_conf_int[1]) + "]</td>";
-                tr += "</tr>";
-                tableBody.html(tr + tableBody.html());
+		        var rowID = "word_stats_tr_" + iRes;
+		        tr = "<td>" + Math.round(v.n_words) + "</td>"
+                tr += "<td class=\"conf_int_span\"> ["
+                      + Math.round(v.n_words_conf_int[0])
+                      + ", " + Math.round(v.n_words_conf_int[1]) + "]</td>";
+                trExisting = $('#' + rowID);
+                if (trExisting.length <= 0) {
+                    tr = "<tr id=\"" + rowID + "\"><td>" + v.name + "</td>" + tr + "</tr>";
+                    tableBody.html(tableBody.html() + tr);
+                }
+                else {
+                    trExisting.html(trExisting.html() + tr);
+                }
             }
 		}
 	}
@@ -424,7 +466,7 @@ $(function() {
 		}
 		else
 		{
-			show_bar_chart(results[0], maxHeight);
+			show_bar_chart(results, maxHeight);
 		}
 	}
 	
@@ -443,11 +485,17 @@ $(function() {
 			return;
 		}
 		var maxHeight = 0
-		for (iRes = 0; iRes < results.length; iRes++) {
-			var curMaxHeight = d3.max(results[iRes], v => v.n_words);
-			if (curMaxHeight > maxHeight) {
-				maxHeight = curMaxHeight;
-			}
+		var maxYUser = $('#select_max_y option:selected').val();
+		if (maxYUser == "as_in_data") {
+            for (iRes = 0; iRes < results.length; iRes++) {
+                var curMaxHeight = d3.max(results[iRes], v => v.n_words);
+                if (curMaxHeight > maxHeight) {
+                    maxHeight = curMaxHeight;
+                }
+            }
+		}
+		else {
+		    maxHeight = maxYUser / 100;
 		}
 		svg = d3.create("svg");
       	plotObj.append(svg);

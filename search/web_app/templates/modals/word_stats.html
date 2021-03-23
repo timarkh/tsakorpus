@@ -21,18 +21,22 @@
 						</select>&nbsp;
 						<label for="select_meta_query_type">{{ _('Query type: ') }}</label>
 						<select name="select_meta_query_type" id="select_meta_query_type" class="search_input">
-							<option value="context" selected>{{ _('search the whole query') }}</option>
-							<option value="compare">{{ _('compare words in the query') }}</option>
+							<option value="context">{{ _('search the whole query') }}</option>
+							<option value="compare" selected>{{ _('compare words in the query') }}</option>
 						</select>
 						<div id="word_stats_plot"></div>
 						<table id="word_stats_table" class="table table-hover">
 							<thead>
-								<tr id="word_stats_table_header">
+								<tr id="word_stats_table_header_top">
 									<th></th>
 									<th colspan="2">{{ _('Query word ') }} 1</th>
 								</tr>
-								<tr>
+								<tr id="word_stats_table_header_bottom">
+								</tr>
+								<tr id="header_template_start" class="hidden">
 									<th>{{ _('value') }}</th>
+								</tr>
+								<tr id="header_template_end" class="hidden">
 									<th>{{ _('frequency (ipm)') }}</th>
 									<th>{{ _('95%% confidence interval ') }}</th>
 								</tr>
@@ -59,6 +63,17 @@
 						<select name="select_x_axis_scale" id="select_x_axis_scale" class="search_input">
 							<option value="linear" selected>{{ _('linear') }}</option>
 							<option value="logarithmic">{{ _('logarithmic') }}</option>
+						</select>
+						<label for="select_max_y">{{ _('Max y: ') }}</label>
+						<select name="select_max_y" id="select_max_y" class="search_input">
+							<option value="as_in_data" selected>{{ _('as in data') }}</option>
+							<option value="100">{{ _('100%%') }}</option>
+							<option value="50">{{ _('50%%') }}</option>
+							<option value="25">{{ _('25%%') }}</option>
+							<option value="10">{{ _('10%%') }}</option>
+							<option value="5">{{ _('5%%') }}</option>
+							<option value="1">{{ _('1%%') }}</option>
+							<option value="0.1">{{ _('0.1%%') }}</option>
 						</select>
 						<div id="word_freq_rank_stats_plot">{{ _('(please wait for the plot to load)') }}</div>
 					</div>
