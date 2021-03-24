@@ -38,6 +38,11 @@ $(function() {
 		$('#load_word_freq_stats').click(load_freq_stats);
 	}
 
+	function assign_word_stats_table_events() {
+	    $('.th_query_word').unbind('hover');
+	    $('.th_query_word').hover(highlight_word, clear_word_highlight);
+	}
+
 	function close_word_stats() {
 		$('#word_stats').modal('toggle');
 		$('#w_id1').val('');
@@ -48,6 +53,17 @@ $(function() {
 		$('#word_freq_rank_stats_plot').html('<svg></svg>');
 		$('#word_stats_nothing_found').hide();
 		$('#word_stats_wait').show();
+	}
+
+	function highlight_word() {
+	    var nWord = $(this).attr("data-nword");
+	    $(".bar").addClass("almost_invisible");
+	    $(".bar_w" + nWord).addClass("opaque");
+	}
+
+	function clear_word_highlight() {
+	    var nWord = $(this).attr("data-nword");
+	    $(".bar").removeClass("almost_invisible").removeClass("opaque");
 	}
 
 	function resize_svg() {
@@ -73,7 +89,6 @@ $(function() {
             .ticks(5)
     }
 
-    // gridlines in y axis function
     function make_y_gridlines() {
         return d3.axisLeft(y)
             .ticks(5)
@@ -128,8 +143,12 @@ $(function() {
 		var barWidth = 20;
 		var maxBars = 25;
 		var nBars = nResults;
-		if (nBars > maxBars) {
+		if (nBars >= maxBars) {
 			nBars = maxBars;
+			$('#word_stats_max_bars').show();
+		}
+		else {
+		    $('#word_stats_max_bars').hide();
 		}
 	    x = d3.scaleBand()
             .rangeRound([0, barWidth * nBars], .1)
@@ -408,7 +427,7 @@ $(function() {
 		}
 		tableHeaderBottom.html(tableHeaderBottom.html() + $('#header_template_start').html());
 		for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {
-		    tableHeaderTop.html(tableHeaderTop.html() + "<th colspan=\"2\">"
+		    tableHeaderTop.html(tableHeaderTop.html() + "<th colspan=\"2\" class=\"th_query_word\" data-nword=\"" + (iQueryWord + 1) + "\">"
 		                        + "<div class=\"circle circle_w" + (iQueryWord + 1) + "\"></div>"
 		                        + queryWordCaption + " " + (iQueryWord + 1) + "</th>");
             tableHeaderBottom.html(tableHeaderBottom.html() + $('#header_template_end').html());
@@ -429,6 +448,7 @@ $(function() {
                 }
             }
 		}
+		assign_word_stats_table_events();
 	}
 	
 	function display_word_stats_plot(results) {

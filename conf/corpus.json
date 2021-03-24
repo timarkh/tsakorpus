@@ -48,8 +48,10 @@
       "linguists",
       "speakers",
       "title",
-      "genre",
-      "year"
+      "year",
+      "speaker",
+      "gender",
+      "birthyear"
     ]
   },
   "word_fields":

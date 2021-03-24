@@ -252,8 +252,10 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
     for iWord in range(1, nWordsProcess + 1):
         curWordBuckets = []
         for bucket in buckets:
-            if (bucket['name'] == '>>'
-                    or (type(bucket['name']) == str and len(bucket['name']) <= 0)):
+            # if (bucket['name'] == '>>'
+            #         or (type(bucket['name']) == str and len(bucket['name']) <= 0)):
+            #     continue
+            if bucket['name'] == '>>':
                 continue
             newBucket = copy.deepcopy(bucket)
             if searchType == 'context':
@@ -280,10 +282,10 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
                 if ('aggregations' not in hits
                     or 'agg_freq' not in hits['aggregations']
                     or 'agg_ndocs' not in hits['aggregations']
-                    or hits['aggregations']['agg_ndocs']['value'] is None
-                    or (hits['aggregations']['agg_ndocs']['value'] <= 0
-                        and not metaField.startswith('year'))):
-                    continue
+                    or hits['aggregations']['agg_ndocs']['value'] is None):
+                        # or (hits['aggregations']['agg_ndocs']['value'] <= 0
+                        #     and not metaField.startswith('year'))):
+                        continue
                 successRate = hits['aggregations']['agg_freq']['value'] / newBucket['n_words']
                 newBucket['n_words_conf_int'] = wilson_confidence_interval(successRate,
                                                                            newBucket['n_words'],
@@ -296,10 +298,10 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
                     or 'agg_nwords' not in hits['aggregations']
                     or 'agg_ndocs' not in hits['aggregations']
                     or hits['aggregations']['agg_ndocs']['value'] is None
-                    or hits['aggregations']['agg_nwords']['sum'] is None
-                    or (hits['aggregations']['agg_ndocs']['value'] <= 0
-                        and not metaField.startswith('year'))):
-                    continue
+                    or hits['aggregations']['agg_nwords']['sum'] is None):
+                        # or (hits['aggregations']['agg_ndocs']['value'] <= 0
+                        #     and not metaField.startswith('year'))):
+                        continue
                 successRate = hits['aggregations']['agg_nwords']['sum'] / newBucket['n_words']
                 newBucket['n_words_conf_int'] = wilson_confidence_interval(successRate,
                                                                            newBucket['n_words'],
@@ -308,9 +310,11 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
                 if nWords > 1:
                     newBucket['n_sents'] = hits['hits']['total']['value']
                 if not bSentenceLevel:
-                    newBucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / newBucket['n_docs'] * 100
+                    if newBucket['n_docs'] > 0:
+                        newBucket['n_docs'] = hits['aggregations']['agg_ndocs']['value'] / newBucket['n_docs'] * 100
                 else:
-                    newBucket['n_sents'] = hits['hits']['total']['value'] / newBucket['n_sents'] * 100
+                    if newBucket['n_sents'] > 0:
+                        newBucket['n_sents'] = hits['hits']['total']['value'] / newBucket['n_sents'] * 100
             curWordBuckets.append(newBucket)
         results.append(curWordBuckets)
     return results

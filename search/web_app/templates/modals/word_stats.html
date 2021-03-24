@@ -24,6 +24,9 @@
 							<option value="context">{{ _('search the whole query') }}</option>
 							<option value="compare" selected>{{ _('compare words in the query') }}</option>
 						</select>
+						<div id="word_stats_max_bars" class="alert alert-warning" role="alert" style="display:none;">
+							<span class="bi bi-exclamation-triangle-fill" aria-hidden="true"></span>&nbsp; {{ _('A maximum of 25 metadata values can be displayed, sorted by the number of words in the relevant texts.') }}
+						</div>
 						<div id="word_stats_plot"></div>
 						<table id="word_stats_table" class="table table-hover">
 							<thead>
@@ -38,7 +41,7 @@
 								</tr>
 								<tr id="header_template_end" class="hidden">
 									<th>{{ _('frequency (ipm)') }}</th>
-									<th>{{ _('95%% confidence interval ') }}</th>
+									<th>{{ _('90%% conf. int. ') }}</th>
 								</tr>
 							</thead>
 							<tbody>

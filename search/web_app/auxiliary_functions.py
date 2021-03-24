@@ -114,7 +114,7 @@ def copy_request_args():
     return query
 
 
-def wilson_confidence_interval(p, n, multiplier, z=1.645):
+def wilson_confidence_interval(p, n, multiplier, z=1.644854):
     """
     Calculate the Wilson confidence interval for Binomial
     distribution, given n trials with p success rate.
@@ -123,7 +123,9 @@ def wilson_confidence_interval(p, n, multiplier, z=1.645):
     # 1.645 for 90%
     center = (p + z * z / (2 * n)) / (1 + z * z / (2 * n))
     halfLength = (z / (1 + z * z / n)) * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
-    return (center - halfLength) * multiplier, (center + halfLength) * multiplier
+    lowerBound = min(p, (center - halfLength)) * multiplier
+    upperBound = max(p, (center + halfLength)) * multiplier
+    return lowerBound, upperBound
 
 
 def distance_constraints_too_complex(wordConstraints):

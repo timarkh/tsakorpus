@@ -1434,3 +1434,23 @@ in different styles) */
 .hidden {
     display: none;
 }
+
+#word_stats_max_bars {
+    margin: 0.5rem;
+}
+
+.th_query_word {
+    border-radius: 5px;
+}
+
+.th_query_word:hover {
+    background-color: #ededed;
+}
+
+.almost_invisible {
+    opacity: 0.1;
+}
+
+.opaque {
+    opacity: 1;
+}
