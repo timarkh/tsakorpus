@@ -39,6 +39,7 @@ class CorpusSettings:
         self.negative_search_enabled = True
         self.gloss_search_enabled = True
         self.year_sort_enabled = False
+        self.fulltext_view_enabled = False
         self.max_docs_retrieve = 9999
         self.max_words_in_sentence = 40
         self.max_context_expand = 5

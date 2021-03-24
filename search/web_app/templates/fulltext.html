@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html lang="{{ locale }}">
+<head>
+	<title>{{ _('corpus_title') }}</title>
+	<link rel="stylesheet" type="text/css" href="../static/bootstrap-5.0.0-beta1-dist/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/css/search.css">
+	<link rel="stylesheet" type="text/css" href="../static/css/gramm_gloss_selection.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+	<script src="../static/jquery-3.5.1-dist/jquery-3.5.1.min.js"></script>
+	<script type='text/javascript' src='../static/bootstrap-5.0.0-beta1-dist/js/bootstrap.bundle.min.js'></script>
+	<script type='text/javascript' src='../static/js/result_parser.js'></script>
+	<!-- <script type='text/javascript' src='../static/js/json_loaders.js'></script> -->
+	<script type='text/javascript'>
+	</script>
+	<!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,400i" rel="stylesheet"> -->
+	{% include "head_add.html" ignore missing %}
+</head>
+<body>
+	<div class="box_column">
+		<div class="row_section_fixed">
+			{% include "header.html" ignore missing %} <!-- user-defined header, if any -->
+		</div>
+		<div class="row_section_expand">
+			<!-- area where the text is displayed -->
+			<div class="sent_results row_section_expand">
+				<div class="context" id='div_res1'>
+					<div class="cx_main">
+					<div class="row sentence">
+						{{ text | safe }}
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row_section_fixed">
+			{% include "footer.html" ignore missing %} <!-- user-defined footer, if any -->
+		</div>
+	</div>
+	{% include "index/hidden_elements.html" %} <!-- modal windows, analysis tooltip etc. -->
+	<script type='text/javascript'>assign_word_events();</script>
+</body>
+</html>

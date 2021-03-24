@@ -432,6 +432,27 @@ def send_image(path):
     return send_from_directory(os.path.join('../img', settings.corpus_name), path)
 
 
+@app.route('/docs/<doc_fname>')
+def send_text_html(doc_fname):
+    """
+    Return the requested document, if full-text view is enabled.
+    """
+    # if not settings.fulltext_view_enabled:
+    #     return ''
+    if not doc_fname.endswith('.html'):
+        doc_fname += '.html'
+    with open(os.path.join('corpus_html',
+                           settings.corpus_name,
+                           doc_fname),
+              'r', encoding='utf-8') as fText:
+        text = fText.read()
+    return render_template('fulltext.html',
+                           locale=get_locale(),
+                           corpus_name=settings.corpus_name,
+                           languages=settings.languages,
+                           text=text)
+
+
 @app.route('/download_cur_results_csv')
 @nocache
 def download_cur_results_csv():

@@ -3,8 +3,26 @@ import html
 import os
 import copy
 import math
+import re
+import jinja2
 from flask import render_template
-from .transliteration import *
+try:
+    from .transliteration import *
+except ImportError:
+    # This happens when response_processots.py is imported
+    # from outside this package, but we do not need the
+    # transliterations in that case
+    pass
+
+
+def render_jinja_html(template_loc, file_name, **context):
+    """
+    Render a flask template without flask context (needed if
+    this file is imported from outside the package).
+    """
+    return jinja2.Environment(
+        loader=jinja2.FileSystemLoader(template_loc+'/')
+    ).get_template(file_name).render(context)
 
 
 class SentenceViewer:
@@ -163,8 +181,16 @@ class SentenceViewer:
         """
         grAnaPart = self.build_gr_ana_part_text(grValues, lang)
         if not gramdic:
-            return render_template('search_results/grammar_popup.html', grAnaPart=grAnaPart).strip()
-        return render_template('search_results/gramdic_popup.html', grAnaPart=grAnaPart).strip()
+            try:
+                return render_template('search_results/grammar_popup.html', grAnaPart=grAnaPart).strip()
+            except AttributeError:
+                return render_jinja_html('../search/web_app/templates/search_results',
+                                         'grammar_popup.html', grAnaPart=grAnaPart).strip()
+        try:
+            return render_template('search_results/gramdic_popup.html', grAnaPart=grAnaPart).strip()
+        except AttributeError:
+            return render_jinja_html('../search/web_app/templates/search_results',
+                                     'gramdic_popup.html', grAnaPart=grAnaPart).strip()
 
     def build_ana_div(self, ana, lang, translit=None):
         """
@@ -213,7 +239,11 @@ class SentenceViewer:
             # Order analysis fields alphabetically
             ana4template['lex_fields'].sort(key=lambda x: x['key'])
             ana4template['other_fields'].sort(key=lambda x: x['key'])
-        return render_template('search_results/analysis_div.html', ana=ana4template).strip()
+        try:
+            return render_template('search_results/analysis_div.html', ana=ana4template).strip()
+        except AttributeError:
+            return render_jinja_html('../search/web_app/templates/search_results',
+                                     'analysis_div.html', ana=ana4template).strip()
 
     def build_ana_popup(self, word, lang, matchingAnalyses=None, translit=None):
         """
@@ -232,7 +262,11 @@ class SentenceViewer:
                 ana4template = {'match': iAna in simpleMatchingAnalyses,
                                 'ana_div': self.build_ana_div(simplifiedAnas[iAna], lang, translit=translit)}
                 data4template['analyses'].append(ana4template)
-        return render_template('search_results/analyses_popup.html', data=data4template)
+        try:
+            return render_template('search_results/analyses_popup.html', data=data4template)
+        except AttributeError:
+            return render_jinja_html('../search/web_app/templates/search_results',
+                                     'analyses_popup.html', data=data4template)
 
     def prepare_analyses(self, words, indexes, lang, matchWordOffsets=None, translit=None):
         """
@@ -431,7 +465,7 @@ class SentenceViewer:
                 offStart, offEnd = pa['off_start'], pa['off_end']
             except KeyError:
                 continue
-            pID = 'p' + pa['para_id'] + str(docID)
+            pID = 'p' + str(pa['para_id']) + str(docID)
             try:
                 offStarts[offStart].add(pID)
             except KeyError:
@@ -1099,11 +1133,11 @@ class SentenceViewer:
             for ana in simplifiedAnas:
                 grTagsList = []
                 for field in sorted(ana):
-                        value = ana[field]
-                        if type(value) == list:
-                            value = ', '.join(value)
-                        if field.startswith('gr.'):
-                            grTagsList.append((field[3:], value))
+                    value = ana[field]
+                    if type(value) == list:
+                        value = ', '.join(value)
+                    if field.startswith('gr.'):
+                        grTagsList.append((field[3:], value))
                 grTags = self.build_gr_ana_part_text(grTagsList, lang)
                 if len(grTags) > 0:
                     curGramm.add(grTags)
@@ -1189,7 +1223,6 @@ class SentenceViewer:
             wordSource = self.sc.get_word_by_id(word['w_id'])['hits']['hits'][0]['_source']
             wordSource.update(word['_source'])
             word['_source'] = wordSource
-            print(word['_source'])
             processedWords.append(self.process_word(word, lang=self.settings.languages[word['_source']['lang']],
                                                     searchType=searchType))
         hitsProcessed = copy.deepcopy(hitsProcessedAll)

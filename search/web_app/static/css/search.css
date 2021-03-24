@@ -474,6 +474,7 @@ label {
 	position: relative;
 	width: 25px;
 	display: flex;
+	margin: auto;
 }
 
 .cx_toggle_chk {

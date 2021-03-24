@@ -25,10 +25,9 @@ class Indexator:
 
     def __init__(self, overwrite=False):
         self.overwrite = overwrite  # whether to overwrite an existing index without asking
-        fSettings = open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
-                         'r', encoding='utf-8')
-        self.settings = json.load(fSettings)
-        fSettings.close()
+        with open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
+                  'r', encoding='utf-8') as fSettings:
+            self.settings = json.load(fSettings)
         self.name = self.settings['corpus_name']
         self.languages = self.settings['languages']
         if len(self.languages) <= 0:

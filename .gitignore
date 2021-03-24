@@ -6,7 +6,8 @@ corpus/**
 src_convertors/corpus/**
 search/media/**
 search/tmp/**
+search/img/**
+search/corpus_html/**
 src_convertors/error.log
 docs_doxygen/**
-search/img/**
 search/web_app/templates/dictionaries/**
