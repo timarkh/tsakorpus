@@ -48,16 +48,22 @@ class JSON2HTML:
                                                            numSent=self.lastSentNum,
                                                            lang=lang,
                                                            langView='lang' + str(nLangView))
-            htmlByLangView['lang' + str(nLangView)] += sentProcessed['languages']['lang' + str(nLangView)]['text'] + ' \n'
+            if len(sentProcessed['languages']['lang' + str(nLangView)]['text']) > 0:
+                htmlByLangView['lang' + str(nLangView)] += sentProcessed['languages']['lang' + str(nLangView)]['text'] + ' \n'
             if bLast or ('last' in s['_source'] and s['_source']['last']):
                 nLangView += 1
                 htmlByLangView['lang' + str(nLangView)] = ''
 
+        htmlByLangView = {langView: htmlByLangView[langView]
+                          for langView in htmlByLangView
+                          if len(htmlByLangView[langView].strip()) > 0}
         colClass = 8
         if len(htmlByLangView) > 1:
             colClass = 10 // len(htmlByLangView)
         for langView in htmlByLangView:
-            htmlByLangView[langView] = re.sub('\n\n+', '\n', htmlByLangView[langView])
+            htmlByLangView[langView] = htmlByLangView[langView].replace('<span class="newline"></span>', '<br>')
+            htmlByLangView[langView] = re.sub('^[\n ]*<br> *', '', htmlByLangView[langView], flags=re.DOTALL)
+            htmlByLangView[langView] = re.sub('\n\n+', '\n', htmlByLangView[langView], flags=re.DOTALL)
             htmlByLangView[langView] = re.sub('  +', ' ', htmlByLangView[langView])
             htmlByLangView[langView] = '<div class="col-sm-' + str(colClass) \
                                        + '"><span class="sent_lang sent_lang_' + langView \
