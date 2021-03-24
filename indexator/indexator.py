@@ -105,7 +105,7 @@ class Indexator:
             if (self.es_ic.exists(index=self.name + '.docs')
                     or self.es_ic.exists(index=self.name + '.words')
                     or self.es_ic.exists(index=self.name + '.sentences')):
-                print('It seems a corpus named "' + self.name + '" already exists. '
+                print('It seems that a corpus named "' + self.name + '" already exists. '
                       + 'Do you want to overwrite it? [y/n]')
                 reply = input()
                 if reply.lower() != 'y':
@@ -232,7 +232,7 @@ class Indexator:
                     self.tmpLemmaIDs[langID][lemma] = lID
                 lID = 'l' + str(lID)
                 self.word2lemma[langID][wID] = lID
-                w['l_id'] = lID
+            w['l_id'] = lID
             for itemID in [wID, lID]:
                 try:
                     self.wordFreqs[langID][itemID] += 1

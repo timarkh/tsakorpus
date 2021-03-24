@@ -43,6 +43,20 @@ $(function() {
 	    $('.th_query_word').hover(highlight_word, clear_word_highlight);
 	}
 
+	function assign_plot_circle_events(chart) {
+	    chart.selectAll(".plot_circle")
+		    .on('mouseover', function (d, i) {
+                d3.select(this).transition()
+                .duration('300')
+                .attr('r', '7');
+            })
+            .on('mouseout', function (d, i) {
+                d3.select(this).transition()
+                .duration('300')
+                .attr('r', '3.5');
+            });
+	}
+
 	function close_word_stats() {
 		$('#word_stats').modal('toggle');
 		$('#w_id1').val('');
@@ -58,29 +72,47 @@ $(function() {
 	function highlight_word() {
 	    var nWord = $(this).attr("data-nword");
 	    $(".bar").addClass("almost_invisible");
-	    $(".bar_w" + nWord).addClass("opaque");
+	    $(".bar_w" + nWord).removeClass("almost_invisible").addClass("opaque");
+	    $(".conf_int").addClass("almost_invisible");
+	    $(".conf_int_w" + nWord).removeClass("almost_invisible").addClass("opaque");
+	    $(".plot_line").addClass("almost_invisible");
+	    $(".plot_line_w" + nWord).removeClass("almost_invisible").addClass("opaque");
+	    $(".plot_circle").addClass("almost_invisible");
+	    $(".plot_circle_w" + nWord).removeClass("almost_invisible").addClass("opaque");
 	}
 
 	function clear_word_highlight() {
 	    var nWord = $(this).attr("data-nword");
 	    $(".bar").removeClass("almost_invisible").removeClass("opaque");
+	    $(".conf_int").removeClass("almost_invisible").removeClass("opaque");
+	    $(".plot_line").removeClass("almost_invisible").removeClass("opaque");
+	    $(".plot_circle").removeClass("almost_invisible").removeClass("opaque");
 	}
 
-	function resize_svg() {
-	    var viewBoxY = (40 + $(".word_meta_plot>g")[0].getBBox()["height"]);
+	function resize_svg(margin) {
 	    var viewBoxX = 600;
-		$(".word_meta_plot").attr("viewBox", "0 0 " + viewBoxX + " " + viewBoxY);
-		$(".word_meta_plot").css("min-height", Math.max(300, $(".word_meta_plot>g")[0].getBBox()["height"]));
-		$(".word_meta_plot").css("min-width", vw(50));
+	    $(".word_meta_plot").css("min-width", vw(50));
+	    try {
+            var viewBoxY = (40 + $(".word_meta_plot>g")[0].getBBox()["height"]);
+            $(".word_meta_plot").attr("viewBox", "0 0 " + viewBoxX + " " + viewBoxY);
+            $(".word_meta_plot").css("min-height", Math.max(300, $(".word_meta_plot>g")[0].getBBox()["height"]));
+        }
+        catch (e) {
+		    setTimeout(function() {
+		        var viewBoxY = (40 + $(".word_meta_plot>g")[0].getBBox()["height"]);
+                $(".word_meta_plot").attr("viewBox", "0 0 " + viewBoxX + " " + viewBoxY);
+                $(".word_meta_plot").css("min-height", Math.max(300, $(".word_meta_plot>g")[0].getBBox()["height"]));
+		    }, 500);
+		}
 		try {
 		    var yAxisWidth = $("#y_axis")[0].getBBox()["width"];
 		    $(".word_meta_plot>g").attr("transform", "translate(" + yAxisWidth + "," + margin["top"] + ")");
 		}
 		catch (e) {
-		    setTimeout(1000, function() {
-		        yAxisWidth = $("#y_axis")[0].getBBox()["width"];
+		    setTimeout(function() {
+		        var yAxisWidth = $("#y_axis")[0].getBBox()["width"];
 		        $(".word_meta_plot>g").attr("transform", "translate(" + yAxisWidth + "," + margin["top"] + ")");
-		    })
+		    }, 2000);
 		}
 	}
 
@@ -136,6 +168,10 @@ $(function() {
 				alert( JSON.stringify(errorThrown) );
 			}
 		});
+	}
+
+	function bar_title(v) {
+	    return Math.round(v.n_words) + " ipm [" + Math.round(v.n_words_conf_int[0]) + ", " + Math.round(v.n_words_conf_int[1]) + "]";
 	}
 	
 	function show_bar_chart(results, maxHeight) {
@@ -213,13 +249,13 @@ $(function() {
             }
         }
 
-        for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {
+        for (iRes = 0; iRes < results.length; iRes++) {
             var barClass = "bar bar_default"
             if (queryType == "compare") {
-                barClass = "bar bar_w" + (iQueryWord + 1);
+                barClass = "bar bar_w" + (iRes + 1);
             }
             bar = chart.selectAll(".bar_new")
-                .data(results[iQueryWord])
+                .data(results[iRes])
               .enter().append("rect")
                 .attr("class", v => "bar bar_w" + (v.n_query_word + 1))
                 .attr("x", v => x(v.name))
@@ -228,15 +264,12 @@ $(function() {
                 .attr("height", 0)
                 .transition().duration(1200)
                 .attr("y", v => y(v.n_words))
-                .attr("height", v => 200 - y(v.n_words));
-            chart.selectAll(".bar")
-                .data(results[iQueryWord])
-              .append("title")
-                .text(v => Math.round(v.n_words) + " ipm [" + Math.round(v.n_words_conf_int[0]) + ", " + Math.round(v.n_words_conf_int[1]) + "]");
+                .attr("height", v => 200 - y(v.n_words))
+                .attr("title", bar_title);
             chart.selectAll(".conf_int_new")
-                .data(results[iQueryWord])
+                .data(results[iRes])
               .enter().append("line")
-                .attr("class", "conf_int")
+                .attr("class", v => "conf_int conf_int_w" + (v.n_query_word + 1))
                 .attr("x1", v => x(v.name) + barWidth / 2)
                 .attr("x2", v => x(v.name) + barWidth / 2)
                 .attr("y1", 200)
@@ -245,9 +278,9 @@ $(function() {
                 .attr("y1", v => y(v.n_words_conf_int[0]))
                 .attr("y2", v => y(v.n_words_conf_int[1]));
             chart.selectAll(".conf_int_cap_top_new")
-                .data(results[iQueryWord])
+                .data(results[iRes])
               .enter().append("line")
-                .attr("class", "conf_int_cap_top")
+                .attr("class", v => "conf_int_cap_top conf_int conf_int_w" + (v.n_query_word + 1))
                 .attr("x1", v => x(v.name) + barWidth / 2 - 3)
                 .attr("x2", v => x(v.name) + barWidth / 2 + 3)
                 .attr("y1", 200)
@@ -256,9 +289,9 @@ $(function() {
                 .attr("y1", v => y(v.n_words_conf_int[0]))
                 .attr("y2", v => y(v.n_words_conf_int[0]));
             chart.selectAll(".conf_int_cap_bottom_new")
-                .data(results[iQueryWord])
+                .data(results[iRes])
               .enter().append("line")
-                .attr("class", "conf_int_cap_bottom")
+                .attr("class", v => "conf_int_cap_bottom conf_int conf_int_w" + (v.n_query_word + 1))
                 .attr("x1", v => x(v.name) + barWidth / 2 - 3)
                 .attr("x2", v => x(v.name) + barWidth / 2 + 3)
                 .attr("y1", 200)
@@ -267,8 +300,17 @@ $(function() {
                 .attr("y1", v => y(v.n_words_conf_int[1]))
                 .attr("y2", v => y(v.n_words_conf_int[1]));
         }
+        setTimeout(function (){
+            $('.bar').each(function () {
+                $(this).html("<title>" + $(this).attr("title") + "</title>")
+            });
+        }, 1);
+//        chart.selectAll(".bar")
+//                .data(results[iQueryWord])
+//              .append("title")
+//                .text();
 
-		setTimeout(resize_svg, 300);
+		setTimeout(function() {resize_svg(margin);}, 300);
 	}
 	
 	function show_line_plot(results, maxHeight, multiplier, yLabel) {
@@ -365,7 +407,7 @@ $(function() {
 				chart.selectAll(".conf_int_new")
 				    .data(results[iQueryWord])
 				  .enter().append("line")
-				    .attr("class", "conf_int plot_line_w" + (iQueryWord + 1))
+				    .attr("class", "conf_int conf_int_w" + (iQueryWord + 1))
 				    .attr("x1", v => x(xTransform(v)))
 					.attr("x2", v => x(xTransform(v)))
 					.attr("y1", 200)
@@ -376,7 +418,7 @@ $(function() {
 				chart.selectAll(".conf_int_cap_top_new")
 				    .data(results[iQueryWord])
 				  .enter().append("line")
-				    .attr("class", "conf_int_cap_top plot_line_w" + (iQueryWord + 1))
+				    .attr("class", "conf_int_cap_top conf_int conf_int_w" + (iQueryWord + 1))
 				    .attr("x1", v => x(xTransform(v)) - 3)
 					.attr("x2", v => x(xTransform(v)) + 3)
 					.attr("y1", 200)
@@ -387,7 +429,7 @@ $(function() {
 				chart.selectAll(".conf_int_cap_bottom_new")
 				    .data(results[iQueryWord])
 				  .enter().append("line")
-				    .attr("class", "conf_int_cap_bottom plot_line_w" + (iQueryWord + 1))
+				    .attr("class", "conf_int_cap_bottom conf_int conf_int_w" + (iQueryWord + 1))
 				    .attr("x1", v => x(xTransform(v)) - 3)
 					.attr("x2", v => x(xTransform(v)) + 3)
 					.attr("y1", 200)
@@ -397,18 +439,8 @@ $(function() {
 				    .attr("y2", v => y(v.n_words_conf_int[1] * multiplier));
 			}
 		}
-		chart.selectAll(".plot_circle")
-		    .on('mouseover', function (d, i) {
-                d3.select(this).transition()
-                .duration('300')
-                .attr('r', '7');
-            })
-            .on('mouseout', function (d, i) {
-                d3.select(this).transition()
-                .duration('300')
-                .attr('r', '3.5');
-            });
-		setTimeout(resize_svg, 300);
+		setTimeout(assign_plot_circle_events(chart), 300)
+		setTimeout(function() {resize_svg(margin);}, 300);
 	}
 
 	function clear_table() {

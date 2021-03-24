@@ -1031,9 +1031,14 @@ class InterfaceQueryParser:
                     sentIndex = -int(htmlQuery['sentence_index' + strWordNum]) - 1
                     curPrelimQuery[pathPfx + 'sentence_index_neg'] = self.make_bool_query(sentIndex,
                                                                                           pathPfx + 'sentence_index_neg', lang)
-            if 'n_ana' + strWordNum in htmlQuery and htmlQuery['n_ana' + strWordNum] != 'any':
-                curPrelimQuery[pathPfx + 'n_ana'] = self.make_n_ana_query(htmlQuery['n_ana' + strWordNum],
+            if groupBy == 'lemma':
+                # only look for words with analyses
+                curPrelimQuery[pathPfx + 'n_ana'] = self.make_n_ana_query('analyzed',
                                                                           pathPfx + 'n_ana')
+            if 'n_ana' + strWordNum in htmlQuery and htmlQuery['n_ana' + strWordNum] != 'any':
+                if groupBy != 'lemma' or htmlQuery['n_ana' + strWordNum] != 'none':
+                    curPrelimQuery[pathPfx + 'n_ana'] = self.make_n_ana_query(htmlQuery['n_ana' + strWordNum],
+                                                                              pathPfx + 'n_ana')
             for anaField in ['lex', 'gr', 'gloss_index'] + self.wordFields:
                 if (anaField + strWordNum in htmlQuery
                         and len(htmlQuery[anaField + strWordNum]) > 0):

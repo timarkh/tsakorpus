@@ -1448,7 +1448,7 @@ in different styles) */
 }
 
 .almost_invisible {
-    opacity: 0.1;
+    opacity: 0.1!important;
 }
 
 .opaque {

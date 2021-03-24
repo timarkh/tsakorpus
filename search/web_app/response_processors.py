@@ -1189,6 +1189,7 @@ class SentenceViewer:
             wordSource = self.sc.get_word_by_id(word['w_id'])['hits']['hits'][0]['_source']
             wordSource.update(word['_source'])
             word['_source'] = wordSource
+            print(word['_source'])
             processedWords.append(self.process_word(word, lang=self.settings.languages[word['_source']['lang']],
                                                     searchType=searchType))
         hitsProcessed = copy.deepcopy(hitsProcessedAll)
