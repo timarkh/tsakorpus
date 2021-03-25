@@ -371,18 +371,6 @@ function assign_input_events() {
 	assign_tooltips();
 }
 
-function assign_tooltips() {
-	$("[data-tooltip=tooltip]").tooltip({
-		trigger: 'hover manual',
-		delay: { "show": 150, "hide": 0 }
-	});	
-}
-
-function hide_tooltips() {
-	$("[data-tooltip=tooltip]").tooltip('hide');
-	$(".tooltip").hide();
-}
-
 function assign_show_hide() {
     $("#hide_query_button").unbind('click');
 	$("#hide_query_button").click(function(e){
@@ -547,55 +535,6 @@ function choose_tags(e) {
 	}
 }
 
-function select_subcorpus(e) {
-	$('#subcorpus_selector').modal('show');
-}
-
-function show_help(e) {
-	$.ajax({
-			url: "help_dialogue",
-			type: "GET",
-			success: function(result) {
-				$('#help_dialogue_body').html(result);
-				$('#help_dialogue').modal('show');
-			},
-			error: function(errorThrown) {
-				alert( JSON.stringify(errorThrown) );
-			}
-		});
-}
-
-function show_dictionary(e) {
-	var lang = $('#lang1 option:selected').val();
-	$.ajax({
-			url: "dictionary/" + lang,
-			type: "GET",
-			success: function(result) {
-				$('#dictionary_dialogue_body').html(result);
-				$('#dictionary_dialogue').modal('show');
-				assign_dictionary_events();
-			},
-			error: function(errorThrown) {
-			}
-		});
-}
-
-function hide_settings(e) {
-	$('#display_settings').modal('hide');
-}
-
-function show_settings(e) {
-	$('#display_settings').modal('show');
-}
-
-function show_history(e) {
-	$('#query_history').modal('show');
-}
-
-function show_citation(e) {
-	$('#citation_dialogue').modal('show');
-}
-
 function gramm_gloss_selector_loaded(result) {
 	$("#gram_sel_body").html(result);
 	$("#gramm_selector_ok").unbind('click');
@@ -631,16 +570,6 @@ function search_if_enter(e) {
 	if (e.keyCode == 13) {
        $('#search_sent').click();        
     }
-}
-
-function toggle_glossed_layer(e) {
-	classToToggle = ".popup_" + $(this).attr('data');
-	if ($(this).is(':checked')) {
-		$(classToToggle).css("display", "");
-	}
-	else {
-		$(classToToggle).css("display", "none");
-	}
 }
 
 function search_if_query() {

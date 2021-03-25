@@ -1467,3 +1467,38 @@ in different styles) */
 	flex-flow: column;
 	padding: 10px 25px 25px 25px;
 }
+
+#fulltext_meta {
+    max-width: 600px;
+    border-collapse: separate;
+    border: solid black 1px;
+    border-radius: 8px;
+}
+
+#fulltext_meta td, #fulltext_meta th {
+    border-left: solid gray 1px;
+    border-bottom: none;
+}
+
+#fulltext_meta td:first-child, #fulltext_meta th:first-child {
+     border-left: none;
+}
+
+.text_title {
+	font-size: 2em;
+	padding-bottom: 10px;
+	font-weight: bold;
+	color: #1f6099;
+}
+
+.paragraph_num {
+    text-align: center;
+    font-size: 0.5em;
+    vertical-align: middle;
+    color: gray;
+    max-width: 35px;
+}
+
+.paragraph_num div {
+    margin: 50% 50% 50% 0;
+}

@@ -14,6 +14,7 @@ import subprocess
 import argparse
 from prepare_data import PrepareData
 from json_doc_reader import JSONDocReader
+from json2html import JSON2HTML
 
 
 class Indexator:
@@ -22,8 +23,10 @@ class Indexator:
     database.
     """
     SETTINGS_DIR = '../conf'
+    rxBadFileName = re.compile('[^\\w_.-]*', flags=re.DOTALL)
 
     def __init__(self, overwrite=False):
+        self.j2h = JSON2HTML()
         self.overwrite = overwrite  # whether to overwrite an existing index without asking
         with open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
                   'r', encoding='utf-8') as fSettings:
@@ -765,6 +768,15 @@ class Indexator:
                 self.es.index(index=self.name + '.docs',
                               id=self.dID,
                               body=shortMeta)
+        if self.settings['fulltext_view_enabled']:
+            if 'id' in meta:
+                fnameOut = self.rxBadFileName.sub('', meta['id']) + '.json'
+            else:
+                fnameOut = str(self.dID) + '.json'
+            self.j2h.process_file(fname,
+                                  os.path.join('../search/corpus_html',
+                                               self.name,
+                                               fnameOut))
         self.dID += 1
 
     def index_dir(self):

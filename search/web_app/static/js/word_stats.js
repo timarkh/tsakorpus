@@ -89,30 +89,30 @@ $(function() {
 	    $(".plot_circle").removeClass("almost_invisible").removeClass("opaque");
 	}
 
-	function resize_svg(margin) {
+	function resize_svg(margin, excessiveHeight) {
 	    var viewBoxX = 600;
 	    $(".word_meta_plot").css("min-width", vw(50));
 	    try {
-            var viewBoxY = (40 + $(".word_meta_plot>g")[0].getBBox()["height"]);
-            $(".word_meta_plot").attr("viewBox", "0 0 " + viewBoxX + " " + viewBoxY);
-            $(".word_meta_plot").css("min-height", Math.max(300, $(".word_meta_plot>g")[0].getBBox()["height"]));
+            var viewBoxY = $(".word_meta_plot>g")[0].getBBox()["height"];
+            $(".word_meta_plot").attr("viewBox", "0 0 " + viewBoxX + " " + (40 + viewBoxY));
+            $(".word_meta_plot").css("min-height", Math.max(300, viewBoxY / excessiveHeight));
         }
         catch (e) {
 		    setTimeout(function() {
-		        var viewBoxY = (40 + $(".word_meta_plot>g")[0].getBBox()["height"]);
-                $(".word_meta_plot").attr("viewBox", "0 0 " + viewBoxX + " " + viewBoxY);
-                $(".word_meta_plot").css("min-height", Math.max(300, $(".word_meta_plot>g")[0].getBBox()["height"]));
+		        var viewBoxY = $(".word_meta_plot>g")[0].getBBox()["height"];
+                $(".word_meta_plot").attr("viewBox", "0 0 " + viewBoxX + " " + (40 + viewBoxY));
+                $(".word_meta_plot").css("min-height", Math.max(300, viewBoxY / excessiveHeight));
 		    }, 500);
 		}
 		try {
-		    var yAxisWidth = $("#y_axis")[0].getBBox()["width"];
+		    var yAxisWidth = document.getElementById("y_axis").getBBox()["width"];
 		    $(".word_meta_plot>g").attr("transform", "translate(" + yAxisWidth + "," + margin["top"] + ")");
 		}
 		catch (e) {
 		    setTimeout(function() {
-		        var yAxisWidth = $("#y_axis")[0].getBBox()["width"];
+		        var yAxisWidth = document.getElementById("y_axis").getBBox()["width"];
 		        $(".word_meta_plot>g").attr("transform", "translate(" + yAxisWidth + "," + margin["top"] + ")");
-		    }, 2000);
+		    }, 500);
 		}
 	}
 
@@ -230,6 +230,7 @@ $(function() {
               .tickFormat("")
           );
 
+        var excessiveHeight = maxHeight; // confidence intervals that go over the roof
         var dataResorted = [];
         for (iRes = 0; iRes < results[0].length; iRes++) {
             dataResorted.push([]);
@@ -238,8 +239,12 @@ $(function() {
             for (iRes = 0; iRes < results[iQueryWord].length; iRes++) {
                 dataResorted[iRes].push(results[iQueryWord][iRes]);
                 dataResorted[iRes][iQueryWord].n_query_word = iQueryWord;
+                if (results[iQueryWord][iRes].n_words_conf_int[1] > excessiveHeight) {
+                    excessiveHeight = results[iQueryWord][iRes].n_words_conf_int[1];
+                }
             }
         }
+        excessiveHeight = excessiveHeight / maxHeight;
         for (iRes = 0; iRes < dataResorted.length; iRes++) {
             dataResorted[iRes].sort((a,b) => (a.n_words > b.n_words) ? -1 : ((b.n_words > a.n_words) ? 1 : 0));
         }
@@ -310,7 +315,7 @@ $(function() {
 //              .append("title")
 //                .text();
 
-		setTimeout(function() {resize_svg(margin);}, 300);
+		setTimeout(function() {resize_svg(margin, excessiveHeight);}, 300);
 	}
 	
 	function show_line_plot(results, maxHeight, multiplier, yLabel) {
@@ -345,6 +350,7 @@ $(function() {
 		
 		gx = chart.append("g")
 		    .attr("class", "x axis")
+		    .attr("id", "x_axis")
 		    .attr("transform", "translate(0,200)")
 		    .call(xAxis);
 		gx.selectAll("text")  
@@ -355,6 +361,7 @@ $(function() {
 			
 	    gy = chart.append("g")
 		    .attr("class", "y axis")
+		    .attr("id", "y_axis")
 		    .call(yAxis);
 
 		chart.append("g")
@@ -371,6 +378,16 @@ $(function() {
               .tickSize(-500)
               .tickFormat("")
           );
+
+        var excessiveHeight = maxHeight; // confidence intervals that go over the roof
+        for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {
+            for (iRes = 0; iRes < results[iQueryWord].length; iRes++) {
+                if (results[iQueryWord][iRes].n_words_conf_int[1] > excessiveHeight) {
+                    excessiveHeight = results[iQueryWord][iRes].n_words_conf_int[1];
+                }
+            }
+        }
+        excessiveHeight = excessiveHeight / maxHeight;
 		
 		for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {
 			var valueline = d3.line()
@@ -440,7 +457,7 @@ $(function() {
 			}
 		}
 		setTimeout(assign_plot_circle_events(chart), 300)
-		setTimeout(function() {resize_svg(margin);}, 300);
+		setTimeout(function() {resize_svg(margin, excessiveHeight);}, 300);
 	}
 
 	function clear_table() {

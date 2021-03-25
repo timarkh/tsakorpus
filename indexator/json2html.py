@@ -36,11 +36,16 @@ class JSON2HTML:
         sent = re.sub('  +', ' ', sent)
         return sent
 
-    def finalize_html_paragraph(self, sentByTier, colClass):
+    def finalize_html_paragraph(self, sentByTier, colClass, paraNum):
         """
         Make one HTML paragraph with parallel sentences.
         """
-        paragraph = ''
+        remainingCol = max(2, 12 - colClass * len(sentByTier))
+        paragraph = '<div class="d-none d-sm-block col-md-' + str(remainingCol // 2) + '"></div>'
+        paragraph += '<div class="paragraph_num">'
+        if paraNum % 10 == 0:
+            paragraph += '<div>' + str(paraNum) + '</div>'
+        paragraph += '</div>\n'
         for iTier in range(len(sentByTier)):
             sent = sentByTier[iTier]
             sent = re.sub('(?<=class="word)(.*)',
@@ -114,6 +119,7 @@ class JSON2HTML:
             'rows': [],
             'meta': self.iterSent.get_metadata(fnameIn)
         }
+
         while curPointers[0] < len(htmlByTier[0]):
             curParagraph = [''] * nTiers
             curParagraph[0] = self.finalize_html_sentence(htmlByTier[0][curPointers[0]]['html'])
@@ -125,7 +131,7 @@ class JSON2HTML:
                     usedParaIDsByTier[iTier] |= set(htmlByTier[iTier][curPointers[iTier]]['para_ids'])
                     remainingParaIDs -= set(htmlByTier[iTier][curPointers[iTier]]['para_ids'])
                     curPointers[iTier] += 1
-            dataFinal['rows'].append(self.finalize_html_paragraph(curParagraph, colClass))
+            dataFinal['rows'].append(self.finalize_html_paragraph(curParagraph, colClass, curPointers[0] + 1))
             curPointers[0] += 1
 
         with open(fnameOut, 'w', encoding='utf-8') as fOut:
@@ -136,3 +142,5 @@ if __name__ == '__main__':
     j2h = JSON2HTML()
     j2h.process_file('../corpus/beserman_multimedia/json_disamb/2014/LV_AS-2014.08.09-TA_MU-cow_1.json',
                      '../search/corpus_html/beserman_multimedia/1.json')
+    j2h.process_file('../corpus/beserman_multimedia/json_disamb/2018/AL_RA-2018.05.01-MU_NF-quest_repeat.json',
+                     '../search/corpus_html/beserman_multimedia/2.json')

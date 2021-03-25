@@ -8,7 +8,8 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 	<script src="../static/jquery-3.5.1-dist/jquery-3.5.1.min.js"></script>
 	<script type='text/javascript' src='../static/bootstrap-5.0.0-beta1-dist/js/bootstrap.bundle.min.js'></script>
-	<script type='text/javascript' src='../static/js/result_parser.js'></script>
+	<script type='text/javascript' src='../static/js/common_interface_functions.js'></script>
+	<script type='text/javascript' src='../static/js/fulltext.js'></script>
 	<!-- <script type='text/javascript' src='../static/js/json_loaders.js'></script> -->
 	<script type='text/javascript'>
 	</script>
@@ -21,10 +22,21 @@
 			{% include "header.html" ignore missing %} <!-- user-defined header, if any -->
 		</div>
 		<div class="row_section_fixed">
-			{% if data.meta.title %}
-			<h2>{{ data.meta.title }}</h2>
-			{% endif %}
+			{% include "index/corpus_header.html" %} <!-- tsakorpus header: corpus name, interface langauges, help link -->
 		</div>
+		<div class="row_section_fixed fulltext_header">
+			{% if data.meta.title %}
+			<h2 class="text_title">{{ data.meta.title }}</h2>
+			{% endif %}
+			<table class="table table-striped" id="fulltext_meta">
+				<tbody>
+					{% for k in data.meta %}
+					{% if k in viewable_meta %}<tr><td>{{ _('metafield_' + k) }}</td><td>{{ data.meta[k] }}</td></tr>{% endif %}
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<hr>
 			{% for row in data.rows %}
 				<div class="row sentence_fulltext">
 				{{ row | safe }}
@@ -35,6 +47,9 @@
 		</div>
 	</div>
 	{% include "index/hidden_elements.html" %} <!-- modal windows, analysis tooltip etc. -->
-	<script type='text/javascript'>assign_word_events();</script>
+	<script type='text/javascript'>
+		assign_word_events();
+		assign_input_events();
+	</script>
 </body>
 </html>

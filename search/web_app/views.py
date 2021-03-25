@@ -433,24 +433,36 @@ def send_image(path):
 
 
 @app.route('/docs/<doc_fname>')
+@gzipped
 def send_text_html(doc_fname):
     """
     Return the requested document, if full-text view is enabled.
     """
-    # if not settings.fulltext_view_enabled:
-    #     return ''
+    if not settings.fulltext_view_enabled:
+        return ''
     doc_fname = re.sub('\\.html?$', '', doc_fname)
     if not doc_fname.endswith('.json'):
         doc_fname += '.json'
-    with open(os.path.join('corpus_html',
-                           settings.corpus_name,
-                           doc_fname),
-              'r', encoding='utf-8') as fText:
-        data = json.load(fText)
+    try:
+        with open(os.path.join('corpus_html',
+                               settings.corpus_name,
+                               doc_fname),
+                  'r', encoding='utf-8') as fText:
+            data = json.load(fText)
+    except FileNotFoundError:
+        data = {
+            'meta': {},
+            'rows': []
+        }
     return render_template('fulltext.html',
                            locale=get_locale(),
                            corpus_name=settings.corpus_name,
                            languages=settings.languages,
+                           generate_dictionary=settings.generate_dictionary,
+                           citation=settings.citation,
+                           start_page_url=settings.start_page_url,
+                           locales=settings.interface_languages,
+                           viewable_meta=settings.viewable_meta,
                            data=data)
 
 
@@ -602,6 +614,7 @@ def get_glossed_sentence(n):
 
 
 @app.route('/set_locale/<lang>')
+@app.route('/docs/set_locale/<lang>')
 def set_locale(lang=''):
     if lang not in settings.interface_languages:
         return
@@ -610,6 +623,7 @@ def set_locale(lang=''):
 
 
 @app.route('/help_dialogue')
+@app.route('/docs/help_dialogue')
 def help_dialogue():
     l = get_locale()
     return render_template('modals/help_dialogue_' + l + '.html',
@@ -617,6 +631,7 @@ def help_dialogue():
                            gloss_search_enabled=settings.gloss_search_enabled)
 
 
+@app.route('/docs/dictionary/<lang>')
 @app.route('/dictionary/<lang>')
 @gzipped
 def get_dictionary(lang):

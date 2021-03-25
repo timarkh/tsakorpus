@@ -15,16 +15,6 @@ except ImportError:
     pass
 
 
-def render_jinja_html(template_loc, file_name, **context):
-    """
-    Render a flask template without flask context (needed if
-    this file is imported from outside the package).
-    """
-    return jinja2.Environment(
-        loader=jinja2.FileSystemLoader(template_loc+'/')
-    ).get_template(file_name).render(context)
-
-
 class SentenceViewer:
     """
     Contains methods for turning the JSON response of ES into
@@ -50,6 +40,21 @@ class SentenceViewer:
             self.authorMeta = self.settings.author_metafield
         self.sc = search_client
         self.w1_labels = set(['w1'] + ['w1_' + str(i) for i in range(self.settings.max_words_in_sentence)])
+        self.templates = {}     # Jinja2 template cache for standalone use
+
+    def render_jinja_html(self, templateDir, templateFilename, **context):
+        """
+        Render a flask template without flask context (needed if
+        this file is imported from outside the package).
+        """
+        try:
+            template = self.templates[(templateDir, templateFilename)]
+        except KeyError:
+            template = jinja2.Environment(
+                loader=jinja2.FileSystemLoader(templateDir + '/')
+            ).get_template(templateFilename)
+            self.templates[(templateDir, templateFilename)] = template
+        return template.render(context)
 
     def differing_ana_field(self, ana1, ana2):
         """
@@ -184,13 +189,13 @@ class SentenceViewer:
             try:
                 return render_template('search_results/grammar_popup.html', grAnaPart=grAnaPart).strip()
             except AttributeError:
-                return render_jinja_html('../search/web_app/templates/search_results',
-                                         'grammar_popup.html', grAnaPart=grAnaPart).strip()
+                return self.render_jinja_html('../search/web_app/templates/search_results',
+                                              'grammar_popup.html', grAnaPart=grAnaPart).strip()
         try:
             return render_template('search_results/gramdic_popup.html', grAnaPart=grAnaPart).strip()
         except AttributeError:
-            return render_jinja_html('../search/web_app/templates/search_results',
-                                     'gramdic_popup.html', grAnaPart=grAnaPart).strip()
+            return self.render_jinja_html('../search/web_app/templates/search_results',
+                                          'gramdic_popup.html', grAnaPart=grAnaPart).strip()
 
     def build_ana_div(self, ana, lang, translit=None):
         """
@@ -242,8 +247,8 @@ class SentenceViewer:
         try:
             return render_template('search_results/analysis_div.html', ana=ana4template).strip()
         except AttributeError:
-            return render_jinja_html('../search/web_app/templates/search_results',
-                                     'analysis_div.html', ana=ana4template).strip()
+            return self.render_jinja_html('../search/web_app/templates/search_results',
+                                          'analysis_div.html', ana=ana4template).strip()
 
     def build_ana_popup(self, word, lang, matchingAnalyses=None, translit=None):
         """
@@ -265,8 +270,8 @@ class SentenceViewer:
         try:
             return render_template('search_results/analyses_popup.html', data=data4template)
         except AttributeError:
-            return render_jinja_html('../search/web_app/templates/search_results',
-                                     'analyses_popup.html', data=data4template)
+            return self.render_jinja_html('../search/web_app/templates/search_results',
+                                          'analyses_popup.html', data=data4template)
 
     def prepare_analyses(self, words, indexes, lang, matchWordOffsets=None, translit=None):
         """

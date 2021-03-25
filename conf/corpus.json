@@ -63,6 +63,7 @@
     "speaker_type": ["native", "linguist"]
   },
   "generate_dictionary": true,
+  "fulltext_view_enabled": true,
   "languages": ["beserman", "russian"],
   "transliterations": ["original", "cyrillic", "UPA"],
   "input_methods": ["normal"],
