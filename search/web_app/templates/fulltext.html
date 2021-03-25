@@ -16,22 +16,20 @@
 	{% include "head_add.html" ignore missing %}
 </head>
 <body>
-	<div class="box_column">
+	<div class="box_text">
 		<div class="row_section_fixed">
 			{% include "header.html" ignore missing %} <!-- user-defined header, if any -->
 		</div>
-		<div class="row_section_expand">
-			<!-- area where the text is displayed -->
-			<div class="sent_results row_section_expand">
-				<div class="context" id='div_res1'>
-					<div class="cx_main">
-					<div class="row sentence">
-						{{ text | safe }}
-					</div>
-					</div>
-				</div>
-			</div>
+		<div class="row_section_fixed">
+			{% if data.meta.title %}
+			<h2>{{ data.meta.title }}</h2>
+			{% endif %}
 		</div>
+			{% for row in data.rows %}
+				<div class="row sentence_fulltext">
+				{{ row | safe }}
+				</div>
+			{% endfor %}
 		<div class="row_section_fixed">
 			{% include "footer.html" ignore missing %} <!-- user-defined footer, if any -->
 		</div>

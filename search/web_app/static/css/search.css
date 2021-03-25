@@ -262,6 +262,10 @@
 	margin: auto;
 }
 
+.sentence_fulltext {
+
+}
+
 .sent_lang:hover {
 	border-left: 2px #bbd dotted;
 	border-right: 2px #bbd dotted;
@@ -1454,4 +1458,12 @@ in different styles) */
 
 .opaque {
     opacity: 1;
+}
+
+.box_text {
+	height: 97vh;
+	width: 99vw;
+	display: flex;
+	flex-flow: column;
+	padding: 10px 25px 25px 25px;
 }
