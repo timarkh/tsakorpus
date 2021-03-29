@@ -11,6 +11,7 @@ import time
 import os
 import uuid
 import xlsxwriter
+from werkzeug.utils import secure_filename
 from . import app, settings, sc, sentView, MAX_PAGE_SIZE
 from .session_management import get_locale, get_session_data, change_display_options, set_session_data
 from .auxiliary_functions import jsonp, gzipped, nocache, lang_sorting_key, copy_request_args,\
@@ -440,7 +441,7 @@ def send_text_html(doc_fname):
     """
     if not settings.fulltext_view_enabled:
         return ''
-    doc_fname = re.sub('\\.html?$', '', doc_fname)
+    doc_fname = secure_filename(re.sub('\\.html?$', '', doc_fname))
     if not doc_fname.endswith('.json'):
         doc_fname += '.json'
     try:

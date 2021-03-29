@@ -26,11 +26,11 @@ class Indexator:
     rxBadFileName = re.compile('[^\\w_.-]*', flags=re.DOTALL)
 
     def __init__(self, overwrite=False):
-        self.j2h = JSON2HTML()
         self.overwrite = overwrite  # whether to overwrite an existing index without asking
         with open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
                   'r', encoding='utf-8') as fSettings:
             self.settings = json.load(fSettings)
+        self.j2h = JSON2HTML(settings=self.settings)
         self.name = self.settings['corpus_name']
         self.languages = self.settings['languages']
         if len(self.languages) <= 0:
@@ -39,7 +39,8 @@ class Indexator:
         self.corpus_dir = os.path.join('../corpus', self.name)
         self.iterSent = None
         if self.input_format in ['json', 'json-gzip']:
-            self.iterSent = JSONDocReader(format=self.input_format)
+            self.iterSent = JSONDocReader(format=self.input_format,
+                                          settings=self.settings)
 
         # Make sure only commonly used word fields and those listed
         # in corpus.json get into the words index.
@@ -769,10 +770,9 @@ class Indexator:
                               id=self.dID,
                               body=shortMeta)
         if self.settings['fulltext_view_enabled']:
-            if 'id' in meta:
-                fnameOut = self.rxBadFileName.sub('', meta['id']) + '.json'
-            else:
-                fnameOut = str(self.dID) + '.json'
+            if 'fulltext_id' not in meta:
+                return
+            fnameOut = meta['fulltext_id'] + '.json'
             self.j2h.process_file(fname,
                                   os.path.join('../search/corpus_html',
                                                self.name,

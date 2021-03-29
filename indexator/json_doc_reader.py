@@ -2,6 +2,7 @@ import json
 import ijson
 import os
 import gzip
+import random
 
 
 class JSONDocReader:
@@ -10,11 +11,13 @@ class JSONDocReader:
     through sentences read from corpus files in tsakorpus native
     JSON format.
     """
-    def __init__(self, format=format):
+    def __init__(self, format, settings):
         self.filesize_limit = -1
         self.lastFileName = ''
         self.format = format
         self.lastDocMeta = None         # for lazy calculations
+        self.settings = settings
+        self.nonpersistentID = random.randint(1, 100)
 
     @staticmethod
     def insert_meta_year(metadata):
@@ -65,6 +68,11 @@ class JSONDocReader:
                 metadata[curMetaField] = value
             elif (prefix, event) == ('meta', 'end_map'):
                 break
+        if ('fulltext_id' not in metadata
+                and 'use_nonpersistent_fulltext_id' in self.settings
+                and self.settings['use_nonpersistent_fulltext_id']):
+            metadata['fulltext_id'] = str(self.nonpersistentID)
+            self.nonpersistentID += random.randint(1, 100)
         self.lastDocMeta = metadata
         fIn.close()
         self.insert_meta_year(metadata)

@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import re
+from werkzeug.utils import secure_filename
 from json_doc_reader import JSONDocReader
 
 sys.path.insert(0, '../search/web_app')
@@ -16,14 +17,15 @@ class JSON2HTML:
     """
     SETTINGS_DIR = '../conf'
 
-    def __init__(self):
+    def __init__(self, settings):
         self.settings = CorpusSettings()
         self.settings.load_settings(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
                                os.path.join(self.SETTINGS_DIR, 'categories.json'))
         self.sentView = SentenceViewer(self.settings, None, fullText=True)
         self.iterSent = None
         if self.settings.input_format in ['json', 'json-gzip']:
-            self.iterSent = JSONDocReader(format=self.settings.input_format)
+            self.iterSent = JSONDocReader(format=self.settings.input_format,
+                                          settings=settings)
         self.lastSentNum = 0  # for the IDs in the HTML
 
     def finalize_html_sentence(self, sent):
@@ -119,6 +121,12 @@ class JSON2HTML:
             'rows': [],
             'meta': self.iterSent.get_metadata(fnameIn)
         }
+
+        fname = ''
+        if 'fulltext_id' in dataFinal['meta']:
+            fname = secure_filename(dataFinal['meta']['fulltext_id'])
+        if len(fname) <= 0:
+            return
 
         while curPointers[0] < len(htmlByTier[0]):
             curParagraph = [''] * nTiers

@@ -64,6 +64,7 @@
   },
   "generate_dictionary": true,
   "fulltext_view_enabled": true,
+  "use_nonpersistent_fulltext_id": true,
   "languages": ["beserman", "russian"],
   "transliterations": ["original", "cyrillic", "UPA"],
   "input_methods": ["normal"],
