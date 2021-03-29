@@ -66,6 +66,7 @@ class CorpusSettings:
         self.word_search_display_gr = True
         self.citation = None
         self.start_page_url = None
+        self.fulltext_page_size = 100     # Size of one page of the full-text representation in sentences
 
         # Languages and their properties
         self.languages = []

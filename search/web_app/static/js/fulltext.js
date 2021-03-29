@@ -17,9 +17,16 @@ function assign_input_events() {
 function assign_word_events() {
 	$("span.word").unbind('click');
 	$('span.word').click(highlight_cur_word);
-	assign_para_highlight();
+	$(".page_link").unbind('click');
+	$(".page_link").click(page_click_fulltext);
+	// assign_para_highlight();
 	assign_gram_popup();
 	assign_sent_meta_popup();
 }
 
-
+function page_click_fulltext(e) {
+	var page = $(e.currentTarget).attr("data-page");
+	var url = window.location.href.split('?')[0];    
+	url += '?page=' + page;
+	window.location.href = url;
+}

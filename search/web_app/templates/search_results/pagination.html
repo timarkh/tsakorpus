@@ -1,0 +1,21 @@
+<div class="pages alert-info">
+{% if data.page - 4 > 0 %}
+<button class="page_link" data-page="1">1</button>&nbsp;
+...&nbsp;
+{% endif %}
+{% for i_page in range(-3, 4) %}
+	{% if (data.page + i_page > 0) and (data.page + i_page <= max_page_number) %}
+	{% if i_page == 0 %}
+	<span class="cur_page">{{ data.page + i_page }}</span>&nbsp;
+	{% else %}
+	<button class="page_link" data-page="{{ data.page + i_page }}">{{ data.page + i_page }}</button>&nbsp;
+	{% endif %}
+	{% endif %}
+{% endfor %}
+{% if data.page + 5 <= max_page_number %}
+...&nbsp;
+{% endif %}
+{% if data.page + 4 <= max_page_number %}
+<button class="page_link" data-page="{{ max_page_number }}">{{ max_page_number }}</button>&nbsp;
+{% endif %}
+</div>

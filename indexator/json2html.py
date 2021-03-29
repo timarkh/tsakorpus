@@ -20,7 +20,7 @@ class JSON2HTML:
         self.settings = CorpusSettings()
         self.settings.load_settings(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
                                os.path.join(self.SETTINGS_DIR, 'categories.json'))
-        self.sentView = SentenceViewer(self.settings, None)
+        self.sentView = SentenceViewer(self.settings, None, fullText=True)
         self.iterSent = None
         if self.settings.input_format in ['json', 'json-gzip']:
             self.iterSent = JSONDocReader(format=self.settings.input_format)

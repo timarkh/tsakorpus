@@ -37,11 +37,21 @@
 			</table>
 		</div>
 		<hr>
-			{% for row in data.rows %}
-				<div class="row sentence_fulltext">
-				{{ row | safe }}
-				</div>
-			{% endfor %}
+{% if max_page_number > 0 %}
+		<div class="after_hits_fulltext row_section_fixed">
+			{% include "search_results/pagination.html" %}
+		</div>
+{% endif %}
+		{% for row in data.rows %}
+			<div class="row sentence_fulltext">
+			{{ row | safe }}
+			</div>
+		{% endfor %}
+{% if max_page_number > 0 %}
+		<div class="after_hits_fulltext row_section_fixed">
+			{% include "search_results/pagination.html" %}
+		</div>
+{% endif %}
 		<div class="row_section_fixed">
 			{% include "footer.html" ignore missing %} <!-- user-defined footer, if any -->
 		</div>

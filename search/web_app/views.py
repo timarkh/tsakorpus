@@ -452,8 +452,22 @@ def send_text_html(doc_fname):
     except FileNotFoundError:
         data = {
             'meta': {},
-            'rows': []
+            'rows': [],
+            'page': 1
         }
+    page = request.args.get('page', 1)
+    try:
+        page = int(page) - 1
+    except:
+        page = 0
+    if page < 0:
+        page = 0
+    maxPage = len(data['rows']) // settings.fulltext_page_size
+    if page > maxPage:
+        page = maxPage
+    data['rows'] = data['rows'][page * settings.fulltext_page_size:
+                                (page + 1) * settings.fulltext_page_size]
+    data['page'] = page + 1
     return render_template('fulltext.html',
                            locale=get_locale(),
                            corpus_name=settings.corpus_name,
@@ -463,7 +477,8 @@ def send_text_html(doc_fname):
                            start_page_url=settings.start_page_url,
                            locales=settings.interface_languages,
                            viewable_meta=settings.viewable_meta,
-                           data=data)
+                           data=data,
+                           max_page_number=maxPage + 1)
 
 
 @app.route('/download_cur_results_csv')

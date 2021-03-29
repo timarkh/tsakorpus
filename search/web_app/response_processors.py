@@ -27,7 +27,12 @@ class SentenceViewer:
     rxTabs = re.compile('^\t*$')
     invisibleAnaFields = {'gloss_index'}
 
-    def __init__(self, settings, search_client):
+    def __init__(self, settings, search_client, fullText=False):
+        """
+        Set fullText = True if this instance is to be used for
+        generating full-text HTML files. This will switch off
+        source alignment spans and maybe some other things.
+        """
         self.settings = settings
         self.name = self.settings.corpus_name
         self.sentence_props = ['text']
@@ -41,6 +46,7 @@ class SentenceViewer:
         self.sc = search_client
         self.w1_labels = set(['w1'] + ['w1_' + str(i) for i in range(self.settings.max_words_in_sentence)])
         self.templates = {}     # Jinja2 template cache for standalone use
+        self.fullText = fullText
 
     def render_jinja_html(self, templateDir, templateFilename, **context):
         """
@@ -304,7 +310,7 @@ class SentenceViewer:
             curClass += ' word '
         if any(wn.startswith('p') for wn in curWords):
             curClass += ' para '
-        if any(wn.startswith('src') for wn in curWords):
+        if not self.fullText and any(wn.startswith('src') for wn in curWords):
             curClass += ' src '
         curClass = curClass.lstrip()
 
@@ -490,7 +496,7 @@ class SentenceViewer:
         of the fragments.
         """
         offStarts, offEnds, fragmentInfo = {}, {}, {}
-        if 'src_alignment' not in sSource or 'doc_id' not in sSource:
+        if self.fullText or 'src_alignment' not in sSource or 'doc_id' not in sSource:
             return offStarts, offEnds, fragmentInfo
         docID = sSource['doc_id']
         for iSA in range(len(sSource['src_alignment'])):

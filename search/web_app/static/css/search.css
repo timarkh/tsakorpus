@@ -266,6 +266,10 @@
 
 }
 
+.sentence_fulltext:hover {
+    background-color: #fff3d1;
+}
+
 .sent_lang:hover {
 	border-left: 2px #bbd dotted;
 	border-right: 2px #bbd dotted;
@@ -342,6 +346,14 @@
 .after_hits {
 	margin: 18px 10px 5px 0px;
 	padding-bottom: 10px;
+}
+
+.after_hits_fulltext {
+	margin: 18px 10px 5px 0px;
+	padding-bottom: 10px;
+	display: flex;
+	flex-flow: column;
+	text-align: center;
 }
 
 .download_results, .pages {
