@@ -364,56 +364,31 @@ class SentenceViewer:
         belongs to. Return an HTML string with this data that
         can serve as a header for the context on the output page.
         """
-        if format == 'csv':
-            result = ''
-        else:
-            result = '<span class="context_header" data-meta="">'
         docID = sentSource['doc_id']
         meta = self.sc.get_doc_by_id(docID)
         if (meta is None
                 or 'hits' not in meta
                 or 'hits' not in meta['hits']
-                or len(meta['hits']['hits']) <= 0):
-            return result + '</span>'
-        meta = meta['hits']['hits'][0]
-        if '_source' not in meta:
-            return result + '</span>'
-        meta = meta['_source']
-        if 'title' in meta:
-            if type(meta['title']) == list:
-                meta['title'] = '; '.join(meta['title'])
+                or len(meta['hits']['hits']) <= 0
+                or '_source' not in meta['hits']['hits'][0]):
             if format == 'csv':
-                result += '"' + meta['title'] + '" '
+                return ''
             else:
-                result += '<span class="ch_title">' + meta['title'] + '</span>'
-        else:
-            if format == 'csv':
-                result += '"???" '
-            else:
-                result += '<span class="ch_title">-</span>'
-        if self.authorMeta in meta:
-            if type(meta[self.authorMeta]) == list:
-                meta[self.authorMeta] = '; '.join(meta[self.authorMeta])
-            if format == 'csv':
-                result += '(' + meta[self.authorMeta] + ') '
-            else:
-                result += '<span class="ch_author">' + meta[self.authorMeta] + '</span>'
-        if 'issue' in meta and len(meta['issue']) > 0:
-            if format == 'csv':
-                result += meta['issue'] + ' '
-            else:
-                result += '<span class="ch_date">' + meta['issue'] + '</span>'
-        if 'year_from' in meta and 'year_to' in meta:
-            dateDisplayed = str(meta['year_from'])
+                return render_template('search_results/sentence_header.html',
+                                       fulltext_view_enabled=False)
+        meta = meta['hits']['hits'][0]['_source']
+        for k in meta:
+            if type(meta[k]) == list:
+                meta[k] = '; '.join(meta[k])
+            elif type(meta[k]) == int:
+                meta[k] = str(meta[k])
+        dateDisplay = ''
+        if 'year' in meta:
+            dateDisplay = str(meta['year'])
+        elif 'year_from' in meta and 'year_to' in meta:
+            dateDisplay = str(meta['year_from'])
             if meta['year_to'] != meta['year_from']:
-                if format == 'csv':
-                    dateDisplayed += '-' + str(meta['year_to'])
-                else:
-                    dateDisplayed += '&ndash;' + str(meta['year_to'])
-            if format == 'csv':
-                result += '[' + dateDisplayed + ']'
-            else:
-                result += '<span class="ch_date">' + dateDisplayed + '</span>'
+                dateDisplay += '–' + str(meta['year_to'])
         dataMeta = ''
         for metaField in self.settings.viewable_meta:
             if metaField == 'filename':
@@ -425,11 +400,27 @@ class SentenceViewer:
                 dataMeta += metaField + ': ' + metaValue + '\\n'
             except KeyError:
                 pass
-        dataMeta = dataMeta.replace('"', '&quot;')
-        if len(dataMeta) > 0 and format != 'csv':
-            result = result.replace('data-meta=""', 'data-meta="' + dataMeta + '"')
-        if format != 'csv':
-            result += '</span>'
+        dataMeta = html.escape(dataMeta)
+
+        if format == 'csv':
+            result = ''
+            if 'title' in meta:
+                result += '"' + meta['title'] + '" '
+            else:
+                result += '"???" '
+            if self.authorMeta in meta:
+                result += '(' + meta[self.authorMeta] + ') '
+            if 'issue' in meta and len(meta['issue']) > 0:
+                result += meta['issue'] + ' '
+            if len(dateDisplay) > 0:
+                result += '[' + dateDisplay + ']'
+        else:
+            result = render_template('search_results/sentence_header.html',
+                                     fulltext_view_enabled=self.settings.fulltext_view_enabled,
+                                     author_meta=self.authorMeta,
+                                     date_display=dateDisplay,
+                                     metaHtml=dataMeta,
+                                     meta=meta)
         return result
 
     def get_word_offsets(self, sSource, numSent, matchOffsets=None):

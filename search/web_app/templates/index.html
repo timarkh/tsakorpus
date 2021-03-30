@@ -50,6 +50,7 @@
 		<div class="row_section_fixed">
 			{% include "index/corpus_header.html" %} <!-- tsakorpus header: corpus name, interface langauges, help link -->
 		</div>
+{% if ready_for_work %}
 		<div class="row_section_fixed">
 			{% include "index/query_area.html" %} <!-- query area: boxes for word search, settings, search buttons -->
 		</div>
@@ -59,6 +60,14 @@
 		<div class="row_section_expand">
 			{% include "index/results_area.html" %} <!-- area where the results are displayed -->
 		</div>
+{% else %}
+		<div class="row_section_fixed">
+			<div class="alert alert-danger alert-dismissible fade show col-sm-6 centered" role="alert" id="greeting">
+			{{ _('Sorry, the server is experiencing technical issues. Please try again later.') }}
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Close') }}"></button>
+		</div>
+		</div>
+{% endif %}
 		<div class="row_section_fixed">
 			{% include "footer.html" ignore missing %} <!-- user-defined footer, if any -->
 		</div>

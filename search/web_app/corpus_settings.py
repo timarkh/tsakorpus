@@ -79,6 +79,7 @@ class CorpusSettings:
         self.corpus_size = 0
         self.word_freq_by_rank = []      # number of word types for each frequency rank
         self.lemma_freq_by_rank = []     # number of lemmata for each frequency rank
+        self.ready_for_work = False      # turns True when all initialization queries have been made
 
     def load_settings(self, fnameCorpus, fnameCategories):
         """

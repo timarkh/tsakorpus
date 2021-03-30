@@ -1,4 +1,5 @@
 from flask import Flask
+from elasticsearch.exceptions import ConnectionError
 import os
 import re
 import random
@@ -32,12 +33,20 @@ sentView = SentenceViewer(settings, sc)
 sc.qp.rp = sentView
 sc.qp.wr.rp = sentView
 
-settings.corpus_size = sc.get_n_words()  # size of the corpus in words
-for lang in settings.languages:
-    # number of word types for each frequency rank
-    settings.word_freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_word_freq_by_rank(lang)))
-    # number of lemmata for each frequency rank
-    settings.lemma_freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_lemma_freq_by_rank(lang)))
+try:
+    settings.corpus_size = sc.get_n_words()  # size of the corpus in words
+    for lang in settings.languages:
+        # number of word types for each frequency rank
+        settings.word_freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_word_freq_by_rank(lang)))
+        # number of lemmata for each frequency rank
+        settings.lemma_freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_lemma_freq_by_rank(lang)))
+    settings.ready_for_work = True
+except ConnectionError:
+    # Elasticsearch is down
+    settings.corpus_size = 0
+    for lang in settings.languages:
+        settings.word_freq_by_rank.append({})
+        settings.lemma_freq_by_rank.append({})
 sc.qp.maxFreqRank = max(max(len(settings.word_freq_by_rank[i]), len(settings.lemma_freq_by_rank[i]))
                         for i in range(len(settings.languages))) + 1
 

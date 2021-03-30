@@ -1,0 +1,21 @@
+<span class="context_header" data-meta="{% if metaHtml %}{{ metaHtml }}{% endif %}">
+{% if meta %}
+{% if meta.title %}
+<span class="ch_title">{{ meta.title }}</span>
+{% else %}
+<span class="ch_title">&ndash;</span>
+{% endif %}
+{% if meta[author_meta] %}
+<span class="ch_author">{{ meta[author_meta] }}</span>
+{% endif %}
+{% if meta.issue %}
+<span class="ch_date">{{ meta.issue }}</span>
+{% endif %}
+{% if date_display %}
+<span class="ch_date">{{ date_display }}</span>
+{% endif %}
+{% endif %}
+</span>
+{% if meta and meta.fulltext_id and fulltext_view_enabled %}
+<a class="bi bi-book fulltext_link" href="/docs/{{ meta.fulltext_id }}" target="_blank" title="{{ _('Full text (opens in a new tab)') }}"> </a>
+{% endif %}

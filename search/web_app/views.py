@@ -27,8 +27,12 @@ def search_page():
     queryString = ''
     if request.query_string is not None:
         queryString = request.query_string.decode('utf-8')
+    ready4work = settings.ready_for_work
+    if settings.ready_for_work:
+        ready4work = sc.is_alive()
 
     return render_template('index.html',
+                           ready_for_work=ready4work,
                            locale=get_locale(),
                            corpus_name=settings.corpus_name,
                            languages=settings.languages,
@@ -456,6 +460,8 @@ def send_text_html(doc_fname):
             'rows': [],
             'page': 1
         }
+    data['meta'] = {k: data['meta'][k]
+                    for k in data['meta'] if k in settings.viewable_meta}
     page = request.args.get('page', 1)
     try:
         page = int(page) - 1

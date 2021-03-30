@@ -219,6 +219,13 @@
 	padding-right: 3px;
 }
 
+.fulltext_link {
+    font-size: 20px;
+	margin: auto;
+	margin-left: 10px;
+	padding-right: 3px;
+}
+
 .bi-arrows-fullscreen {
 	width: 22px;
 	font-size: 22px;
