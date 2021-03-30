@@ -177,3 +177,12 @@ class SearchClient:
         hits = self.es.search(index=self.name + '.words',
                               body=esQuery)
         return hits
+
+    def is_alive(self):
+        """
+        Check if the Elasticsearch connection is alive.
+        """
+        try:
+            return self.es.ping()
+        except Exception as err:
+            return False

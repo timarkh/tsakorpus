@@ -121,6 +121,10 @@ def wilson_confidence_interval(p, n, multiplier, z=1.644854):
     """
     # z: 1.96 for 95%
     # 1.645 for 90%
+    if p > 1:
+        p = 1.0
+    elif p < 0:
+        p = 0.0
     center = (p + z * z / (2 * n)) / (1 + z * z / (2 * n))
     halfLength = (z / (1 + z * z / n)) * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
     lowerBound = min(p, (center - halfLength)) * multiplier

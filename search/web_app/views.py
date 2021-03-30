@@ -228,7 +228,7 @@ def get_word_freq_stats(searchType='word'):
         htmlQuery['lang' + str(iWord)] = htmlQuery['lang1']
         partHtmlQuery = sc.qp.swap_query_words(1, iWord, copy.deepcopy(htmlQuery))
         esQuery = sc.qp.word_freqs_query(partHtmlQuery, searchType=searchType)
-        # print(esQuery)
+        print(esQuery)
         hits = sc.get_words(esQuery)
         # return jsonify(hits)
         curFreqByRank = sentView.extract_cumulative_freq_by_rank(hits)
@@ -291,7 +291,9 @@ def get_word_stats(searchType, metaField):
 
     searchIndex = 'words'
     queryWordConstraints = None
-    if (searchType == 'context' and nWords > 1) or metaField in settings.sentence_meta:
+    if ((searchType == 'context' and nWords > 1)
+            or metaField in settings.sentence_meta
+            or sc.qp.check_html_parameters(htmlQuery, searchOutput='words')[3] == 'sentences'):
         searchIndex = 'sentences'
         wordConstraints = sc.qp.wr.get_constraints(htmlQuery)
         set_session_data('word_constraints', wordConstraints)

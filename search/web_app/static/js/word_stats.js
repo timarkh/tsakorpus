@@ -382,7 +382,7 @@ $(function() {
         var excessiveHeight = maxHeight; // confidence intervals that go over the roof
         for (iQueryWord = 0; iQueryWord < results.length; iQueryWord++) {
             for (iRes = 0; iRes < results[iQueryWord].length; iRes++) {
-                if (results[iQueryWord][iRes].n_words_conf_int[1] > excessiveHeight) {
+                if ('n_words_conf_int' in results[iQueryWord][iRes] && results[iQueryWord][iRes].n_words_conf_int[1] > excessiveHeight) {
                     excessiveHeight = results[iQueryWord][iRes].n_words_conf_int[1];
                 }
             }

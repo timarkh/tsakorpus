@@ -112,8 +112,9 @@ function show_doc_meta(e) {
 	while (e_obj.attr('class') != 'context_header') {
 		e_obj = e_obj.parent();
 	}
-	var doc_meta = e_obj.attr('data-meta');
-	alert(doc_meta.replace(/\\n/g, "\n"));
+	var docMeta = e_obj.attr('data-meta');
+	$("#metadata_dialogue_body").html(html_decode(docMeta.replace(/\\n/g, "\n")));
+	$("#metadata_dialogue").modal('show');
 }
 
 function clear_search_form() {

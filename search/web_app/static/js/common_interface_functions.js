@@ -205,3 +205,9 @@ function toggle_interlinear() {
 		$('.ana_interlinear').remove();
 	}
 }
+
+function html_decode(input){
+  var e = document.createElement('textarea');
+  e.innerHTML = input;
+  return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+}

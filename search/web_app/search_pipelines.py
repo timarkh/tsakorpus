@@ -168,7 +168,7 @@ def get_buckets_for_sent_metafield(fieldName, langID=-1, docIDs=None, maxBuckets
     else:
         innerQuery = {'match_all': {}}
     if docIDs is not None:
-        innerQuery = {'filter': [{'terms': {'d_id': docIDs}}]}
+        innerQuery = {'filter': {'bool': {'must': [{'terms': {'d_id': docIDs}}]}}}
     # if not fieldName.startswith('year'):
     #     queryFieldName = fieldName + '_kw'
     # else:
@@ -274,9 +274,10 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
             query = sc.qp.html2es(curHtmlQuery,
                                   searchOutput=searchIndex,
                                   groupBy='word',
-                                  sortOrder='',
+                                  sortOrder='no',
                                   query_size=1,
-                                  distances=queryWordConstraints)
+                                  distances=queryWordConstraints,
+                                  highlight=False)
             if searchIndex == 'words' and newBucket['n_words'] > 0:
                 hits = sc.get_words(query)
                 if ('aggregations' not in hits
@@ -552,7 +553,11 @@ def find_words_json(searchType='word', page=0):
             queryWordConstraints = wordConstraints
             if distance_constraints_too_complex(wordConstraints):
                 constraintsTooComplex = True
-    elif 'sentence_index1' in query and len(query['sentence_index1']) > 0:
+    elif ('sentence_index1' in query and len(query['sentence_index1']) > 0
+          or any(k.startswith('sent_meta_')
+                 and len(query[k]) > 0 and query[k] not in ('*', '.*')
+                 for k in query)):
+        # Sentence-level-meta query or query involving position in sentence
         searchIndex = 'sentences'
         sortOrder = 'random'
 

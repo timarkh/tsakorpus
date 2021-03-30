@@ -49,6 +49,21 @@
 		</div>
 	</div>
 </div>
+
+<div class="modal fade" id="metadata_dialogue" tabindex="-1" role="dialog" aria-labelledby="metadata_dialogue_header" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="metadata_dialogue_header">{{ _('Metadata_header') }}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+			</div>
+			<div class="modal-body" id="metadata_dialogue_body">
+			<p>The metadata table should be loaded here.</p>
+			</div>
+		</div>
+	</div>
+</div>
+
 {% if citation %}
 <div class="modal fade" id="citation_dialogue" tabindex="-1" role="dialog" aria-labelledby="citation_dialogue_header" aria-hidden="true">
 	<div class="modal-dialog">

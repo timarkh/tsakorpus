@@ -1,0 +1,7 @@
+<table class="table table-striped" id="fulltext_meta">
+	<tbody>
+		{% for k in data.meta %}
+		{% if k in viewable_meta %}<tr><td>{{ _('metafield_' + k) }}</td><td>{{ data.meta[k] }}</td></tr>{% endif %}
+		{% endfor %}
+	</tbody>
+</table>

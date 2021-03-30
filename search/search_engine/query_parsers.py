@@ -715,7 +715,8 @@ class InterfaceQueryParser:
     def full_sentence_query(self, queryDict, query_from=0, query_size=10,
                             sortOrder='random', randomSeed=None, lang=0,
                             searchOutput='sentences', distances=None,
-                            includeNextWordField=False):
+                            includeNextWordField=False,
+                            highlight=True):
         """
         Make a full ES query for the sentences index out of a dictionary
         with bool queries.
@@ -794,7 +795,7 @@ class InterfaceQueryParser:
                 esQuery['_source'] += ['words.wtype', 'words.next_word']
         esQuery['aggs'] = {'agg_ndocs': {'cardinality': {'field': 'doc_id'}},
                            'agg_nwords': {'stats': {'script': '_score'}}}
-        if len(queryDictTop) > 0:
+        if len(queryDictTop) > 0 and highlight:
             esQuery['highlight'] = {'fields': {f: {'number_of_fragments': 100,
                                                    'fragment_size': 2048}
                                                for f in queryDictTop}}
@@ -954,6 +955,10 @@ class InterfaceQueryParser:
                 and self.rxNumber.search(htmlQuery['sentence_index1']) is not None
                 and int(htmlQuery['sentence_index1']) != 0):
             searchIndex = 'sentences'
+        elif any(k.startswith('sent_meta_')
+                 and len(htmlQuery[k]) > 0 and htmlQuery[k] not in ('*', '.*')
+                 for k in htmlQuery):
+            searchIndex = 'sentences'
         else:
             searchIndex = searchOutput
         # searchIndex is the name of the ES index where the search is performed.
@@ -964,7 +969,7 @@ class InterfaceQueryParser:
     def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
                 randomSeed=None, searchOutput='sentences', groupBy='word',
                 distances=None, includeNextWordField=False,
-                after_key=None):
+                after_key=None, highlight=True):
         """
         Make and return a ES query out of the HTML form data.
         """
@@ -1067,7 +1072,8 @@ class InterfaceQueryParser:
                                                  lang=langID,
                                                  searchOutput=searchOutput,
                                                  distances=distances,
-                                                 includeNextWordField=includeNextWordField)
+                                                 includeNextWordField=includeNextWordField,
+                                                 highlight=highlight)
         elif searchIndex == 'words':
             queryDict = self.full_word_query(prelimQuery, query_from, query_size, sortOrder,
                                              randomSeed, lang=langID, groupBy=groupBy,
@@ -1104,7 +1110,8 @@ class InterfaceQueryParser:
         else:
             htmlQuery['wtype1'] = 'lemma'
         esQuery = self.html2es(htmlQuery, query_size=0, sortOrder='', searchOutput='words')
-        esQuery['query']['bool']['must_not'].append({'term': {'l_id': 'l0'}})
+        if searchType == 'lemma':
+            esQuery['query']['bool']['must_not'].append({'term': {'l_id': 'l0'}})
         if searchType == 'lemma' and wfFields:
             esQuery['aggs'] = {
                 'agg_rank': {

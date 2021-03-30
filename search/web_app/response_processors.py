@@ -389,18 +389,10 @@ class SentenceViewer:
             dateDisplay = str(meta['year_from'])
             if meta['year_to'] != meta['year_from']:
                 dateDisplay += '–' + str(meta['year_to'])
-        dataMeta = ''
-        for metaField in self.settings.viewable_meta:
-            if metaField == 'filename':
-                continue
-            try:
-                metaValue = meta[metaField]
-                if type(metaValue) != str:
-                    metaValue = str(metaValue)
-                dataMeta += metaField + ': ' + metaValue + '\\n'
-            except KeyError:
-                pass
-        dataMeta = html.escape(dataMeta)
+        metaHtml = render_template('modals/metadata_table.html',
+                                   data={'meta': meta},
+                                   viewable_meta=self.settings.viewable_meta)
+        metaHtml = html.escape(metaHtml)
 
         if format == 'csv':
             result = ''
@@ -419,7 +411,7 @@ class SentenceViewer:
                                      fulltext_view_enabled=self.settings.fulltext_view_enabled,
                                      author_meta=self.authorMeta,
                                      date_display=dateDisplay,
-                                     metaHtml=dataMeta,
+                                     metaHtml=metaHtml,
                                      meta=meta)
         return result
 
