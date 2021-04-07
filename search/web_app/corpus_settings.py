@@ -6,6 +6,7 @@ defaults if some keys are absent in corpus.json.
 
 
 import json
+import copy
 
 
 class CorpusSettings:
@@ -99,3 +100,29 @@ class CorpusSettings:
 
         if 'stat_options' not in self.search_meta:
             self.search_meta['stat_options'] = []
+
+    def as_dict(self):
+        """
+        Return current settings as a dictionary. Only include
+        parameters relevant for corpus.json.
+        """
+        badFields = {
+            'ready_for_work',
+            'corpus_size',
+            'word_freq_by_rank',
+            'lemma_freq_by_rank'
+        }
+        dictSettings = copy.deepcopy(vars(self))
+        for k in [_ for _ in dictSettings.keys()]:
+            if k in badFields:
+                del dictSettings[k]
+        return dictSettings
+
+    def save_settings(self, fname):
+        """
+        Save current settings as a JSON file (can be used to edit
+        corpus.json through a web interface).
+        """
+        dictSettings = self.as_dict()
+        with open(fname, 'w', encoding='utf-8') as fOut:
+            json.dump(dictSettings, fOut, sort_keys=True, ensure_ascii=False, indent=2)

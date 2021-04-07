@@ -1,0 +1,27 @@
+.explanation {
+	padding: 5px 5px 0 5px;
+	color: #464646;
+}
+
+.option_group {
+	box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+	padding: 10px;
+	border-radius: 5px;
+}
+
+.form-check-label {
+	margin-left: 1em;
+	display: inline!important;
+}
+
+.form-check-input {
+	margin-left: 0!important;
+}
+
+textarea.form-control {
+    min-height: calc(7.5em + .75rem + 2px);
+}
+
+.form-label {
+	font-size: 1.3em;
+}

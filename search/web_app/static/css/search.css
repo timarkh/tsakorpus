@@ -871,6 +871,10 @@ hr.separator {
 	max-height: 93vh;
 }
 
+.modal-body {
+	overflow-y: auto;
+}
+
 .documents_list_table {
 	border: solid 1px gray;
 	border-radius: 4px;
@@ -1437,7 +1441,7 @@ in different styles) */
 }
 
 .row_checkbox {
-	width: 0.5em;
+	width: 1em;
 }
 
 .repeat_query_link {

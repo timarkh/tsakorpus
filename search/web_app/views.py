@@ -228,7 +228,7 @@ def get_word_freq_stats(searchType='word'):
         htmlQuery['lang' + str(iWord)] = htmlQuery['lang1']
         partHtmlQuery = sc.qp.swap_query_words(1, iWord, copy.deepcopy(htmlQuery))
         esQuery = sc.qp.word_freqs_query(partHtmlQuery, searchType=searchType)
-        print(esQuery)
+        # print(esQuery)
         hits = sc.get_words(esQuery)
         # return jsonify(hits)
         curFreqByRank = sentView.extract_cumulative_freq_by_rank(hits)
@@ -239,7 +239,10 @@ def get_word_freq_stats(searchType='word'):
         else:
             freq_by_rank = settings.word_freq_by_rank
         for freqRank in sorted(freq_by_rank[langID]):
-            bucket = {'name': freqRank, 'n_words': 0}
+            bucket = {
+                'name': freqRank,
+                'n_words': 0
+            }
             if freqRank in curFreqByRank:
                 bucket['n_words'] = curFreqByRank[freqRank] / freq_by_rank[langID][freqRank]
                 prevFreq = curFreqByRank[freqRank]
@@ -666,3 +669,12 @@ def get_dictionary(lang):
         return render_template(dictFilename)
     except:
         return ''
+
+
+@app.route('/config')
+def setup_corpus():
+    if not request.host.strip('/').endswith(('0.0.0.0:7342', '127.0.0.1:7342')):
+        return 'This page can only be accessed from localhost.', 403
+    return render_template('admin/corpus_setup.html',
+                           filename=os.path.abspath('../corpus.json'),
+                           settings=settings.as_dict())

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Set up a corpus</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" type="text/css" href="static/bootstrap-5.0.0-beta1-dist/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="static/css/corpus_setup.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<script src="static/jquery-3.5.1-dist/jquery-3.5.1.min.js"></script>
+<script type='text/javascript' src='static/bootstrap-5.0.0-beta1-dist/js/bootstrap.bundle.min.js'></script>
+<body>
+
+<form id="settings_form">
+<div class="row">
+<div class="col-md-2"></div>
+<div class="col-md-8">
+<div class="accordion" id="setings_accordion">
+<div class="accordion-item">
+    <h2 class="accordion-header" id="headingOne">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Introduction
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#setings_accordion">
+      <div class="accordion-body">
+		<h3>Corpus setup</h3>
+		<p class="lead">This is a corpus setup page. You can use it to create a <code>corpus.json</code> file that you will move to the <code>/conf</code> directory before indexing your corpus. You can also edit <code>corpus.json</code> manually. After you are finished, the settings will be saved in this file:</p>
+		<p class="text-center bd-highlight fs-2"><code>{{ filename }}</code></p>
+		<p>This page is only available in English and can only be accessed when you run <code>tsakorpus.wsgi</code> as a standalone application on port 7342. The default values will be based on the current contents of <code>/conf/corpus.json</code>. It is assumed that you already have JSON files ready for indexing in <code>/corpus/%CORPUS_NAME%</code>.</p>
+		<p>As Tsakorpus is designed for a multitude of formats and usage scenarios, there are a lot of options. Please be patient!</p>
+      </div>
+    </div>
+</div>
+<div class="accordion-item">
+    <h2 class="accordion-header" id="headingTwo">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+        Basic settings
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#setings_accordion">
+		<div class="accordion-body">
+			<div class="mb-3 option_group">
+				<label for="corpus_name" class="form-label">Corpus name</label>
+				<input type="text" class="form-control" id="corpus_name" value="{{ settings.corpus_name }}">
+				<p class="explanation">Please choose a <strong>unique</strong> name, preferably long and clearly identifying your corpus. This value is used in two places. First, it is used when naming elasticsearch databases. As a consequence, if there is another corpus with the same name on your server, its data will be overwritten. Second, all JSON corpus files must be stored in <code>/corpus/%CORPUS_NAME%</code> at indexation time. The users will not see this value.</p>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="input_format" class="form-label">Input format</label>
+				<select class="form-select" id="input_format">
+				  <option value="json" {% if settings.input_format == "json" %}selected{% endif %}>uncompressed JSON</option>
+				  <option value="json-gzip" {% if settings.input_format == "json-gzip" %}selected{% endif %}>gzipped JSON</option>
+				</select>
+				<p class="explanation">Your annotated files must be either in plain JSON (with the extension <code>.json</code>), or in gzipped JSON (with the extension <code>.json.gz</code>). The indexator will only look at files with the corresponding extension.</p>
+			</div>
+			<div class="form-check option_group">
+			  <input class="form-check-input" type="checkbox" value="debug" id="debug" {% if settings.debug %}checked{% endif %}>
+			  <label class="form-check-label" for="debug">
+				Are you going to launch the corpus in debug mode? (Probably not if you are not one of the platform developers.) Uncheck in production environment!
+			  </label>
+			</div>
+		</div>
+    </div>
+</div>
+<div class="accordion-item">
+	<h2 class="accordion-header" id="headingThree">
+		<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+		Media
+		</button>
+	</h2>
+    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#setings_accordion">
+		<div class="accordion-body">
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="images" id="images" {% if settings.images %}checked{% endif %}>
+				<label class="form-check-label" for="images">
+				Does the corpus have aligned images?
+				</label>
+			</div>
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="media" id="media" {% if settings.media %}checked{% endif %}>
+				<label class="form-check-label" for="media">
+				Does the corpus have aligned sound or video files?
+				</label>
+			</div>
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="media_youtube" id="media_youtube" {% if settings.media_youtube %}checked{% endif %}>
+				<label class="form-check-label" for="media_youtube">
+				If there are sound or video files, are they stored on Youtube rather than locally?
+				</label>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="media_length" class="form-label">Media fragment length in seconds</label>
+				<input type="number" class="form-control" id="media_length" value="{{ settings.media_length }}">
+				<p class="explanation">If there are sound or video files in the corpus, they are cut into overlapping fragments during source files conversion. This is done so that when someone finds a sentence, they could listen to its immediate context without having to download the entire file. All such fragments, apart from the last ones, have the same length; the default is 60 seconds. Please enter the same value you used in <code>/src_convertors/corpus/conf_conversion</code>.</p>
+			</div>
+		</div>
+    </div>
+</div>
+<div class="accordion-item">
+	<h2 class="accordion-header" id="heading4">
+		<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+		Metadata and annotation
+		</button>
+	</h2>
+    <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="heading4" data-bs-parent="#setings_accordion">
+		<div class="accordion-body">
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="ambiguous_analyses" id="ambiguous_analyses" {% if settings.ambiguous_analyses %}checked{% endif %}>
+				<label class="form-check-label" for="ambiguous_analyses">
+				Words may have multiple analyses (e.g. ambiguous analyses for the whole word or different analyses for different parts of a host-clitic combination written as one token).
+				</label>
+			</div>
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="keep_lemma_order" id="keep_lemma_order" {% if settings.keep_lemma_order %}checked{% endif %}>
+				<label class="form-check-label" for="keep_lemma_order">
+				If there are amiguous analyses, keep their mutual order in each word. (Otherwise, lemmata may be sorted lexicographically.)
+				</label>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="word_fields" class="form-label">Additional word-level fields</label>
+				<textarea class="form-control" id="word_fields" wrap="hard">{{ settings.word_fields|join('\n') }}</textarea>
+				<p class="explanation">Names of additional word-level metadata fields (e.g. translations into a metalanguage) that should appear when the user clicks <i class="bi bi-box-arrow-down" title="more fields"></i>. Write one per line.</p>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="viewable_meta" class="form-label">Document-level metadata fields</label>
+				<textarea class="form-control" id="viewable_meta" wrap="hard">{{ settings.viewable_meta|join('\n') }}</textarea>
+				<p class="explanation">Names of document-level metadata fields (e.g. author or genre) that should be present in a popup when the user clicks on a text header. Write one per line.</p>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="sentence_meta" class="form-label">Sentence-level metadata fields</label>
+				<textarea class="form-control" id="sentence_meta" wrap="hard">{{ settings.sentence_meta|join('\n') }}</textarea>
+				<p class="explanation">Names of sentence-level metadata fields (e.g. speaker code) that should be searchable and visible in a popup when the user moves the pointer over a sentence. Write one per line.</p>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="search_meta.stat_options" class="form-label">Document- and sentence-level metadata in statistics popup</label>
+				<textarea class="form-control" id="search_meta.stat_options" wrap="hard">{{ settings.search_meta.stat_options|join('\n') }}</textarea>
+				<p class="explanation">Names of those metadata fields that the user should be able to select when they click <i class="bi bi-bar-chart-line-fill" title="Show statistics"></i>. Write one per line.</p>
+			</div>
+			<div class="mb-3 option_group">
+				<p for="search_meta.columns" class="form-label">Subcorpus selection table</label>
+				{% for column in settings.search_meta.columns %}
+				<div class="meta_column">
+					<h4>Column #{{ loop.index }}</h4>
+					{% set col_loop = loop %}
+					{% for item in column %}
+					<div class="row">
+						<div class="col-md-2">
+						<select class="form-select" name="search_meta.columns_{{ col_loop.index }}_{{ loop.index }}_type">
+							<option value="input_text" {% if item.type=='input_text' %}selected{% endif %}>Text box (string)</option>
+							<option value="input_number" {% if item.type=='input_number' %}selected{% endif %}>Text box (number)</option>
+							<option value="option" {% if item.type=='option' %}selected{% endif %}>Option button for a text box</option>
+							<option value="separator" {% if item.type=='separator' %}selected{% endif %}>Separator</option>
+						</select>
+						</div>
+						<div class="col-md-2"><input type="text" class="form-control" name="search_meta.columns_{{ col_loop.index }}_{{ loop.index }}_name" value="{{ item.name }}"></div>
+						<div class="col-md-3"><input type="text" class="form-control" name="search_meta.columns_{{ col_loop.index }}_{{ loop.index }}_placeholder" value="{{ item.placeholder }}"></div>
+						<div class="col-md-2"><input type="text" class="form-control" name="search_meta.columns_{{ col_loop.index }}_{{ loop.index }}_value" value="{{ item.value }}"></div>
+						<div class="col-md-3"><input type="text" class="form-control" name="search_meta.columns_{{ col_loop.index }}_{{ loop.index }}_text" value="{{ item.text }}"></div>
+					</div>
+					{% endfor %}
+				</div>
+				{% endfor %}
+				<p class="explanation">These text boxes define which document-level metadata fields should be present in the subcorpus selection popup and in which order.</p>
+			</div>
+		</div>
+    </div>
+</div>
+
+
+
+
+
+
+</div>
+</form>
+</div>
+</div>
+<footer class="footer">
+  <div class="container">
+	<span class="text-muted">Tsakorpus 2.0 configuration page</span>
+  </div>
+</footer>
+</body>
+</html>
