@@ -19,8 +19,11 @@ function show_load_query() {
 
 function clear_all_search_fields() {
 	$('input.search_input').val('');
-	$('#distance_strict').prop('checked', false);
-	$('#precise').prop('checked', false);
+	$('.word_search').removeClass('negated');
+	$('.word_search_r').removeClass('negated');
+	$('.neg_query_checkbox').prop('checked', false);
+	$('#distance_strict').prop('checked', true);
+	$('#precise').prop('checked', true);
 }
 
 function load_query() {
@@ -78,7 +81,12 @@ function load_query_str(query) {
 		$('#wsearch_' + wordNum + ' .add_rel').trigger('click');
 	});
 	$.each(neg_queries, function (i, wordNum) {
-		$('#wsearch_' + wordNum + ' .neg_query').trigger('click');
+		if (wordNum > 1) {
+			$('#wsearch_' + wordNum + ' .neg_query').trigger('click');
+		}
+		else {
+			$('#first_word .neg_query').trigger('click');
+		}
 	});
 	$.each(dictFields, function (field, value) {
 		if ($('#' + field).length > 0 && $('#' + field).attr('type') == 'checkbox') {

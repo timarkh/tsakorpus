@@ -2,8 +2,8 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="query_share_dialogue_header">{{ _('Share query') }}</h4>
+				<h5 class="modal-title" id="query_share_dialogue_header">{{ _('Share query') }}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
 			</div>
 			<div class="modal-body" id="query_share_dialogue_body">
 				<p>{{ _('If you want to share your query with someone, send them the text you see below. The person who loads this query will see the same results in the same order, unless the corpus has been re-indexed.') }}</p>
@@ -16,14 +16,14 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="query_load_dialogue_header">{{ _('Load query') }}</h4>
+				<h5 class="modal-title" id="query_load_dialogue_header">{{ _('Load query') }}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
 			</div>
 			<div class="modal-body" id="query_load_dialogue_body">
 				<p>{{ _('Here you can load a corpus query someone sent you. Please enter the query below:') }}</p>
 				<textarea id="query_to_load">{{ query_string }}</textarea>
 				<div class="selector_buttons">
-					<button type="button" class="btn btn-default btn-success" aria-label="Left Align" id="query_load_ok">OK</button>
+					<button type="button" class="btn btn-default btn-success" id="query_load_ok">OK</button>
 				</div>
 			</div>
 		</div>

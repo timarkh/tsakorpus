@@ -867,6 +867,10 @@ hr.separator {
 	max-width: 60vw;
 }
 
+.modal-content {
+	max-height: 93vh;
+}
+
 .documents_list_table {
 	border: solid 1px gray;
 	border-radius: 4px;
@@ -1520,4 +1524,8 @@ in different styles) */
 
 .paragraph_num div {
     margin: 50% 50% 50% 0;
+}
+
+#greeting {
+    max-width: 900px;
 }
