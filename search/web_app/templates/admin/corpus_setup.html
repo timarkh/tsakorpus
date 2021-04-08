@@ -190,6 +190,83 @@
 					</div>
 				</div>
 			</div>
+			<div class="mb-3 option_group">
+				<label for="search_meta.stat_options" class="form-label">Document- and sentence-level metadata in statistics popup</label>
+				<p class="explanation">Names of those metadata fields that the user should be able to select when they click <i class="bi bi-bar-chart-line-fill" title="Show statistics"></i>. Write one per line.</p>
+				<textarea class="form-control" id="search_meta.stat_options" wrap="hard">{{ settings.search_meta.stat_options|join('\n') }}</textarea>
+			</div>
+		</div>
+    </div>
+</div>
+<div class="accordion-item">
+	<h2 class="accordion-header" id="heading5">
+		<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+		Search options
+		</button>
+	</h2>
+    <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="heading5" data-bs-parent="#setings_accordion">
+		<div class="accordion-body">
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="all_language_search_enabled" id="all_language_search_enabled" {% if settings.all_language_search_enabled %}checked{% endif %}>
+				<label class="form-check-label" for="all_language_search_enabled">
+				If there are multiple tiers/languages in the corpus, "search in all languages" option is available.
+				</label>
+			</div>
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="fulltext_search_enabled" id="fulltext_search_enabled" {% if settings.fulltext_search_enabled %}checked{% endif %}>
+				<label class="form-check-label" for="fulltext_search_enabled">
+				Full-text search (a single text box underneath word query boxes) is enabled.
+				</label>
+			</div>
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="negative_search_enabled" id="negative_search_enabled" {% if settings.negative_search_enabled %}checked{% endif %}>
+				<label class="form-check-label" for="negative_search_enabled">
+				Negative search ("find all sentences without this word") is enabled.
+				</label>
+			</div>
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="gloss_search_enabled" id="gloss_search_enabled" {% if settings.gloss_search_enabled %}checked{% endif %}>
+				<label class="form-check-label" for="gloss_search_enabled">
+				Gloss search is enabled.
+				</label>
+			</div>
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="year_sort_enabled" id="year_sort_enabled" {% if settings.year_sort_enabled %}checked{% endif %}>
+				<label class="form-check-label" for="year_sort_enabled">
+				"Sort by year (descending)" option is enabled.
+				</label>
+			</div>
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="fulltext_view_enabled" id="fulltext_view_enabled" {% if settings.fulltext_view_enabled %}checked{% endif %}>
+				<label class="form-check-label" for="fulltext_view_enabled">
+				Full-text view is enabled. Do not check this if your texts are not in public domain and you do not have permission to distribute them.
+				</label>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="max_context_expand" class="form-label">Maximum number of times you can click on "expand context" button</label>
+				<input type="number" class="form-control" id="max_context_expand" value="{{ settings.max_context_expand }}">
+				<p class="explanation">If your texts are subject to copyright, you can limit the maximum size of the snippet the user can see. Put <em>-1</em> to allow unlimited expanding.</p>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="max_hits_retrieve" class="form-label">Maximum number of hits (sentences) the user can see</label>
+				<input type="number" class="form-control" id="max_hits_retrieve" value="{{ settings.max_hits_retrieve }}">
+				<p class="explanation">If a search returns more sentences, they will be reflected in the statistics, but the user will only be able to look at this number of sentences. This number is connected to the Elasticsearch limit on maximum number of hits returned, which is 10,000 as of Elasticsearch 7.10. If you choose to increase this value, you will have to configure Elasticsearch accordingly, otherwise it will have no effect. Apparenty, setting the value too high can lead to high memory consuption, so be careful about that. Anyway, if somebody has the need to see at the results beyound the first 10,000, it usually means something is wrong with the query (e.g. the user wants to look at older texts by switching on "sort by year" and going to the last page instead of setting year limits in the subcorpus selection).</p>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="max_words_in_sentence" class="form-label">Maximum number of words in sentence</label>
+				<input type="number" class="form-control" id="max_words_in_sentence" value="{{ settings.max_words_in_sentence }}">
+				<p class="explanation">Sentences can have any number of words, of course, but there is a problem with multi-word search. If you search for more than one word and set strict distances, tsakorpus builds a very large Elasticsearch query that says something like "if word 1 is A and word 2 is B, or word 2 is A and word 3 is B, etc.". In order to make such queries finite, tsakorpus has to know where to stop. If you set this value too high, this will slow down multi-word search. If you have sentences longer than this limit, the extra words will be available for single-word search and multi-word search without distances, but invisible for mult-word search with distances.</p>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="max_docs_retrieve" class="form-label">Maximum number of rows in "Select documents" tab of subcorpus selection window</label>
+				<input type="number" class="form-control" id="max_docs_retrieve" value="{{ settings.max_docs_retrieve }}">
+				<p class="explanation">If you have too many documents, then too large number of rows may hang the browser.</p>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="query_timeout" class="form-label">Search timeout in seconds</label>
+				<input type="number" class="form-control" id="query_timeout" value="{{ settings.query_timeout }}">
+				<p class="explanation">Queries whose execution time exceeds this limit will be terminated. This is a safeguard against unexpectedly heavy searches that can hang your server. The actual execution time may be somewhat longer than this limit because of implementation details, but not significantly so.</p>
+			</div>
 		</div>
     </div>
 </div>
