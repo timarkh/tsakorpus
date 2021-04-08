@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 <script src="static/jquery-3.5.1-dist/jquery-3.5.1.min.js"></script>
 <script type='text/javascript' src='static/bootstrap-5.0.0-beta1-dist/js/bootstrap.bundle.min.js'></script>
+<script type='text/javascript' src='static/js/corpus_setup.js'></script>
 <body>
 
 <form id="settings_form">
@@ -137,29 +138,56 @@
 				<p class="explanation">Names of those metadata fields that the user should be able to select when they click <i class="bi bi-bar-chart-line-fill" title="Show statistics"></i>. Write one per line.</p>
 			</div>
 			<div class="mb-3 option_group">
-				<p for="search_meta.columns" class="form-label">Subcorpus selection table</label>
+				<div style="display: none" class="column_stub">
+					{% include "admin/subcorpus_select_col.html" %}
+				</div>
+				<p class="form-label">Subcorpus selection table</p>
 				{% for column in settings.search_meta.columns %}
-				<div class="meta_column">
+				<div class="meta_column removable_column" data-ncol="{{ loop.index }}">
+					<div style="display: none" class="row_stub">
+						{% include "admin/subcorpus_select_row.html" %}
+					</div>
 					<h4>Column #{{ loop.index }}</h4>
+					<div class="row">
+						<div class="col-md-3">Element type</div>
+						<div class="col-md-3">Metadata field name</div>
+						<div class="col-md-3">Metadata value</div>
+						<div class="col-md-3">Text (for option buttons)</div>
+					</div>
 					{% set col_loop = loop %}
 					{% for item in column %}
-					<div class="row">
-						<div class="col-md-2">
+					<div class="row removable_row" data-nrow="{{ loop.index }}">
+						<div class="col-md-3">
 						<select class="form-select" name="search_meta.columns_{{ col_loop.index }}_{{ loop.index }}_type">
-							<option value="input_text" {% if item.type=='input_text' %}selected{% endif %}>Text box (string)</option>
-							<option value="input_number" {% if item.type=='input_number' %}selected{% endif %}>Text box (number)</option>
+							<option value="input_text" {% if item.type=='input_text' %}selected{% endif %}>Text</option>
+							<option value="input_number" {% if item.type=='input_number' %}selected{% endif %}>Number</option>
+							<option value="input_range" {% if item.type=='input_range' %}selected{% endif %}>Range</option>
 							<option value="option" {% if item.type=='option' %}selected{% endif %}>Option button for a text box</option>
 							<option value="separator" {% if item.type=='separator' %}selected{% endif %}>Separator</option>
+							<option value="header" {% if item.type=='header' %}selected{% endif %}>Header</option>
 						</select>
 						</div>
-						<div class="col-md-2"><input type="text" class="form-control" name="search_meta.columns_{{ col_loop.index }}_{{ loop.index }}_name" value="{{ item.name }}"></div>
-						<div class="col-md-3"><input type="text" class="form-control" name="search_meta.columns_{{ col_loop.index }}_{{ loop.index }}_placeholder" value="{{ item.placeholder }}"></div>
-						<div class="col-md-2"><input type="text" class="form-control" name="search_meta.columns_{{ col_loop.index }}_{{ loop.index }}_value" value="{{ item.value }}"></div>
+						<div class="col-md-3"><input type="text" class="form-control" name="search_meta.columns_{{ col_loop.index }}_{{ loop.index }}_name" value="{{ item.name }}"></div>
+						<div class="col-md-3"><input type="text" class="form-control" name="search_meta.columns_{{ col_loop.index }}_{{ loop.index }}_value" value="{{ item.value }}"></div>
 						<div class="col-md-3"><input type="text" class="form-control" name="search_meta.columns_{{ col_loop.index }}_{{ loop.index }}_text" value="{{ item.text }}"></div>
 					</div>
 					{% endfor %}
+					<div class="row button_row">
+						<div class="col-md-9"></div>
+						<div class="col-md-3">
+							<button type="button" class="btn btn-danger btn-sm del_row">Remove row</button>
+							<button type="button" class="btn btn-primary btn-sm add_row">Add row</button>
+						</div>
+					</div>
 				</div>
 				{% endfor %}
+				<div class="row button_row">
+					<div class="col-md-9"></div>
+					<div class="col-md-3">
+						<button type="button" class="btn btn-danger del_col">Remove column</button>
+						<button type="button" class="btn btn-primary add_col">Add column</button>
+					</div>
+				</div>
 				<p class="explanation">These text boxes define which document-level metadata fields should be present in the subcorpus selection popup and in which order.</p>
 			</div>
 		</div>
@@ -181,4 +209,9 @@
   </div>
 </footer>
 </body>
+<script>
+	$(function() {
+		assign_corpus_setup_buttons();
+	});
+</script>
 </html>

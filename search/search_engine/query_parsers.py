@@ -834,11 +834,24 @@ class InterfaceQueryParser:
         fields in htmlQuery.
         """
         queryParts = []
+        rangeQueriesFrom = {}
+        rangeQueriesTo = {}
         for field in self.docMetaFields:
             if field in ('year_from', 'year_to'):
                 continue
-            if field in htmlQuery and (type(htmlQuery[field]) == int or len(htmlQuery[field]) > 0):
+            elif field in htmlQuery and (type(htmlQuery[field]) == int or len(htmlQuery[field]) > 0):
                 queryParts.append(self.make_bool_query(htmlQuery[field], field, 'all', keyword_query=True))
+            elif (field + '__from' in htmlQuery
+                  and (type(htmlQuery[field + '__from']) == int
+                       or len(htmlQuery[field + '__from']) > 0)):
+                rangeQueriesFrom[field] = htmlQuery[field]
+            elif (field + '__to' in htmlQuery
+                  and (type(htmlQuery[field + '__to']) == int
+                       or len(htmlQuery[field + '__to']) > 0)):
+                rangeQueriesTo[field] = htmlQuery[field]
+        # Deal with year range queries (this can be tricky because the lower bound
+        # has to be compared to year_from, but the upper bound has to be compared
+        # to year_to in case there are two fields for the approximate date of creation)
         yearFrom, yearTo = None, None
         if 'year_from' in htmlQuery and (type(htmlQuery['year_from']) == int or len(htmlQuery['year_from']) > 0):
             yearFrom = htmlQuery['year_from']
@@ -852,6 +865,16 @@ class InterfaceQueryParser:
                     queryParts.append(self.make_range_query([None, yearTo], 'year_to'))
             elif 'year' in self.docMetaFields:
                 queryParts.append(self.make_range_query([yearFrom, yearTo], 'year'))
+        # Now deal with the rest of ranged fields (...__from and ...__to in the HTML query)
+        for field in set(f for f in rangeQueriesFrom) | set(f for f in rangeQueriesTo):
+            if field in rangeQueriesFrom:
+                if field in rangeQueriesTo:
+                    queryParts.append(self.make_range_query([rangeQueriesFrom[field], rangeQueriesTo[field]], field))
+                else:
+                    queryParts.append(self.make_range_query([rangeQueriesFrom[field], None], field))
+            else:
+                queryParts.append(self.make_range_query([None, rangeQueriesTo[field]], field))
+        # Remove manually excluded documents by ID
         if exclude is not None and len(exclude) > 0:
             queryParts.append({'bool': {'must_not': [{'terms': {'_id': list(exclude)}}]}})
         if len(queryParts) > 0:

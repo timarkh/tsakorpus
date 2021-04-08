@@ -25,3 +25,12 @@ textarea.form-control {
 .form-label {
 	font-size: 1.3em;
 }
+
+.meta_column {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.button_row {
+	padding-top: 10px;
+}
