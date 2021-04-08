@@ -339,6 +339,7 @@ def search_sent(page=-1):
     cur_search_context().sync_page_data(hitsProcessed['page'], hitsProcessed)
     maxPageNumber = (min(hitsProcessed['n_sentences'], settings.max_hits_retrieve) - 1) \
                     // hitsProcessed['page_size'] + 1
+    hitsProcessed['too_many_hits'] = (settings.max_hits_retrieve < hitsProcessed['n_sentences'])
 
     return render_template('search_results/result_sentences.html',
                            data=hitsProcessed,

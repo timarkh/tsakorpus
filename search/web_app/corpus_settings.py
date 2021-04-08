@@ -45,7 +45,7 @@ class CorpusSettings:
         self.max_words_in_sentence = 40
         self.max_context_expand = 5
         self.max_distance_filter = 200000
-        self.max_hits_retrieve = 10000
+        self.max_hits_retrieve = 10000      # Increasing this value will have no effect unless you also reconfigure Elasticsearch
         self.query_timeout = 60
 
         # Interface options and tools

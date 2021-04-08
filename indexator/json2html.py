@@ -142,6 +142,8 @@ class JSON2HTML:
             dataFinal['rows'].append(self.finalize_html_paragraph(curParagraph, colClass, curPointers[0] + 1))
             curPointers[0] += 1
 
+        if not os.path.exists(os.path.dirname(fnameOut)):
+            os.makedirs(os.path.dirname(fnameOut))
         with open(fnameOut, 'w', encoding='utf-8') as fOut:
             json.dump(dataFinal, fOut, indent=1, ensure_ascii=False)
 

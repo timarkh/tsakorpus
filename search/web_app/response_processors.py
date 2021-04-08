@@ -1350,7 +1350,8 @@ class SentenceViewer:
             'page': 1,
             'message': 'Nothing found.',
             'contexts': [],
-            'languages': []
+            'languages': [],
+            'too_many_hits': False
         }
         result['context_header_rtl'] = self.settings.context_header_rtl
         if ('hits' not in response or 'total' not in response['hits']
@@ -1386,6 +1387,8 @@ class SentenceViewer:
         if len(srcAlignmentInfo) > 0:
             result['src_alignment'] = json.dumps(srcAlignmentInfo)
         result['languages'] += [l for l in sorted(resultLanguages)]
+        if self.settings.max_hits_retrieve < result['n_sentences']:
+            result['too_many_hits'] = True
         return result
 
     def process_word_json(self, response, searchType='word', subcorpus=False, translit=None):

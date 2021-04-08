@@ -14,6 +14,11 @@
 	<span class="bi bi-exclamation-triangle" aria-hidden="true"></span> {{ _(data.message) }}
 	</div>
 	{% endif %}
+	{% if data.too_many_hits %}
+	<div class="alert alert-danger" role="alert">
+	<span class="bi bi-exclamation-triangle" aria-hidden="true"></span> {{ _('Number of results found exceeds the maximum number of pages you can view.') }}
+	</div>
+	{% endif %}
 	{% if data.subcorpus_enabled %}
 	<div class="alert alert-warning" role="alert">
 	<span class="bi bi-exclamation-triangle" aria-hidden="true"></span> {{ _('You are searching in a subcorpus.') }}
