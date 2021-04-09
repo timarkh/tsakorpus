@@ -133,8 +133,18 @@
 				<textarea class="form-control" id="sentence_meta" wrap="hard">{{ settings.sentence_meta|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
+				<label for="integer_meta_fields" class="form-label">Integer sentence-level metadata fields</label>
+				<p class="explanation">Names of sentence-level fields that have to be interpreted as integers rather than strings. Instead of a single text box, they will be represented by two text boxes where the user can specify a range.</p>
+				<textarea class="form-control" id="integer_meta_fields" wrap="hard">{{ settings.integer_meta_fields|join('\n') }}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="line_plot_meta" class="form-label">Integer sentence-level metadata fields with line plots</label>
+				<p class="explanation">Names of integer sentence-level fields that have to be represented by a line plot rather than a bar chart in the statistics.</p>
+				<textarea class="form-control" id="line_plot_meta" wrap="hard">{{ settings.line_plot_meta|join('\n') }}</textarea>
+			</div>
+			<div class="mb-3 option_group">
 				<label for="search_meta.stat_options" class="form-label">Document- and sentence-level metadata in statistics popup</label>
-				<p class="explanation">Names of those metadata fields that the user should be able to select when they click <i class="bi bi-bar-chart-line-fill" title="Show statistics"></i>. Write one per line.</p>
+				<p class="explanation">Names of those metadata fields that the user should be able to select when they click <i class="bi bi-bar-chart-line-fill" title="Show statistics"></i>. Document-level fields will also appear in the Subcorpus statistics tab. Write one per line.</p>
 				<textarea class="form-control" id="search_meta.stat_options" wrap="hard">{{ settings.search_meta.stat_options|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
@@ -189,11 +199,6 @@
 						<button type="button" class="btn btn-primary add_col">Add column</button>
 					</div>
 				</div>
-			</div>
-			<div class="mb-3 option_group">
-				<label for="search_meta.stat_options" class="form-label">Document- and sentence-level metadata in statistics popup</label>
-				<p class="explanation">Names of those metadata fields that the user should be able to select when they click <i class="bi bi-bar-chart-line-fill" title="Show statistics"></i>. Write one per line.</p>
-				<textarea class="form-control" id="search_meta.stat_options" wrap="hard">{{ settings.search_meta.stat_options|join('\n') }}</textarea>
 			</div>
 		</div>
     </div>
@@ -250,7 +255,7 @@
 			<div class="mb-3 option_group">
 				<label for="max_hits_retrieve" class="form-label">Maximum number of hits (sentences) the user can see</label>
 				<input type="number" class="form-control" id="max_hits_retrieve" value="{{ settings.max_hits_retrieve }}">
-				<p class="explanation">If a search returns more sentences, they will be reflected in the statistics, but the user will only be able to look at this number of sentences. This number is connected to the Elasticsearch limit on maximum number of hits returned, which is 10,000 as of Elasticsearch 7.10. If you choose to increase this value, you will have to configure Elasticsearch accordingly, otherwise it will have no effect. Apparenty, setting the value too high can lead to high memory consuption, so be careful about that. Anyway, if somebody has the need to see at the results beyound the first 10,000, it usually means something is wrong with the query (e.g. the user wants to look at older texts by switching on "sort by year" and going to the last page instead of setting year limits in the subcorpus selection).</p>
+				<p class="explanation">If a search returns more sentences, they will be reflected in the statistics, but the user will only be able to look at this number of sentences. This number is connected to the Elasticsearch limit on maximum number of hits returned (<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html"><code>index.max_result_window</code> parameter</a>), which is 10,000 as of Elasticsearch 7.10. If you choose to increase this value, you will have to configure Elasticsearch accordingly, otherwise it will have no effect. Doing so may lead to very high memory consumption if the user actually wants to see these examples, so don't do it. If you want to look past the example number 10,000, it almost certainly means that you should narrow down your query or change the sorting method. For example, you want to look at older texts by switching on "sort by year" and going to the last page instead of setting year limits in the subcorpus selection. I don't know of anyone who would like to actually sift through more than 10,000 examples looking at each of them.</p>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="max_words_in_sentence" class="form-label">Maximum number of words in sentence</label>
@@ -266,6 +271,154 @@
 				<label for="query_timeout" class="form-label">Search timeout in seconds</label>
 				<input type="number" class="form-control" id="query_timeout" value="{{ settings.query_timeout }}">
 				<p class="explanation">Queries whose execution time exceeds this limit will be terminated. This is a safeguard against unexpectedly heavy searches that can hang your server. The actual execution time may be somewhat longer than this limit because of implementation details, but not significantly so.</p>
+			</div>
+		</div>
+    </div>
+</div>
+<div class="accordion-item">
+	<h2 class="accordion-header" id="heading6">
+		<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6" aria-expanded="false" aria-controls="collapse6">
+		Basic interface options
+		</button>
+	</h2>
+    <div id="collapse6" class="accordion-collapse collapse" aria-labelledby="heading6" data-bs-parent="#setings_accordion">
+		<div class="accordion-body">
+			<div class="mb-3 option_group">
+				<label for="interface_languages" class="form-label">Interface languages</label>
+				<p class="explanation">Codes of the languages the interface has to be available in. For each language in the list, the following translation files have to exist: (1) pyBabel <code>.po</code> translation files in <code>/search/web_app/translations/%LANGUAGE_CODE%/LC_MESSAGES/</code>; (2) help popup template <code>/search/web_app/templates/modals/help_dialogue_%LANGUAGE_CODE%.html</code>; (3) greeting alert <code>/search/web_app/templates/index/greeting_%LANGUAGE_CODE%.html</code>.</p>
+				<textarea class="form-control" id="interface_languages" wrap="hard">{{ settings.interface_languages|join('\n') }}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="default_locale" class="form-label">Default interface language</label>
+				<input type="text" class="form-control" id="default_locale" value="{{ settings.default_locale }}">
+				<p class="explanation">The code of the language the interface opens in by default. This code should also be in the "Interface languages" list.</p>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="start_page_url" class="form-label">URL of the corpus start page</label>
+				<input type="text" class="form-control" id="start_page_url" value="{{ settings.start_page_url }}">
+				<p class="explanation">Corpus name in the right upper corner will link to this URL. Do not forget to include <code>http[s]://</code> in it.</p>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="citation" class="form-label">How to cite the corpus</label>
+				<p class="explanation">Citation string for the corpus. May include HTML. Only one citation string is available at the moment; if you want to have it in multiple languages, just list all language versions here.</p>
+				<textarea class="form-control" id="citation" wrap="hard">{{ settings.citation }}</textarea>
+			</div>
+		</div>
+    </div>
+</div>
+<div class="accordion-item">
+	<h2 class="accordion-header" id="heading7">
+		<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse7" aria-expanded="false" aria-controls="collapse7">
+		Advanced interface options
+		</button>
+	</h2>
+    <div id="collapse7" class="accordion-collapse collapse" aria-labelledby="heading7" data-bs-parent="#setings_accordion">
+		<div class="accordion-body">
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="generate_dictionary" id="generate_dictionary" {% if settings.generate_dictionary %}checked{% endif %}>
+				<label class="form-check-label" for="generate_dictionary">
+				Generate an HTML dictionary for each language.
+				</label>
+			</div>
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="display_freq_rank" id="display_freq_rank" {% if settings.display_freq_rank %}checked{% endif %}>
+				<label class="form-check-label" for="display_freq_rank">
+				Display frequency rank / quantile column in word/lemma search.
+				</label>
+			</div>
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="word_search_display_gr" id="word_search_display_gr" {% if settings.word_search_display_gr %}checked{% endif %}>
+				<label class="form-check-label" for="word_search_display_gr">
+				Display grammar column in word/lemma search.
+				</label>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="word_table_fields" class="form-label">Additional word/lemma search columns</label>
+				<p class="explanation">Names of additional word-level metadata fields (e.g. translations into a metalanguage) whose values should appear in separate columns in word/lemma search results. Write one per line.</p>
+				<textarea class="form-control" id="word_table_fields" wrap="hard">{{ settings.word_table_fields|join('\n') }}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="fulltext_page_size" class="form-label">Page size in full-text view</label>
+				<input type="number" class="form-control" id="fulltext_page_size" value="{{ settings.fulltext_page_size }}">
+				<p class="explanation">If full-text view is allowed, the texts are split into pages. This number determines how many sentences one page contains. Too high values may result in user's browser becoming less responsive or freezing.</p>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="author_metafield" class="form-label">Author metadata field</label>
+				<input type="text" class="form-control" id="author_metafield" value="{{ settings.author_metafield }}">
+				<p class="explanation">When displaying search hits, all examples are headed by the values of "title", "author" and "year" metadata fields. If you want to have something other than "author" as the second most important field, type its name here.</p>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="multiple_choice_fields" class="form-label">Multiple-choice sentence-level metadata fields</label>
+				<p class="explanation">Names of sentence-level fields that should have a tag selection table like the <em>Grammar</em> field. Write one per line.</p>
+				<textarea class="form-control" id="multiple_choice_fields" wrap="hard">{{ settings.multiple_choice_fields|join('\n') }}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<p class="form-label">Multiple-choice fields</p>
+				<p class="explanation">A tag selection table is always present in the <em>Grammar</em> field, but you can also add one to any metadata search field that appears in the word query box. This makes sense for fields that have a limited number of values.</p>
+				{% set cur_field = "settings.multiple_choice_fields" %}
+				<div style="display: none" class="metafield_stub">
+					{% include "admin/tag_select_metafield.html" %}
+				</div>
+				{% for key in settings.multiple_choice_fields %}
+				<div class="meta_column removable_metafield" data-nfield={{ loop.index }}>
+					<label for="{{ cur_field }}_{{ loop.index }}_key" class="form-label">Name of the multiple choice metadata field</label>
+					<input type="text" class="form-control" id="{{ cur_field }}_{{ loop.index }}_key" value="{{ key }}">
+					<div style="display: none" class="column_stub">
+						{% include "admin/tag_select_col.html" %}
+					</div>
+					{% set field_loop = loop %}
+					{% for column in settings.multiple_choice_fields[k].columns %}
+					<div class="meta_column removable_column" data-ncol="{{ loop.index }}">
+						<div style="display: none" class="row_stub">
+							{% include "admin/tag_select_row.html" %}
+						</div>
+						<h5>Column #{{ loop.index }}</h5>
+						<div class="row">
+							<div class="col-md-3">Element type</div>
+							<div class="col-md-3">Metadata field name</div>
+							<div class="col-md-3">Metadata value (for option buttons)</div>
+							<div class="col-md-3">Text (for option buttons; optional)</div>
+						</div>
+						{% set col_loop = loop %}
+						{% for item in column %}
+						<div class="row removable_row" data-nrow="{{ loop.index }}">
+							<div class="col-md-3">
+							<select class="form-select" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_type">
+								<option value="input_text" {% if item.type=='input_text' %}selected{% endif %}>Text</option>
+								<option value="separator" {% if item.type=='separator' %}selected{% endif %}>Separator</option>
+								<option value="header" {% if item.type=='header' %}selected{% endif %}>Header</option>
+							</select>
+							</div>
+							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_name" value="{{ item.name }}"></div>
+							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_value" value="{{ item.value }}"></div>
+							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_text" value="{{ item.text }}"></div>
+						</div>
+						{% endfor %}
+						<div class="row button_row">
+							<div class="col-md-9"></div>
+							<div class="col-md-3">
+								<button type="button" class="btn btn-danger btn-sm del_row">Remove row</button>
+								<button type="button" class="btn btn-primary btn-sm add_row">Add row</button>
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+					<div class="row button_row">
+						<div class="col-md-9"></div>
+						<div class="col-md-3">
+							<button type="button" class="btn btn-danger del_col">Remove column</button>
+							<button type="button" class="btn btn-primary add_col">Add column</button>
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+				<div class="row button_row">
+					<div class="col-md-9"></div>
+					<div class="col-md-3">
+						<button type="button" class="btn btn-danger del_field">Remove field</button>
+						<button type="button" class="btn btn-primary add_field">Add field</button>
+					</div>
+				</div>
 			</div>
 		</div>
     </div>

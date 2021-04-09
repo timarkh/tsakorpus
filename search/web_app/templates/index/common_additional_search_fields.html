@@ -7,7 +7,7 @@
 <hr class="separator">
 	{% for field in sentence_meta %}
 		{% if int_meta_fields and field in int_meta_fields %}
-		{{ _('metafield_' + field) | capitalize }}: <input type="number" class="search_input_num" name="sent_meta_{{ field }}_FR1" id="sent_meta_{{ field }}1">&ndash;<input type="number" class="search_input_num" name="sent_meta_{{ field }}_TO1" id="sent_meta_{{ field }}1"><br>
+		{{ _('metafield_' + field) | capitalize }}: <input type="number" class="search_input_num" name="sent_meta_{{ field }}__from1" id="sent_meta_{{ field }}__from1">&ndash;<input type="number" class="search_input_num" name="sent_meta_{{ field }}__to1" id="sent_meta_{{ field }}__to1"><br>
 		{% elif sentence_meta_values and field in sentence_meta_values %}
 		{{ _('metafield_' + field) | capitalize }}: <select class="search_input" name="sent_meta_{{ field }}1" id="sent_meta_{{ field }}1"><br>
 		<option value="" selected></option>

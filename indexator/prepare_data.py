@@ -31,7 +31,7 @@ class PrepareData:
         self.categories = json.loads(f.read())
         f.close()
         wfAnalyzerPatter = '[.\n()\\[\\]/]'
-        if 'wf_analyzer_pattern' in self.settings:
+        if 'wf_analyzer_pattern' in self.settings and self.settings['wf_analyzer_pattern'] is not None:
             wfAnalyzerPatter = self.settings['wf_analyzer_pattern']
         wfLowercase = True
         if 'wf_lowercase' in self.settings:

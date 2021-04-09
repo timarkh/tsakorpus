@@ -28,7 +28,7 @@ settings.load_settings(os.path.join(SETTINGS_DIR, 'corpus.json'),
 from search_engine.client import SearchClient
 from .response_processors import SentenceViewer
 localizations = {}
-sc = SearchClient(SETTINGS_DIR)
+sc = SearchClient(SETTINGS_DIR, settings)
 sentView = SentenceViewer(settings, sc)
 sc.qp.rp = sentView
 sc.qp.wr.rp = sentView

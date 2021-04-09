@@ -55,10 +55,8 @@ class CorpusSettings:
         self.input_methods = None
         self.generate_dictionary = False
         self.author_metafield = None
-        self.word_fields_by_tier = {}
-        self.auto_switch_tiers = {}
         self.line_plot_meta = ['year']    # metadata fields whose statistics can be displayed on a line plot
-        self.multiple_choice_fields = []
+        self.multiple_choice_fields = {}
         self.integer_meta_fields = []
         self.word_table_fields = []
         self.default_values = {}
@@ -68,6 +66,7 @@ class CorpusSettings:
         self.citation = None
         self.start_page_url = None
         self.fulltext_page_size = 100     # Size of one page of the full-text representation in sentences
+        self.accidental_word_fields = []
 
         # Languages and their properties
         self.languages = []
@@ -75,6 +74,15 @@ class CorpusSettings:
         self.context_header_rtl = False
         self.categories = {}
         self.lang_props = {}
+        self.word_fields_by_tier = {}
+        self.auto_switch_tiers = {}
+
+        # Regexes etc.
+        self.wf_analyzer_pattern = None
+        self.wf_lowercase = True
+        self.regex_simple_search = None
+        self.search_remove_whitespaces = True
+        self.detect_lemma_queries = False
 
         # Statistics calculated at runtime
         self.corpus_size = 0

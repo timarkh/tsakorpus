@@ -25,16 +25,12 @@ class SearchClient:
     Contains methods for querying the corpus database.
     """
 
-    def __init__(self, settings_dir):
-        self.settings_dir = settings_dir
-        f = open(os.path.join(self.settings_dir, 'corpus.json'),
-                 'r', encoding='utf-8')
-        self.settings = json.loads(f.read())
-        f.close()
-        self.name = self.settings['corpus_name']
-        self.es = Elasticsearch(timeout=max(20, self.settings['query_timeout']))
+    def __init__(self, settings_dir, settings):
+        self.settings = settings
+        self.name = self.settings.corpus_name
+        self.es = Elasticsearch(timeout=max(20, self.settings.query_timeout))
         self.es_ic = IndicesClient(self.es)
-        self.qp = InterfaceQueryParser(self.settings_dir)
+        self.qp = InterfaceQueryParser(settings_dir, self.settings)
         self.logging = 'none'   # none|query|hits
         self.query_log = []
         # Logging is only switched temporarily when the user clicks on
@@ -71,9 +67,9 @@ class SearchClient:
         used to count the number of occurrences in a particular
         subcorpus.
         """
-        if self.settings['query_timeout'] > 0:
+        if self.settings.query_timeout > 0:
             hits = self.es.search(index=self.name + '.words',
-                                  body=esQuery, request_timeout=self.settings['query_timeout'])
+                                  body=esQuery, request_timeout=self.settings.query_timeout)
         else:
             hits = self.es.search(index=self.name + '.words',
                                   body=esQuery)
@@ -96,9 +92,9 @@ class SearchClient:
 
     @log_if_needed
     def get_sentences(self, esQuery):
-        if self.settings['query_timeout'] > 0:
+        if self.settings.query_timeout > 0:
             hits = self.es.search(index=self.name + '.sentences',
-                                  body=esQuery, request_timeout=self.settings['query_timeout'])
+                                  body=esQuery, request_timeout=self.settings.query_timeout)
         else:
             hits = self.es.search(index=self.name + '.sentences',
                                   body=esQuery)
@@ -110,9 +106,9 @@ class SearchClient:
         """
         Iterate over all sentences found with the query.
         """
-        if self.settings['query_timeout'] > 0:
+        if self.settings.query_timeout > 0:
             iterator = helpers.scan(self.es, index=self.name + '.sentences',
-                                    query=esQuery, request_timeout=self.settings['query_timeout'])
+                                    query=esQuery, request_timeout=self.settings.query_timeout)
         else:
             iterator = helpers.scan(self.es, index=self.name + '.sentences',
                                     query=esQuery)

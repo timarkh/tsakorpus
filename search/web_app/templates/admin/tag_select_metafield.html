@@ -1,0 +1,13 @@
+<div class="meta_column removable_metafield" data-nfield=%FIELD_NUMBER%>
+	<label for="{{ cur_field }}_%FIELD_NUMBER%_key" class="form-label">Name of the multiple choice metadata field</label>
+	<input type="text" class="form-control" id="{{ cur_field }}_%FIELD_NUMBER%_key">
+	<div style="display: none" class="column_stub">
+		{% include "admin/tag_select_col.html" %}
+	</div>
+<div class="row button_row">
+	<div class="col-md-9"></div>
+	<div class="col-md-3">
+		<button type="button" class="btn btn-danger del_col">Remove column</button>
+		<button type="button" class="btn btn-primary add_col">Add column</button>
+	</div>
+</div>

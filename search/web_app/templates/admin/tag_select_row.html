@@ -1,0 +1,12 @@
+<div class="row removable_row" data-nrow="%ROW_NUMBER%">
+	<div class="col-md-3">
+	<select class="form-select" name="{{ cur_field }}_%FIELD_NUMBER%.columns_%COL_NUMBER%_%ROW_NUMBER%_type">
+		<option value="tag" selected>Tag</option>
+		<option value="separator">Separator</option>
+		<option value="header">Header</option>
+	</select>
+	</div>
+	<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_%FIELD_NUMBER%.columns_%COL_NUMBER%_%ROW_NUMBER%_category"></div>
+	<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_%FIELD_NUMBER%.columns_%COL_NUMBER%_%ROW_NUMBER%_value"></div>
+	<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_%FIELD_NUMBER%.columns_%COL_NUMBER%_%ROW_NUMBER%_tooltip"></div>
+</div>

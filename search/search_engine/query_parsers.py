@@ -18,33 +18,23 @@ class InterfaceQueryParser:
                      '&': 'must',
                      '|': 'should'}
 
-    def __init__(self, settings_dir, rp=None):
-        f = open(os.path.join(settings_dir, 'categories.json'),
-                 'r', encoding='utf-8-sig')
-        self.gramDict = json.loads(f.read())
-        f.close()
-        f = open(os.path.join(settings_dir, 'corpus.json'),
-                 'r', encoding='utf-8-sig')
-        self.settings = json.loads(f.read())
-        f.close()
+    def __init__(self, settings_dir, settings, rp=None):
+        with open(os.path.join(settings_dir, 'categories.json'),
+                  'r', encoding='utf-8-sig') as fIn:
+            self.gramDict = json.loads(fIn.read())
+        self.settings = settings
 
         self.rxSimpleText = re.compile('^[^\\[\\]()*\\\\{}^$.?+~|,&]*$')
         self.rxBooleanText = re.compile('^[^\\[\\]()\\\\{}^$.+|]*$')
-        if 'regex_simple_search' in self.settings:
-            self.rxSimpleText = re.compile(self.settings['regex_simple_search'])
-
-        if 'word_fields' in self.settings:
-            self.wordFields = self.settings['word_fields']
-        else:
-            self.wordFields = []
+        if self.settings.regex_simple_search is not None and len(self.settings.regex_simple_search) > 0:
+            self.rxSimpleText = re.compile(self.settings.regex_simple_search)
+        self.wordFields = self.settings.word_fields
         self.wr = WordRelations(settings_dir, rp=rp)
         self.docMetaFields = ['author', 'title', 'genre']
-        if 'viewable_meta' in self.settings:
-            self.docMetaFields += [f for f in self.settings['viewable_meta']
-                                   if f not in self.docMetaFields and f != 'filename']
-        if 'search_meta' in self.settings and 'stat_options' in self.settings['search_meta']:
-            self.docMetaFields += [f for f in self.settings['search_meta']['stat_options']
-                                   if f not in self.docMetaFields and f != 'filename']
+        self.docMetaFields += [f for f in self.settings.viewable_meta
+                               if f not in self.docMetaFields and f != 'filename']
+        self.docMetaFields += [f for f in self.settings.search_meta['stat_options']
+                               if f not in self.docMetaFields and f != 'filename']
         kwMetaFields = [f + '_kw' for f in self.docMetaFields if not f.startswith('year')]
         self.docMetaFields += kwMetaFields
         self.rp = rp    # ResponseProcessor instance
@@ -126,10 +116,10 @@ class InterfaceQueryParser:
             if len(glossTag) <= 0:
                 return '[^{}]*\\{(' + self.make_gloss_query_src_part(glossSrc, lang) + ')\\}[\\-=<>]'
             return '(' + glossTag + ')\\{(' + self.make_gloss_query_src_part(glossSrc, lang) + ')\\}[\\-=<>]'
-        if ('lang_props' in self.settings and lang in self.settings['lang_props']
-                and 'gloss_shortcuts' in self.settings['lang_props'][lang]
-                and text in self.settings['lang_props'][lang]['gloss_shortcuts']):
-            text = self.settings['lang_props'][lang]['gloss_shortcuts'][text]
+        if (lang in self.settings.lang_props
+                and 'gloss_shortcuts' in self.settings.lang_props[lang]
+                and text in self.settings.lang_props[lang]['gloss_shortcuts']):
+            text = self.settings.lang_props[lang]['gloss_shortcuts'][text]
             return '(' + text + ')\\{[^{}]+\\}[\\-=<>]'
         return '(' + text.replace('.', '\\.') + ')\\{[^{}]+\\}[\\-=<>]'
 
@@ -164,7 +154,7 @@ class InterfaceQueryParser:
         elif keyword_query:
             return {'match': {field: text}}
         elif not (field == 'ana.gr' or field.endswith('.ana.gr')):
-            if field in self.settings['viewable_meta']:
+            if field in self.settings.viewable_meta:
                 text = text.lower()
             elif field == 'w_id':
                 field = '_id'   # search for word ID: _id in words index, but words.w_id in sentences index
@@ -198,9 +188,8 @@ class InterfaceQueryParser:
             if type(strQuery) == int:
                 return self.make_simple_term_query(strQuery, field, lang, keyword_query=True)
             if not keyword_query:
-                if ('search_remove_whitespaces' not in self.settings
-                    or self.settings['search_remove_whitespaces']):
-                        strQuery = strQuery.replace(' ', '')
+                if self.settings.search_remove_whitespaces:
+                    strQuery = strQuery.replace(' ', '')
             else:
                 strQuery = strQuery.strip()
                 if '|' not in strQuery and '~' not in strQuery:
@@ -236,7 +225,11 @@ class InterfaceQueryParser:
             else:
                 mustNotClause = self.make_bool_query(strQuery, field, lang,
                                                      start=start+1, end=end)
-            return {'bool': {'must_not': mustNotClause}}
+            return {
+                'bool': {
+                    'must_not': mustNotClause
+                }
+            }
         return {}
 
     def make_range_query(self, listQuery, field):
@@ -679,7 +672,7 @@ class InterfaceQueryParser:
                                                    searchOutput=searchOutput)
         else:
             nPivotalTerm, constraints = self.wr.find_pivotal_term(distances)
-            for pivotalTermIndex in range(self.settings['max_words_in_sentence']):
+            for pivotalTermIndex in range(self.settings.max_words_in_sentence):
                 distanceQueryTuple = []
                 for iQueryWord in range(len(queryDict['words'])):
                     wordDesc, negQuery = queryDict['words'][iQueryWord]
@@ -758,13 +751,11 @@ class InterfaceQueryParser:
                     k = 'meta.' + k[10:]
                     if k.endswith('_kw'):
                         boolQuery = self.make_bool_query(v, k, lang=lang, keyword_query=True)
-                    elif (k.endswith('_TO')
-                          and 'integer_meta_fields' in self.settings
-                          and k[5:len(k)-3] in self.settings['integer_meta_fields']):
+                    elif (k.endswith('__to')
+                          and k[5:len(k)-3] in self.settings.integer_meta_fields):
                         boolQuery = self.make_range_query([None, v], k[:-3])
-                    elif (k.endswith('_FR')
-                          and 'integer_meta_fields' in self.settings
-                          and k[5:len(k)-3] in self.settings['integer_meta_fields']):
+                    elif (k.endswith('__from')
+                          and k[5:len(k)-3] in self.settings.integer_meta_fields):
                         boolQuery = self.make_range_query([v, None], k[:-3])
                     else:
                         boolQuery = self.make_bool_query(v, k, lang=lang)
@@ -905,11 +896,11 @@ class InterfaceQueryParser:
         for iWord in range(int(htmlQuery['n_words'])):
             strWordNum = str(iWord + 1)
             if ('lang' + strWordNum not in htmlQuery
-                    or htmlQuery['lang' + strWordNum] not in self.settings['languages']):
+                    or htmlQuery['lang' + strWordNum] not in self.settings.languages):
                 return None
             else:
                 lang = htmlQuery['lang' + strWordNum]
-                langID = str(self.settings['languages'].index(lang))
+                langID = str(self.settings.languages.index(lang))
             if langID not in langQueryParts:
                 langQueryParts[langID] = {k: v for k, v in htmlQuery.items()
                                           if self.rxFieldNum.search(k) is None}
@@ -962,15 +953,15 @@ class InterfaceQueryParser:
         if len(htmlQuery) <= 0 or 'n_words' not in htmlQuery:
             return None, None, None, None
         query_from = (page - 1) * query_size
-        if 'lang1' not in htmlQuery or htmlQuery['lang1'] not in self.settings['languages']:
-            if self.settings['all_language_search_enabled']:
+        if 'lang1' not in htmlQuery or htmlQuery['lang1'] not in self.settings.languages:
+            if self.settings.all_language_search_enabled:
                 lang = 'all'
                 langID = -1
             else:
                 return None, None, None, None
         else:
             lang = htmlQuery['lang1']
-            langID = self.settings['languages'].index(lang)
+            langID = self.settings.languages.index(lang)
         if int(htmlQuery['n_words']) > 1:
             searchIndex = 'sentences'
         elif ('sentence_index1' in htmlQuery
@@ -1019,7 +1010,7 @@ class InterfaceQueryParser:
         if searchIndex == 'sentences' and 'para_ids' in htmlQuery:
             prelimQuery['para_ids'] = htmlQuery['para_ids']
 
-        if 'detect_lemma_queries' in self.settings and self.settings['detect_lemma_queries']:
+        if self.settings.detect_lemma_queries:
             # Check if this is a query which means "Find all forms
             # of a particular lemma (possibly with additional constraints".
             # If it is, remove the cap on the number of forms found.
