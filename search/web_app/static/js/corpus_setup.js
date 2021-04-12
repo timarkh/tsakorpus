@@ -1,17 +1,21 @@
 
 function assign_corpus_setup_buttons() {
-	$(".add_row").unbind('click');
+	$(".add_row_below").unbind('click');
+	$(".add_row_above").unbind('click');
 	$(".del_row").unbind('click');
 	$(".add_col").unbind('click');
 	$(".del_col").unbind('click');
 	$(".add_field").unbind('click');
 	$(".del_field").unbind('click');
-	$(".add_row").click(add_row);
+	$("#save_changes").unbind('click');
+	$(".add_row_below").click(add_row_below);
+	$(".add_row_above").click(add_row_above);
 	$(".del_row").click(del_row);
 	$(".add_col").click(add_col);
 	$(".del_col").click(del_col);
 	$(".add_field").click(add_field);
 	$(".del_field").click(del_field);
+	$("#save_changes").click(save_changes);
 }
 
 
@@ -36,8 +40,15 @@ function del_field(e) {
 	prevCol.remove();
 }
 
+function add_row_below(e) {
+	return add_row(e, true);
+}
 
-function add_row(e) {
+function add_row_above(e) {
+	return add_row(e, false);
+}
+
+function add_row(e, below) {
 	var curButtonRow = $(e.currentTarget).parent().parent();
 	var prevRow = curButtonRow.prev('.removable_row');
 	var nextRowNum = 1;
@@ -52,7 +63,12 @@ function add_row(e) {
 		newRowHTML = newRowHTML.replaceAll('%FIELD_NUMBER%', curFieldNum);
 	}
 	var newRow = $(newRowHTML);
-	curButtonRow.before(newRow);
+	if (below) {
+		curButtonRow.before(newRow);
+	}
+	else {
+		curButtonRow.siblings('.selection_table_header').after(newRow);
+	}
 	assign_corpus_setup_buttons();
 }
 
@@ -88,4 +104,23 @@ function add_field(e) {
 	var newField = $(newFieldHTML);
 	curButtonRow.before(newField);
 	assign_corpus_setup_buttons();
+}
+
+function save_changes(e) {
+	e.preventDefault();
+	$.ajax({
+		url: "config_update",
+		data: $("#settings_form").serialize(),
+		type: "POST",
+		dataType: "json",
+		success: changes_saved,
+		error: function(errorThrown) {
+			alert( JSON.stringify(errorThrown) );
+		}
+	});
+}
+
+function changes_saved(results) {
+	$('#changes_saved').addClass('show');
+	setTimeout(function () { $('#changes_saved').removeClass('show'); }, 1000);
 }

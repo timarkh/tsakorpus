@@ -90,6 +90,20 @@ class CorpusSettings:
         self.lemma_freq_by_rank = []     # number of lemmata for each frequency rank
         self.ready_for_work = False      # turns True when all initialization queries have been made
 
+    def update_format(self):
+        """
+        Rename keys that have been changed since Tsakorpus 1.0.
+        """
+        for lang in self.lang_props:
+            if 'gramm_selection' in self.lang_props[lang]:
+                for el in self.lang_props[lang]['gramm_selection']:
+                    if 'type' in el and el['type'] in ('gramm', 'gloss'):
+                        el['type'] = 'tag'
+            if 'gloss_selection' in self.lang_props[lang]:
+                for el in self.lang_props[lang]['gramm_selection']:
+                    if 'type' in el and el['type'] in ('gramm', 'gloss'):
+                        el['type'] = 'tag'
+
     def load_settings(self, fnameCorpus, fnameCategories):
         """
         Load corpus settings from JSON files (corpus.json and categories.json).
@@ -100,6 +114,7 @@ class CorpusSettings:
             setattr(self, k, v)
         with open(fnameCategories, 'r', encoding='utf-8') as fCategories:
             self.categories = json.load(fCategories)
+        self.update_format()
 
         # Add empty dictionary for each language absent in categories.json:
         for lang in self.languages:
@@ -118,12 +133,15 @@ class CorpusSettings:
             'ready_for_work',
             'corpus_size',
             'word_freq_by_rank',
-            'lemma_freq_by_rank'
+            'lemma_freq_by_rank',
+            'categories'
         }
         dictSettings = copy.deepcopy(vars(self))
         for k in [_ for _ in dictSettings.keys()]:
             if k in badFields:
                 del dictSettings[k]
+            elif dictSettings[k] is None:
+                dictSettings[k] = ''
         return dictSettings
 
     def save_settings(self, fname):

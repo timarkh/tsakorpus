@@ -3,7 +3,7 @@
 		{% include "admin/subcorpus_select_row.html" %}
 	</div>
 	<h5>Column #%COL_NUMBER%</h5>
-	<div class="row">
+	<div class="row selection_table_header">
 		<div class="col-md-3">Element type</div>
 		<div class="col-md-3">Metadata field name</div>
 		<div class="col-md-3">Metadata value (for option buttons)</div>
@@ -13,7 +13,8 @@
 		<div class="col-md-9"></div>
 		<div class="col-md-3">
 			<button type="button" class="btn btn-danger btn-sm del_row">Remove row</button>
-			<button type="button" class="btn btn-primary btn-sm add_row">Add row</button>
+			<button type="button" class="btn btn-primary btn-sm add_row_below">Add row below</button>
+			<button type="button" class="btn btn-primary btn-sm add_row_above">Add row above</button>
 		</div>
 	</div>
 </div>

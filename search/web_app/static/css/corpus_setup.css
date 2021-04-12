@@ -34,3 +34,15 @@ textarea.form-control {
 .button_row {
 	padding-top: 10px;
 }
+
+#save_changes {
+	margin: auto;
+}
+
+.footer {
+	margin-top: 25px;
+}
+
+#accordion_save_header_button {
+	font-size: 1.8rem;
+}

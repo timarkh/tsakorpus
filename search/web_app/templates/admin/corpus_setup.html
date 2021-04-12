@@ -30,6 +30,7 @@
 		<p class="text-center bd-highlight fs-2"><code>{{ filename }}</code></p>
 		<p>This page is only available in English and can only be accessed when you run <code>tsakorpus.wsgi</code> as a standalone application on port 7342. The default values will be based on the current contents of <code>/conf/corpus.json</code>. It is assumed that you already have JSON files ready for indexing in <code>/corpus/%CORPUS_NAME%</code>.</p>
 		<p>As Tsakorpus is designed for a multitude of formats and usage scenarios, there are a lot of options. Please be patient!</p>
+		<p><strong>Do not forget to save your changes by clicking the button in the last slide.</strong> You can also do that in the process, the page does not clos after you click the button.
       </div>
     </div>
 </div>
@@ -61,7 +62,7 @@
 			  </label>
 			</div>
 		</div>
-    </div>
+	</div>
 </div>
 <div class="accordion-item">
 	<h2 class="accordion-header" id="headingThree">
@@ -119,8 +120,13 @@
 			</div>
 			<div class="mb-3 option_group">
 				<label for="word_fields" class="form-label">Additional word-level fields</label>
-				<p class="explanation">Names of additional word-level metadata fields (e.g. translations into a metalanguage) that should appear when the user clicks <i class="bi bi-box-arrow-down" title="more fields"></i>. Write one per line.</p>
+				<p class="explanation">Names of additional word-level fields (e.g. translations into a metalanguage) that should appear when the user clicks <i class="bi bi-box-arrow-down" title="more fields"></i>. Write one per line.</p>
 				<textarea class="form-control" id="word_fields" wrap="hard">{{ settings.word_fields|join('\n') }}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="accidental_word_fields" class="form-label">Accidental word-level fields</label>
+				<p class="explanation">Names of non-essential additional word-level fields. These fields will not be taken into account when deciding whether two tokens represent the same word, whic will be reflected in the statistics. Write one per line.</p>
+				<textarea class="form-control" id="accidental_word_fields" wrap="hard">{{ settings.accidental_word_fields|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="viewable_meta" class="form-label">Document-level metadata fields</label>
@@ -333,6 +339,16 @@
 				</label>
 			</div>
 			<div class="mb-3 option_group">
+				<label for="transliterations" class="form-label">Transliterations</label>
+				<p class="explanation">If automatic transliterations are available for your corpus, put their names here. Do not forget to include the "original" option that does not transliterate anything. Write one per line. The first option is default. For each transliteration, there should be a function in <code>/search/web_app/transliteration.py</code> named <code>trans_%TRANSLITERATION_NAME%_baseline</code> that takes the text and the name of the language as input and returns transliterated text.</p>
+				<textarea class="form-control" id="transliterations" wrap="hard">{{ settings.transliterations|join('\n') }}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="input_methods" class="form-label">Input methods</label>
+				<p class="explanation">Each input method, or user input transliteration, corresponds to a function that has to be applied to any value typed in any of the text fields of the search query form, such as <em>Word</em> or <em>Lemma</em>, before this value is passed to the search. The functions are allowed to make a regular expression out of the value. For each input method, there should be a function in <code>/search/web_app/transliteration.py</code> named <code>input_method_%INPUT_METHOD_NAME%</code> that takes the name of the query field, the text and the name of the language as input and returns transliterated text. Do not forget to include the "normal" option that does not transliterate anything. Write one per line. The first option is default.</p>
+				<textarea class="form-control" id="input_methods" wrap="hard">{{ settings.input_methods|join('\n') }}</textarea>
+			</div>
+			<div class="mb-3 option_group">
 				<label for="word_table_fields" class="form-label">Additional word/lemma search columns</label>
 				<p class="explanation">Names of additional word-level metadata fields (e.g. translations into a metalanguage) whose values should appear in separate columns in word/lemma search results. Write one per line.</p>
 				<textarea class="form-control" id="word_table_fields" wrap="hard">{{ settings.word_table_fields|join('\n') }}</textarea>
@@ -348,13 +364,8 @@
 				<p class="explanation">When displaying search hits, all examples are headed by the values of "title", "author" and "year" metadata fields. If you want to have something other than "author" as the second most important field, type its name here.</p>
 			</div>
 			<div class="mb-3 option_group">
-				<label for="multiple_choice_fields" class="form-label">Multiple-choice sentence-level metadata fields</label>
-				<p class="explanation">Names of sentence-level fields that should have a tag selection table like the <em>Grammar</em> field. Write one per line.</p>
-				<textarea class="form-control" id="multiple_choice_fields" wrap="hard">{{ settings.multiple_choice_fields|join('\n') }}</textarea>
-			</div>
-			<div class="mb-3 option_group">
 				<p class="form-label">Multiple-choice fields</p>
-				<p class="explanation">A tag selection table is always present in the <em>Grammar</em> field, but you can also add one to any metadata search field that appears in the word query box. This makes sense for fields that have a limited number of values.</p>
+				<p class="explanation">A tag selection table is always present in the <em>Grammar</em> field, but you can also add one to any metadata search field that appears in the word query box. This makes sense for fields that have a limited number of values. The tag buttons are visually grouped into columns. The <em>category</em> text box is used for logical grouping of tags and can contain arbitrary strings, which will not be visible to the user. Whenever several tags from the same category are selected, they get into the query with a logical OR between them; tags from different categories are united with an AND.</p>
 				{% set cur_field = "settings.multiple_choice_fields" %}
 				<div style="display: none" class="metafield_stub">
 					{% include "admin/tag_select_metafield.html" %}
@@ -367,7 +378,7 @@
 						{% include "admin/tag_select_col.html" %}
 					</div>
 					{% set field_loop = loop %}
-					{% for column in settings.multiple_choice_fields[k].columns %}
+					{% for column in settings.multiple_choice_fields[key].columns %}
 					<div class="meta_column removable_column" data-ncol="{{ loop.index }}">
 						<div style="display: none" class="row_stub">
 							{% include "admin/tag_select_row.html" %}
@@ -375,30 +386,31 @@
 						<h5>Column #{{ loop.index }}</h5>
 						<div class="row">
 							<div class="col-md-3">Element type</div>
-							<div class="col-md-3">Metadata field name</div>
-							<div class="col-md-3">Metadata value (for option buttons)</div>
-							<div class="col-md-3">Text (for option buttons; optional)</div>
+							<div class="col-md-3">Category</div>
+							<div class="col-md-3">Value</div>
+							<div class="col-md-3">Tooltip text</div>
 						</div>
 						{% set col_loop = loop %}
 						{% for item in column %}
 						<div class="row removable_row" data-nrow="{{ loop.index }}">
 							<div class="col-md-3">
 							<select class="form-select" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_type">
-								<option value="input_text" {% if item.type=='input_text' %}selected{% endif %}>Text</option>
+								<option value="tag" {% if item.type=='tag' %}selected{% endif %}>Text</option>
 								<option value="separator" {% if item.type=='separator' %}selected{% endif %}>Separator</option>
 								<option value="header" {% if item.type=='header' %}selected{% endif %}>Header</option>
 							</select>
 							</div>
-							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_name" value="{{ item.name }}"></div>
+							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_category" value="{{ item.category }}"></div>
 							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_value" value="{{ item.value }}"></div>
-							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_text" value="{{ item.text }}"></div>
+							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_tooltip" value="{{ item.tooltip }}"></div>
 						</div>
 						{% endfor %}
 						<div class="row button_row">
 							<div class="col-md-9"></div>
 							<div class="col-md-3">
 								<button type="button" class="btn btn-danger btn-sm del_row">Remove row</button>
-								<button type="button" class="btn btn-primary btn-sm add_row">Add row</button>
+								<button type="button" class="btn btn-primary btn-sm add_row_below">Add row below</button>
+								<button type="button" class="btn btn-primary btn-sm add_row_above">Add row above</button>
 							</div>
 						</div>
 					</div>
@@ -410,8 +422,8 @@
 							<button type="button" class="btn btn-primary add_col">Add column</button>
 						</div>
 					</div>
-					{% endfor %}
 				</div>
+				{% endfor %}
 				<div class="row button_row">
 					<div class="col-md-9"></div>
 					<div class="col-md-3">
@@ -420,14 +432,252 @@
 					</div>
 				</div>
 			</div>
+			<div class="mb-3 option_group">
+				<label for="default_values" class="form-label">Default metadata values</label>
+				<p class="explanation">Some metadata textboxes can be pre-populated with default values. Note that these values are not just placeholders: they will become part of the query if the user does not edit them. Add one line per metadata field, separate field name and its value by a colon (possibly with whitespaces). Currently, it only works for simple string-valued sentence metadata fields. <em>Important</em>: here, the textboxes should be called by the IDs they have in the HTML, e.g. <code>sent_meta_speaker</code> rather than <code>speaker</code> if <code>speaker</code> is a sentence-levele metadata field.</p>
+				<textarea class="form-control" id="default_values" wrap="hard">{% for k in settings.default_values %}{{ k }}: {{ settings.default_values[k] }}
+{% endfor %}</textarea>
+			</div>
+		</div>
+    </div>
+</div>
+<div class="accordion-item">
+	<h2 class="accordion-header" id="heading8">
+		<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse8" aria-expanded="false" aria-controls="collapse8">
+		Main language-specific properties
+		</button>
+	</h2>
+    <div id="collapse8" class="accordion-collapse collapse" aria-labelledby="heading8" data-bs-parent="#setings_accordion">
+		<div class="accordion-body">
+			<div class="mb-3 option_group">
+				<label for="languages" class="form-label">Languages / tiers in the corpus</label>
+				<p class="explanation">Names of the languages or tiers in your corpus data. These names are used in <code>categories.json</code> and as IDs in HTML elements, and can be used as keys in the <code>lang_props</code> dictionary (language-specific properties) and in other settings, see below. Write one per line. The number of lines <em>must</em> coincide with the number of different values of the <code>lang</code> property in corpus JSON files.</p>
+				<textarea class="form-control" id="languages" wrap="hard">{{ settings.languages|join('\n') }}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="rtl_languages" class="form-label">RTL languages</label>
+				<p class="explanation">Names of the languages written in a right-to-left script. Write one per line.</p>
+				<textarea class="form-control" id="rtl_languages" wrap="hard">{{ settings.rtl_languages|join('\n') }}</textarea>
+			</div>
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="context_header_rtl" id="context_header_rtl" {% if settings.context_header_rtl %}checked{% endif %}>
+				<label class="form-check-label" for="context_header_rtl">
+				Search hit headers (title, author etc.) require a right-to-left script.
+				</label>
+			</div>
+			<div class="mb-3 option_group">
+				<p class="form-label">Grammatical tags selection table</p>
+				<p class="explanation">If your corpus is tagged, the user can type tags and their combinations in the <em>Grammar</em> field. However, it is difficult to remember all tags, so you can create tag selection tables, one per language. Put all your tags together with short tooltip explanations there. (If you want to have longer explanations, it's a good idea to list them on the start page of the corpus, which you have to create yourself.) Only create tables for languages that have tagging. The tag buttons are visually grouped into columns. The <em>category</em> text box is used for logical grouping of tags and can contain arbitrary strings (not necessarily those that you have in <code>categories.json</code>), which will not be visible to the user. Whenever several tags from the same category are selected, they get into the query with a logical OR between them; tags from different categories are united with an AND.</p>
+				{% set cur_field = "lang_props.gramm_selection" %}
+				<div style="display: none" class="metafield_stub">
+					{% include "admin/tag_select_language.html" %}
+				</div>
+				{% for key in settings.lang_props %}
+				{% if "gramm_selection" in settings.lang_props[key] %}
+				<div class="meta_column removable_metafield" data-nfield={{ loop.index }}>
+					<label for="{{ cur_field }}_{{ loop.index }}_key" class="form-label">Language name</label>
+					<input type="text" class="form-control" id="{{ cur_field }}_{{ loop.index }}_key" value="{{ key }}">
+					<div style="display: none" class="column_stub">
+						{% include "admin/tag_select_col.html" %}
+					</div>
+					{% set field_loop = loop %}
+					{% for column in settings.lang_props[key].gramm_selection.columns %}
+					<div class="meta_column removable_column" data-ncol="{{ loop.index }}">
+						<div style="display: none" class="row_stub">
+							{% include "admin/tag_select_row.html" %}
+						</div>
+						<h5>Column #{{ loop.index }}</h5>
+						<div class="row selection_table_header">
+							<div class="col-md-3">Element type</div>
+							<div class="col-md-3">Category</div>
+							<div class="col-md-3">Value</div>
+							<div class="col-md-3">Tooltip text</div>
+						</div>
+						{% set col_loop = loop %}
+						{% for item in column %}
+						<div class="row removable_row" data-nrow="{{ loop.index }}">
+							<div class="col-md-3">
+							<select class="form-select" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_type">
+								<option value="tag" {% if item.type=='tag' %}selected{% endif %}>Tag</option>
+								<option value="separator" {% if item.type=='separator' %}selected{% endif %}>Separator</option>
+								<option value="header" {% if item.type=='header' %}selected{% endif %}>Header</option>
+							</select>
+							</div>
+							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_category" value="{{ item.category }}"></div>
+							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_value" value="{{ item.value }}"></div>
+							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_tooltip" value="{{ item.tooltip }}"></div>
+						</div>
+						{% endfor %}
+						<div class="row button_row">
+							<div class="col-md-9"></div>
+							<div class="col-md-3">
+								<button type="button" class="btn btn-danger btn-sm del_row">Remove row</button>
+								<button type="button" class="btn btn-primary btn-sm add_row_below">Add row below</button>
+								<button type="button" class="btn btn-primary btn-sm add_row_above">Add row above</button>
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+					<div class="row button_row">
+						<div class="col-md-9"></div>
+						<div class="col-md-3">
+							<button type="button" class="btn btn-danger del_col">Remove column</button>
+							<button type="button" class="btn btn-primary add_col">Add column</button>
+						</div>
+					</div>
+				</div>
+				{% endif %}
+				{% endfor %}
+				<div class="row button_row">
+					<div class="col-md-9"></div>
+					<div class="col-md-3">
+						<button type="button" class="btn btn-danger del_field">Remove language</button>
+						<button type="button" class="btn btn-primary add_field">Add language</button>
+					</div>
+				</div>
+			</div>
+			<div class="mb-3 option_group">
+				<p class="form-label">Gloss selection table</p>
+				<p class="explanation">If your corpus is glossed, the user can type glosses and their combinations in the <em>Gloss</em> field, using a special language. However, it is difficult to remember all glosses, so you can create gloss selection tables, one per language. Put all your glosses together with short tooltip explanations there. Only create tables for languages that have glossing. The gloss buttons are visually grouped into columns. The <em>category</em> text box is not used for gloss buttons, so leave it blank.</p>
+				{% set cur_field = "lang_props.gloss_selection" %}
+				<div style="display: none" class="metafield_stub">
+					{% include "admin/tag_select_language.html" %}
+				</div>
+				{% for key in settings.lang_props %}
+				{% if "gloss_selection" in settings.lang_props[key] %}
+				<div class="meta_column removable_metafield" data-nfield={{ loop.index }}>
+					<label for="{{ cur_field }}_{{ loop.index }}_key" class="form-label">Language name</label>
+					<input type="text" class="form-control" id="{{ cur_field }}_{{ loop.index }}_key" value="{{ key }}">
+					<div style="display: none" class="column_stub">
+						{% include "admin/tag_select_col.html" %}
+					</div>
+					{% set field_loop = loop %}
+					{% for column in settings.lang_props[key].gloss_selection.columns %}
+					<div class="meta_column removable_column" data-ncol="{{ loop.index }}">
+						<div style="display: none" class="row_stub">
+							{% include "admin/tag_select_row.html" %}
+						</div>
+						<h5>Column #{{ loop.index }}</h5>
+						<div class="row selection_table_header">
+							<div class="col-md-3">Element type</div>
+							<div class="col-md-3">Category</div>
+							<div class="col-md-3">Value</div>
+							<div class="col-md-3">Tooltip text</div>
+						</div>
+						{% set col_loop = loop %}
+						{% for item in column %}
+						<div class="row removable_row" data-nrow="{{ loop.index }}">
+							<div class="col-md-3">
+							<select class="form-select" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_type">
+								<option value="tag" {% if item.type=='tag' %}selected{% endif %}>Tag</option>
+								<option value="separator" {% if item.type=='separator' %}selected{% endif %}>Separator</option>
+								<option value="header" {% if item.type=='header' %}selected{% endif %}>Header</option>
+							</select>
+							</div>
+							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_category" value="{{ item.category }}"></div>
+							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_value" value="{{ item.value }}"></div>
+							<div class="col-md-3"><input type="text" class="form-control" name="{{ cur_field }}_{{ field_loop.index }}.columns_{{ col_loop.index }}_{{ loop.index }}_tooltip" value="{{ item.tooltip }}"></div>
+						</div>
+						{% endfor %}
+						<div class="row button_row">
+							<div class="col-md-9"></div>
+							<div class="col-md-3">
+								<button type="button" class="btn btn-danger btn-sm del_row">Remove row</button>
+								<button type="button" class="btn btn-primary btn-sm add_row_below">Add row below</button>
+								<button type="button" class="btn btn-primary btn-sm add_row_above">Add row above</button>
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+					<div class="row button_row">
+						<div class="col-md-9"></div>
+						<div class="col-md-3">
+							<button type="button" class="btn btn-danger del_col">Remove column</button>
+							<button type="button" class="btn btn-primary add_col">Add column</button>
+						</div>
+					</div>
+				</div>
+				{% endif %}
+				{% endfor %}
+				<div class="row button_row">
+					<div class="col-md-9"></div>
+					<div class="col-md-3">
+						<button type="button" class="btn btn-danger del_field">Remove language</button>
+						<button type="button" class="btn btn-primary add_field">Add language</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="accordion-item">
+	<h2 class="accordion-header" id="heading9">
+		<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse9" aria-expanded="false" aria-controls="collapse9">
+		Additional language-specific properties
+		</button>
+	</h2>
+    <div id="collapse9" class="accordion-collapse collapse" aria-labelledby="heading9" data-bs-parent="#setings_accordion">
+		<div class="accordion-body">
+			<div class="mb-3 option_group">
+				<label for="word_fields_by_tier" class="form-label">Enabled search fields for each language</label>
+				<p class="explanation">Each language/tier that does not support all of the word search fields (e.g. does not support Lemma search because it has no lemmatization) can appear in this dictionary as a key. The corresponding value is a list of all search fields that should be switched on when searching in this tier. This includes all main and additional word-level search fields, except for word form (<code>wf</code>), which is always available. When the user selects a tier, the fields not supported by it, as well as their labels, turn grey (although they are not technically disabled). Write one line per language/tier. Separate language/tier name and list of field names with a colon (possibly with whitespaces). Separate field names with a comma (possibly with whitespaces). If a language does not appear in this list, all search fields will be enabled for it.</p>
+				<textarea class="form-control" id="word_fields_by_tier" wrap="hard">{% for k in settings.word_fields_by_tier %}{{ k }}: {{ settings.word_fields_by_tier[k]|join(', ') }}
+{% endfor %}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="auto_switch_tiers" class="form-label">Automatically switch language if certain fields are filled</label>
+				<p class="explanation">If the user writes something in a field that is not supported by the language/tier which is currently chosen, you can force the interface to switch to another language. Write one field-language pair per line, separated by a colon (possibly with whitespaces).</p>
+				<textarea class="form-control" id="auto_switch_tiers" wrap="hard">{% for k in settings.auto_switch_tiers %}{{ k }}: {{ settings.auto_switch_tiers[k] }}
+{% endfor %}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="lang_props.gr_fields_order" class="form-label">Tag ordering</label>
+				<p class="explanation">By default, grammatical tags displayed next to a word will be sorted lexicographically. If you want to specify the order of tags, you can do so by listing the categories (as represented in <code>categories.json</code>) in the desired order. Write one line per language/tier. Separate language/tier name and its category ordering list with a colon (possibly with whitespaces). Separate category names with a comma (possibly with whitespaces).</p>
+				<textarea class="form-control" id="lang_props.gr_fields_order" wrap="hard">{% for k in settings.lang_props %}{% if "gr_fields_order" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].gr_fields_order|join(', ') }}
+{% endif %}{% endfor %}</textarea>
+			<div class="mb-3 option_group">
+				<label for="lang_props.other_fields_order" class="form-label">Ordering for other fields</label>
+				<p class="explanation">Here you can set the order for non-grammatical analysis fields. If you choose to set the order for a language, then you must list <strong>all</strong> field names that exist in the corpus for that language. Separate language/tier name and its field ordering list with a colon (possibly with whitespaces). Separate field names with a comma (possibly with whitespaces).</p>
+				<textarea class="form-control" id="lang_props.other_fields_order" wrap="hard">{% for k in settings.lang_props %}{% if "other_fields_order" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].other_fields_order|join(', ') }}
+{% endif %}{% endfor %}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="lang_props.dictionary_categories" class="form-label">Dictionary categories</label>
+				<p class="explanation">If you want to separate tags for dictionary/lexical categories (e.g. part of speech) from inflectional tags, you can list the categories for dictionary tags here. (It is currently impossible to treat a category differently depending on other tags the word has, e.g. treat gender as a lexical category for nouns, but as an inflectional category for adjectives. You might store them as different tags under different categories if you would still like to do so.) The dictionary tags will be displayed next to the lemma. Write one line per language/tier. Separate language/tier name and its dictionary category list with a colon (possibly with whitespaces). Separate category names with a comma (possibly with whitespaces).</p>
+				<textarea class="form-control" id="lang_props.dictionary_categories" wrap="hard">{% for k in settings.lang_props %}{% if "dictionary_categories" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].dictionary_categories|join(', ') }}
+{% endif %}{% endfor %}</textarea>
+			</div>
 		</div>
     </div>
 </div>
 
 
 
-
-
+<div class="accordion-item">
+    <h2 class="accordion-header" id="headingSave">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSave" aria-expanded="false" aria-controls="collapseSave" id="accordion_save_header_button">
+        <strong>Save changes</strong>
+      </button>
+    </h2>
+    <div id="collapseSave" class="accordion-collapse collapse" aria-labelledby="headingSave" data-bs-parent="#setings_accordion">
+		<div class="accordion-body centered">
+			<div class="row">
+				<div class="col-sm-3"></div>
+				<div class="col-sm-6" style="display: flex">
+					<button class="btn btn-primary btn-lg" id="save_changes">Save changes</button>
+				</div>
+			</div>
+			<p>Remember that the changes are saved to a file in the root folder of your Tsakorpus installation. You will have to move the file to <code>/conf</code> for the changes to take effect.</p>
+		</div>
+		<div class="row">
+			<div class="col-sm-3"></div>
+			<div class="alert alert-success alert-dismissible fade col-sm-6 centered" role="alert" id="changes_saved">
+				Changes have been saved.
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			</div>
+		</div>
+	</div>
+</div>
 
 </div>
 </form>

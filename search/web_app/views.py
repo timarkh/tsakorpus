@@ -679,3 +679,11 @@ def setup_corpus():
     return render_template('admin/corpus_setup.html',
                            filename=os.path.abspath('../corpus.json'),
                            settings=settings.as_dict())
+
+
+@app.route('/config_update', methods=['POST'])
+def setup_corpus_save_changes():
+    if not request.host.strip('/').endswith(('0.0.0.0:7342', '127.0.0.1:7342')):
+        return 'This page can only be accessed from localhost.', 403
+    print(request.form)
+    return jsonify(result='OK')
