@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Short FAQ &#8212; tsakorpus 2.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting started" href="overview.html" />
+    <link rel="prev" title="Tsakorpus" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="short-faq">
+<h1>Short FAQ<a class="headerlink" href="#short-faq" title="Permalink to this headline">¶</a></h1>
+<p>Here are some short answers to common questions. They can help you decide if Tsakorpus is what you need.</p>
+<div class="section" id="from-the-developer-s-perspective">
+<h2>From the developer’s perspective<a class="headerlink" href="#from-the-developer-s-perspective" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Is the platform open source and free to use for any purpose?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Will it work if my corpus has &lt;= 1 million words?</em></div>
+<div class="line"><strong>A</strong>: Definitely yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Will it work if my corpus has 10-20 million words?</em></div>
+<div class="line"><strong>A</strong>: Yes, but you’ll want to use more memory (say, 3-4 Gb), otherwise complex multi-word queries may be slow.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Will it work if my corpus has 100-200 million words?</em></div>
+<div class="line"><strong>A</strong>: The largest corpus people have tried tsakorpus on so far has about 280 million words (or about 300 million tokens, counting the punctuation). It seems to work ok with at least 8 Gb memory (but more is better). Larger corpora are probably also ok, but no guarantees. And multi-word queries will be slow anyway.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I have audio/video alignment so that the users can listen/watch whatever they find?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I have aligned translations in multiple languages?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I have arbitrary document-level metadata?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I have sentence-level metadata, such as age or sex of the speaker in dialogues?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I have words with multiple ambiguous analyses?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I have analyses/metadata attached to arbitrary spans of text longer than one word?</em></div>
+<div class="line"><strong>A</strong>: Not exactly. You can have annotated multi-word spans, and this annotation will be visible in the search results. But you cannot search for them directly. You would have to either assign that annotation to each word of the span or assign it to the sentence as sentence-level metadata. In both cases, it will become searchable, but will be impossible to count how many spans have been found.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I have syntactic annotation (dependencies/constituents)?</em></div>
+<div class="line"><strong>A</strong>: No.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Is it possible to offer web interface in several languages?</em></div>
+<div class="line"><strong>A</strong>: Yes. English and Russian are in the box, but you may add other languages. There are a lot of strings to translate though.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I have several transliteration options?</em></div>
+<div class="line"><strong>A</strong>: Yes. Some are in the box; if you want to create your own, you will have to implement it as a Python function.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I install the platform on my personal computer and use it alone?</em></div>
+<div class="line"><strong>A</strong>: Yes. But it’s just as complicated as installing it on a server: you will have to install Elasticsearch and run the platform server. Tsakorpus is primarily designed for publishing your corpus online.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>I do not have access to any server. Can I still use this platform to put my corpus online?</em></div>
+<div class="line"><strong>A</strong>: No, you have to find a server.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>What are the system requirements for the server?</em></div>
+<div class="line"><strong>A</strong>: Linux with apache/nginx configured for use with Python 3.x. The more memory, the better, but I guess at least 2 Gb should be made available to Elasticsearch, with additional 1-2 Gb for the ingest script. Required disk space depends on corpus size and annotation. Very roughly, you could expect 0.5-1 Gb per million tokens.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>I am a linguist who is not afraid of words like</em> SSH <em>or</em> repository <em>and had some programming experience in the university, but has mostly forgotten it all by now. Will it be too difficult for me to use the platform without any help?</em></div>
+<div class="line"><strong>A</strong>: If your corpus is in one of the formats for which Tsakorpus has source convertors, than probably it will be okay. You will have to fill in some lengthy configuration files and put it all to the server, but no actual programming is required.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>I am a linguist who has never dealt with servers or any kind of programming. How can I use the platform for my corpus?</em></div>
+<div class="line"><strong>A</strong>: The easiest way is to hire a computational linguistics / computer science student. An average undergraduate student in their pre-final or final year should be able to do this.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>How much time will it take to set up a fully functional corpus if I already have the source files?</em></div>
+<div class="line"><strong>A</strong>: That depends on the kind of data you have. If the format is simple, there is a <a class="reference internal" href="src_convertors.html"><span class="doc">convertor</span></a> for it and nothing unexpected happens, the process should be pretty straightforward. It can turn out that you have to write some scripts for data conversion, which will make the process longer. Even in the simplest case, there are a lot of options to configure and, consequently, a lot of documentation to read. If this is your first experience with Tsakorpus, you will probably need at least one working day to get acquainted with it.</div>
+</div>
+</div>
+<div class="section" id="from-the-user-s-perspective">
+<h2>From the user’s perspective<a class="headerlink" href="#from-the-user-s-perspective" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I search with regular expressions?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I simultaneously set several annotation fields when searching for a word, e.g. lemma, grammatical tags and translation?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>When I find a sentence, can I look at its context (several neighboring sentences)?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>When I find a sentence, can I read the whole text?</em></div>
+<div class="line"><strong>A</strong>: Yes, but only if the corpus developers allow it.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I download the results I found?</em></div>
+<div class="line"><strong>A</strong>: Yes, but only the pages you’ve looked at, not all the results at once.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I select a subcorpus, i.e. a subset of corpus texts, based on metadata, and search only inside it?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>If the corpus has morphological annotation, can I search for e.g. nouns that are in the genitive or in the dative, but not in plural?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>If the corpus is glossed, can I search for words that have, say, an iterative marker that starts with “a” followed immediately by any passive marker?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I search for expressions / multiple words inside one sentence?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I search for multiple words within any segments larger than sentence (like paragraph or text)?</em></div>
+<div class="line"><strong>A</strong>: No.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I search for sentences that</em> do not <em>contain certain words?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I get frequency lists of words or lemmata that conform to my query?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I get frequency lists of words that conform to a query and occupy a certain slot in a construction?</em></div>
+<div class="line"><strong>A</strong>: Yes, but if your construction is too complex and the corpus is large, you will only see the list based on a random sample of corpus sentences.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I get lists of n-grams or learn something about their pointwise mutual information etc.?</em></div>
+<div class="line"><strong>A</strong>: No.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I see charts comparing the usage of certain words/expressions between genres, years etc.?</em></div>
+<div class="line"><strong>A</strong>: Yes.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Q</strong>: <em>Can I save a query for later use and get the results in the same order?</em></div>
+<div class="line"><strong>A</strong>: Yes, if the corpus is not re-indexed until then.</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">tsakorpus</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Short FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#from-the-developer-s-perspective">From the developer’s perspective</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#from-the-user-s-perspective">From the user’s perspective</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forks.html">Forks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="src_convertors.html">Source convertors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Conversion-time morphological analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eaf2json.html">ELAN convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Tsakorpus</a></li>
+      <li>Next: <a href="overview.html" title="next chapter">Getting started</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Timofey Arkhangelskiy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/faq.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

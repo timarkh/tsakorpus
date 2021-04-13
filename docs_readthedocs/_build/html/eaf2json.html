@@ -1,0 +1,261 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELAN convertor &#8212; tsakorpus 2.0 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RNC XML convertor" href="xml_rnc2json.html" />
+    <link rel="prev" title="Conversion-time morphological analysis" href="parsed_wordlist_format.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="elan-convertor">
+<h1>ELAN convertor<a class="headerlink" href="#elan-convertor" title="Permalink to this headline">¶</a></h1>
+<p>This document explains what kind of ELAN files Tsakorpus understands and how to convert them to Tsakorpus JSON. See general information about source convertors and their configuration files <a class="reference internal" href="src_convertors.html"><span class="doc">here</span></a>.</p>
+<div class="section" id="elan-format">
+<h2>ELAN format<a class="headerlink" href="#elan-format" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://tla.mpi.nl/tools/tla-tools/elan/">ELAN</a> is a widely adopted linguistic tool for transcribing audio or video recordings. The sound-aligned transcription and (possibly) annotation are displayed in a set of hierarchically organized tiers and stored in XML files, which normally have the <code class="docutils literal notranslate"><span class="pre">.eaf</span></code> extension. The annotation may be carried out manually or exported from other tools, e.g. <a class="reference external" href="https://software.sil.org/fieldworks/">FieldWorks</a>.</p>
+<p>The problem with the ELAN XML format is that the same data may be represented by multiple different tier structures, or by similar structures with different naming conventions. Different structures may look approximately the same from the user’s perspective, but the convertor will have to process them differently. Therefore, it is impossible for a single convertor to accept any ELAN file. What follows is an explanation of what kind of structures the Tsakorpus convertor understands.</p>
+<p>The file can be a transcription of a monologue (one speaker) or a dialogue (multiple speakers). If there are multiple speakers, then for each speaker, there should be a separate set of tiers that contains the transcription of their speech and the corresponding annotation.</p>
+<p>The level of segmentation granularity (duration of segments) is not important for the convertor and should be based on your linguistic needs. By default, one segment is treated as one sentence (i.e. basic search unit) in Tsakorpus, so in a normal general-purpose corpus you would probably want to have one phrase, intonational unit or sentence per segment. However, there is an option of conversion-time sentence segmentation (somewhat resembling the paradigm used in <a class="reference external" href="https://exmaralda.org/en/">EXMARaLDA</a>, where time alignment is decoupled from sentence segmantation). If you set <code class="docutils literal notranslate"><span class="pre">sentence_segmentation</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">true</span></code>, the convertor will join adjacent segments that do not have sentence-final punctuation (which is set as a regex in the <code class="docutils literal notranslate"><span class="pre">sent_end_punc</span></code> parameter). In this case, you can have multiple media alignment units within one sentence, which could correspond e.g. to intonational units. However, it is not possible to use the time alignment units in search, i.e. it is not possible to look for several words inside one such unit.</p>
+</div>
+<div class="section" id="tier-hierarchy">
+<h2>Tier hierarchy<a class="headerlink" href="#tier-hierarchy" title="Permalink to this headline">¶</a></h2>
+<p>For each speaker, there should be only one time-aligned (independent, “main”) tier. The <code class="docutils literal notranslate"><span class="pre">PARTICIPANT</span></code> attribute of this tier should contain a speaker ID (arbitrary string, e.g. their initials or a code like <code class="docutils literal notranslate"><span class="pre">apk1948_m</span></code>). The IDs of the speakers should be used consistently throughout the corpus, i.e. same speakers should have same IDs in different files, and different speakers should have different IDs. Other attributes (e.g. <code class="docutils literal notranslate"><span class="pre">ANNOTATOR</span></code>) are not taken into account. This main tier should contain either the transcription, or segment IDs (<code class="docutils literal notranslate"><span class="pre">ref</span></code> tier, in FieldWorks/Toolbox terms). If it contains segment IDs, a transcription tier should be <a class="reference external" href="https://www.mpi.nl/corpus/html/elan/ch02.html">symbolically associated</a> with it. If you use several representations of a transcription (e.g. in different scripts), you will have to treat one of them as primary.</p>
+<p>All translations into metalanguages, as well as alternative representations of the same transcription, sentence-level notes and sentence-level metadata, should reside in separate tiers symbolically associated with the main tier.</p>
+<p>If you do not have tiers with token segmentation or word-level annotation (e.g. morphology), Tsakorpus will tokenize the text for you. If you provide a list of annotated word forms, it will also be annotated. See <a class="reference internal" href="src_convertors.html"><span class="doc">Source convertors</span></a> for the list of relevant parameters.</p>
+<p>If you do have word-level annotation, e.g. morphological analysis, there should be a tokenized tier, which should be a <em>symbolic subdivision</em> of the “main” tier. You can list all tokens (including punctuation) or just word tokens there. There should be no mismatches between words in the “main” tier and in the tokenized one, i.e. same words should look the same in the two tiers. All further annotation tiers (morpheme segmentation, glosses, POS, lemma etc.) should <em>subdivide</em> or <em>be symbolically associated with</em> this tokenized tier. If there are tokens with multiple analyses (e.g. resulting from a rule-based automatic morphological annotation that does not disambiguate based on the context), the next tier down the hierarchy (e.g. lemma) should subdivide the token. You will have as many lemmata as you have analyses for that token; each lemma cell will head one of the analyses. If you always have at most one analysis per token (which is the case for most manually annotated corpora), <em>symbolic association</em> can be used.</p>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="basic-tier-configuration">
+<h3>Basic tier configuration<a class="headerlink" href="#basic-tier-configuration" title="Permalink to this headline">¶</a></h3>
+<p>You should explain the convertor which tier contain which information. There are several parameters in <code class="docutils literal notranslate"><span class="pre">conversion_settings.json</span></code> that do that. In what follows, <em>tier name</em> means either a string or a regular expression used to identify tiers in your EAFs. The convertor first looks for exact coincidences among <a class="reference external" href="https://www.mpi.nl/corpus/html/elan_ug/ch03.html">tier types</a>. If it does not find a match, it then uses the <em>tier name</em> as a regex to search among tier IDs. (Although having consistent and informative tier types throughout your corpus is best practice, there are corpora where you can only distinguish between e.g. lemma and POS tiers based on their IDs because they have the same type. This regex thing is a workaround for such cases.)</p>
+<p>Note that the term <em>languages</em> in the case of ELAN files is synonymous with <em>(non-analysis) tiers</em>. For example, if you have a “reference tier”, or a tier with an alternative orthography, they will have to be treated as different languages.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">main_tiers</span></code> is a list with the names of the top-level / time-aligned tiers. Normally, this array will contain only one name. There may be multiple such tiers in each file, each corresponding to one participant, but they normally have the same type and/or the same naming pattern, e.g. <code class="docutils literal notranslate"><span class="pre">tx&#64;.*</span></code> or <code class="docutils literal notranslate"><span class="pre">.*_Text</span></code>. “Main tiers” usually means “transcription tiers”, but not always. For example, it is common to have the “reference tier” as a top-level tier and the transcription tier as its daughter in FieldWorks corpora. If you want to reorder the tiers in the web interface (e.g. make the transcription appear at the top and the sentence IDs on the bottom), you can do that by ordering the corresponding languages in the <code class="docutils literal notranslate"><span class="pre">languages</span></code> list.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">aligned_tiers</span></code> is a list with the names of translation/comment/transcription tiers that have a main tier as their parent.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">analysis_tiers</span></code> (optional) is a dictionary describing which ELAN tiers correspond to which word-level analysis fields. The keys are the <em>tier names</em> (plain strings or regexes), and the values are the names of the analysis fields where the annotations from those tiers should end up. Pre-defined values, i.e. field names, are the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">word</span></code> for tokens/words</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lemma</span></code> for lemmata</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pos</span></code> for part of speech</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gramm</span></code> for any number of comma-separated grammatical tags (this may include part of speech as well; do not include a <code class="docutils literal notranslate"><span class="pre">pos</span></code> tier in this case)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">parts</span></code> for morpheme segmentation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gloss</span></code> for glosses</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>Annotations that belong to these tiers are processed in a special way, e.g. grammatical tags are sorted by category. Any other value (e.g. <code class="docutils literal notranslate"><span class="pre">trans_en</span></code>) will be added to the analyses as a field with the same name, and the annotations will be transfered there without change.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tier_languages</span></code> is a dictionary where keys are the names of the tier types (listed in <code class="docutils literal notranslate"><span class="pre">main_tiers</span></code> and <code class="docutils literal notranslate"><span class="pre">analysis_tiers</span></code>) and the values are the names of their languages.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">one_morph_per_cell</span></code> (Boolean, optional; only if you have glossing) – whether the annotation tiers contain one cell per morpheme/gloss (<code class="docutils literal notranslate"><span class="pre">true</span></code>) or the whole morpheme segmentation / glossing is written inside one cell with hyphens as separators (<code class="docutils literal notranslate"><span class="pre">false</span></code>). For example, if the morpheme segmentation of the German word <em>ge-schloss-en</em> is kept in three different cells (<em>ge-</em>, <em>schloss</em> and <em>-en</em>), this value should be set to true. Defaults to <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
+</ul>
+<p>Here is an example of a relevant part of the <code class="docutils literal notranslate"><span class="pre">conversion_settings.json</span></code> file:</p>
+<div class="highlight-javascript notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="c1">// ...</span>
+  <span class="s2">&quot;languages&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;klingon&quot;</span><span class="p">,</span> <span class="s2">&quot;english&quot;</span><span class="p">,</span> <span class="s2">&quot;english_note&quot;</span><span class="p">,</span> <span class="s2">&quot;ref&quot;</span><span class="p">],</span>
+  <span class="s2">&quot;tier_languages&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;tx@.*&quot;</span><span class="o">:</span> <span class="s2">&quot;klingon&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ft@.*&quot;</span><span class="o">:</span> <span class="s2">&quot;english&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;not@.*&quot;</span><span class="o">:</span> <span class="s2">&quot;english_note&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ref@.*&quot;</span><span class="o">:</span> <span class="s2">&quot;ref&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;main_tiers&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;ref@.*&quot;</span><span class="p">],</span>
+  <span class="s2">&quot;aligned_tiers&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;tx@.*&quot;</span><span class="p">,</span> <span class="s2">&quot;ft@.*&quot;</span><span class="p">,</span> <span class="s2">&quot;not@.*&quot;</span><span class="p">],</span>
+  <span class="s2">&quot;analysis_tiers&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;word@.*&quot;</span><span class="o">:</span> <span class="s2">&quot;word&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ps@.*&quot;</span><span class="o">:</span> <span class="s2">&quot;pos&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mb@.*&quot;</span><span class="o">:</span> <span class="s2">&quot;parts&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ge@.*&quot;</span><span class="o">:</span> <span class="s2">&quot;gloss&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;one_morph_per_cell&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="other-configuration">
+<h3>Other configuration<a class="headerlink" href="#other-configuration" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ignore_tokens</span></code> (string, optional) – a regex that describes which tokens should be skipped when automatically aligning a token tier with a text tier. Defaults to common Western punctuation marks.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sentence_segmentation</span></code> (Boolean, optional) – whether the convertor should resegment your text into sentences based on sentence-final punctuation set in <code class="docutils literal notranslate"><span class="pre">sent_end_punc</span></code>. If <code class="docutils literal notranslate"><span class="pre">false</span></code>, the time-aligned segments are treated as sentences. Defaults to <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">media_length</span></code> (integer) – the length of one media file piece in seconds. All media files will be split into overlapping pieces of that length, so that the user does not have to download the entire file to listen for one sentence.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">media_dir</span></code> (string, optional) – path to the media files to be cut, if they are located in a different folder than the ELAN files.</p></li>
+</ul>
+</div>
+<div class="section" id="span-annotations">
+<h3>Span annotations<a class="headerlink" href="#span-annotations" title="Permalink to this headline">¶</a></h3>
+<p>The previous section described what to do with sentence-level and word-level annotations. What if you have span annotations that may cover multiple words or even sentences, e.g. code switching or some kind of discourse annotation?</p>
+<p>Tsakorpus generally allows for span annotations, but with serious limitations. Span annotations can be displayed in the search results, but they cannot be searched for directly, unlike word-level and sentence-level annotations. One way to partially make them searchable is add these annotations to the sentence-level metadata. This way, it will be possible to search for them just like you search e.g. for sentences belonging to a particular speaker. The downside of this approach is that Tsakorpus cannot count the number of spans found, only the number of sentences where such spans exist. It also cannot search for words within certain kinds of spans, only for words in sentences that contain those spans.</p>
+<p>Another problem is the way such annotations are stored in ELAN. ELAN has no dedicated means for that: you can only subdivide cells in daughter tiers, but not unite them into one span. This is why there are dozens of ways such annotations can be stored in ELAN files, all of them far from ideal from the point of view of machine readability.</p>
+<p>Tsakorpus understands one of them. In this approach, your span annotation resides in a separate <em>time-aligned</em> tier, where cell boundaries are <em>visually</em> aligned with the boundaries in the token tier. Visual alignment is bad because it is not machine-readable, and there can be tiny mismatches invisible to the naked eye, but no significantly better solution exists at the moment. Tsakorpus will try to match tokens with the cell boundaries in such tiers. Then it will put spans to the JSON sentence for display purposes and add something to the sentence-level metadata.</p>
+<p>The way span tiers should be processed is defined by th <code class="docutils literal notranslate"><span class="pre">span_annotation_tiers</span></code> dictionary. Its keys are <em>tier names</em>, and values are dictionaries with several pre-defined keys:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">languages</span></code> (list of strings) – names of languages/tiers the spans should be added to.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sentence_meta</span></code> (string) – name of a new sentence-level metadata field associated with this span tier. Values of its annotations will be stored under this key in the sentences with which they overlap.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">styles</span></code> (dictionary) – determines <span class="xref std std-doc">style classes</span> for each annotation value. The keys are annotation values, the values are style class names. Styles determine how the spans will be highlighted in the search results. You may add styles only to certain values.</p></li>
+</ul>
+<p>Here is an example:</p>
+<div class="highlight-javascript notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="s2">&quot;span_annotation_tiers&quot;</span><span class="o">:</span> <span class="p">{</span>
+  <span class="s2">&quot;rp@.*&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;languages&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;joola&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;sentence_meta&quot;</span><span class="o">:</span> <span class="s2">&quot;rp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;styles&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&quot;Discourse Report&quot;</span><span class="o">:</span> <span class="s2">&quot;disc_rep&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;Discourse Reporting Event&quot;</span><span class="o">:</span> <span class="s2">&quot;disc_rep_event&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;Quotative&quot;</span><span class="o">:</span> <span class="s2">&quot;disc_rep_quotative&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;Demonstrative&quot;</span><span class="o">:</span> <span class="s2">&quot;disc_rep_demonstrative&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;Other&quot;</span><span class="o">:</span> <span class="s2">&quot;disc_rep_other&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Here, all tiers whose name starts with <code class="docutils literal notranslate"><span class="pre">rp&#64;</span></code> are treated as span tiers. The spans should only be added to the sentences in the <code class="docutils literal notranslate"><span class="pre">joola</span></code> language. The values from this tier’s segments will be added to the sentence-level metadata field called <code class="docutils literal notranslate"><span class="pre">rp</span></code>. Spans with five specific values will be additionally assigned certain style classes so that they can be highlighted in the search hits.</p>
+</div>
+</div>
+<div class="section" id="media-files">
+<h2>Media files<a class="headerlink" href="#media-files" title="Permalink to this headline">¶</a></h2>
+<p>The source audio/video files will be split into small pieces with <a class="reference external" href="https://www.ffmpeg.org/">ffmpeg</a>. You have to have it installed. If you are working in Windows, then its directory should be in the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> variable.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">tsakorpus</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Short FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forks.html">Forks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="src_convertors.html">Source convertors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Conversion-time morphological analysis</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ELAN convertor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#elan-format">ELAN format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tier-hierarchy">Tier hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#media-files">Media files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="parsed_wordlist_format.html" title="previous chapter">Conversion-time morphological analysis</a></li>
+      <li>Next: <a href="xml_rnc2json.html" title="next chapter">RNC XML convertor</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Timofey Arkhangelskiy.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/eaf2json.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
