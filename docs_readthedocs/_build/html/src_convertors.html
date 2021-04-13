@@ -36,7 +36,7 @@
 <h1>Source convertors<a class="headerlink" href="#source-convertors" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>Before indexing, your corpus data has to be transformed into <span class="xref std std-doc">Tsakorpus JSON</span> format. Tsakorpus includes customizable source conversion scripts for a number of source file formats. However, if your format is not supported or you do not get the result you expected, you will have to write a convertor yourself.</p>
+<p>Before indexing, your corpus data has to be transformed into <a class="reference internal" href="data_model.html"><span class="doc">Tsakorpus JSON</span></a> format. Tsakorpus includes customizable source conversion scripts for a number of source file formats. However, if your format is not supported or you do not get the result you expected, you will have to write a convertor yourself.</p>
 <p>All files related to the convertors are located in <code class="docutils literal notranslate"><span class="pre">/src_convertors</span></code>.</p>
 <p>This is how it works:</p>
 <ol class="arabic simple">
@@ -90,7 +90,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">coma_meta_conversion</span></code> (dictionary, optional) – determines which communication-level description fields from a Coma metadata file have to be used and what metadata fields they map to. Only usable with the Coma metadata files.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">speaker_meta_filename</span></code> (string, optional) – the name of the JSON file with metadata for individual speakers (for the ELAN convertor). The file should contain a dictionary where the keys are the codes of the speakers and the values are dictionaries with their metadata (fields and plain string/integer values). Here is an example of how such a file could look like:</p></li>
 </ul>
-<div class="highlight-xml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<div class="highlight-javascript notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
 <span class="normal"> 4</span>
@@ -99,16 +99,16 @@
 <span class="normal"> 7</span>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
-<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span>{
-  &quot;AB&quot;: {
-    &quot;gender&quot;: &quot;F&quot;,
-    &quot;origin&quot;: &quot;Moscow&quot;
-  },
-  &quot;PR&quot;: {
-    &quot;gender&quot;: &quot;M&quot;,
-    &quot;origin&quot;: &quot;New York&quot;
-  }
-}
+<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;AB&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;gender&quot;</span><span class="o">:</span> <span class="s2">&quot;F&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;origin&quot;</span><span class="o">:</span> <span class="s2">&quot;Moscow&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;PR&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;gender&quot;</span><span class="o">:</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;origin&quot;</span><span class="o">:</span> <span class="s2">&quot;New York&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </td></tr></table></div>
 </div>
@@ -147,9 +147,9 @@
 <div class="section" id="commonly-used-convertors">
 <h3>Commonly used convertors<a class="headerlink" href="#commonly-used-convertors" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p><span class="xref std std-doc">Plain text convertor</span>: <code class="docutils literal notranslate"><span class="pre">txt2json.py</span></code>.</p></li>
+<li><p><a class="reference internal" href="txt2json.html"><span class="doc">Plain text convertor</span></a>: <code class="docutils literal notranslate"><span class="pre">txt2json.py</span></code>.</p></li>
 <li><p><a class="reference internal" href="eaf2json.html"><span class="doc">ELAN media-aligned files convertor</span></a>: <code class="docutils literal notranslate"><span class="pre">eaf2json.py</span></code>.</p></li>
-<li><p><span class="xref std std-doc">Fieldworks FLEX glossed texts convertor</span>: <code class="docutils literal notranslate"><span class="pre">xml_flex2json.py</span></code>.</p></li>
+<li><p><a class="reference internal" href="xml_flex2json.html"><span class="doc">Fieldworks FLEX glossed texts convertor</span></a>: <code class="docutils literal notranslate"><span class="pre">xml_flex2json.py</span></code>.</p></li>
 <li><p><a class="reference internal" href="xml_rnc2json.html"><span class="doc">Convertor of morphologically annotated XML (possibly parallel)</span></a> in one of the formats used by Russian National Corpus: <code class="docutils literal notranslate"><span class="pre">xml_rnc2json.py</span></code>.</p></li>
 </ul>
 </div>
@@ -171,11 +171,11 @@
 <p>### Processing glossed text (xml_flex2json, iso_tei_hamburg2json, exmaralda_hamburg2json, eaf2json)
 The default way of representing word-level morphological information in corpus linguistics is to assign each word a grammatical tag or a set of tags. Each tag represents one value of one particular morphosyntactic category. Part-of-speech (POS) tags are the most common example, but corpora of morphologically rich languages often have tags for other categories, such as tense, number or case. Information about lexical classes, such as animate nouns or motion verbs, can also be encoded in such a way. In tsakorpus, each tag is a string, and all tags are split into classes (e.g. “case tags”) in <code class="docutils literal notranslate"><span class="pre">categories.json</span></code> (see <code class="docutils literal notranslate"><span class="pre">configuration.md</span></code>).</p>
 <p>In typology and language documentation, however, another approach is often used, which is called glossing. Glossing means that each word is split into morphemes, and each morpheme gets a label, called gloss, that summarizes the morphosyntactic values expressed in it. Stems/roots are usually glossed with their English translation, although translations in other major metalanguages are also common. The most widely adopted glossing styleguide is the [Leipzig glossing rules](<a class="reference external" href="https://www.eva.mpg.de/lingua/resources/glossing-rules.php">https://www.eva.mpg.de/lingua/resources/glossing-rules.php</a>).</p>
-<p>However, if only glosses are present in the annotation, it may affect the search functionality of the corpus in a negative way. To address this problem, tsakorpus source convertors offer a possibility of converting one’s glosses into grammatical tags. Please refer to <span class="xref std std-doc">tags_vs_glosses</span> for more detailed explanations and the format of the conversion rules.</p>
+<p>However, if only glosses are present in the annotation, it may affect the search functionality of the corpus in a negative way. To address this problem, tsakorpus source convertors offer a possibility of converting one’s glosses into grammatical tags. Please refer to <a class="reference internal" href="tags_vs_glosses.html"><span class="doc">&lt;no title&gt;</span></a> for more detailed explanations and the format of the conversion rules.</p>
 <p>### Fieldworks FLEX files conversion (flex2json)
 To convert your FLEX database, you first have to export it using the “Verifiable generic XML” option. When exporting, the “Interlinear texts” section should be active, the “Analyze” tab should be open, and all relevant annotation tiers should be switched on and visible.</p>
 <p>There are several problems with Fieldworks files. First, XMLs coming from different versions of Fieldworks look differently. Second, the exported XML does not have any connection to the dictionary (there should be one, but it does not work as of now), so any dictionary information not present in the interlinear will be lost. Third, Fieldworks does not have the lemma concept, so either you will have stems instead of lemmata, or you will have to somehow reconstruct lemmata from stems and grammatical information yourself. Fourth, all inflectional morphological information is stored in the glosses, so if some category is not overtly marked (which is common for e.g. singular, nominative/absolutive or imperative) and you do not have null morphemes, you will not be able to search for it unless you reconstruct it.</p>
-<p>Tsakorpus FLEX convertor addresses the first problem by using flexible data extraction that was tested on different kinds of XML. Nevertheless, I cannot guarantee that it will work with any FLEX XML. I do not have any solution for second and third problems. The fourth problem can be solved by writing a set of rules which will allow the convertor to reconstruct hidden categories (see <span class="xref std std-doc">tags_vs_glosses</span>).</p>
+<p>Tsakorpus FLEX convertor addresses the first problem by using flexible data extraction that was tested on different kinds of XML. Nevertheless, I cannot guarantee that it will work with any FLEX XML. I do not have any solution for second and third problems. The fourth problem can be solved by writing a set of rules which will allow the convertor to reconstruct hidden categories (see <a class="reference internal" href="tags_vs_glosses.html"><span class="doc">&lt;no title&gt;</span></a>).</p>
 </div>
 </div>
 
@@ -213,6 +213,7 @@ To convert your FLEX database, you first have to export it using the “Verifiab
 <li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Conversion-time morphological analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eaf2json.html">ELAN convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_model.html">Data model</a></li>
 </ul>
 
 <div class="relations">

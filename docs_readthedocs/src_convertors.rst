@@ -78,7 +78,7 @@ In most cases, it is expected that metadata for your texts (such as title, autho
 
 - ``speaker_meta_filename`` (string, optional) -- the name of the JSON file with metadata for individual speakers (for the ELAN convertor). The file should contain a dictionary where the keys are the codes of the speakers and the values are dictionaries with their metadata (fields and plain string/integer values). Here is an example of how such a file could look like:
 
-.. code-block:: xml
+.. code-block:: javascript
   :linenos:
 
   {

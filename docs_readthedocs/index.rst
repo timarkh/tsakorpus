@@ -25,7 +25,7 @@ Here is a fact sheet about Tsakorpus:
 * Tsakorpus includes a number of source convertors that can turn raw or annotated texts in widely used formats in the JSON format it requires.
 * Tsakorpus is only suitable for publishing and searching in your corpus, but **not for annotating or managing your corpus data**.
 
-See :doc:`FAQ </faq>` for a short list of commonly asked questions, which can help you decide if Tsakorpus suits your purposes.
+See :doc:`FAQ </faq>` for a short list of commonly asked questions, which can help you decide if Tsakorpus suits your purposes. If you want to learn how to set up Tsakorpus, please go to :doc:`overview`.
 
 If you are not sure Tsakorpus is what you need, you can compare it to other common corpus analysis software:
 
@@ -48,28 +48,6 @@ If you are not sure Tsakorpus is what you need, you can compare it to other comm
 .. _Corpus Workbench: http://cwb.sourceforge.net/index.php
 .. _Korp: https://spraakbanken.gu.se/en/tools/korp/distribution-and-development
 .. _SpoCo: https://bitbucket.org/michauw/spoco/src/master/
-
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-   
-   faq
-   overview
-   forks
-   src_convertors
-   parsed_wordlist_format
-   tags_vs_glosses
-   txt2json
-   eaf2json
-   xml_flex2json
-   xml_rnc2json
-   data_model
-   configuration
-   indexator
-   interface_languages
-   transliteration
-   styles
 
 Requirements
 ------------
@@ -104,6 +82,27 @@ License
 
 The software is distributed under MIT license.
 
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+   
+   faq
+   overview
+   forks
+   src_convertors
+   parsed_wordlist_format
+   tags_vs_glosses
+   txt2json
+   eaf2json
+   xml_flex2json
+   xml_rnc2json
+   data_model
+   configuration
+   indexator
+   interface_languages
+   transliteration
+   styles
 
 
 Indices and tables

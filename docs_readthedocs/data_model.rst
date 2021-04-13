@@ -1,61 +1,72 @@
 Data model
-----------
+==========
 
-A corpus which can be indexed by Tsakorpus is a collection of JSON or gzipped JSON files structured according to the rules described below. The corpus may contain any number of files scattered across a file system subtree starting with ``/corpus/%your_corpus_name%``. The files must be stored in UTF-8 without BOM.
+Introduction
+------------
 
-There are three major kinds of objects in Tsakorpus: *documents*, *sentences* and *tokens*. Normally, a document represents one text, a sentence represents, well, one sentence, and tokens represent words or punctuation marks. However, you can interpret these objects differently. for
+There are three major kinds of objects in Tsakorpus: *documents*, *sentences* and *tokens*. Normally, a document represents one text, a sentence represents, well, one sentence, and tokens represent words or punctuation marks. However, you can interpret these objects differently. For example, a *sentence* might correspond to one intonational unit or one line of verse. It is impossible not to split the text into sentences, since sentence is the basic search unit.
 
-Each JSON file stores a dictionary representing one corpus document. Each dictionary should have the following keys:
+A corpus should be a collection of JSON or gzipped JSON files structured according to the rules described below. The corpus may contain any number of files scattered across a file system subtree starting with ``/corpus/%your_corpus_name%``. The files must be stored in UTF-8 without BOM.
 
-* ``meta`` -- a dictionary with the metadata for the document.
-* ``sentences`` -- an array of sentences the document consists of.
+Each JSON file contains a dictionary representing one corpus document. Each dictionary should have the following keys:
 
-The document has, therefore, the following structure:
+* ``meta`` -- a dictionary with the document-level metadata.
+* ``sentences`` -- a list of sentences the document consists of.
 
-```
-{
-  "meta": {...},
-  "sentences": [...]
-}
-```
+The document has, therefore, the following structure::
 
-### The metadata
-The value of the ``meta`` key is a dictionary where keys are the names of the metafields and the values are strings. All metafields listed in the ``viewable_meta`` array in ``conf/corpus.json`` must be present in each document of the corpus. Other than that, there are no restrictions on metadata; the array may even be empty. However, there are several field names which get special treatment in tsakorpus:
+.. code-block:: javascript
+  :linenos:
 
-* The value of ``filename`` is never included in the search results to avoid accidentally compromising the data of the author of the corpus.
-* The ``title`` and ``author`` fields are displayed as document identifiers next to each context in the search results.
+  {
+    "meta": {...},
+    "sentences": [...]
+  }
+
+Metadata
+--------
+
+The value of the ``meta`` key is a dictionary where keys are the names of the metadata fields and the values are strings. All fields listed in the ``viewable_meta`` array in ``/conf/corpus.json`` must be present in each document of the corpus. Other than that, there are no restrictions on metadata; the array may even be empty. However, there are several field names which get special treatment in Tsakorpus:
+
+* The value of ``filename`` is never included in the search results to avoid accidentally compromising the data of corpus developers.
+* By default, the ``title`` and ``author`` fields are displayed as document identifiers next to each context in the search results.
 * The value of ``year`` should be integer.
 * If in your corpus you have texts for which the exact year of creation is unknown, or which contain parts written in different years, you may use fields ``year_from`` and ``year_to`` as lower and upper bounds for the year. If the difference between them is less than 2 and the document does not have the ``year`` field, it will be created and filled automatically.
 
-### The sentence list
-The array with sentences is the main part of the document. Each sentence is a dictionary with the following keys:
+Sentence list
+-------------
 
-* ``text`` -- a string with full text of the sentence.
-* ``words`` -- an array with objects, each representing a token (word or punctuation mark) in the sentence together with all the annotation. There are several reasons why the text of the sentence (or at least most of it) is actually stored twice, first in the ``text`` field and second inside the word objects. One of them is allowing multiple (ambiguous) tokenization options for a single sentence. Another is allowing easy full-text search, which would have been impossible in elasticsearch without the ``text`` field. Yet another is the possibility of normalizing the tokens so that they can look differently in the sentence and in the analysis.
-* ``lang`` -- a one-byte integer representing the language the sentence is written in. This number should be a valid index for the ``languages`` array in ``conf/corpus.json``.
-* ``meta`` -- a dictionary with sentence-level metafields. Sentence-level metafields may include, for example, speaker data for multi-tier (dialogue) files or year in a document that includes data from different years. All metafields listed in the ``sentence_meta`` array in ``conf/corpus.json`` must be present in this dictionary. The values should be strings.
+The list of sentences is the main part of the document. Each sentence is a dictionary with the following keys:
+
+* ``text`` -- a string with the full text of the sentence.
+* ``words`` -- a list of objects, each representing a token (word or punctuation mark) in the sentence together with all the annotation. There are several reasons why the text of the sentence (or at least most of it) is actually stored twice, first in the ``text`` field and second inside the word objects. One of them is allowing multiple (ambiguous) tokenization options for a single sentence. Another is allowing easy full-text search, which would have been impossible in elasticsearch without the ``text`` field. Yet another is the possibility of normalizing the tokens so that they can look differently in the sentence and in the analysis.
+* ``lang`` -- a one-byte integer representing the language the sentence is written in. This number should be a valid index for the ``languages`` array in ``/conf/corpus.json``.
+* ``meta`` -- a dictionary with sentence-level metafields. Sentence-level metafields may include, for example, speaker data for multi-tier (dialogue) files or year in a document that includes data from different years. All metafields listed in the ``sentence_meta`` array in ``/conf/corpus.json`` must be present in this dictionary. The values should be strings.
 * ``para_alignment`` (only in parallel corpora, i.e. corpora with several languages where all or some of the sentences in one language are aligned to sentences in another language) -- a list with dictionaries, each representing an alignment of some part of the sentence with a part of another sentence in the corpus.
 * ``src_alignment`` (only for media-aligned corpora) -- a list with dictionaries, each representing an alignment of some part of the sentence with a segment of a video or sound file.
 * ``style_spans`` (optional) -- a list with dictionaries, each representing a segment of the sentence text that should be displayed in a non-default style, e.g. in italics or in superscript.
 
-The order of the sentences is important. The sentences should be grouped by language, and within each language they should be ordered exactly as they are ordered in the document. When the sentence collection is indexed, each sentence is assigned the keys ``_id``, ``prev_id`` and ``next_id``, the latter two being filled in based on the mutual position of the sentences in the JSON file.
+The order of the sentences is important. The sentences should be grouped by language, and within each language they should be ordered exactly as they are ordered in the document. When the sentence collection is indexed, each sentence is assigned the keys ``_id``, ``prev_id`` and ``next_id``, the latter two being filled based on the mutual position of the sentences in the JSON file.
 
 The elements of the ``sentences`` array therefore look like this:
 
-```
-{
-  "text": "...",
-  "words": [...],
-  "lang": ...,
-  "meta": {...},
-  "para_alignment": [...],
-  "src_alignment": [...],
-  "style_spans": [...]
-}
-```
+.. code-block:: javascript
+  :linenos:
 
-### Words
-Each word in the ``words`` array is a dictionary with the following keys and values:
+  {
+    "text": "...",
+    "words": [...],
+    "lang": ...,
+    "meta": {...},
+    "para_alignment": [...],
+    "src_alignment": [...],
+    "style_spans": [...]
+  }
+
+Words
+-----
+
+Each word in the ``words`` list is a dictionary with the following keys and values:
 
 * ``wf`` -- a string with the token (word form), used for word search.
 * ``wtype`` -- type of the token. Currently, two values are possible: "word" and "punct".
@@ -70,20 +81,24 @@ Additionally, the word may have following fields which may be relevant for certa
 
 Overall, a word dictionary looks like this:
 
-```
-{
-  "wf": "...",
-  "wf_display": "...",   # optional
-  "wtype": "word|punct",
-  "off_start": ...,
-  "off_end": ...,
-  "next_word": ...,
-  "sentence_index": ...,
-  "ana": [...]           # optional
-}
-```
+.. code-block:: javascript
+  :linenos:
 
-### Analyses
+  {
+    "wf": "...",
+    "wf_display": "...",   // optional
+    "wtype": "word|punct",
+    "off_start": ...,
+    "off_end": ...,
+    "next_word": ...,
+    "sentence_index": ...,
+    "ana": [...]           // optional
+  }
+
+
+Analyses
+--------
+
 A word can have more than one analysis variant. Usually a word having multiple analyses is the result of automatic morphological annotation without subsequent disambiguation. However, this option is useful even in manually annotated corpora when there is no way to distinguish between several homonymous forms, or when the annotator has doubts (which happens especially often when annotating historical corpora). Search queries will find all words that have at least one analysis conforming to the query.
 
 Each analysis is a dictionary with the following keys and values:
@@ -93,48 +108,58 @@ Each analysis is a dictionary with the following keys and values:
 * ``gloss``, ``parts`` and ``gloss_index`` (only for corpora with glossing) -- strings representing the glosses for the word (``gloss``), segmentation of the word into morphemes (``parts``) and the combination of these two fields used during search (``gloss_index``). The ``gloss`` field should contain glossing according to the Leipzig glossing rules (the glosses can be arbitrary, but the format should be correct). The stem should be glossed as STEM instead of a short English translation, otherwise it would be impossible to make queries such as "find a genitive marker immediately following the stem". Glossing and segmentation into morphemes should not contain empty morphemes and glosses for them; all categories that are not overtly expressed in the word should be tagged using the ``gr.`` fields. The string ``gloss_index`` has the following format: GLOSS1{morpheme1}-GLOSS2{morpheme2}-... Each gloss is accompanied by the corresponding morpheme in curly brackets. All glosses are separated by hyphens; there should also be a hanging hyphen at the end of the string.
 * any number of other keys with string values, such as ``trans_en``. All fields used here have to be listed in the ``word_fields`` list in ``conf/corpus.json``, and their additional properties can be specified through optional ``kw_word_fields``, ``word_table_fields`` and ``accidental_word_fields`` parameters in the same file. You cannot have a field named ``gr``.
 
-### Parallel alignment
+Parallel alignment
+------------------
+
 If all or some of the documents in your corpus have several parallel tiers, e.g. original text and its translations into other languages, the tiers have to be assigned different language IDs, starting from zero. These IDs should correspond to the names of the languages in the ``languages`` array in ``conf/corpus.conf`` file. The sentences of all tiers should be stored in one JSON file, but independently. The sentences in the file should be ordered by language ID. In order to indicate that a certain part of a sentence is aligned with a certain part of another sentence in another tier, these sentences should contain the following dictionary in their ``para_alignment`` arrays:
 
-```
-{
-  "off_start": ...,
-  "off_end": ...,
-  "para_id": ...
-}
-```
+.. code-block:: javascript
+  :linenos:
+
+  {
+    "off_start": ...,
+    "off_end": ...,
+    "para_id": ...
+  }
 
 The ``off_start`` and ``off_end`` parameters are integers that determine the aligned span in characters. The ``para_id`` parameter is an integer uniquely (at the document level) identifying a bunch of aligned segments: it should have the same value in all tiers of an aligned segment. The aligned segment may be shorter or longer than the sentence. In the first case, the sentence will contain several dictionaries in the ``para_alignment`` array. In the second case, several consecutive sentences in the same tier will have alignments with the same ``para_id``.
 
 
-### Source alignment
-If all or some of the documents in your corpus were aligned with sound or video, the aligned sentences (in all tiers, if there are several) should contain the following dictionary in their ``src_alignment`` arrays:
+Source alignment
+----------------
 
-```
-{
-  "off_start_src": ...,
-  "off_end_src": ...,
-  "off_start_sent": ...,
-  "off_end_sent": ...,
-  "mtype": "audio|video",
-  "src_id": "...",
-  "src": "..."
-}
-```
+If all or some of the documents in your corpus were aligned with sound or video, the aligned sentences (in all tiers, if there are several) should contain the following dictionary in their ``src_alignment`` lists:
+
+.. code-block:: javascript
+  :linenos:
+
+  {
+    "off_start_src": ...,
+    "off_end_src": ...,
+    "off_start_sent": ...,
+    "off_end_sent": ...,
+    "mtype": "audio|video",
+    "src_id": "...",
+    "src": "..."
+  }
+
 
 The ``off_start_src`` and ``off_end_src`` parameters are numbers (float) that determine the relevant segment in the media file in seconds. The ``off_start_sent`` and ``off_end_sent`` parameters are integers that determine the aligned span in the sentence in characters. The ``mtype`` is a string that says if the media is a sound file or a video file. The ``src_id`` parameter is a string uniquely (at the document level) identifying an aligned segment. The ``src`` parameter is the name and the relative path to the media file. All media files have to be located in the ``search/media/%corpus_name%`` directory. Just as with ``para_alignment``, it is possible to have several aligned segments in a sentence or several sentences in an aligned segment.
 
 
-### Style spans
+Style spans
+-----------
+
 The baseline of the sentence may contain segments that should be displayed in a style other than the default, e.g. in italics or in superscript. Each dictionary in the ``style_spans`` list represents one such segment. It looks like this:
 
-```
-{
-  "off_start": ...,
-  "off_end": ...,
-  "span_class": "..."
-}
-```
+.. code-block:: javascript
+  :linenos:
+
+  {
+    "off_start": ...,
+    "off_end": ...,
+    "span_class": "..."
+  }
 
 The ``off_start`` and ``off_end`` parameters are integers that determine the relevant segment in the sentence in characters. The ``span_class`` parameter is a string that determines the style. When displayed in a search hit, the relevant segment is put inside a ``<span>`` element with the ``class`` attribute set to ``style_[SPAN_CLASS]``. For example, if ``span_class`` equals ``i``, the actual span tag will look like ``<span class="style_i">``. The classes should be defined in ``search/web_app/static/css/search.css``. Predefined classes are ``style_i`` (italics), ``style_b`` (bold), ``style_sup`` (superscript), ``style_sub`` (subscript), and ``style_txt_hX`` for ``X`` = 1, 2 and 3 (headers).
 

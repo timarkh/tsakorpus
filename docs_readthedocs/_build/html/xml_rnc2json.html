@@ -14,7 +14,8 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="ELAN convertor" href="eaf2json.html" />
+    <link rel="next" title="Data model" href="data_model.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="xml_flex2json.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -41,7 +42,7 @@
 <div class="section" id="format-description">
 <h2>Format description<a class="headerlink" href="#format-description" title="Permalink to this headline">¶</a></h2>
 <p>All data is contained in an <code class="docutils literal notranslate"><span class="pre">&lt;html&gt;</span></code> node, which has <code class="docutils literal notranslate"><span class="pre">&lt;head&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;body&gt;</span></code> daughters. <code class="docutils literal notranslate"><span class="pre">&lt;head&gt;</span></code> may contain metadata, which alternatively can be stored in a separate metadata file. Each metadata field is stored as <code class="docutils literal notranslate"><span class="pre">&lt;meta</span> <span class="pre">name=&quot;...&quot;</span> <span class="pre">content=&quot;...&quot;/&gt;</span></code>.</p>
-<p>In the case of simple annotated files, <code class="docutils literal notranslate"><span class="pre">&lt;body&gt;</span></code> contains paragraphs (<code class="docutils literal notranslate"><span class="pre">&lt;p&gt;</span></code>, possibly with a class attribute), which, in turn, contain sentences (<code class="docutils literal notranslate"><span class="pre">&lt;se&gt;</span></code>). Sentences contain words (<code class="docutils literal notranslate"><span class="pre">&lt;w&gt;</span></code>, see <a class="reference internal" href="parsed_wordlist_format.html"><span class="doc">Conversion-time morphological analysis</span></a> for details), while punctuation is placed between the word nodes as plain text. If there are newlines between the words, they are ignored. It is allowed to have spans marking italics (<code class="docutils literal notranslate"><span class="pre">&lt;i&gt;</span></code>) or boldface (<code class="docutils literal notranslate"><span class="pre">&lt;b&gt;</span></code>) inside <code class="docutils literal notranslate"><span class="pre">&lt;se&gt;</span></code>; they will be transofrmed into <span class="xref std std-doc">style spans</span>.</p>
+<p>In the case of simple annotated files, <code class="docutils literal notranslate"><span class="pre">&lt;body&gt;</span></code> contains paragraphs (<code class="docutils literal notranslate"><span class="pre">&lt;p&gt;</span></code>, possibly with a class attribute), which, in turn, contain sentences (<code class="docutils literal notranslate"><span class="pre">&lt;se&gt;</span></code>). Sentences contain words (<code class="docutils literal notranslate"><span class="pre">&lt;w&gt;</span></code>, see <a class="reference internal" href="parsed_wordlist_format.html"><span class="doc">Conversion-time morphological analysis</span></a> for details), while punctuation is placed between the word nodes as plain text. If there are newlines between the words, they are ignored. It is allowed to have spans marking italics (<code class="docutils literal notranslate"><span class="pre">&lt;i&gt;</span></code>) or boldface (<code class="docutils literal notranslate"><span class="pre">&lt;b&gt;</span></code>) inside <code class="docutils literal notranslate"><span class="pre">&lt;se&gt;</span></code>; they will be transofrmed into <a class="reference internal" href="styles.html"><span class="doc">style spans</span></a>.</p>
 <p>In parallel corpora, <code class="docutils literal notranslate"><span class="pre">&lt;body&gt;</span></code> contains translation units (<code class="docutils literal notranslate"><span class="pre">&lt;para&gt;</span></code>), which contain aligned sentences. Each sentence has to have a <code class="docutils literal notranslate"><span class="pre">lang</span></code> attribute. The sentences are structured in the same way as in the case of simple texts. There may also be a <code class="docutils literal notranslate"><span class="pre">&lt;p&gt;</span></code> layer between <code class="docutils literal notranslate"><span class="pre">&lt;body&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;para&gt;</span></code>.</p>
 <p>If your files or some of the languages in your files do not have morphological annotation, the <code class="docutils literal notranslate"><span class="pre">&lt;se&gt;</span></code> elements must contain plain text without the <code class="docutils literal notranslate"><span class="pre">&lt;w&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;ana&gt;</span></code> tags.</p>
 </div>
@@ -153,13 +154,15 @@
 <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="data_model.html">Data model</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="eaf2json.html" title="previous chapter">ELAN convertor</a></li>
+      <li>Previous: <a href="xml_flex2json.html" title="previous chapter">&lt;no title&gt;</a></li>
+      <li>Next: <a href="data_model.html" title="next chapter">Data model</a></li>
   </ul></li>
 </ul>
 </div>

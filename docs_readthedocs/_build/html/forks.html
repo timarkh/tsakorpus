@@ -53,7 +53,7 @@
 </div>
 </li>
 <li><p>Add a <code class="docutils literal notranslate"><span class="pre">corpus</span></code> folder to <code class="docutils literal notranslate"><span class="pre">/src_convertors</span></code> and put all your source files and metadata there, as well as conversion settings (see <a class="reference internal" href="src_convertors.html"><span class="doc">Source convertors</span></a>).</p></li>
-<li><p>Adjust settings in <code class="docutils literal notranslate"><span class="pre">/conf</span></code> (see <span class="xref std std-doc">configuration</span>) and the interface translations in <code class="docutils literal notranslate"><span class="pre">/search/web_app/translations</span></code> (you should at least write the title of your corpus there; see <span class="xref std std-doc">interface_languages</span>).</p></li>
+<li><p>Adjust settings in <code class="docutils literal notranslate"><span class="pre">/conf</span></code> (see <a class="reference internal" href="configuration.html"><span class="doc">&lt;no title&gt;</span></a>) and the interface translations in <code class="docutils literal notranslate"><span class="pre">/search/web_app/translations</span></code> (you should at least write the title of your corpus there; see <a class="reference internal" href="interface_languages.html"><span class="doc">&lt;no title&gt;</span></a>).</p></li>
 <li><p>Remove the <code class="docutils literal notranslate"><span class="pre">/src_convertors/corpus/\*\*</span></code> line from the <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> file, so that your corpus files can become part of the repository. If you only want to store the source corpus files (e.g. txt or ELAN transcriptions), but not the converted JSONs, you can modify <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> by including <code class="docutils literal notranslate"><span class="pre">src_convertors/corpus/json/\*\*</span></code>. This usually makes sense because JSONs can be automatically generated from your source files.</p></li>
 </ol>
 <p>After you are through with these steps, you can commit changes and continue working with the corpus. However, if you are familiar with shell scripts or a programming language like Python, it would make sense to add a script that would do all preprocessing steps for you. First of all, that means launching the right convertor on your source files and then moving the output to <code class="docutils literal notranslate"><span class="pre">/corpus/%CORPUS_NAME%</span></code>. However, depending on the particularities of your corpus, it could do other preprocessing steps, e.g. compiling a word list and analyzing it before launching the source convertor. This way, you will save time on routine operations you need to perform every time before updating the corpus.</p>
@@ -98,6 +98,10 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors.html">Source convertors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Conversion-time morphological analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eaf2json.html">ELAN convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_model.html">Data model</a></li>
 </ul>
 
 <div class="relations">

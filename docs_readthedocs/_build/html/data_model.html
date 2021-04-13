@@ -34,59 +34,79 @@
             
   <div class="section" id="data-model">
 <h1>Data model<a class="headerlink" href="#data-model" title="Permalink to this headline">¶</a></h1>
-<p>A corpus which can be indexed by Tsakorpus is a collection of JSON or gzipped JSON files structured according to the rules described below. The corpus may contain any number of files scattered across a file system subtree starting with <code class="docutils literal notranslate"><span class="pre">/corpus/%your_corpus_name%</span></code>. The files must be stored in UTF-8 without BOM.</p>
-<p>There are three major kinds of objects in Tsakorpus: <em>documents</em>, <em>sentences</em> and <em>tokens</em>. Normally, a document represents one text, a sentence represents, well, one sentence, and tokens represent words or punctuation marks. However, you can interpret these objects differently. for</p>
-<p>Each JSON file stores a dictionary representing one corpus document. Each dictionary should have the following keys:</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>There are three major kinds of objects in Tsakorpus: <em>documents</em>, <em>sentences</em> and <em>tokens</em>. Normally, a document represents one text, a sentence represents, well, one sentence, and tokens represent words or punctuation marks. However, you can interpret these objects differently. For example, a <em>sentence</em> might correspond to one intonational unit or one line of verse. It is impossible not to split the text into sentences, since sentence is the basic search unit.</p>
+<p>A corpus should be a collection of JSON or gzipped JSON files structured according to the rules described below. The corpus may contain any number of files scattered across a file system subtree starting with <code class="docutils literal notranslate"><span class="pre">/corpus/%your_corpus_name%</span></code>. The files must be stored in UTF-8 without BOM.</p>
+<p>Each JSON file contains a dictionary representing one corpus document. Each dictionary should have the following keys:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">meta</span></code> – a dictionary with the metadata for the document.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sentences</span></code> – an array of sentences the document consists of.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta</span></code> – a dictionary with the document-level metadata.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sentences</span></code> – a list of sentences the document consists of.</p></li>
 </ul>
 <p>The document has, therefore, the following structure:</p>
-<p><a href="#id1"><span class="problematic" id="id2">``</span></a>`
-{</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">code</span><span class="o">-</span><span class="n">block</span><span class="p">::</span> <span class="n">javascript</span>
+</pre></div>
+</div>
 <blockquote>
-<div><p>“meta”: {…},
+<div><dl class="field-list simple">
+<dt class="field-odd">linenos</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<dl class="simple">
+<dt>{</dt><dd><p>“meta”: {…},
 “sentences”: […]</p>
+</dd>
+</dl>
+<p>}</p>
 </div></blockquote>
-<div class="section" id="id3">
-<h2>}<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
-<p>### The metadata
-The value of the <code class="docutils literal notranslate"><span class="pre">meta</span></code> key is a dictionary where keys are the names of the metafields and the values are strings. All metafields listed in the <code class="docutils literal notranslate"><span class="pre">viewable_meta</span></code> array in <code class="docutils literal notranslate"><span class="pre">conf/corpus.json</span></code> must be present in each document of the corpus. Other than that, there are no restrictions on metadata; the array may even be empty. However, there are several field names which get special treatment in tsakorpus:</p>
+</div>
+<div class="section" id="metadata">
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
+<p>The value of the <code class="docutils literal notranslate"><span class="pre">meta</span></code> key is a dictionary where keys are the names of the metadata fields and the values are strings. All fields listed in the <code class="docutils literal notranslate"><span class="pre">viewable_meta</span></code> array in <code class="docutils literal notranslate"><span class="pre">/conf/corpus.json</span></code> must be present in each document of the corpus. Other than that, there are no restrictions on metadata; the array may even be empty. However, there are several field names which get special treatment in Tsakorpus:</p>
 <ul class="simple">
-<li><p>The value of <code class="docutils literal notranslate"><span class="pre">filename</span></code> is never included in the search results to avoid accidentally compromising the data of the author of the corpus.</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">title</span></code> and <code class="docutils literal notranslate"><span class="pre">author</span></code> fields are displayed as document identifiers next to each context in the search results.</p></li>
+<li><p>The value of <code class="docutils literal notranslate"><span class="pre">filename</span></code> is never included in the search results to avoid accidentally compromising the data of corpus developers.</p></li>
+<li><p>By default, the <code class="docutils literal notranslate"><span class="pre">title</span></code> and <code class="docutils literal notranslate"><span class="pre">author</span></code> fields are displayed as document identifiers next to each context in the search results.</p></li>
 <li><p>The value of <code class="docutils literal notranslate"><span class="pre">year</span></code> should be integer.</p></li>
 <li><p>If in your corpus you have texts for which the exact year of creation is unknown, or which contain parts written in different years, you may use fields <code class="docutils literal notranslate"><span class="pre">year_from</span></code> and <code class="docutils literal notranslate"><span class="pre">year_to</span></code> as lower and upper bounds for the year. If the difference between them is less than 2 and the document does not have the <code class="docutils literal notranslate"><span class="pre">year</span></code> field, it will be created and filled automatically.</p></li>
 </ul>
-<p>### The sentence list
-The array with sentences is the main part of the document. Each sentence is a dictionary with the following keys:</p>
+</div>
+<div class="section" id="sentence-list">
+<h2>Sentence list<a class="headerlink" href="#sentence-list" title="Permalink to this headline">¶</a></h2>
+<p>The list of sentences is the main part of the document. Each sentence is a dictionary with the following keys:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">text</span></code> – a string with full text of the sentence.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">words</span></code> – an array with objects, each representing a token (word or punctuation mark) in the sentence together with all the annotation. There are several reasons why the text of the sentence (or at least most of it) is actually stored twice, first in the <code class="docutils literal notranslate"><span class="pre">text</span></code> field and second inside the word objects. One of them is allowing multiple (ambiguous) tokenization options for a single sentence. Another is allowing easy full-text search, which would have been impossible in elasticsearch without the <code class="docutils literal notranslate"><span class="pre">text</span></code> field. Yet another is the possibility of normalizing the tokens so that they can look differently in the sentence and in the analysis.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">lang</span></code> – a one-byte integer representing the language the sentence is written in. This number should be a valid index for the <code class="docutils literal notranslate"><span class="pre">languages</span></code> array in <code class="docutils literal notranslate"><span class="pre">conf/corpus.json</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">meta</span></code> – a dictionary with sentence-level metafields. Sentence-level metafields may include, for example, speaker data for multi-tier (dialogue) files or year in a document that includes data from different years. All metafields listed in the <code class="docutils literal notranslate"><span class="pre">sentence_meta</span></code> array in <code class="docutils literal notranslate"><span class="pre">conf/corpus.json</span></code> must be present in this dictionary. The values should be strings.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">text</span></code> – a string with the full text of the sentence.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">words</span></code> – a list of objects, each representing a token (word or punctuation mark) in the sentence together with all the annotation. There are several reasons why the text of the sentence (or at least most of it) is actually stored twice, first in the <code class="docutils literal notranslate"><span class="pre">text</span></code> field and second inside the word objects. One of them is allowing multiple (ambiguous) tokenization options for a single sentence. Another is allowing easy full-text search, which would have been impossible in elasticsearch without the <code class="docutils literal notranslate"><span class="pre">text</span></code> field. Yet another is the possibility of normalizing the tokens so that they can look differently in the sentence and in the analysis.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lang</span></code> – a one-byte integer representing the language the sentence is written in. This number should be a valid index for the <code class="docutils literal notranslate"><span class="pre">languages</span></code> array in <code class="docutils literal notranslate"><span class="pre">/conf/corpus.json</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta</span></code> – a dictionary with sentence-level metafields. Sentence-level metafields may include, for example, speaker data for multi-tier (dialogue) files or year in a document that includes data from different years. All metafields listed in the <code class="docutils literal notranslate"><span class="pre">sentence_meta</span></code> array in <code class="docutils literal notranslate"><span class="pre">/conf/corpus.json</span></code> must be present in this dictionary. The values should be strings.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">para_alignment</span></code> (only in parallel corpora, i.e. corpora with several languages where all or some of the sentences in one language are aligned to sentences in another language) – a list with dictionaries, each representing an alignment of some part of the sentence with a part of another sentence in the corpus.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">src_alignment</span></code> (only for media-aligned corpora) – a list with dictionaries, each representing an alignment of some part of the sentence with a segment of a video or sound file.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">style_spans</span></code> (optional) – a list with dictionaries, each representing a segment of the sentence text that should be displayed in a non-default style, e.g. in italics or in superscript.</p></li>
 </ul>
-<p>The order of the sentences is important. The sentences should be grouped by language, and within each language they should be ordered exactly as they are ordered in the document. When the sentence collection is indexed, each sentence is assigned the keys <code class="docutils literal notranslate"><span class="pre">_id</span></code>, <code class="docutils literal notranslate"><span class="pre">prev_id</span></code> and <code class="docutils literal notranslate"><span class="pre">next_id</span></code>, the latter two being filled in based on the mutual position of the sentences in the JSON file.</p>
+<p>The order of the sentences is important. The sentences should be grouped by language, and within each language they should be ordered exactly as they are ordered in the document. When the sentence collection is indexed, each sentence is assigned the keys <code class="docutils literal notranslate"><span class="pre">_id</span></code>, <code class="docutils literal notranslate"><span class="pre">prev_id</span></code> and <code class="docutils literal notranslate"><span class="pre">next_id</span></code>, the latter two being filled based on the mutual position of the sentences in the JSON file.</p>
 <p>The elements of the <code class="docutils literal notranslate"><span class="pre">sentences</span></code> array therefore look like this:</p>
-<p><a href="#id4"><span class="problematic" id="id5">``</span></a>`
-{</p>
-<blockquote>
-<div><p>“text”: “…”,
-“words”: […],
-“lang”: …,
-“meta”: {…},
-“para_alignment”: […],
-“src_alignment”: […],
-“style_spans”: […]</p>
-</div></blockquote>
+<div class="highlight-javascript notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;text&quot;</span><span class="o">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;words&quot;</span><span class="o">:</span> <span class="p">[...],</span>
+  <span class="s2">&quot;lang&quot;</span><span class="o">:</span> <span class="p">...,</span>
+  <span class="s2">&quot;meta&quot;</span><span class="o">:</span> <span class="p">{...},</span>
+  <span class="s2">&quot;para_alignment&quot;</span><span class="o">:</span> <span class="p">[...],</span>
+  <span class="s2">&quot;src_alignment&quot;</span><span class="o">:</span> <span class="p">[...],</span>
+  <span class="s2">&quot;style_spans&quot;</span><span class="o">:</span> <span class="p">[...]</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
 </div>
-<div class="section" id="id6">
-<h2>}<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
-<p>### Words
-Each word in the <code class="docutils literal notranslate"><span class="pre">words</span></code> array is a dictionary with the following keys and values:</p>
+<div class="section" id="words">
+<h2>Words<a class="headerlink" href="#words" title="Permalink to this headline">¶</a></h2>
+<p>Each word in the <code class="docutils literal notranslate"><span class="pre">words</span></code> list is a dictionary with the following keys and values:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">wf</span></code> – a string with the token (word form), used for word search.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">wtype</span></code> – type of the token. Currently, two values are possible: “word” and “punct”.</p></li>
@@ -100,23 +120,31 @@ Each word in the <code class="docutils literal notranslate"><span class="pre">wo
 <li><p><code class="docutils literal notranslate"><span class="pre">wf_display</span></code> – a string with the token in HTML. It can be used if the displayed version of the token should look different from the one used for search. The displayed version is non-searchable and is displayed exactly as written, without HTML escaping that takes place otherwise. For example, if part of the token has to be in superscript, <code class="docutils literal notranslate"><span class="pre">wf_display</span></code> may include <code class="docutils literal notranslate"><span class="pre">&lt;sup&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;/sup&gt;</span></code> tags. All HTML tags used should be closed in the same token. If you use transliteration, you should make sure the tags in <code class="docutils literal notranslate"><span class="pre">wf_display</span></code> are not transliterated. This field only determines what the token looks like in the popup, but not the baseline.</p></li>
 </ul>
 <p>Overall, a word dictionary looks like this:</p>
-<p><a href="#id7"><span class="problematic" id="id8">``</span></a>`
-{</p>
-<blockquote>
-<div><p>“wf”: “…”,
-“wf_display”: “…”,   # optional
-“wtype”: “word|punct”,
-“off_start”: …,
-“off_end”: …,
-“next_word”: …,
-“sentence_index”: …,
-“ana”: […]           # optional</p>
-</div></blockquote>
+<div class="highlight-javascript notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;wf&quot;</span><span class="o">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;wf_display&quot;</span><span class="o">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>   <span class="c1">// optional</span>
+  <span class="s2">&quot;wtype&quot;</span><span class="o">:</span> <span class="s2">&quot;word|punct&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;off_start&quot;</span><span class="o">:</span> <span class="p">...,</span>
+  <span class="s2">&quot;off_end&quot;</span><span class="o">:</span> <span class="p">...,</span>
+  <span class="s2">&quot;next_word&quot;</span><span class="o">:</span> <span class="p">...,</span>
+  <span class="s2">&quot;sentence_index&quot;</span><span class="o">:</span> <span class="p">...,</span>
+  <span class="s2">&quot;ana&quot;</span><span class="o">:</span> <span class="p">[...]</span>           <span class="c1">// optional</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
 </div>
-<div class="section" id="id9">
-<h2>}<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
-<p>### Analyses
-A word can have more than one analysis variant. Usually a word having multiple analyses is the result of automatic morphological annotation without subsequent disambiguation. However, this option is useful even in manually annotated corpora when there is no way to distinguish between several homonymous forms, or when the annotator has doubts (which happens especially often when annotating historical corpora). Search queries will find all words that have at least one analysis conforming to the query.</p>
+<div class="section" id="analyses">
+<h2>Analyses<a class="headerlink" href="#analyses" title="Permalink to this headline">¶</a></h2>
+<p>A word can have more than one analysis variant. Usually a word having multiple analyses is the result of automatic morphological annotation without subsequent disambiguation. However, this option is useful even in manually annotated corpora when there is no way to distinguish between several homonymous forms, or when the annotator has doubts (which happens especially often when annotating historical corpora). Search queries will find all words that have at least one analysis conforming to the query.</p>
 <p>Each analysis is a dictionary with the following keys and values:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">lex</span></code> – lemma (dictionary form), a string.</p></li>
@@ -124,52 +152,65 @@ A word can have more than one analysis variant. Usually a word having multiple a
 <li><p><code class="docutils literal notranslate"><span class="pre">gloss</span></code>, <code class="docutils literal notranslate"><span class="pre">parts</span></code> and <code class="docutils literal notranslate"><span class="pre">gloss_index</span></code> (only for corpora with glossing) – strings representing the glosses for the word (<code class="docutils literal notranslate"><span class="pre">gloss</span></code>), segmentation of the word into morphemes (<code class="docutils literal notranslate"><span class="pre">parts</span></code>) and the combination of these two fields used during search (<code class="docutils literal notranslate"><span class="pre">gloss_index</span></code>). The <code class="docutils literal notranslate"><span class="pre">gloss</span></code> field should contain glossing according to the Leipzig glossing rules (the glosses can be arbitrary, but the format should be correct). The stem should be glossed as STEM instead of a short English translation, otherwise it would be impossible to make queries such as “find a genitive marker immediately following the stem”. Glossing and segmentation into morphemes should not contain empty morphemes and glosses for them; all categories that are not overtly expressed in the word should be tagged using the <code class="docutils literal notranslate"><span class="pre">gr.</span></code> fields. The string <code class="docutils literal notranslate"><span class="pre">gloss_index</span></code> has the following format: GLOSS1{morpheme1}-GLOSS2{morpheme2}-… Each gloss is accompanied by the corresponding morpheme in curly brackets. All glosses are separated by hyphens; there should also be a hanging hyphen at the end of the string.</p></li>
 <li><p>any number of other keys with string values, such as <code class="docutils literal notranslate"><span class="pre">trans_en</span></code>. All fields used here have to be listed in the <code class="docutils literal notranslate"><span class="pre">word_fields</span></code> list in <code class="docutils literal notranslate"><span class="pre">conf/corpus.json</span></code>, and their additional properties can be specified through optional <code class="docutils literal notranslate"><span class="pre">kw_word_fields</span></code>, <code class="docutils literal notranslate"><span class="pre">word_table_fields</span></code> and <code class="docutils literal notranslate"><span class="pre">accidental_word_fields</span></code> parameters in the same file. You cannot have a field named <code class="docutils literal notranslate"><span class="pre">gr</span></code>.</p></li>
 </ul>
-<p>### Parallel alignment
-If all or some of the documents in your corpus have several parallel tiers, e.g. original text and its translations into other languages, the tiers have to be assigned different language IDs, starting from zero. These IDs should correspond to the names of the languages in the <code class="docutils literal notranslate"><span class="pre">languages</span></code> array in <code class="docutils literal notranslate"><span class="pre">conf/corpus.conf</span></code> file. The sentences of all tiers should be stored in one JSON file, but independently. The sentences in the file should be ordered by language ID. In order to indicate that a certain part of a sentence is aligned with a certain part of another sentence in another tier, these sentences should contain the following dictionary in their <code class="docutils literal notranslate"><span class="pre">para_alignment</span></code> arrays:</p>
-<p><a href="#id10"><span class="problematic" id="id11">``</span></a>`
-{</p>
-<blockquote>
-<div><p>“off_start”: …,
-“off_end”: …,
-“para_id”: …</p>
-</div></blockquote>
 </div>
-<div class="section" id="id12">
-<h2>}<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="parallel-alignment">
+<h2>Parallel alignment<a class="headerlink" href="#parallel-alignment" title="Permalink to this headline">¶</a></h2>
+<p>If all or some of the documents in your corpus have several parallel tiers, e.g. original text and its translations into other languages, the tiers have to be assigned different language IDs, starting from zero. These IDs should correspond to the names of the languages in the <code class="docutils literal notranslate"><span class="pre">languages</span></code> array in <code class="docutils literal notranslate"><span class="pre">conf/corpus.conf</span></code> file. The sentences of all tiers should be stored in one JSON file, but independently. The sentences in the file should be ordered by language ID. In order to indicate that a certain part of a sentence is aligned with a certain part of another sentence in another tier, these sentences should contain the following dictionary in their <code class="docutils literal notranslate"><span class="pre">para_alignment</span></code> arrays:</p>
+<div class="highlight-javascript notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;off_start&quot;</span><span class="o">:</span> <span class="p">...,</span>
+  <span class="s2">&quot;off_end&quot;</span><span class="o">:</span> <span class="p">...,</span>
+  <span class="s2">&quot;para_id&quot;</span><span class="o">:</span> <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
 <p>The <code class="docutils literal notranslate"><span class="pre">off_start</span></code> and <code class="docutils literal notranslate"><span class="pre">off_end</span></code> parameters are integers that determine the aligned span in characters. The <code class="docutils literal notranslate"><span class="pre">para_id</span></code> parameter is an integer uniquely (at the document level) identifying a bunch of aligned segments: it should have the same value in all tiers of an aligned segment. The aligned segment may be shorter or longer than the sentence. In the first case, the sentence will contain several dictionaries in the <code class="docutils literal notranslate"><span class="pre">para_alignment</span></code> array. In the second case, several consecutive sentences in the same tier will have alignments with the same <code class="docutils literal notranslate"><span class="pre">para_id</span></code>.</p>
-<p>### Source alignment
-If all or some of the documents in your corpus were aligned with sound or video, the aligned sentences (in all tiers, if there are several) should contain the following dictionary in their <code class="docutils literal notranslate"><span class="pre">src_alignment</span></code> arrays:</p>
-<p><a href="#id13"><span class="problematic" id="id14">``</span></a>`
-{</p>
-<blockquote>
-<div><p>“off_start_src”: …,
-“off_end_src”: …,
-“off_start_sent”: …,
-“off_end_sent”: …,
-“mtype”: “audio|video”,
-“src_id”: “…”,
-“src”: “…”</p>
-</div></blockquote>
 </div>
-<div class="section" id="id15">
-<h2>}<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="source-alignment">
+<h2>Source alignment<a class="headerlink" href="#source-alignment" title="Permalink to this headline">¶</a></h2>
+<p>If all or some of the documents in your corpus were aligned with sound or video, the aligned sentences (in all tiers, if there are several) should contain the following dictionary in their <code class="docutils literal notranslate"><span class="pre">src_alignment</span></code> lists:</p>
+<div class="highlight-javascript notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;off_start_src&quot;</span><span class="o">:</span> <span class="p">...,</span>
+  <span class="s2">&quot;off_end_src&quot;</span><span class="o">:</span> <span class="p">...,</span>
+  <span class="s2">&quot;off_start_sent&quot;</span><span class="o">:</span> <span class="p">...,</span>
+  <span class="s2">&quot;off_end_sent&quot;</span><span class="o">:</span> <span class="p">...,</span>
+  <span class="s2">&quot;mtype&quot;</span><span class="o">:</span> <span class="s2">&quot;audio|video&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;src_id&quot;</span><span class="o">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;src&quot;</span><span class="o">:</span> <span class="s2">&quot;...&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
 <p>The <code class="docutils literal notranslate"><span class="pre">off_start_src</span></code> and <code class="docutils literal notranslate"><span class="pre">off_end_src</span></code> parameters are numbers (float) that determine the relevant segment in the media file in seconds. The <code class="docutils literal notranslate"><span class="pre">off_start_sent</span></code> and <code class="docutils literal notranslate"><span class="pre">off_end_sent</span></code> parameters are integers that determine the aligned span in the sentence in characters. The <code class="docutils literal notranslate"><span class="pre">mtype</span></code> is a string that says if the media is a sound file or a video file. The <code class="docutils literal notranslate"><span class="pre">src_id</span></code> parameter is a string uniquely (at the document level) identifying an aligned segment. The <code class="docutils literal notranslate"><span class="pre">src</span></code> parameter is the name and the relative path to the media file. All media files have to be located in the <code class="docutils literal notranslate"><span class="pre">search/media/%corpus_name%</span></code> directory. Just as with <code class="docutils literal notranslate"><span class="pre">para_alignment</span></code>, it is possible to have several aligned segments in a sentence or several sentences in an aligned segment.</p>
-<p>### Style spans
-The baseline of the sentence may contain segments that should be displayed in a style other than the default, e.g. in italics or in superscript. Each dictionary in the <code class="docutils literal notranslate"><span class="pre">style_spans</span></code> list represents one such segment. It looks like this:</p>
-<p><a href="#id16"><span class="problematic" id="id17">``</span></a>`
-{</p>
-<blockquote>
-<div><p>“off_start”: …,
-“off_end”: …,
-“span_class”: “…”</p>
-</div></blockquote>
 </div>
-<div class="section" id="id18">
-<h2>}<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="style-spans">
+<h2>Style spans<a class="headerlink" href="#style-spans" title="Permalink to this headline">¶</a></h2>
+<p>The baseline of the sentence may contain segments that should be displayed in a style other than the default, e.g. in italics or in superscript. Each dictionary in the <code class="docutils literal notranslate"><span class="pre">style_spans</span></code> list represents one such segment. It looks like this:</p>
+<div class="highlight-javascript notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;off_start&quot;</span><span class="o">:</span> <span class="p">...,</span>
+  <span class="s2">&quot;off_end&quot;</span><span class="o">:</span> <span class="p">...,</span>
+  <span class="s2">&quot;span_class&quot;</span><span class="o">:</span> <span class="s2">&quot;...&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
 <p>The <code class="docutils literal notranslate"><span class="pre">off_start</span></code> and <code class="docutils literal notranslate"><span class="pre">off_end</span></code> parameters are integers that determine the relevant segment in the sentence in characters. The <code class="docutils literal notranslate"><span class="pre">span_class</span></code> parameter is a string that determines the style. When displayed in a search hit, the relevant segment is put inside a <code class="docutils literal notranslate"><span class="pre">&lt;span&gt;</span></code> element with the <code class="docutils literal notranslate"><span class="pre">class</span></code> attribute set to <code class="docutils literal notranslate"><span class="pre">style_[SPAN_CLASS]</span></code>. For example, if <code class="docutils literal notranslate"><span class="pre">span_class</span></code> equals <code class="docutils literal notranslate"><span class="pre">i</span></code>, the actual span tag will look like <code class="docutils literal notranslate"><span class="pre">&lt;span</span> <span class="pre">class=&quot;style_i&quot;&gt;</span></code>. The classes should be defined in <code class="docutils literal notranslate"><span class="pre">search/web_app/static/css/search.css</span></code>. Predefined classes are <code class="docutils literal notranslate"><span class="pre">style_i</span></code> (italics), <code class="docutils literal notranslate"><span class="pre">style_b</span></code> (bold), <code class="docutils literal notranslate"><span class="pre">style_sup</span></code> (superscript), <code class="docutils literal notranslate"><span class="pre">style_sub</span></code> (subscript), and <code class="docutils literal notranslate"><span class="pre">style_txt_hX</span></code> for <code class="docutils literal notranslate"><span class="pre">X</span></code> = 1, 2 and 3 (headers).</p>
 <p>### Sentence example
 Here is an example of a sentence from the Beserman corpus. It contains both parallel alignment (the texts are aligned with their Russian translations) and media alignment.</p>
-<p><a href="#id19"><span class="problematic" id="id20">``</span></a>`
+<p><a href="#id1"><span class="problematic" id="id2">``</span></a>`
 {</p>
 <blockquote>
 <div><p>“text”: “[нрзб] tačʼe taos.”,
@@ -317,9 +358,9 @@ Here is an example of a sentence from the Beserman corpus. It contains both para
 </div></blockquote>
 <p>]</p>
 </div></blockquote>
+<div class="section" id="id3">
+<h3>}<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 </div>
-<div class="section" id="id21">
-<h2>}<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -350,13 +391,14 @@ Here is an example of a sentence from the Beserman corpus. It contains both para
 <li class="toctree-l1"><a class="reference internal" href="eaf2json.html">ELAN convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Data model</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#id3">}</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id6">}</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id9">}</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id12">}</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id15">}</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id18">}</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id21">}</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#metadata">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sentence-list">Sentence list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#words">Words</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#analyses">Analyses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parallel-alignment">Parallel alignment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#source-alignment">Source alignment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#style-spans">Style spans</a></li>
 </ul>
 </li>
 </ul>
