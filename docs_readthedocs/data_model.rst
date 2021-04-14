@@ -4,16 +4,16 @@ Data model
 Introduction
 ------------
 
-There are three major kinds of objects in Tsakorpus: *documents*, *sentences* and *tokens*. Normally, a document represents one text, a sentence represents, well, one sentence, and tokens represent words or punctuation marks. However, you can interpret these objects differently. For example, a *sentence* might correspond to one intonational unit or one line of verse. It is impossible not to split the text into sentences, since sentence is the basic search unit.
+There are three major kinds of objects in Tsakorpus: *documents*, *sentences* and *tokens*. Normally, a document represents one text, a sentence represents, well, one sentence, and tokens represent words or punctuation marks. However, you can interpret these objects differently. For example, a *sentence* might correspond to one intonational unit or one line of verse. Note that it is only possible to search for multiple words inside one sentence. It is impossible not to split the text into sentences, since sentence is the basic search unit.
 
-A corpus should be a collection of JSON or gzipped JSON files structured according to the rules described below. The corpus may contain any number of files scattered across a file system subtree starting with ``/corpus/%your_corpus_name%``. The files must be stored in UTF-8 without BOM.
+A corpus should be a collection of JSON or gzipped JSON files structured according to the rules described below. A corpus may contain any number of files scattered across a file system subtree starting with ``/corpus/%corpus_name%``. The files must be stored in UTF-8 without BOM.
 
 Each JSON file contains a dictionary representing one corpus document. Each dictionary should have the following keys:
 
 * ``meta`` -- a dictionary with the document-level metadata.
 * ``sentences`` -- a list of sentences the document consists of.
 
-The document has, therefore, the following structure::
+The document has, therefore, the following structure:
 
 .. code-block:: javascript
   :linenos:
@@ -161,111 +161,114 @@ The baseline of the sentence may contain segments that should be displayed in a 
     "span_class": "..."
   }
 
-The ``off_start`` and ``off_end`` parameters are integers that determine the relevant segment in the sentence in characters. The ``span_class`` parameter is a string that determines the style. When displayed in a search hit, the relevant segment is put inside a ``<span>`` element with the ``class`` attribute set to ``style_[SPAN_CLASS]``. For example, if ``span_class`` equals ``i``, the actual span tag will look like ``<span class="style_i">``. The classes should be defined in ``search/web_app/static/css/search.css``. Predefined classes are ``style_i`` (italics), ``style_b`` (bold), ``style_sup`` (superscript), ``style_sub`` (subscript), and ``style_txt_hX`` for ``X`` = 1, 2 and 3 (headers).
+The ``off_start`` and ``off_end`` parameters are integers that define the offset of the relevant segment in the ``text`` value in characters. ``span_class`` is a string that defines the style. When displayed in a search hit, the relevant segment is put inside a ``<span>`` element with the ``class`` attribute set to ``style_%SPAN_CLASS%``. For example, if ``span_class`` equals ``i``, the actual span tag will look like ``<span class="style_i">``. The classes should be defined in ``/search/web_app/static/css/search.css``. Predefined classes are ``style_i`` (italics), ``style_b`` (bold), ``style_sup`` (superscript), ``style_sub`` (subscript), and ``style_txt_hX`` for ``X`` = ``1``, ``2`` and ``3`` (headers). See :doc:`styles` for more.
 
 
-### Sentence example
-Here is an example of a sentence from the Beserman corpus. It contains both parallel alignment (the texts are aligned with their Russian translations) and media alignment.
+Sentence example
+----------------
 
-```
-{
-  "text": "[нрзб] tačʼe taos.",
-  "words": [
-    {
-      "wf": "[",
-      "wtype": "punct",
-	  "off_start": 0,
-      "off_end": 1,
-      "next_word": 1
+Here is an example of a sentence. It contains both parallel alignment (the text is aligned with its Russian translation) and media alignment.
+
+.. code-block:: javascript
+  :linenos:
+
+  {
+    "text": "[нрзб] tačʼe taos.",
+    "words": [
+      {
+        "wf": "[",
+        "wtype": "punct",
+        "off_start": 0,
+        "off_end": 1,
+        "next_word": 1
+      },
+      {
+        "wf": "нрзб",
+        "wtype": "word",
+        "off_start": 1,
+        "off_end": 5,
+        "next_word": 2,
+        "sentence_index": 0
+      },
+      {
+        "wf": "]",
+        "wtype": "punct",
+        "off_start": 5,
+        "off_end": 6,
+        "next_word": 3,
+        "sentence_index": 1
+      },
+      {
+        "wf": "tačʼe",
+        "wtype": "word",
+        "off_start": 7,
+        "off_end": 12,
+        "next_word": 4,
+        "sentence_index": 2,
+        "ana": [
+          {
+            "lex": "tačʼe",
+            "gr.pos": "PRO",
+            "gr.number": "sg",
+            "gr.case": "nom",
+            "parts": "tačʼe",
+            "gloss": "STEM",
+            "gloss_index": "STEM{tačʼe}-",
+            "trans_ru": "такой"
+          }
+        ]
+      },
+      {
+        "wf": "taos",
+        "wtype": "word",
+        "off_start": 13,
+        "off_end": 17,
+        "next_word": 5,
+        "sentence_index": 3,
+        "ana": [
+          {
+            "lex": "ta",
+            "gr.pos": "PRO",
+            "gr.proType": "pers",
+            "gr.number": "pl",
+            "gr.case": "nom",
+            "parts": "ta-os",
+            "gloss": "STEM-PL",
+            "gloss_index": "STEM{ta}-PL{os}-",
+            "trans_ru": "он, она"
+          }
+        ]
+      },
+      {
+        "wf": ".",
+        "wtype": "punct",
+        "off_start": 17,
+        "off_end": 18,
+        "next_word": 6
+      }
+    ],
+    "lang": 0,
+    "meta": {
+      "speaker": "AP",
+	  "gender": "M",
+      "year": "2017"
     },
-    {
-      "wf": "нрзб",
-      "wtype": "word",
-	  "off_start": 1,
-      "off_end": 5,
-      "next_word": 2,
-      "sentence_index": 0
-    },
-    {
-      "wf": "]",
-      "wtype": "punct",
-	  "off_start": 5,
-      "off_end": 6,
-      "next_word": 3,
-      "sentence_index": 1
-    },
-    {
-      "wf": "tačʼe",
-      "wtype": "word",
-	  "off_start": 7,
-      "off_end": 12,
-      "next_word": 4,
-      "sentence_index": 2,
-      "ana": [
-        {
-          "lex": "tačʼe",
-          "gr.pos": "PRO",
-          "gr.number": "sg",
-          "gr.case": "nom",
-          "parts": "tačʼe",
-          "gloss": "STEM",
-          "gloss_index": "STEM{tačʼe}-",
-          "trans_ru": "такой"
-        }
-      ]
-    },
-    {
-      "wf": "taos",
-      "wtype": "word",
-	  "off_start": 13,
-      "off_end": 17,
-      "next_word": 5,
-      "sentence_index": 3,
-      "ana": [
-        {
-          "lex": "ta",
-          "gr.pos": "PRO",
-          "gr.proType": "pers",
-          "gr.number": "pl",
-          "gr.case": "nom",
-          "parts": "ta-os",
-          "gloss": "STEM-PL",
-          "gloss_index": "STEM{ta}-PL{os}-",
-          "trans_ru": "он, она"
-        }
-      ]
-    },
-    {
-      "wf": ".",
-      "wtype": "punct",
-	  "off_start": 17,
-      "off_end": 18,
-      "next_word": 6
-    }
-  ],
-  "lang": 0,
-  "meta": {
-    "speaker": "AP",
-	"gender": "M",
-    "year": "2017"
-  },
-  "para_alignment": [
-    {
-      "off_start": 0,
-      "off_end": 18,
-      "para_id": 616
-    }
-  ],
-  "src_alignment": [
-    {
-      "off_start_src": "0.05",
-      "off_end_src": "1.3",
-      "off_start_sent": 0,
-      "off_end_sent": 18,
-      "mtype": "audio",
-      "src_id": "50_1300",
-      "src": "AP_AS_2017.01.06_words_YZ_training-0-0.mp4"
-    }
-  ]
-}
-```
+    "para_alignment": [
+      {
+        "off_start": 0,
+        "off_end": 18,
+        "para_id": 616
+      }
+    ],
+    "src_alignment": [
+      {
+        "off_start_src": "0.05",
+        "off_end_src": "1.3",
+        "off_start_sent": 0,
+        "off_end_sent": 18,
+        "mtype": "audio",
+        "src_id": "50_1300",
+        "src": "AP_AS_2017.01.06_words_YZ_training-0-0.mp4"
+      }
+    ]
+  }
