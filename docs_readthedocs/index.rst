@@ -98,7 +98,9 @@ The software is distributed under MIT license.
    eaf2json
    xml_flex2json
    xml_rnc2json
+   iso_tei_hamburg2json
    data_model
+   categories
    configuration
    indexator
    interface_languages

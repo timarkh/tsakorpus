@@ -1,5 +1,7 @@
-Conversion-time morphological analysis
-======================================
+Morphological analysis
+======================
+
+If your texts already have morphological annotation, you can skip this page.
 
 Analyzed word lists
 -------------------

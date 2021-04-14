@@ -3,6 +3,8 @@ ELAN convertor
 
 This document explains what kind of ELAN files Tsakorpus understands and how to convert them to Tsakorpus JSON. See general information about source convertors and their configuration files :doc:`here </src_convertors>`.
 
+Convertor: ``/src_convertors/eaf2json.py``.
+
 ELAN format
 -----------
 
@@ -92,10 +94,6 @@ Other configuration
 
 - ``sentence_segmentation`` (Boolean, optional) -- whether the convertor should resegment your text into sentences based on sentence-final punctuation set in ``sent_end_punc``. If ``false``, the time-aligned segments are treated as sentences. Defaults to ``false``.
 
-- ``media_length`` (integer) -- the length of one media file piece in seconds. All media files will be split into overlapping pieces of that length, so that the user does not have to download the entire file to listen for one sentence.
-
-- ``media_dir`` (string, optional) -- path to the media files to be cut, if they are located in a different folder than the ELAN files.
-
 Span annotations
 ~~~~~~~~~~~~~~~~
 
@@ -107,7 +105,7 @@ Another problem is the way such annotations are stored in ELAN. ELAN has no dedi
 
 Tsakorpus understands one of them. In this approach, your span annotation resides in a separate *time-aligned* tier, where cell boundaries are *visually* aligned with the boundaries in the token tier. Visual alignment is bad because it is not machine-readable, and there can be tiny mismatches invisible to the naked eye, but no significantly better solution exists at the moment. Tsakorpus will try to match tokens with the cell boundaries in such tiers. Then it will put spans to the JSON sentence for display purposes and add something to the sentence-level metadata.
 
-The way span tiers should be processed is defined by th ``span_annotation_tiers`` dictionary. Its keys are *tier names*, and values are dictionaries with several pre-defined keys:
+The way span tiers should be processed is defined by the ``span_annotation_tiers`` dictionary. Its keys are *tier names*, and values are dictionaries with several pre-defined keys:
 
 - ``languages`` (list of strings) -- names of languages/tiers the spans should be added to.
 - ``sentence_meta`` (string) -- name of a new sentence-level metadata field associated with this span tier. Values of its annotations will be stored under this key in the sentences with which they overlap.

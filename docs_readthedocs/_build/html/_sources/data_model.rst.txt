@@ -250,7 +250,7 @@ Here is an example of a sentence. It contains both parallel alignment (the text 
     "lang": 0,
     "meta": {
       "speaker": "AP",
-	  "gender": "M",
+      "gender": "M",
       "year": "2017"
     },
     "para_alignment": [

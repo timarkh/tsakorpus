@@ -14,7 +14,7 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Conversion-time morphological analysis" href="parsed_wordlist_format.html" />
+    <link rel="next" title="Morphological analysis" href="parsed_wordlist_format.html" />
     <link rel="prev" title="Forks" href="forks.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -66,7 +66,7 @@
 </div>
 <div class="section" id="configuration-files">
 <h2>Configuration files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h2>
-<p>The obligatory configuration files are <code class="docutils literal notranslate"><span class="pre">conversion_settings.json</span></code> and <code class="docutils literal notranslate"><span class="pre">categories.json</span></code>. The latter describes which tags correspond to which grammatical categories and has the same format as <code class="docutils literal notranslate"><span class="pre">categories.json</span></code> in the main configuration directory (see <span class="xref std std-doc">categories</span>). <code class="docutils literal notranslate"><span class="pre">conversion_settings.json</span></code> contains a number of key-value pairs that describe the contents of the corpus and tell the convertors how to deal with it. Here is a common list of parameters; see also format-specific parameters in the description of individual convertors.</p>
+<p>The obligatory configuration files are <code class="docutils literal notranslate"><span class="pre">conversion_settings.json</span></code> and <code class="docutils literal notranslate"><span class="pre">categories.json</span></code>. The latter describes which tags correspond to which grammatical categories and has the same format as <code class="docutils literal notranslate"><span class="pre">categories.json</span></code> in the main configuration directory (see <a class="reference internal" href="categories.html"><span class="doc">Categories and tags</span></a>). <code class="docutils literal notranslate"><span class="pre">conversion_settings.json</span></code> contains a number of key-value pairs that describe the contents of the corpus and tell the convertors how to deal with it. Here is a common list of parameters; see also format-specific parameters in the description of individual convertors.</p>
 <div class="section" id="general-parameters">
 <h3>General parameters<a class="headerlink" href="#general-parameters" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
@@ -123,6 +123,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">transparent_punctuation</span></code> (string, optional) – regexp that determines which punctuation should be considered “transparent”, i.e. should not be counted when calculating distances between words for a multiword query. This parameter influences the assignment of <code class="docutils literal notranslate"><span class="pre">sentence_index</span></code> values, which are added to words and punctuation marks at conversion time and then used in multiword queries at search time. Defaults to <code class="docutils literal notranslate"><span class="pre">^</span> <span class="pre">*$</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">non_word_internal_punct</span></code> (list of strings, optional) – list of non-letter characters that should never be treated as word-internal during tokenization (if built-in tokenization is used). Defaults to the newline character; whitespace is always included. For example, a tokenizer with default options will consider words like <em>bla-bla-bla</em> to constitute single tokens, but if you add hyphen to this list, <em>bla-bla-bla</em> will be split into three tokens.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">special_tokens</span></code> (dictionary, optional) – determines which tokens have to be treated in a special way when performing automatic tokenization. Each key is a regex, and the corresponding value is a dictionary that should be inserted in the JSON files as an object representing that token. E.g. <code class="docutils literal notranslate"><span class="pre">&quot;&lt;(REPOST|USER|LINK)&gt;&quot;:</span> <span class="pre">{&quot;wtype&quot;:</span> <span class="pre">&quot;punct&quot;}</span></code> would lead to tokens <code class="docutils literal notranslate"><span class="pre">&lt;REPOST&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;USER&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;LINK&gt;</span></code> being tokenized as such (i.e. the angle brackets will not become separate tokens) and being treated as punctuation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">split_tokens</span></code> (list of string, optional) – determines which character segments should be split into several tokens. Each string is a regex. Each token that conforms to one of the regex will be split into several parts, each part being one of the regex groups. E.g. an expression <code class="docutils literal notranslate"><span class="pre">(hello)(world)</span></code> will split the string <code class="docutils literal notranslate"><span class="pre">helloworld</span></code> into <code class="docutils literal notranslate"><span class="pre">hello</span></code> and <code class="docutils literal notranslate"><span class="pre">word</span></code> (no whitespaces).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">capitalize_sentences</span></code> (Boolean, optional) – whether the first letter of the first word in each sentence should be automatically capitalized. Defaults to <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">convert_quotes</span></code> (Boolean) – whether simple quotation marks should be converted to something typographically better-looking. This makes sense for some European languages, e.g. German, French or Russian.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">left_quot_mark</span></code> (string) – a replacement for a left-side double quotation mark (such as <code class="docutils literal notranslate"><span class="pre">«</span></code> or <code class="docutils literal notranslate"><span class="pre">»</span></code>).</p></li>
@@ -141,6 +142,14 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">cg_filename</span></code> (dictionary, optional) – names of the CG3 rule files (if you want to disambiguate your corpus). The files should be located in <code class="docutils literal notranslate"><span class="pre">src_convertors/corpus/</span></code>. The value of this field is a dictionary where the keys are the names of the languages and the values are the names of the corresponding files. You are not required to list all the languages you have.</p></li>
 </ul>
 </div>
+<div class="section" id="media">
+<h3>Media<a class="headerlink" href="#media" title="Permalink to this headline">¶</a></h3>
+<p>If your texts are aligned with sound or video files, the following parameters are relevant:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">media_length</span></code> (integer) – the length of one media file piece in seconds. All media files will be split into overlapping pieces of that length, so that the user does not have to download the entire file to listen for one sentence.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">media_dir</span></code> (string, optional) – path to the media files to be cut, if they are located in a different folder than the ELAN files.</p></li>
+</ul>
+</div>
 </div>
 <div class="section" id="the-convertors">
 <h2>The convertors<a class="headerlink" href="#the-convertors" title="Permalink to this headline">¶</a></h2>
@@ -157,22 +166,22 @@
 <div class="section" id="project-specific-and-ad-hoc-convertors">
 <h3>Project-specific and ad-hoc convertors<a class="headerlink" href="#project-specific-and-ad-hoc-convertors" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>HZSK ISO/TEI media-aligned files convertor: <code class="docutils literal notranslate"><span class="pre">iso_tei_hamburg2json.py</span></code>.</p></li>
+<li><p><a class="reference internal" href="iso_tei_hamburg2json.html"><span class="doc">HZSK ISO/TEI media-aligned files convertor</span></a>: <code class="docutils literal notranslate"><span class="pre">iso_tei_hamburg2json.py</span></code>.</p></li>
 <li><p>EXMARaLDA media-aligned files convertor (works only for non-segmented EXB files where events coincide with segments): <code class="docutils literal notranslate"><span class="pre">exmaralda_hamburg2json.py</span></code>.</p></li>
 <li><p>Convertor for JSON files obtained by harvesting social media with a <a class="reference external" href="https://github.com/timarkh/vk-texts-harvester">VK text harvester</a>: <code class="docutils literal notranslate"><span class="pre">social_networks2json.py</span></code>.</p></li>
 <li><p>Plain-text questionnaire convertor: <code class="docutils literal notranslate"><span class="pre">txt_questionnaires2json.py</span></code>.</p></li>
 <li><p>Convertor for a YAML-like format used by the Morphy annotator: <code class="docutils literal notranslate"><span class="pre">morphy_yaml2json.py</span></code>.</p></li>
 </ul>
-<p>Please see the documentation pages for individual convertors to find out how they can be used.</p>
+<p>Please see the documentation pages for individual convertors to find out how they can be used. The following pages also may be relevant:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="parsed_wordlist_format.html"><span class="doc">Morphological analysis</span></a></p></li>
+<li><p><a class="reference internal" href="src_convertors_gloss.html"><span class="doc">Converting glosses to tags</span></a></p></li>
+</ul>
 </div>
 </div>
 <div class="section" id="running-a-convertor">
 <h2>Running a convertor<a class="headerlink" href="#running-a-convertor" title="Permalink to this headline">¶</a></h2>
 <p>When you are ready with the configuration and the source files are stored in the relevant folder, all you have to do is to run the corresponding Python file and wait until it terminates. If your corpus consists of several parts stored in different formats, you may process them one by one with different source convertors and put the resulting JSONs in one place. The resulting files will be stored in <code class="docutils literal notranslate"><span class="pre">/src_convertors/corpus/json</span></code> or, if you used CG3 disambiguation, in <code class="docutils literal notranslate"><span class="pre">/src_convertors/corpus/json_disamb</span></code>.</p>
-<p>### Fieldworks FLEX files conversion (flex2json)
-To convert your FLEX database, you first have to export it using the “Verifiable generic XML” option. When exporting, the “Interlinear texts” section should be active, the “Analyze” tab should be open, and all relevant annotation tiers should be switched on and visible.</p>
-<p>There are several problems with Fieldworks files. First, XMLs coming from different versions of Fieldworks look differently. Second, the exported XML does not have any connection to the dictionary (there should be one, but it does not work as of now), so any dictionary information not present in the interlinear will be lost. Third, Fieldworks does not have the lemma concept, so either you will have stems instead of lemmata, or you will have to somehow reconstruct lemmata from stems and grammatical information yourself. Fourth, all inflectional morphological information is stored in the glosses, so if some category is not overtly marked (which is common for e.g. singular, nominative/absolutive or imperative) and you do not have null morphemes, you will not be able to search for it unless you reconstruct it.</p>
-<p>Tsakorpus FLEX convertor addresses the first problem by using flexible data extraction that was tested on different kinds of XML. Nevertheless, I cannot guarantee that it will work with any FLEX XML. I do not have any solution for second and third problems. The fourth problem can be solved by writing a set of rules which will allow the convertor to reconstruct hidden categories (see <a class="reference internal" href="tags_vs_glosses.html"><span class="doc">Tags or glosses?</span></a>).</p>
 </div>
 </div>
 
@@ -207,12 +216,17 @@ To convert your FLEX database, you first have to export it using the “Verifiab
 <li class="toctree-l2"><a class="reference internal" href="#running-a-convertor">Running a convertor</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Conversion-time morphological analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Morphological analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tags_vs_glosses.html">Tags or glosses?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors_gloss.html">Converting glosses to tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="txt2json.html">Plain text convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eaf2json.html">ELAN convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html">FieldWorks convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_model.html">Data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="categories.html">Categories and tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Corpus configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="indexator.html">Indexing</a></li>
 </ul>
 
 <div class="relations">
@@ -220,7 +234,7 @@ To convert your FLEX database, you first have to export it using the “Verifiab
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="forks.html" title="previous chapter">Forks</a></li>
-      <li>Next: <a href="parsed_wordlist_format.html" title="next chapter">Conversion-time morphological analysis</a></li>
+      <li>Next: <a href="parsed_wordlist_format.html" title="next chapter">Morphological analysis</a></li>
   </ul></li>
 </ul>
 </div>

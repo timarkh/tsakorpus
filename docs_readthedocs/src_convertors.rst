@@ -42,7 +42,7 @@ The source files should be placed in ``/src_convertors/corpus/%ext%``, where ``%
 Configuration files
 -------------------
 
-The obligatory configuration files are ``conversion_settings.json`` and ``categories.json``. The latter describes which tags correspond to which grammatical categories and has the same format as ``categories.json`` in the main configuration directory (see :doc:`categories`). ``conversion_settings.json`` contains a number of key-value pairs that describe the contents of the corpus and tell the convertors how to deal with it. Here is a common list of parameters; see also format-specific parameters in the description of individual convertors.
+The obligatory configuration files are ``conversion_settings.json`` and ``categories.json``. The latter describes which tags correspond to which grammatical categories and has the same format as ``categories.json`` in the main configuration directory (see :doc:`/categories`). ``conversion_settings.json`` contains a number of key-value pairs that describe the contents of the corpus and tell the convertors how to deal with it. Here is a common list of parameters; see also format-specific parameters in the description of individual convertors.
 
 General parameters
 ~~~~~~~~~~~~~~~~~~
@@ -112,6 +112,8 @@ These parameters are taken into account in scenarios where Tsakorpus performs to
 
 - ``special_tokens`` (dictionary, optional) -- determines which tokens have to be treated in a special way when performing automatic tokenization. Each key is a regex, and the corresponding value is a dictionary that should be inserted in the JSON files as an object representing that token. E.g. ``"<(REPOST|USER|LINK)>": {"wtype": "punct"}`` would lead to tokens ``<REPOST>``, ``<USER>`` and ``<LINK>`` being tokenized as such (i.e. the angle brackets will not become separate tokens) and being treated as punctuation.
 
+- ``split_tokens`` (list of string, optional) -- determines which character segments should be split into several tokens. Each string is a regex. Each token that conforms to one of the regex will be split into several parts, each part being one of the regex groups. E.g. an expression ``(hello)(world)`` will split the string ``helloworld`` into ``hello`` and ``word`` (no whitespaces).
+
 - ``capitalize_sentences`` (Boolean, optional) -- whether the first letter of the first word in each sentence should be automatically capitalized. Defaults to ``false``.
 
 - ``convert_quotes`` (Boolean) -- whether simple quotation marks should be converted to something typographically better-looking. This makes sense for some European languages, e.g. German, French or Russian.
@@ -139,6 +141,14 @@ These parameters are relevant in the scenarios where you have no POS tagging / m
 
 - ``cg_filename`` (dictionary, optional) -- names of the CG3 rule files (if you want to disambiguate your corpus). The files should be located in ``src_convertors/corpus/``. The value of this field is a dictionary where the keys are the names of the languages and the values are the names of the corresponding files. You are not required to list all the languages you have.
 
+Media
+~~~~~
+
+If your texts are aligned with sound or video files, the following parameters are relevant:
+
+- ``media_length`` (integer) -- the length of one media file piece in seconds. All media files will be split into overlapping pieces of that length, so that the user does not have to download the entire file to listen for one sentence.
+
+- ``media_dir`` (string, optional) -- path to the media files to be cut, if they are located in a different folder than the ELAN files.
 
 The convertors
 --------------
@@ -148,45 +158,26 @@ There are several source convertors for different input formats. Each of them is
 Commonly used convertors
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-* :doc:`Plain text convertor </txt2json>`: ``txt2json.py``.
-
-* :doc:`ELAN media-aligned files convertor </eaf2json>`: ``eaf2json.py``.
-
-* :doc:`Fieldworks FLEX glossed texts convertor </xml_flex2json>`: ``xml_flex2json.py``.
-
-* :doc:`Convertor of morphologically annotated XML (possibly parallel) </xml_rnc2json>` in one of the formats used by Russian National Corpus: ``xml_rnc2json.py``.
+- :doc:`Plain text convertor </txt2json>`: ``txt2json.py``.
+- :doc:`ELAN media-aligned files convertor </eaf2json>`: ``eaf2json.py``.
+- :doc:`Fieldworks FLEX glossed texts convertor </xml_flex2json>`: ``xml_flex2json.py``.
+- :doc:`Convertor of morphologically annotated XML (possibly parallel) </xml_rnc2json>` in one of the formats used by Russian National Corpus: ``xml_rnc2json.py``.
 
 Project-specific and ad-hoc convertors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* HZSK ISO/TEI media-aligned files convertor: ``iso_tei_hamburg2json.py``.
+- :doc:`HZSK ISO/TEI media-aligned files convertor </iso_tei_hamburg2json>`: ``iso_tei_hamburg2json.py``.
+- EXMARaLDA media-aligned files convertor (works only for non-segmented EXB files where events coincide with segments): ``exmaralda_hamburg2json.py``.
+- Convertor for JSON files obtained by harvesting social media with a `VK text harvester <https://github.com/timarkh/vk-texts-harvester>`_: ``social_networks2json.py``.
+- Plain-text questionnaire convertor: ``txt_questionnaires2json.py``.
+- Convertor for a YAML-like format used by the Morphy annotator: ``morphy_yaml2json.py``.
 
-* EXMARaLDA media-aligned files convertor (works only for non-segmented EXB files where events coincide with segments): ``exmaralda_hamburg2json.py``.
+Please see the documentation pages for individual convertors to find out how they can be used. The following pages also may be relevant:
 
-* Convertor for JSON files obtained by harvesting social media with a `VK text harvester <https://github.com/timarkh/vk-texts-harvester>`_: ``social_networks2json.py``.
-
-* Plain-text questionnaire convertor: ``txt_questionnaires2json.py``.
-
-* Convertor for a YAML-like format used by the Morphy annotator: ``morphy_yaml2json.py``.
-
-Please see the documentation pages for individual convertors to find out how they can be used.
+- :doc:`/parsed_wordlist_format`
+- :doc:`/src_convertors_gloss`
 
 Running a convertor
 -------------------
 
 When you are ready with the configuration and the source files are stored in the relevant folder, all you have to do is to run the corresponding Python file and wait until it terminates. If your corpus consists of several parts stored in different formats, you may process them one by one with different source convertors and put the resulting JSONs in one place. The resulting files will be stored in ``/src_convertors/corpus/json`` or, if you used CG3 disambiguation, in ``/src_convertors/corpus/json_disamb``.
-
-
-
-
-
-
-
-### Fieldworks FLEX files conversion (flex2json)
-To convert your FLEX database, you first have to export it using the "Verifiable generic XML" option. When exporting, the "Interlinear texts" section should be active, the "Analyze" tab should be open, and all relevant annotation tiers should be switched on and visible.
-
-There are several problems with Fieldworks files. First, XMLs coming from different versions of Fieldworks look differently. Second, the exported XML does not have any connection to the dictionary (there should be one, but it does not work as of now), so any dictionary information not present in the interlinear will be lost. Third, Fieldworks does not have the lemma concept, so either you will have stems instead of lemmata, or you will have to somehow reconstruct lemmata from stems and grammatical information yourself. Fourth, all inflectional morphological information is stored in the glosses, so if some category is not overtly marked (which is common for e.g. singular, nominative/absolutive or imperative) and you do not have null morphemes, you will not be able to search for it unless you reconstruct it.
-
-Tsakorpus FLEX convertor addresses the first problem by using flexible data extraction that was tested on different kinds of XML. Nevertheless, I cannot guarantee that it will work with any FLEX XML. I do not have any solution for second and third problems. The fourth problem can be solved by writing a set of rules which will allow the convertor to reconstruct hidden categories (see :doc:`tags_vs_glosses`).
-
-

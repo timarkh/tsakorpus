@@ -15,7 +15,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Data model" href="data_model.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="xml_flex2json.html" />
+    <link rel="prev" title="FieldWorks convertor" href="xml_flex2json.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -35,14 +35,15 @@
   <div class="section" id="rnc-xml-convertor">
 <h1>RNC XML convertor<a class="headerlink" href="#rnc-xml-convertor" title="Permalink to this headline">¶</a></h1>
 <p>This document explains how to convert RNC XML docuemnts to Tsakorpus JSON. See general information about source convertors and their configuration files <a class="reference internal" href="src_convertors.html"><span class="doc">here</span></a>.</p>
+<p>Convertor: <code class="docutils literal notranslate"><span class="pre">/src_convertors/xml_rnc2json.py</span></code>.</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>The RNC XML convertor (<code class="docutils literal notranslate"><span class="pre">/src_convertors/xml_rnc2json.py</span></code>) understands XML files with raw or morphologically annotated text in the format of Russian National Corpus. Currently, files with simple annotated texts (“Main subcorpus” and similar subcorpora) and parallel texts are supported. Although this is a project-specific format, it is a fairly simple one. If your format is not supported by Tsakorpus, it might be easier for you to convert your files into RNC XML, so that Tsakorpus can take it from there.</p>
+<p>The RNC XML convertor understands XML files with raw or morphologically annotated text in the format of Russian National Corpus. Currently, files with simple annotated texts (“Main subcorpus” and similar subcorpora) and parallel texts are supported. Although this is a project-specific format, it is a fairly simple one. If your format is not supported by Tsakorpus, it might be easier for you to convert your files into RNC XML, so that Tsakorpus can take it from there.</p>
 </div>
 <div class="section" id="format-description">
 <h2>Format description<a class="headerlink" href="#format-description" title="Permalink to this headline">¶</a></h2>
 <p>All data is contained in an <code class="docutils literal notranslate"><span class="pre">&lt;html&gt;</span></code> node, which has <code class="docutils literal notranslate"><span class="pre">&lt;head&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;body&gt;</span></code> daughters. <code class="docutils literal notranslate"><span class="pre">&lt;head&gt;</span></code> may contain metadata, which alternatively can be stored in a separate metadata file. Each metadata field is stored as <code class="docutils literal notranslate"><span class="pre">&lt;meta</span> <span class="pre">name=&quot;...&quot;</span> <span class="pre">content=&quot;...&quot;/&gt;</span></code>.</p>
-<p>In the case of simple annotated files, <code class="docutils literal notranslate"><span class="pre">&lt;body&gt;</span></code> contains paragraphs (<code class="docutils literal notranslate"><span class="pre">&lt;p&gt;</span></code>, possibly with a class attribute), which, in turn, contain sentences (<code class="docutils literal notranslate"><span class="pre">&lt;se&gt;</span></code>). Sentences contain words (<code class="docutils literal notranslate"><span class="pre">&lt;w&gt;</span></code>, see <a class="reference internal" href="parsed_wordlist_format.html"><span class="doc">Conversion-time morphological analysis</span></a> for details), while punctuation is placed between the word nodes as plain text. If there are newlines between the words, they are ignored. It is allowed to have spans marking italics (<code class="docutils literal notranslate"><span class="pre">&lt;i&gt;</span></code>) or boldface (<code class="docutils literal notranslate"><span class="pre">&lt;b&gt;</span></code>) inside <code class="docutils literal notranslate"><span class="pre">&lt;se&gt;</span></code>; they will be transofrmed into <a class="reference internal" href="styles.html"><span class="doc">style spans</span></a>.</p>
+<p>In the case of simple annotated files, <code class="docutils literal notranslate"><span class="pre">&lt;body&gt;</span></code> contains paragraphs (<code class="docutils literal notranslate"><span class="pre">&lt;p&gt;</span></code>, possibly with a class attribute), which, in turn, contain sentences (<code class="docutils literal notranslate"><span class="pre">&lt;se&gt;</span></code>). Sentences contain words (<code class="docutils literal notranslate"><span class="pre">&lt;w&gt;</span></code>, see <a class="reference internal" href="parsed_wordlist_format.html"><span class="doc">Morphological analysis</span></a> for details), while punctuation is placed between the word nodes as plain text. If there are newlines between the words, they are ignored. It is allowed to have spans marking italics (<code class="docutils literal notranslate"><span class="pre">&lt;i&gt;</span></code>) or boldface (<code class="docutils literal notranslate"><span class="pre">&lt;b&gt;</span></code>) inside <code class="docutils literal notranslate"><span class="pre">&lt;se&gt;</span></code>; they will be transofrmed into <a class="reference internal" href="styles.html"><span class="doc">style spans</span></a>.</p>
 <p>In parallel corpora, <code class="docutils literal notranslate"><span class="pre">&lt;body&gt;</span></code> contains translation units (<code class="docutils literal notranslate"><span class="pre">&lt;para&gt;</span></code>), which contain aligned sentences. Each sentence has to have a <code class="docutils literal notranslate"><span class="pre">lang</span></code> attribute. The sentences are structured in the same way as in the case of simple texts. There may also be a <code class="docutils literal notranslate"><span class="pre">&lt;p&gt;</span></code> layer between <code class="docutils literal notranslate"><span class="pre">&lt;body&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;para&gt;</span></code>.</p>
 <p>If your files or some of the languages in your files do not have morphological annotation, the <code class="docutils literal notranslate"><span class="pre">&lt;se&gt;</span></code> elements must contain plain text without the <code class="docutils literal notranslate"><span class="pre">&lt;w&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;ana&gt;</span></code> tags.</p>
 </div>
@@ -145,10 +146,14 @@
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forks.html">Forks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors.html">Source convertors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Conversion-time morphological analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Morphological analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tags_vs_glosses.html">Tags or glosses?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors_gloss.html">Converting glosses to tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="txt2json.html">Plain text convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eaf2json.html">ELAN convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html">FieldWorks convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html#export">Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html#configuration-and-challenges">Configuration and challenges</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">RNC XML convertor</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#format-description">Format description</a></li>
@@ -163,7 +168,7 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="xml_flex2json.html" title="previous chapter">&lt;no title&gt;</a></li>
+      <li>Previous: <a href="xml_flex2json.html" title="previous chapter">FieldWorks convertor</a></li>
       <li>Next: <a href="data_model.html" title="next chapter">Data model</a></li>
   </ul></li>
 </ul>

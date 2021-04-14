@@ -14,8 +14,8 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="&lt;no title&gt;" href="xml_flex2json.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="txt2json.html" />
+    <link rel="next" title="FieldWorks convertor" href="xml_flex2json.html" />
+    <link rel="prev" title="Plain text convertor" href="txt2json.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -35,6 +35,7 @@
   <div class="section" id="elan-convertor">
 <h1>ELAN convertor<a class="headerlink" href="#elan-convertor" title="Permalink to this headline">¶</a></h1>
 <p>This document explains what kind of ELAN files Tsakorpus understands and how to convert them to Tsakorpus JSON. See general information about source convertors and their configuration files <a class="reference internal" href="src_convertors.html"><span class="doc">here</span></a>.</p>
+<p>Convertor: <code class="docutils literal notranslate"><span class="pre">/src_convertors/eaf2json.py</span></code>.</p>
 <div class="section" id="elan-format">
 <h2>ELAN format<a class="headerlink" href="#elan-format" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://tla.mpi.nl/tools/tla-tools/elan/">ELAN</a> is a widely adopted linguistic tool for transcribing audio or video recordings. The sound-aligned transcription and (possibly) annotation are displayed in a set of hierarchically organized tiers and stored in XML files, which normally have the <code class="docutils literal notranslate"><span class="pre">.eaf</span></code> extension. The annotation may be carried out manually or exported from other tools, e.g. <a class="reference external" href="https://software.sil.org/fieldworks/">FieldWorks</a>.</p>
@@ -124,8 +125,6 @@
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">ignore_tokens</span></code> (string, optional) – a regex that describes which tokens should be skipped when automatically aligning a token tier with a text tier. Defaults to common Western punctuation marks.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">sentence_segmentation</span></code> (Boolean, optional) – whether the convertor should resegment your text into sentences based on sentence-final punctuation set in <code class="docutils literal notranslate"><span class="pre">sent_end_punc</span></code>. If <code class="docutils literal notranslate"><span class="pre">false</span></code>, the time-aligned segments are treated as sentences. Defaults to <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">media_length</span></code> (integer) – the length of one media file piece in seconds. All media files will be split into overlapping pieces of that length, so that the user does not have to download the entire file to listen for one sentence.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">media_dir</span></code> (string, optional) – path to the media files to be cut, if they are located in a different folder than the ELAN files.</p></li>
 </ul>
 </div>
 <div class="section" id="span-annotations">
@@ -134,7 +133,7 @@
 <p>Tsakorpus generally allows for span annotations, but with serious limitations. Span annotations can be displayed in the search results, but they cannot be searched for directly, unlike word-level and sentence-level annotations. One way to partially make them searchable is add these annotations to the sentence-level metadata. This way, it will be possible to search for them just like you search e.g. for sentences belonging to a particular speaker. The downside of this approach is that Tsakorpus cannot count the number of spans found, only the number of sentences where such spans exist. It also cannot search for words within certain kinds of spans, only for words in sentences that contain those spans.</p>
 <p>Another problem is the way such annotations are stored in ELAN. ELAN has no dedicated means for that: you can only subdivide cells in daughter tiers, but not unite them into one span. This is why there are dozens of ways such annotations can be stored in ELAN files, all of them far from ideal from the point of view of machine readability.</p>
 <p>Tsakorpus understands one of them. In this approach, your span annotation resides in a separate <em>time-aligned</em> tier, where cell boundaries are <em>visually</em> aligned with the boundaries in the token tier. Visual alignment is bad because it is not machine-readable, and there can be tiny mismatches invisible to the naked eye, but no significantly better solution exists at the moment. Tsakorpus will try to match tokens with the cell boundaries in such tiers. Then it will put spans to the JSON sentence for display purposes and add something to the sentence-level metadata.</p>
-<p>The way span tiers should be processed is defined by th <code class="docutils literal notranslate"><span class="pre">span_annotation_tiers</span></code> dictionary. Its keys are <em>tier names</em>, and values are dictionaries with several pre-defined keys:</p>
+<p>The way span tiers should be processed is defined by the <code class="docutils literal notranslate"><span class="pre">span_annotation_tiers</span></code> dictionary. Its keys are <em>tier names</em>, and values are dictionaries with several pre-defined keys:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">languages</span></code> (list of strings) – names of languages/tiers the spans should be added to.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">sentence_meta</span></code> (string) – name of a new sentence-level metadata field associated with this span tier. Values of its annotations will be stored under this key in the sentences with which they overlap.</p></li>
@@ -200,9 +199,10 @@
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forks.html">Forks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors.html">Source convertors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Conversion-time morphological analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Morphological analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tags_vs_glosses.html">Tags or glosses?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors_gloss.html">Converting glosses to tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="txt2json.html">Plain text convertor</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">ELAN convertor</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#elan-format">ELAN format</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tier-hierarchy">Tier hierarchy</a></li>
@@ -210,6 +210,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#media-files">Media files</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html">FieldWorks convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html#export">Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html#configuration-and-challenges">Configuration and challenges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_model.html">Data model</a></li>
 </ul>
@@ -218,8 +221,8 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="txt2json.html" title="previous chapter">&lt;no title&gt;</a></li>
-      <li>Next: <a href="xml_flex2json.html" title="next chapter">&lt;no title&gt;</a></li>
+      <li>Previous: <a href="txt2json.html" title="previous chapter">Plain text convertor</a></li>
+      <li>Next: <a href="xml_flex2json.html" title="next chapter">FieldWorks convertor</a></li>
   </ul></li>
 </ul>
 </div>

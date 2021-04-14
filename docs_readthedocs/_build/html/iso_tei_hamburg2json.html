@@ -5,14 +5,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; tsakorpus 2.0 documentation</title>
+    <title>Spoken ISO/TEI convertor &#8212; tsakorpus 2.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <link rel="index" title="Index" href="#" />
+    <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -30,11 +30,18 @@
 
           <div class="body" role="main">
             
-
-<h1 id="index">Index</h1>
-
-<div class="genindex-jumpbox">
- 
+  <div class="section" id="spoken-iso-tei-convertor">
+<h1>Spoken ISO/TEI convertor<a class="headerlink" href="#spoken-iso-tei-convertor" title="Permalink to this headline">¶</a></h1>
+<p>This document explains how to convert media-aligned texts in ISO/TEI format to Tsakorpus JSON. See general information about source convertors and their configuration files <a class="reference internal" href="src_convertors.html"><span class="doc">here</span></a>.</p>
+<p>Convertor: <code class="docutils literal notranslate"><span class="pre">/src_convertors/iso_tei_hamburg2json.py</span></code>.</p>
+<div class="section" id="spoken-iso-tei-format">
+<h2>Spoken ISO/TEI format<a class="headerlink" href="#spoken-iso-tei-format" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://tei-c.org/">TEI</a> is a format for annotating texts. <em>ISO/TEI for spoken language</em> is a subset of TEI that describes how spoken language data can be encoded in TEI. Despite formalizing some aspects, both TEI in general and spoken ISO/TEI allow for too much variation: same data can be encoded in thousands different ways. This is why it is impossible to create a convertor that could work with <em>any</em> spoken ISO/TEI data. This convertor can work with a <a class="reference external" href="https://www.aclweb.org/anthology/W19-0310.pdf">specific version of spoken ISO/TEI</a> used in the <a class="reference external" href="https://www.slm.uni-hamburg.de/inel.html">INEL</a> project.</p>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>There are no parameters specific for this particular convertor. Please see documentation on <a class="reference internal" href="src_convertors.html"><span class="doc">general parameters</span></a> and <a class="reference internal" href="src_convertors_gloss.html"><span class="doc">glosses-to-tags conversion</span></a>.</p>
+</div>
 </div>
 
 
@@ -66,12 +73,10 @@
 <li class="toctree-l1"><a class="reference internal" href="txt2json.html">Plain text convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eaf2json.html">ELAN convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html">FieldWorks convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html#export">Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html#configuration-and-challenges">Configuration and challenges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
-<li class="toctree-l1"><a class="reference internal" href="iso_tei_hamburg2json.html">Spoken ISO/TEI convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_model.html">Data model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="categories.html">Categories and tags</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html">Corpus configuration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="indexator.html">Indexing</a></li>
 </ul>
 
 <div class="relations">
@@ -110,6 +115,9 @@
       Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
+      |
+      <a href="_sources/iso_tei_hamburg2json.rst.txt"
+          rel="nofollow">Page source</a>
     </div>
 
     

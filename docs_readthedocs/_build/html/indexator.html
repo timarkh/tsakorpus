@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>&lt;no title&gt; &#8212; tsakorpus 2.0 documentation</title>
+    <title>Indexing &#8212; tsakorpus 2.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -32,7 +32,39 @@
 
           <div class="body" role="main">
             
-  
+  <div class="section" id="indexing">
+<h1>Indexing<a class="headerlink" href="#indexing" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="how-to-index-your-corpus">
+<h2>How to index your corpus<a class="headerlink" href="#how-to-index-your-corpus" title="Permalink to this headline">¶</a></h2>
+<p>When your corpus JSON files are ready, they must be indexed in Elasticsearch before the corpus becomes available. You have to follow these steps:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="configuration.html"><span class="doc">Configure the corpus</span></a> by filling out a configuration page in the browser or editing <code class="docutils literal notranslate"><span class="pre">/conf/corpus.json</span></code>.</p></li>
+<li><p>Edit <a class="reference internal" href="categories.html"><span class="doc">categories.json</span></a> (or copy an existing one) and put it to <code class="docutils literal notranslate"><span class="pre">/conf</span></code>.</p></li>
+<li><p>Make sure all interface messages are <a class="reference internal" href="interface_languages.html"><span class="doc">translated</span></a> into all interface languages.</p></li>
+<li><p>Make sure all <a class="reference internal" href="transliteration.html"><span class="doc">transliteration methods</span></a> mentioned in <code class="docutils literal notranslate"><span class="pre">corpus.json</span></code> exist.</p></li>
+<li><p>Put the JSON files to <code class="docutils literal notranslate"><span class="pre">/corpus/%corpus_name%</span></code>.</p></li>
+<li><p>If you have media files cut by the source convertors, put them to <code class="docutils literal notranslate"><span class="pre">/search/media/%corpus_name%</span></code> or symlink this folder to the place where they are stored.</p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">/indexator/indexator.py</span></code>.</p></li>
+</ol>
+<p>Indexing may take a while; you will see messages in the process. If you have a large corpus and would like to disconnect from the server until indexation is complete, you can launch it with <code class="docutils literal notranslate"><span class="pre">nohup</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">indexator</span>
+<span class="n">nohup</span> <span class="n">python3</span> <span class="n">indexator</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">index</span><span class="o">.</span><span class="n">log</span> <span class="mi">2</span><span class="o">&gt;&amp;</span><span class="mi">1</span> <span class="o">&amp;</span>
+</pre></div>
+</div>
+<p>If you are setting up the corpus for the first time, do not forget to set up apache/nginx/… configuration files, so that some URL resolves to your corpus, and switch it on. If you are reindexing the corpus, <strong>reload apache/nginx</strong> after the indexation is complete.</p>
+</div>
+<div class="section" id="what-indexator-does">
+<h2>What indexator does<a class="headerlink" href="#what-indexator-does" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>It creates three Elasticsearch indexes called <code class="docutils literal notranslate"><span class="pre">%corpus_name%.sentences</span></code>, <code class="docutils literal notranslate"><span class="pre">%corpus_name%.docs</span></code> and <code class="docutils literal notranslate"><span class="pre">%corpus_name%.words</span></code>. If indexes with such names already exist, the indexator will ask you for permission to proceed. Use the <code class="docutils literal notranslate"><span class="pre">-y</span></code> option to overwrite existing indexes without asking.</p></li>
+<li><p>It compiles your PyBabel translations of the interface.</p></li>
+<li><p>It puts the contents of your JSON files to the indexes. Sentences are transfered to the database almost without changes.</p></li>
+<li><p>It calculates word and lemma statistics and puts it to the indexes. The statistics is kept in memory during the indexation, so the larger your corpus, the more memory indexation will require.</p></li>
+<li><p>It generates full-text representations and dictionaries, if you chose so in the configuration.</p></li>
+</ol>
+</div>
+</div>
+
 
           </div>
           
@@ -51,17 +83,25 @@
 
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Short FAQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forks.html">Forks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors.html">Source convertors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Conversion-time morphological analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Morphological analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tags_vs_glosses.html">Tags or glosses?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors_gloss.html">Converting glosses to tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="txt2json.html">Plain text convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eaf2json.html">ELAN convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html">FieldWorks convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_model.html">Data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="categories.html">Categories and tags</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Indexing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-index-your-corpus">How to index your corpus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-indexator-does">What indexator does</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">

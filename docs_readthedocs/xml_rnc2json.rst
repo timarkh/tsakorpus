@@ -3,10 +3,12 @@ RNC XML convertor
 
 This document explains how to convert RNC XML docuemnts to Tsakorpus JSON. See general information about source convertors and their configuration files :doc:`here </src_convertors>`.
 
+Convertor: ``/src_convertors/xml_rnc2json.py``.
+
 Introduction
 ------------
 
-The RNC XML convertor (``/src_convertors/xml_rnc2json.py``) understands XML files with raw or morphologically annotated text in the format of Russian National Corpus. Currently, files with simple annotated texts ("Main subcorpus" and similar subcorpora) and parallel texts are supported. Although this is a project-specific format, it is a fairly simple one. If your format is not supported by Tsakorpus, it might be easier for you to convert your files into RNC XML, so that Tsakorpus can take it from there.
+The RNC XML convertor understands XML files with raw or morphologically annotated text in the format of Russian National Corpus. Currently, files with simple annotated texts ("Main subcorpus" and similar subcorpora) and parallel texts are supported. Although this is a project-specific format, it is a fairly simple one. If your format is not supported by Tsakorpus, it might be easier for you to convert your files into RNC XML, so that Tsakorpus can take it from there.
 
 Format description
 ------------------

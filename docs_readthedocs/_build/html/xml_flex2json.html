@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>&lt;no title&gt; &#8212; tsakorpus 2.0 documentation</title>
+    <title>FieldWorks convertor &#8212; tsakorpus 2.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -32,7 +32,27 @@
 
           <div class="body" role="main">
             
-  
+  <div class="section" id="fieldworks-convertor">
+<h1>FieldWorks convertor<a class="headerlink" href="#fieldworks-convertor" title="Permalink to this headline">¶</a></h1>
+<p>This document explains how to convert texts annotated in <a class="reference external" href="https://software.sil.org/fieldworks/">FieldWorks</a> (FLEX) to Tsakorpus JSON. See general information about source convertors and their configuration files <a class="reference internal" href="src_convertors.html"><span class="doc">here</span></a>.</p>
+<p>Convertor: <code class="docutils literal notranslate"><span class="pre">/src_convertors/xml_rnc2json.py</span></code>.</p>
+<div class="section" id="export">
+<h2>Export<a class="headerlink" href="#export" title="Permalink to this headline">¶</a></h2>
+<p>FieldWorks stores texts in a sophisticated database, so first you need to export your data. You have to open your project in FieldWorks and click “Export” using the “Verifiable generic XML” option. When exporting, the “Interlinear texts” section should be active, the “Analyze” tab should be open, and all relevant annotation tiers should be switched on and visible.</p>
+</div>
+<div class="section" id="configuration-and-challenges">
+<h2>Configuration and challenges<a class="headerlink" href="#configuration-and-challenges" title="Permalink to this headline">¶</a></h2>
+<p>Files exported from FieldWorks are problematic in many respects:</p>
+<ul class="simple">
+<li><p>XMLs coming from different versions of FieldWorks look differently.</p></li>
+<li><p>The exported XML does not have any connection to the dictionary (there should be one, but it has been broken for a long time now). Any dictionary information not present in the interlinear will be lost.</p></li>
+<li><p>FieldWorks does not have the lemma concept, unlike Tsakorpus. That means that you will either have stems instead of lemmata, or have to somehow reconstruct lemmata from stems and grammatical information yourself.</p></li>
+<li><p>All inflectional morphological information is stored in the glosses, so if some category is not overtly marked (which is common for e.g. singular, nominative/absolutive or imperative) and you do not have null morphemes, you will not be able to search for it unless you reconstruct it.</p></li>
+</ul>
+<p>Tsakorpus FieldWorks convertor addresses the first problem by using flexible data extraction that was tested on different kinds of XML. Nevertheless, there is no guarantee that it will work with any FLEX XML. There is currently no solution for second and third problems. The fourth problem can be solved by <a class="reference internal" href="src_convertors_gloss.html"><span class="doc">writing a set of rules</span></a> which will allow the convertor to reconstruct hidden categories.</p>
+</div>
+</div>
+
 
           </div>
           
@@ -51,17 +71,24 @@
 
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Short FAQ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forks.html">Forks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors.html">Source convertors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Conversion-time morphological analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Morphological analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tags_vs_glosses.html">Tags or glosses?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors_gloss.html">Converting glosses to tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="txt2json.html">Plain text convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eaf2json.html">ELAN convertor</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">FieldWorks convertor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#export">Export</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-and-challenges">Configuration and challenges</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_model.html">Data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="categories.html">Tags and categories</a></li>
 </ul>
 
 <div class="relations">

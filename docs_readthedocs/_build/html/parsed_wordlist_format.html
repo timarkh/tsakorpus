@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Conversion-time morphological analysis &#8212; tsakorpus 2.0 documentation</title>
+    <title>Morphological analysis &#8212; tsakorpus 2.0 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -32,8 +32,9 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="conversion-time-morphological-analysis">
-<h1>Conversion-time morphological analysis<a class="headerlink" href="#conversion-time-morphological-analysis" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="morphological-analysis">
+<h1>Morphological analysis<a class="headerlink" href="#morphological-analysis" title="Permalink to this headline">¶</a></h1>
+<p>If your texts already have morphological annotation, you can skip this page.</p>
 <div class="section" id="analyzed-word-lists">
 <h2>Analyzed word lists<a class="headerlink" href="#analyzed-word-lists" title="Permalink to this headline">¶</a></h2>
 <p>Convertors that read raw text (from <code class="docutils literal notranslate"><span class="pre">.txt</span></code>, <code class="docutils literal notranslate"><span class="pre">.eaf</span></code> and so on) allow you to have a separate file with morphological (or any other word-level) annotation for all or some of the word forms. The only available option for now is <code class="docutils literal notranslate"><span class="pre">xml_rnc</span></code>, the XML format used in the Russian National Corpus. An annotated word list in this format is a plain text file where each line is a valid XML that describes one unique word form. The lines should look as follows:</p>
@@ -80,14 +81,18 @@
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forks.html">Forks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors.html">Source convertors</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Conversion-time morphological analysis</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Morphological analysis</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#analyzed-word-lists">Analyzed word lists</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#disambiguation">Disambiguation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tags_vs_glosses.html">Tags or glosses?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors_gloss.html">Converting glosses to tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="txt2json.html">Plain text convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eaf2json.html">ELAN convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html">FieldWorks convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html#export">Export</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html#configuration-and-challenges">Configuration and challenges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_model.html">Data model</a></li>
 </ul>

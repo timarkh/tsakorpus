@@ -1,15 +1,15 @@
 Tags or glosses?
-----------------
+================
 
 Introduction
-============
+------------
 
 The default way of representing word-level morphological information in mainstream corpus linguistics is to assign each word a grammatical *tag* or a set of tags. Each tag represents one value of one particular morphosyntactic category. Part-of-speech (POS) tags are the most common example, but corpora of morphologically rich languages often have tags for other categories, such as tense, number or case. Information about lexical classes, such as animate nouns or motion verbs, can also be encoded in such a way. In Tsakorpus, each tag is a string, and all tags are split into classes (e.g. "case tags") in :doc:`categories.json`.
 
 In typology and language documentation, however, another approach is often used, which is called *glossing*. Glossing means that each word is split into morphemes, and each morpheme gets a label, called *gloss*, that summarizes the morphosyntactic values expressed in it. Stems/roots are usually glossed with their English translation, although translations in other major metalanguages are also common. The most widely adopted glossing styleguide is the `Leipzig glossing rules <https://www.eva.mpg.de/lingua/resources/glossing-rules.php>`_. Glossed texts is what you will have if you annotate your texts in FieldWorks or Toolbox.
 
 Example
-=======
+-------
 
 Here is a simple Hungarian example:
 
@@ -20,7 +20,7 @@ Here is a simple Hungarian example:
 (The actual tags could be different, e.g. "1poss" or "p1" instead of "1.p"; there is no universally accepted list of tags. Also the format is different in different corpora; Tsakorpus uses comma-delimited lists.) This word contains three morphemes: the stem with the meaning "corpus", the portmanteau plural/possessive marker (**-aim-**) and the inessive case marker (**-ban**). It is an inanimate (tag *inanim*) noun (tag *N*) with four morphosyntactic values expressed by inflectional morphology: plural number (*pl*), first person of the possessor (*1.p*), plurality of the possessor (*pl.p*), and inessive case (*iness*).
 
 Aren't glosses and grammatical tags basically the same thing?
-=============================================================
+-------------------------------------------------------------
 
 Glosses and grammatical tags generally represent the same kind of information, i.e. which morphosyntactic categories are expressed in a word, but in a different way. Here are some of the differences:
 
@@ -45,10 +45,10 @@ There are also additional reasons why glosses are not always the most transparen
 
 Nevetheless, glosses can also be useful, for example because they provide positional information absent in the tags. The tags are usually interpreted as a sack of values: their mutual order has no connection to the mutual order of the morphemes that express those values (which comes as no surprise, since there is no one-to-one correspondence between morphemes and grammatical values). Glosses, on the other hand, contain this information. This might be important for morphologically rich languages. For example, Udmurt has a number of derivational verbal suffixes, such as passive or causative, that can have different mutual order, determined by their scope. If you have glosses, you can search for all verbs where a passive is followed by a causative, but not vice versa. With mere tags that would be impossible.
 
-All in all, both representations of grammatical information can be useful, but tags are probably more suited for corpus search purposes.
+All in all, both representations of grammatical information can be useful, but tags are probably better suited for corpus search purposes.
 
 Glosses-to-tags conversion
-==========================
+--------------------------
 
 If you only have glosses in your corpus, Tsakorpus source convertors offer a possibility of :doc:`converting </src_convertors_gloss>` them into grammatical tags. This way, both kinds of information will be available for search. To do so, you will have to prepare a set of rules that will tell the source convertor which tags to add for which gloss or combination of glosses.
 

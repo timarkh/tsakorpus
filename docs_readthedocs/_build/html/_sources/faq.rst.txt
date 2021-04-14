@@ -1,6 +1,6 @@
 Short FAQ
 =========
-Here are some short answers to common questions. They can help you decide if Tsakorpus is what you need.
+Here are some short answers to common questions. They can help you decide if Tsakorpus is what you need. If you have already decided, go to :doc:`overview`.
 
 From the developer's perspective
 --------------------------------

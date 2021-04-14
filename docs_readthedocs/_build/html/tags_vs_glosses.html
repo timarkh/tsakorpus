@@ -15,7 +15,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Converting glosses to tags" href="src_convertors_gloss.html" />
-    <link rel="prev" title="Conversion-time morphological analysis" href="parsed_wordlist_format.html" />
+    <link rel="prev" title="Morphological analysis" href="parsed_wordlist_format.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -71,7 +71,7 @@
 <li><p>With glossing, it is not so easy to distinguish between lexical and grammatical/functional morphemes, at least for a machine. If you see a word glossed as <em>table-SG</em>, how does the computer now that <em>SG</em> is a grammatical gloss that has to be searchable as such, while <em>table</em> is a lexical gloss (translation of the stem)? Certain conventions could help, such as reserving the uppercase for grammatical glosses, but they do not yield unambiguous results. For example, the 1sg English pronoun <em>I</em> would be indistinguishable from a grammatical gloss because it is uppercase. Also, sometimes linguists gloss “small words” with uncertain meaning as e.g. <em>PTCL</em> or <em>INTERJ</em>.</p></li>
 </ul>
 <p>Nevetheless, glosses can also be useful, for example because they provide positional information absent in the tags. The tags are usually interpreted as a sack of values: their mutual order has no connection to the mutual order of the morphemes that express those values (which comes as no surprise, since there is no one-to-one correspondence between morphemes and grammatical values). Glosses, on the other hand, contain this information. This might be important for morphologically rich languages. For example, Udmurt has a number of derivational verbal suffixes, such as passive or causative, that can have different mutual order, determined by their scope. If you have glosses, you can search for all verbs where a passive is followed by a causative, but not vice versa. With mere tags that would be impossible.</p>
-<p>All in all, both representations of grammatical information can be useful, but tags are probably more suited for corpus search purposes.</p>
+<p>All in all, both representations of grammatical information can be useful, but tags are probably better suited for corpus search purposes.</p>
 </div>
 <div class="section" id="glosses-to-tags-conversion">
 <h2>Glosses-to-tags conversion<a class="headerlink" href="#glosses-to-tags-conversion" title="Permalink to this headline">¶</a></h2>
@@ -103,7 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forks.html">Forks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors.html">Source convertors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Conversion-time morphological analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Morphological analysis</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tags or glosses?</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
@@ -112,16 +112,19 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors_gloss.html">Converting glosses to tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="txt2json.html">Plain text convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eaf2json.html">ELAN convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html">FieldWorks convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_model.html">Data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="categories.html">Tags and categories</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="parsed_wordlist_format.html" title="previous chapter">Conversion-time morphological analysis</a></li>
+      <li>Previous: <a href="parsed_wordlist_format.html" title="previous chapter">Morphological analysis</a></li>
       <li>Next: <a href="src_convertors_gloss.html" title="next chapter">Converting glosses to tags</a></li>
   </ul></li>
 </ul>
