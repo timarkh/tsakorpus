@@ -102,6 +102,7 @@ The software is distributed under MIT license.
    xml_flex2json
    xml_rnc2json
    iso_tei_hamburg2json
+   exmaralda_hamburg2json
    data_model
    categories
    configuration
