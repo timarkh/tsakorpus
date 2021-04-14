@@ -14,7 +14,7 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="&lt;no title&gt;" href="txt2json.html" />
+    <link rel="next" title="Converting glosses to tags" href="src_convertors_gloss.html" />
     <link rel="prev" title="Conversion-time morphological analysis" href="parsed_wordlist_format.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -38,8 +38,6 @@
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>The default way of representing word-level morphological information in mainstream corpus linguistics is to assign each word a grammatical <em>tag</em> or a set of tags. Each tag represents one value of one particular morphosyntactic category. Part-of-speech (POS) tags are the most common example, but corpora of morphologically rich languages often have tags for other categories, such as tense, number or case. Information about lexical classes, such as animate nouns or motion verbs, can also be encoded in such a way. In Tsakorpus, each tag is a string, and all tags are split into classes (e.g. “case tags”) in <span class="xref std std-doc">categories.json</span>.</p>
 <p>In typology and language documentation, however, another approach is often used, which is called <em>glossing</em>. Glossing means that each word is split into morphemes, and each morpheme gets a label, called <em>gloss</em>, that summarizes the morphosyntactic values expressed in it. Stems/roots are usually glossed with their English translation, although translations in other major metalanguages are also common. The most widely adopted glossing styleguide is the <a class="reference external" href="https://www.eva.mpg.de/lingua/resources/glossing-rules.php">Leipzig glossing rules</a>. Glossed texts is what you will have if you annotate your texts in FieldWorks or Toolbox.</p>
-<p>However, if only glosses are present in the annotation, it may negatively affect the search functionality of the corpus. To address this problem, Tsakorpus source convertors offer a possibility of <span class="xref std std-doc">converting</span> one’s glosses into grammatical tags. This way, both kinds of information will be available for search. To do so, you will have to prepare a set of rules that will tell the source convertor which tags to add for which gloss or combination of glosses.</p>
-<p>It is worth noting that the part of speech tag is present in the texts annotated in FieldWorks or Toolbox, so there is no need to extract the POS information from glosses (which would be very difficult).</p>
 </div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
@@ -59,7 +57,7 @@
 <li><p>With tags, you do not know which category is expressed by which morpheme.</p></li>
 <li><p>Each tag ideally expresses one particular value of one particular category, while there is generally no one-to-one correspondence between categories and morphemes. One category can be experessed by several different morphemes, or several categories can be expressed by one morpheme.</p></li>
 </ul>
-<p>It may seem that, putting aside lexical class glosses such <em>inanim</em> above, tags would be redundant compared to glosses. However, this is not always the case. Consider, for example, Udmurt (Uralic &gt; Permic) word <strong>bi̮dtiśkemmi̮</strong>. Here is how it could be glossed:</p>
+<p>It may seem that, putting aside lexical class glosses such <em>inanim</em> above, tags would be redundant compared to glosses. However, this is not always the case. If only glosses are present in the annotation, it may negatively affect the search functionality of the corpus. Consider, for example, Udmurt (Uralic &gt; Permic) word <strong>bi̮dtiśkemmi̮</strong>. Here is how it could be glossed:</p>
 <ul class="simple">
 <li><p>morpheme breaks: <strong>bi̮dt-iśk-em-mi̮</strong></p></li>
 <li><p>glosses: <em>finish-PASS-PST.EVID-1PL.POSS</em> (or <em>finish-PRS.12-PST.EVID-1PL.POSS</em>)</p></li>
@@ -73,6 +71,12 @@
 <li><p>With glossing, it is not so easy to distinguish between lexical and grammatical/functional morphemes, at least for a machine. If you see a word glossed as <em>table-SG</em>, how does the computer now that <em>SG</em> is a grammatical gloss that has to be searchable as such, while <em>table</em> is a lexical gloss (translation of the stem)? Certain conventions could help, such as reserving the uppercase for grammatical glosses, but they do not yield unambiguous results. For example, the 1sg English pronoun <em>I</em> would be indistinguishable from a grammatical gloss because it is uppercase. Also, sometimes linguists gloss “small words” with uncertain meaning as e.g. <em>PTCL</em> or <em>INTERJ</em>.</p></li>
 </ul>
 <p>Nevetheless, glosses can also be useful, for example because they provide positional information absent in the tags. The tags are usually interpreted as a sack of values: their mutual order has no connection to the mutual order of the morphemes that express those values (which comes as no surprise, since there is no one-to-one correspondence between morphemes and grammatical values). Glosses, on the other hand, contain this information. This might be important for morphologically rich languages. For example, Udmurt has a number of derivational verbal suffixes, such as passive or causative, that can have different mutual order, determined by their scope. If you have glosses, you can search for all verbs where a passive is followed by a causative, but not vice versa. With mere tags that would be impossible.</p>
+<p>All in all, both representations of grammatical information can be useful, but tags are probably more suited for corpus search purposes.</p>
+</div>
+<div class="section" id="glosses-to-tags-conversion">
+<h2>Glosses-to-tags conversion<a class="headerlink" href="#glosses-to-tags-conversion" title="Permalink to this headline">¶</a></h2>
+<p>If you only have glosses in your corpus, Tsakorpus source convertors offer a possibility of <a class="reference internal" href="src_convertors_gloss.html"><span class="doc">converting</span></a> them into grammatical tags. This way, both kinds of information will be available for search. To do so, you will have to prepare a set of rules that will tell the source convertor which tags to add for which gloss or combination of glosses.</p>
+<p>It is worth noting that the part-of-speech tag is present in the texts annotated in FieldWorks or Toolbox, so there is no need to extract the POS information from glosses (which would be very difficult).</p>
 </div>
 </div>
 
@@ -104,8 +108,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#aren-t-glosses-and-grammatical-tags-basically-the-same-thing">Aren’t glosses and grammatical tags basically the same thing?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#glosses-to-tags-conversion">Glosses-to-tags conversion</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="src_convertors_gloss.html">Converting glosses to tags</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eaf2json.html">ELAN convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_model.html">Data model</a></li>
@@ -116,7 +122,7 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="parsed_wordlist_format.html" title="previous chapter">Conversion-time morphological analysis</a></li>
-      <li>Next: <a href="txt2json.html" title="next chapter">&lt;no title&gt;</a></li>
+      <li>Next: <a href="src_convertors_gloss.html" title="next chapter">Converting glosses to tags</a></li>
   </ul></li>
 </ul>
 </div>

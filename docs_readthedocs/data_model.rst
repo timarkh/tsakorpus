@@ -10,8 +10,8 @@ A corpus should be a collection of JSON or gzipped JSON files structured accordi
 
 Each JSON file contains a dictionary representing one corpus document. Each dictionary should have the following keys:
 
-* ``meta`` -- a dictionary with the document-level metadata.
-* ``sentences`` -- a list of sentences the document consists of.
+- ``meta`` -- a dictionary with the document-level metadata.
+- ``sentences`` -- a list of sentences the document consists of.
 
 The document has, therefore, the following structure:
 
@@ -28,23 +28,23 @@ Metadata
 
 The value of the ``meta`` key is a dictionary where keys are the names of the metadata fields and the values are strings. All fields listed in the ``viewable_meta`` array in ``/conf/corpus.json`` must be present in each document of the corpus. Other than that, there are no restrictions on metadata; the array may even be empty. However, there are several field names which get special treatment in Tsakorpus:
 
-* The value of ``filename`` is never included in the search results to avoid accidentally compromising the data of corpus developers.
-* By default, the ``title`` and ``author`` fields are displayed as document identifiers next to each context in the search results.
-* The value of ``year`` should be integer.
-* If in your corpus you have texts for which the exact year of creation is unknown, or which contain parts written in different years, you may use fields ``year_from`` and ``year_to`` as lower and upper bounds for the year. If the difference between them is less than 2 and the document does not have the ``year`` field, it will be created and filled automatically.
+- The value of ``filename`` is never included in the search results to avoid accidentally compromising the data of corpus developers.
+- By default, the ``title`` and ``author`` fields are displayed as document identifiers next to each context in the search results.
+- The value of ``year`` should be integer.
+- If in your corpus you have texts for which the exact year of creation is unknown, or which contain parts written in different years, you may use fields ``year_from`` and ``year_to`` as lower and upper bounds for the year. If the difference between them is less than 2 and the document does not have the ``year`` field, it will be created and filled automatically.
 
 Sentence list
 -------------
 
 The list of sentences is the main part of the document. Each sentence is a dictionary with the following keys:
 
-* ``text`` -- a string with the full text of the sentence.
-* ``words`` -- a list of objects, each representing a token (word or punctuation mark) in the sentence together with all the annotation. There are several reasons why the text of the sentence (or at least most of it) is actually stored twice, first in the ``text`` field and second inside the word objects. One of them is allowing multiple (ambiguous) tokenization options for a single sentence. Another is allowing easy full-text search, which would have been impossible in elasticsearch without the ``text`` field. Yet another is the possibility of normalizing the tokens so that they can look differently in the sentence and in the analysis.
-* ``lang`` -- a one-byte integer representing the language the sentence is written in. This number should be a valid index for the ``languages`` array in ``/conf/corpus.json``.
-* ``meta`` -- a dictionary with sentence-level metafields. Sentence-level metafields may include, for example, speaker data for multi-tier (dialogue) files or year in a document that includes data from different years. All metafields listed in the ``sentence_meta`` array in ``/conf/corpus.json`` must be present in this dictionary. The values should be strings.
-* ``para_alignment`` (only in parallel corpora, i.e. corpora with several languages where all or some of the sentences in one language are aligned to sentences in another language) -- a list with dictionaries, each representing an alignment of some part of the sentence with a part of another sentence in the corpus.
-* ``src_alignment`` (only for media-aligned corpora) -- a list with dictionaries, each representing an alignment of some part of the sentence with a segment of a video or sound file.
-* ``style_spans`` (optional) -- a list with dictionaries, each representing a segment of the sentence text that should be displayed in a non-default style, e.g. in italics or in superscript.
+- ``text`` -- a string with the full text of the sentence.
+- ``words`` -- a list of objects, each representing a token (word or punctuation mark) in the sentence together with all the annotation. There are several reasons why the text of the sentence (or at least most of it) is actually stored twice, first in the ``text`` field and second inside the word objects. One of them is allowing multiple (ambiguous) tokenization options for a single sentence. Another is allowing easy full-text search, which would have been impossible in elasticsearch without the ``text`` field. Yet another is the possibility of normalizing the tokens so that they can look differently in the sentence and in the analysis.
+- ``lang`` -- a one-byte integer representing the language the sentence is written in. This number should be a valid index for the ``languages`` array in ``/conf/corpus.json``.
+- ``meta`` -- a dictionary with sentence-level metafields. Sentence-level metafields may include, for example, speaker data for multi-tier (dialogue) files or year in a document that includes data from different years. All metafields listed in the ``sentence_meta`` array in ``/conf/corpus.json`` must be present in this dictionary. The values should be strings.
+- ``para_alignment`` (only in parallel corpora, i.e. corpora with several languages where all or some of the sentences in one language are aligned to sentences in another language) -- a list with dictionaries, each representing an alignment of some part of the sentence with a part of another sentence in the corpus.
+- ``src_alignment`` (only for media-aligned corpora) -- a list with dictionaries, each representing an alignment of some part of the sentence with a segment of a video or sound file.
+- ``style_spans`` (optional) -- a list with dictionaries, each representing a segment of the sentence text that should be displayed in a non-default style, e.g. in italics or in superscript.
 
 The order of the sentences is important. The sentences should be grouped by language, and within each language they should be ordered exactly as they are ordered in the document. When the sentence collection is indexed, each sentence is assigned the keys ``_id``, ``prev_id`` and ``next_id``, the latter two being filled based on the mutual position of the sentences in the JSON file.
 
@@ -68,16 +68,16 @@ Words
 
 Each word in the ``words`` list is a dictionary with the following keys and values:
 
-* ``wf`` -- a string with the token (word form), used for word search.
-* ``wtype`` -- type of the token. Currently, two values are possible: "word" and "punct".
-* ``off_start``, ``off_end`` -- character offsets indicating to which segment of the ``text`` string the word corresponds. As mentioned earlier, this can be useful for multiple overlapping tokenization variants, or when the ``wf`` value is normalized for search.
-* ``next_word`` -- an integer or a list of integers indicating the index (in the ``words`` array) of the token immediately following the current token. This is also important for multiple tokenization variants.
-* ``sentence_index`` -- an integer or an array of integers (again, for multiple tokenizations) indicating the 0-based position of the token in the sentence, not counting the leading and the tail punctuation marks (which do not have to have this field).
-* ``ana`` -- a list of possible annotation variants for this word. If the word has no annotation, this key may be omitted.
+- ``wf`` -- a string with the token (word form), used for word search.
+- ``wtype`` -- type of the token. Currently, two values are possible: "word" and "punct".
+- ``off_start``, ``off_end`` -- character offsets indicating to which segment of the ``text`` string the word corresponds. As mentioned earlier, this can be useful for multiple overlapping tokenization variants, or when the ``wf`` value is normalized for search.
+- ``next_word`` -- an integer or a list of integers indicating the index (in the ``words`` array) of the token immediately following the current token. This is also important for multiple tokenization variants.
+- ``sentence_index`` -- an integer or an array of integers (again, for multiple tokenizations) indicating the 0-based position of the token in the sentence, not counting the leading and the tail punctuation marks (which do not have to have this field).
+- ``ana`` -- a list of possible annotation variants for this word. If the word has no annotation, this key may be omitted.
 
 Additionally, the word may have following fields which may be relevant for certain corpora:
 
-* ``wf_display`` -- a string with the token in HTML. It can be used if the displayed version of the token should look different from the one used for search. The displayed version is non-searchable and is displayed exactly as written, without HTML escaping that takes place otherwise. For example, if part of the token has to be in superscript, ``wf_display`` may include ``<sup>`` and ``</sup>`` tags. All HTML tags used should be closed in the same token. If you use transliteration, you should make sure the tags in ``wf_display`` are not transliterated. This field only determines what the token looks like in the popup, but not the baseline.
+- ``wf_display`` -- a string with the token in HTML. It can be used if the displayed version of the token should look different from the one used for search. The displayed version is non-searchable and is displayed exactly as written, without HTML escaping that takes place otherwise. For example, if part of the token has to be in superscript, ``wf_display`` may include ``<sup>`` and ``</sup>`` tags. All HTML tags used should be closed in the same token. If you use transliteration, you should make sure the tags in ``wf_display`` are not transliterated. This field only determines what the token looks like in the popup, but not the baseline.
 
 Overall, a word dictionary looks like this:
 
@@ -103,10 +103,10 @@ A word can have more than one analysis variant. Usually a word having multiple a
 
 Each analysis is a dictionary with the following keys and values:
 
-* ``lex`` -- lemma (dictionary form), a string.
-* any number of keys starting with ``gr.`` (such as ``gr.pos`` or ``gr.case``) -- strings or arrays of strings that contain values of grammatical or lexical categories expressed in the word. The name of the category, as well as the value, should be listed in the ``categories.json`` file for the language the sentence is written in, otherwise this information will not be searchable. Each category can have multiple values (this can happen e.g. in case compounding when a stem attaches several case markers).
-* ``gloss``, ``parts`` and ``gloss_index`` (only for corpora with glossing) -- strings representing the glosses for the word (``gloss``), segmentation of the word into morphemes (``parts``) and the combination of these two fields used during search (``gloss_index``). The ``gloss`` field should contain glossing according to the Leipzig glossing rules (the glosses can be arbitrary, but the format should be correct). The stem should be glossed as STEM instead of a short English translation, otherwise it would be impossible to make queries such as "find a genitive marker immediately following the stem". Glossing and segmentation into morphemes should not contain empty morphemes and glosses for them; all categories that are not overtly expressed in the word should be tagged using the ``gr.`` fields. The string ``gloss_index`` has the following format: GLOSS1{morpheme1}-GLOSS2{morpheme2}-... Each gloss is accompanied by the corresponding morpheme in curly brackets. All glosses are separated by hyphens; there should also be a hanging hyphen at the end of the string.
-* any number of other keys with string values, such as ``trans_en``. All fields used here have to be listed in the ``word_fields`` list in ``conf/corpus.json``, and their additional properties can be specified through optional ``kw_word_fields``, ``word_table_fields`` and ``accidental_word_fields`` parameters in the same file. You cannot have a field named ``gr``.
+- ``lex`` -- lemma (dictionary form), a string.
+- any number of keys starting with ``gr.`` (such as ``gr.pos`` or ``gr.case``) -- strings or arrays of strings that contain values of grammatical or lexical categories expressed in the word. The name of the category, as well as the value, should be listed in the ``categories.json`` file for the language the sentence is written in, otherwise this information will not be searchable. Each category can have multiple values (this can happen e.g. in case compounding when a stem attaches several case markers).
+- ``gloss``, ``parts`` and ``gloss_index`` (only for corpora with glossing) -- strings representing the glosses for the word (``gloss``), segmentation of the word into morphemes (``parts``) and the combination of these two fields used during search (``gloss_index``). The ``gloss`` field should contain glossing according to the Leipzig glossing rules (the glosses can be arbitrary, but the format should be correct). The stem should be glossed as STEM instead of a short English translation, otherwise it would be impossible to make queries such as "find a genitive marker immediately following the stem". Glossing and segmentation into morphemes should not contain empty morphemes and glosses for them; all categories that are not overtly expressed in the word should be tagged using the ``gr.`` fields. The string ``gloss_index`` has the following format: GLOSS1{morpheme1}-GLOSS2{morpheme2}-... Each gloss is accompanied by the corresponding morpheme in curly brackets. All glosses are separated by hyphens; there should also be a hanging hyphen at the end of the string.
+- any number of other keys with string values, such as ``trans_en``. All fields used here have to be listed in the ``word_fields`` list in ``conf/corpus.json``, and their additional properties can be specified through optional ``kw_word_fields``, ``word_table_fields`` and ``accidental_word_fields`` parameters in the same file. You cannot have a field named ``gr``.
 
 Parallel alignment
 ------------------

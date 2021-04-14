@@ -93,6 +93,7 @@ The software is distributed under MIT license.
    src_convertors
    parsed_wordlist_format
    tags_vs_glosses
+   src_convertors_gloss
    txt2json
    eaf2json
    xml_flex2json

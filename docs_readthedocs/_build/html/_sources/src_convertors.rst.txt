@@ -120,6 +120,8 @@ These parameters are taken into account in scenarios where Tsakorpus performs to
 
 - ``right_quot_mark`` (string) -- a replacement for a right-side double quotation mark (such as ``«`` or ``»``).
 
+- ``char_replacements`` (dictionary, optional) -- describes characters that should be replaced. Keys are characters to be replaced, values are strings they should be replaced with. Can be used e.g. for replacing lookalike special characters.
+
 Morphological analysis
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -177,12 +179,6 @@ When you are ready with the configuration and the source files are stored in the
 
 
 
-### Processing glossed text (xml_flex2json, iso_tei_hamburg2json, exmaralda_hamburg2json, eaf2json)
-The default way of representing word-level morphological information in corpus linguistics is to assign each word a grammatical tag or a set of tags. Each tag represents one value of one particular morphosyntactic category. Part-of-speech (POS) tags are the most common example, but corpora of morphologically rich languages often have tags for other categories, such as tense, number or case. Information about lexical classes, such as animate nouns or motion verbs, can also be encoded in such a way. In tsakorpus, each tag is a string, and all tags are split into classes (e.g. "case tags") in ``categories.json`` (see ``configuration.md``).
-
-In typology and language documentation, however, another approach is often used, which is called glossing. Glossing means that each word is split into morphemes, and each morpheme gets a label, called gloss, that summarizes the morphosyntactic values expressed in it. Stems/roots are usually glossed with their English translation, although translations in other major metalanguages are also common. The most widely adopted glossing styleguide is the [Leipzig glossing rules](https://www.eva.mpg.de/lingua/resources/glossing-rules.php).
-
-However, if only glosses are present in the annotation, it may affect the search functionality of the corpus in a negative way. To address this problem, tsakorpus source convertors offer a possibility of converting one's glosses into grammatical tags. Please refer to :doc:`tags_vs_glosses` for more detailed explanations and the format of the conversion rules.
 
 
 

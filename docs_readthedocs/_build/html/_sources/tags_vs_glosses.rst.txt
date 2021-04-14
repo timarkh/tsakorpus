@@ -8,10 +8,6 @@ The default way of representing word-level morphological information in mainstre
 
 In typology and language documentation, however, another approach is often used, which is called *glossing*. Glossing means that each word is split into morphemes, and each morpheme gets a label, called *gloss*, that summarizes the morphosyntactic values expressed in it. Stems/roots are usually glossed with their English translation, although translations in other major metalanguages are also common. The most widely adopted glossing styleguide is the `Leipzig glossing rules <https://www.eva.mpg.de/lingua/resources/glossing-rules.php>`_. Glossed texts is what you will have if you annotate your texts in FieldWorks or Toolbox.
 
-However, if only glosses are present in the annotation, it may negatively affect the search functionality of the corpus. To address this problem, Tsakorpus source convertors offer a possibility of :doc:`converting </src_convertors_gloss>` one's glosses into grammatical tags. This way, both kinds of information will be available for search. To do so, you will have to prepare a set of rules that will tell the source convertor which tags to add for which gloss or combination of glosses.
-
-It is worth noting that the part of speech tag is present in the texts annotated in FieldWorks or Toolbox, so there is no need to extract the POS information from glosses (which would be very difficult).
-
 Example
 =======
 
@@ -32,7 +28,7 @@ Glosses and grammatical tags generally represent the same kind of information, i
 - With tags, you do not know which category is expressed by which morpheme.
 - Each tag ideally expresses one particular value of one particular category, while there is generally no one-to-one correspondence between categories and morphemes. One category can be experessed by several different morphemes, or several categories can be expressed by one morpheme.
 
-It may seem that, putting aside lexical class glosses such *inanim* above, tags would be redundant compared to glosses. However, this is not always the case. Consider, for example, Udmurt (Uralic > Permic) word **bi̮dtiśkemmi̮**. Here is how it could be glossed:
+It may seem that, putting aside lexical class glosses such *inanim* above, tags would be redundant compared to glosses. However, this is not always the case. If only glosses are present in the annotation, it may negatively affect the search functionality of the corpus. Consider, for example, Udmurt (Uralic > Permic) word **bi̮dtiśkemmi̮**. Here is how it could be glossed:
 
 - morpheme breaks: **bi̮dt-iśk-em-mi̮**
 - glosses: *finish-PASS-PST.EVID-1PL.POSS* (or *finish-PRS.12-PST.EVID-1PL.POSS*)
@@ -48,3 +44,12 @@ There are also additional reasons why glosses are not always the most transparen
 - With glossing, it is not so easy to distinguish between lexical and grammatical/functional morphemes, at least for a machine. If you see a word glossed as *table-SG*, how does the computer now that *SG* is a grammatical gloss that has to be searchable as such, while *table* is a lexical gloss (translation of the stem)? Certain conventions could help, such as reserving the uppercase for grammatical glosses, but they do not yield unambiguous results. For example, the 1sg English pronoun *I* would be indistinguishable from a grammatical gloss because it is uppercase. Also, sometimes linguists gloss "small words" with uncertain meaning as e.g. *PTCL* or *INTERJ*.
 
 Nevetheless, glosses can also be useful, for example because they provide positional information absent in the tags. The tags are usually interpreted as a sack of values: their mutual order has no connection to the mutual order of the morphemes that express those values (which comes as no surprise, since there is no one-to-one correspondence between morphemes and grammatical values). Glosses, on the other hand, contain this information. This might be important for morphologically rich languages. For example, Udmurt has a number of derivational verbal suffixes, such as passive or causative, that can have different mutual order, determined by their scope. If you have glosses, you can search for all verbs where a passive is followed by a causative, but not vice versa. With mere tags that would be impossible.
+
+All in all, both representations of grammatical information can be useful, but tags are probably more suited for corpus search purposes.
+
+Glosses-to-tags conversion
+==========================
+
+If you only have glosses in your corpus, Tsakorpus source convertors offer a possibility of :doc:`converting </src_convertors_gloss>` them into grammatical tags. This way, both kinds of information will be available for search. To do so, you will have to prepare a set of rules that will tell the source convertor which tags to add for which gloss or combination of glosses.
+
+It is worth noting that the part-of-speech tag is present in the texts annotated in FieldWorks or Toolbox, so there is no need to extract the POS information from glosses (which would be very difficult).
