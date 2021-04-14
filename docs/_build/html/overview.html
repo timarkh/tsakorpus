@@ -89,7 +89,7 @@
 </div>
 <div class="section" id="source-convertors">
 <h2>Source convertors<a class="headerlink" href="#source-convertors" title="Permalink to this headline">¶</a></h2>
-<p>You can generate JSON files yourself, or use one of the several convertors that come with tsakorpus. The convertors are located in the <code class="docutils literal notranslate"><span class="pre">src_convertors</span></code> directory. A convertor takes a collection of files in one of the source formats, as well as a number of additional setting files, and converts them to the Tsakorpus JSON. You can find out more <a class="reference internal" href="src_convertors.html"><span class="doc">here</span></a>.</p>
+<p>You can generate JSON files yourself, or use one of the several convertors that come with Tsakorpus. The convertors are located in the <code class="docutils literal notranslate"><span class="pre">src_convertors</span></code> directory. A convertor takes a collection of files in one of the source formats, as well as a number of additional setting files, and converts them to the Tsakorpus JSON. You can find out more <a class="reference internal" href="src_convertors.html"><span class="doc">here</span></a>.</p>
 <p>Normally, conversion takes 1-10 minutes per million tokens. However, if the source convertor has to cut media files, this may take much longer (up to several hours per million tokens).</p>
 </div>
 <div class="section" id="indexing">
@@ -128,8 +128,8 @@
 <p>If you want the texts of your corpus to be available in several transliterations, you can write your own transliteration functions in Python and integrate them in the platform. See more <a class="reference internal" href="transliteration.html"><span class="doc">here</span></a>.</p>
 </div>
 <div class="section" id="running-tsakorpus">
-<h2>Running tsakorpus<a class="headerlink" href="#running-tsakorpus" title="Permalink to this headline">¶</a></h2>
-<p>You can use tsakorpus either locally or as a web service available from outside. In the first case, it is sufficient to run <code class="docutils literal notranslate"><span class="pre">tsakorpus.wsgi</span></code> as a Python file. This will start a flask web server, after which the corpus will be accessible at <code class="docutils literal notranslate"><span class="pre">http://127.0.0.1:7342/search</span></code>.</p>
+<h2>Running Tsakorpus<a class="headerlink" href="#running-tsakorpus" title="Permalink to this headline">¶</a></h2>
+<p>You can use Tsakorpus either locally or as a web service available from outside. In the first case, it is sufficient to run <code class="docutils literal notranslate"><span class="pre">tsakorpus.wsgi</span></code> as a Python file. This will start a flask web server, after which the corpus will be accessible at <code class="docutils literal notranslate"><span class="pre">http://127.0.0.1:7342/search</span></code>.</p>
 <p>In the case of the web service, it is recommended to configure your <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/deploying/mod_wsgi/">apache2</a> or <a class="reference external" href="https://flask.palletsprojects.com/en/1.1.x/deploying/fastcgi/#configuring-nginx">nginx</a> server for working with your corpus (supposing you have a Linux server). If you work with apache, you have to install and enable <code class="docutils literal notranslate"><span class="pre">mod_wsgi</span></code> for Python3. (Note that you cannot have <code class="docutils literal notranslate"><span class="pre">mod_wsgi</span></code> for both Python2 and Python3 on the same server, at least not that easy.) Then you have to specify the URL under which your corpus is going to be available and the path to the corpus files in an apache .conf file (normally by creating a new <code class="docutils literal notranslate"><span class="pre">.conf</span></code> file in the apache <code class="docutils literal notranslate"><span class="pre">sites-available</span></code> directory). The directory where your corpus is stored should have relevant read and execute permissions. Here is a sample configuration that you should put to the <code class="docutils literal notranslate"><span class="pre">.conf</span></code> file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WSGIDaemonProcess</span> <span class="o">%</span><span class="n">some_unique_process_name</span><span class="o">%</span> <span class="n">user</span><span class="o">=%</span><span class="n">you</span><span class="o">%</span> <span class="n">group</span><span class="o">=</span><span class="n">www</span><span class="o">-</span><span class="n">data</span> <span class="n">home</span><span class="o">=%</span><span class="n">path_to_corpus_directory</span><span class="o">%/</span><span class="n">search</span>
 <span class="n">WSGIScriptAlias</span> <span class="o">/%</span><span class="n">url_for_your_corpus</span><span class="o">%</span> <span class="o">%</span><span class="n">path_to_corpus_directory</span><span class="o">%/</span><span class="n">search</span><span class="o">/</span><span class="n">tsakorpus</span><span class="o">.</span><span class="n">wsgi</span>
@@ -176,17 +176,23 @@
 <li class="toctree-l2"><a class="reference internal" href="#memory-and-disk-space-consumption">Memory and disk space consumption</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#interface-translation">Interface translation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#transliterations">Transliterations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#running-tsakorpus">Running tsakorpus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-tsakorpus">Running Tsakorpus</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="forks.html">Forks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors.html">Source convertors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Conversion-time morphological analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parsed_wordlist_format.html">Morphological analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tags_vs_glosses.html">Tags or glosses?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src_convertors_gloss.html">Converting glosses to tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="txt2json.html">Plain text convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eaf2json.html">ELAN convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xml_flex2json.html">FieldWorks convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xml_rnc2json.html">RNC XML convertor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="iso_tei_hamburg2json.html">Spoken ISO/TEI convertor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_model.html">Data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="categories.html">Categories and tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Corpus configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="indexator.html">Indexing</a></li>
 </ul>
 
 <div class="relations">

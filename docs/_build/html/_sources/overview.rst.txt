@@ -60,7 +60,7 @@ If you have a corpus in one of several accepted formats, this is the typical pip
 Source convertors
 -----------------
 
-You can generate JSON files yourself, or use one of the several convertors that come with tsakorpus. The convertors are located in the ``src_convertors`` directory. A convertor takes a collection of files in one of the source formats, as well as a number of additional setting files, and converts them to the Tsakorpus JSON. You can find out more :doc:`here </src_convertors>`.
+You can generate JSON files yourself, or use one of the several convertors that come with Tsakorpus. The convertors are located in the ``src_convertors`` directory. A convertor takes a collection of files in one of the source formats, as well as a number of additional setting files, and converts them to the Tsakorpus JSON. You can find out more :doc:`here </src_convertors>`.
 
 Normally, conversion takes 1-10 minutes per million tokens. However, if the source convertor has to cut media files, this may take much longer (up to several hours per million tokens).
 
@@ -111,10 +111,10 @@ Transliterations
 
 If you want the texts of your corpus to be available in several transliterations, you can write your own transliteration functions in Python and integrate them in the platform. See more :doc:`here </transliteration>`.
 
-Running tsakorpus
+Running Tsakorpus
 -----------------
 
-You can use tsakorpus either locally or as a web service available from outside. In the first case, it is sufficient to run ``tsakorpus.wsgi`` as a Python file. This will start a flask web server, after which the corpus will be accessible at ``http://127.0.0.1:7342/search``.
+You can use Tsakorpus either locally or as a web service available from outside. In the first case, it is sufficient to run ``tsakorpus.wsgi`` as a Python file. This will start a flask web server, after which the corpus will be accessible at ``http://127.0.0.1:7342/search``.
 
 In the case of the web service, it is recommended to configure your apache2_ or nginx_ server for working with your corpus (supposing you have a Linux server). If you work with apache, you have to install and enable ``mod_wsgi`` for Python3. (Note that you cannot have ``mod_wsgi`` for both Python2 and Python3 on the same server, at least not that easy.) Then you have to specify the URL under which your corpus is going to be available and the path to the corpus files in an apache .conf file (normally by creating a new ``.conf`` file in the apache ``sites-available`` directory). The directory where your corpus is stored should have relevant read and execute permissions. Here is a sample configuration that you should put to the ``.conf`` file::
 

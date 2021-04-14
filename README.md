@@ -32,4 +32,4 @@ The following resources are used by tsakorpus, but do not need to be installed:
 
 ## License
 
-The software is distributed under MIT license (see LICENSE.md).
+The software is distributed under MIT license (see LICENSE).

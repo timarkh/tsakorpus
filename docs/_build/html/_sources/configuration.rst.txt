@@ -118,8 +118,8 @@ List of parameters
 
 - ``search_meta`` (dictionary) -- describes what should appear on different tabs of the "Select subcorpus" dialogue:
 
-   - ``columns`` -- array with column-by-column description of what options should appear on the "Specify parameters" tab;
-   - ``stat_options`` -- array with the names of the metadata fields that should be available for plotting statistics on the "Subcorpus statistics" tab.
+   - ``columns`` -- list with column-by-column description of what options should appear on the "Specify parameters" tab;
+   - ``stat_options`` -- list with the names of the metadata fields that should be available for plotting statistics on the "Subcorpus statistics" tab.
 
 - ``search_remove_whitespaces`` (Boolean) -- whether all whitespaces should be deleted from the search textbox before making a non-keyword query, such as word or lemma query. Defaults to ``true``. The whitespaces are trimmed at the ends of the textboxes regardless of this parameter.
 
@@ -143,7 +143,7 @@ List of parameters
 
 - ``word_search_display_gr`` (Boolean) -- whether the grammar column should be displayed for word/lemma query hits. Defaults to ``true``.
 
-- ``word_table_fields`` (optional) -- list with names of the word-level analysis fields that should be displayed in the table with Word search results, along with the wordform and lemma, which appear automatically. Defaults to empty list.
+- ``word_table_fields`` (list of strings) -- names of the word-level analysis fields that should be displayed in the table with Word search results, along with the wordform and lemma, which appear automatically. Defaults to empty list.
 
 - ``year_sort_enabled`` (Boolean) -- whether the "sort by year" option is enabled in sentence search. Defaults to ``false``. If enabled, sentences can be sorted by the ``year_from`` field (or just ``year``, if there is no ``year_from``) of their document in the decreasing order. Only makes sense if all documents are dated.
 

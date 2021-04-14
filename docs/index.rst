@@ -9,7 +9,10 @@ Tsakorpus
 Introduction
 ------------
 
-Tsakorpus is a linguistic corpus platform. You can use it to publish your corpora online, so that linguists can search in them without downloading the source files or any software. The backend of Tsakorpus is written in Python (with flask_) and uses Elasticsearch_ for storing and querying data.
+Tsakorpus_ is a linguistic corpus platform. You can use it to publish your corpora online, so that linguists can search in them without downloading the source files or any software. The backend of Tsakorpus is written in Python (with flask_) and uses Elasticsearch_ for storing and querying data.
+
+.. warning:: This is documentation for Tsakorpus 2.0, which is going to be released in **May 2021**.
+.. _Tsakorpus: https://github.com/timarkh/tsakorpus
 
 Here is a fact sheet about Tsakorpus:
 
