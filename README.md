@@ -1,5 +1,7 @@
 # Tsakorpus
 
+**WARNING:** Tsakorpus 2.0 is being developed right now. It is going to be released in May 2021.
+
 If you want to use tsakorpus, download the most recent version from this repository.
 
 ## Overview
