@@ -13,6 +13,7 @@ class CorpusSettings:
     """
     Properties of this class correspond to the keys in corpus.json.
     """
+
     def __init__(self):
         # General information
         self.corpus_name = ''
@@ -92,6 +93,25 @@ class CorpusSettings:
         # Parameters restructured for convenience
         self.word_fields_by_tier = {}
 
+        self.booleanFields = set(k for k in self.__dict__
+                                 if type(self.__dict__[k]) == bool)
+        self.integerFields = set(k for k in self.__dict__
+                                 if type(self.__dict__[k]) == int)
+        self.lsFields = {
+            'sentence_meta',
+            'viewable_meta',
+            'word_fields',
+            'interface_languages',
+            'transliterations',
+            'input_methods',
+            'line_plot_meta',
+            'integer_meta_fields',
+            'word_table_fields',
+            'accidental_word_fields',
+            'languages',
+            'rtl_languages'
+        }
+
     def update_format(self):
         """
         Rename keys that have been changed since Tsakorpus 1.0.
@@ -167,11 +187,38 @@ class CorpusSettings:
                 dictSettings[k] = ''
         return dictSettings
 
-    def save_settings(self, fname):
+    def processed_gui_settings(self, data):
         """
-        Save current settings as a JSON file (can be used to edit
+        Turn form data filled by the user in the configuration GUI to
+        a dictionary in the correct format.
+        """
+        dictSettings = {}
+        for f in self.booleanFields:
+            if f in data and len(data[f]) > 0:
+                dictSettings[f] = True
+            else:
+                dictSettings[f] = False
+        for f in self.integerFields:
+            if f in data and len(data[f]) > 0:
+                dictSettings[f] = int(data[f])
+        for f in self.lsFields:
+            if f in data and len(data[f]) > 0:
+                dictSettings[f] = [v.strip() for v in data[f].replace('\r', '').strip().split('\n')]
+            else:
+                dictSettings[f] = []
+        for k, v in data.items():
+            if k not in dictSettings:
+                dictSettings[k] = v
+        return dictSettings
+
+    def save_settings(self, fname, data=None):
+        """
+        Save current or new settings as a JSON file (can be used to edit
         corpus.json through a web interface).
         """
-        dictSettings = self.as_dict()
+        if data is None or len(data) <= 0:
+            dictSettings = self.as_dict()
+        else:
+            dictSettings = self.processed_gui_settings(data)
         with open(fname, 'w', encoding='utf-8') as fOut:
             json.dump(dictSettings, fOut, sort_keys=True, ensure_ascii=False, indent=2)

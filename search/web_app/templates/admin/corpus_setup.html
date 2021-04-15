@@ -44,19 +44,19 @@
 		<div class="accordion-body">
 			<div class="mb-3 option_group">
 				<label for="corpus_name" class="form-label">Corpus name</label>
-				<input type="text" class="form-control" id="corpus_name" value="{{ settings.corpus_name }}">
+				<input type="text" class="form-control" id="corpus_name" name="corpus_name" value="{{ settings.corpus_name }}">
 				<p class="explanation">Please choose a <strong>unique</strong> name, preferably long and clearly identifying your corpus. This value is used in two places. First, it is used when naming elasticsearch databases. As a consequence, if there is another corpus with the same name on your server, its data will be overwritten. Second, all corpus JSON files must be stored in <code>/corpus/%CORPUS_NAME%/</code> at indexation time. The users will not see this value.</p>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="input_format" class="form-label">Input format</label>
-				<select class="form-select" id="input_format">
+				<select class="form-select" id="input_format" name="input_format">
 				  <option value="json" {% if settings.input_format == "json" %}selected{% endif %}>uncompressed JSON</option>
 				  <option value="json-gzip" {% if settings.input_format == "json-gzip" %}selected{% endif %}>gzipped JSON</option>
 				</select>
 				<p class="explanation">Your annotated files must be either in plain JSON (with the extension <code>.json</code>), or in gzipped JSON (with the extension <code>.json.gz</code>). The indexator will only look at files with the corresponding extension.</p>
 			</div>
 			<div class="form-check option_group">
-			  <input class="form-check-input" type="checkbox" value="debug" id="debug" {% if settings.debug %}checked{% endif %}>
+			  <input class="form-check-input" type="checkbox" value="debug" id="debug" name="debug" {% if settings.debug %}checked{% endif %}>
 			  <label class="form-check-label" for="debug">
 				Are you going to launch the corpus in debug mode? (Probably not if you are not one of the platform developers.) Uncheck in production environment!
 			  </label>
@@ -73,24 +73,24 @@
     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#setings_accordion">
 		<div class="accordion-body">
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="media" id="media" {% if settings.media %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="media" id="media" name="media" {% if settings.media %}checked{% endif %}>
 				<label class="form-check-label" for="media">
 				Corpus has aligned sound or video files
 				</label>
 			</div>
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="media_youtube" id="media_youtube" {% if settings.media_youtube %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="media_youtube" id="media_youtube" name="media_youtube" {% if settings.media_youtube %}checked{% endif %}>
 				<label class="form-check-label" for="media_youtube">
 				If there are sound or video files, they are stored on Youtube rather than locally
 				</label>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="media_length" class="form-label">Media fragment length in seconds</label>
-				<input type="number" class="form-control" id="media_length" value="{{ settings.media_length }}">
+				<input type="number" class="form-control" id="media_length" name="media_length" value="{{ settings.media_length }}">
 				<p class="explanation">If there are sound or video files in the corpus, they are cut into overlapping fragments during source files conversion. This is done so that when someone finds a sentence, they could listen to its immediate context without having to download the entire file. All such fragments, apart from the last ones, have the same length; the default is 60 seconds. Please enter the same value you used in <code>/src_convertors/corpus/conf_conversion</code>.</p>
 			</div>
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="images" id="images" {% if settings.images %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="images" id="images" name="images" {% if settings.images %}checked{% endif %}>
 				<label class="form-check-label" for="images">
 				Corpus has aligned images
 				</label>
@@ -107,13 +107,13 @@
     <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="heading4" data-bs-parent="#setings_accordion">
 		<div class="accordion-body">
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="ambiguous_analyses" id="ambiguous_analyses" {% if settings.ambiguous_analyses %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="ambiguous_analyses" id="ambiguous_analyses" name="ambiguous_analyses" {% if settings.ambiguous_analyses %}checked{% endif %}>
 				<label class="form-check-label" for="ambiguous_analyses">
 				Words may have multiple analyses (e.g. ambiguous analyses for the whole word or different analyses for different parts of a host-clitic combination written as one token).
 				</label>
 			</div>
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="keep_lemma_order" id="keep_lemma_order" {% if settings.keep_lemma_order %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="keep_lemma_order" id="keep_lemma_order" name="keep_lemma_order" {% if settings.keep_lemma_order %}checked{% endif %}>
 				<label class="form-check-label" for="keep_lemma_order">
 				If there are amiguous analyses, keep their mutual order in each word. (Otherwise, lemmata may be sorted lexicographically.)
 				</label>
@@ -121,37 +121,37 @@
 			<div class="mb-3 option_group">
 				<label for="word_fields" class="form-label">Additional word-level fields</label>
 				<p class="explanation">Names of additional word-level fields (e.g. translations into a metalanguage) that should appear when the user clicks <i class="bi bi-box-arrow-down" title="more fields"></i>. Write one per line.</p>
-				<textarea class="form-control" id="word_fields" wrap="hard">{{ settings.word_fields|join('\n') }}</textarea>
+				<textarea class="form-control" id="word_fields" name="word_fields" wrap="hard">{{ settings.word_fields|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="accidental_word_fields" class="form-label">Accidental word-level fields</label>
 				<p class="explanation">Names of non-essential additional word-level fields. These fields will not be taken into account when deciding whether two tokens represent the same word, which will be reflected in the statistics. Write one per line.</p>
-				<textarea class="form-control" id="accidental_word_fields" wrap="hard">{{ settings.accidental_word_fields|join('\n') }}</textarea>
+				<textarea class="form-control" id="accidental_word_fields" name="accidental_word_fields" wrap="hard">{{ settings.accidental_word_fields|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="viewable_meta" class="form-label">Document-level metadata fields</label>
 				<p class="explanation">Names of document-level metadata fields (e.g. author or genre) that should be present in a popup when the user clicks on a text header. Write one per line.</p>
-				<textarea class="form-control" id="viewable_meta" wrap="hard">{{ settings.viewable_meta|join('\n') }}</textarea>
+				<textarea class="form-control" id="viewable_meta" name="viewable_meta" wrap="hard">{{ settings.viewable_meta|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="sentence_meta" class="form-label">Sentence-level metadata fields</label>
 				<p class="explanation">Names of sentence-level metadata fields (e.g. speaker code) that should be searchable and visible in a popup when the user moves the pointer over a sentence. Write one per line.</p>
-				<textarea class="form-control" id="sentence_meta" wrap="hard">{{ settings.sentence_meta|join('\n') }}</textarea>
+				<textarea class="form-control" id="sentence_meta" name="sentence_meta" wrap="hard">{{ settings.sentence_meta|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="integer_meta_fields" class="form-label">Integer sentence-level metadata fields</label>
 				<p class="explanation">Names of sentence-level fields that have to be interpreted as integers rather than strings. Instead of a single text box, they will be represented by two text boxes where the user can specify a range.</p>
-				<textarea class="form-control" id="integer_meta_fields" wrap="hard">{{ settings.integer_meta_fields|join('\n') }}</textarea>
+				<textarea class="form-control" id="integer_meta_fields" name="integer_meta_fields" wrap="hard">{{ settings.integer_meta_fields|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="line_plot_meta" class="form-label">Integer sentence-level metadata fields with line plots</label>
 				<p class="explanation">Names of integer sentence-level fields that have to be represented by a line plot rather than a bar chart in the statistics.</p>
-				<textarea class="form-control" id="line_plot_meta" wrap="hard">{{ settings.line_plot_meta|join('\n') }}</textarea>
+				<textarea class="form-control" id="line_plot_meta" name="line_plot_meta" wrap="hard">{{ settings.line_plot_meta|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="search_meta.stat_options" class="form-label">Document- and sentence-level metadata in statistics popup</label>
 				<p class="explanation">Names of those metadata fields that the user should be able to select when they click <i class="bi bi-bar-chart-line-fill" title="Show statistics"></i>. Document-level fields will also appear in the Subcorpus statistics tab. Write one per line.</p>
-				<textarea class="form-control" id="search_meta.stat_options" wrap="hard">{{ settings.search_meta.stat_options|join('\n') }}</textarea>
+				<textarea class="form-control" id="search_meta.stat_options" name="search_meta.stat_options" wrap="hard">{{ settings.search_meta.stat_options|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<p class="form-label">Subcorpus selection table</p>
@@ -218,64 +218,64 @@
     <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="heading5" data-bs-parent="#setings_accordion">
 		<div class="accordion-body">
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="all_language_search_enabled" id="all_language_search_enabled" {% if settings.all_language_search_enabled %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="all_language_search_enabled" id="all_language_search_enabled" name="all_language_search_enabled" {% if settings.all_language_search_enabled %}checked{% endif %}>
 				<label class="form-check-label" for="all_language_search_enabled">
 				If there are multiple tiers/languages in the corpus, "search in all languages" option is available.
 				</label>
 			</div>
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="fulltext_search_enabled" id="fulltext_search_enabled" {% if settings.fulltext_search_enabled %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="fulltext_search_enabled" id="fulltext_search_enabled" name="fulltext_search_enabled" {% if settings.fulltext_search_enabled %}checked{% endif %}>
 				<label class="form-check-label" for="fulltext_search_enabled">
 				Full-text search (a single text box underneath word query boxes) is enabled.
 				</label>
 			</div>
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="negative_search_enabled" id="negative_search_enabled" {% if settings.negative_search_enabled %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="negative_search_enabled" id="negative_search_enabled" name="negative_search_enabled" {% if settings.negative_search_enabled %}checked{% endif %}>
 				<label class="form-check-label" for="negative_search_enabled">
 				Negative search ("find all sentences without this word") is enabled.
 				</label>
 			</div>
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="gloss_search_enabled" id="gloss_search_enabled" {% if settings.gloss_search_enabled %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="gloss_search_enabled" id="gloss_search_enabled" name="gloss_search_enabled" {% if settings.gloss_search_enabled %}checked{% endif %}>
 				<label class="form-check-label" for="gloss_search_enabled">
 				Gloss search is enabled.
 				</label>
 			</div>
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="year_sort_enabled" id="year_sort_enabled" {% if settings.year_sort_enabled %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="year_sort_enabled" id="year_sort_enabled" name="year_sort_enabled" {% if settings.year_sort_enabled %}checked{% endif %}>
 				<label class="form-check-label" for="year_sort_enabled">
 				"Sort by year (descending)" option is enabled.
 				</label>
 			</div>
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="fulltext_view_enabled" id="fulltext_view_enabled" {% if settings.fulltext_view_enabled %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="fulltext_view_enabled" id="fulltext_view_enabled" name="fulltext_view_enabled" {% if settings.fulltext_view_enabled %}checked{% endif %}>
 				<label class="form-check-label" for="fulltext_view_enabled">
 				Full-text view is enabled. Do not check this if your texts are not in public domain and you do not have permission to distribute them.
 				</label>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="max_context_expand" class="form-label">Maximum number of times you can click on "expand context" button</label>
-				<input type="number" class="form-control" id="max_context_expand" value="{{ settings.max_context_expand }}">
+				<input type="number" class="form-control" id="max_context_expand" name="max_context_expand" value="{{ settings.max_context_expand }}">
 				<p class="explanation">If your texts are subject to copyright, you can limit the maximum size of the snippet the user can see. Put <em>-1</em> to allow unlimited expanding.</p>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="max_hits_retrieve" class="form-label">Maximum number of hits (sentences) the user can see</label>
-				<input type="number" class="form-control" id="max_hits_retrieve" value="{{ settings.max_hits_retrieve }}">
+				<input type="number" class="form-control" id="max_hits_retrieve" name="max_hits_retrieve" value="{{ settings.max_hits_retrieve }}">
 				<p class="explanation">If a search returns more sentences, they will be reflected in the statistics, but the user will only be able to look at this number of sentences. This number is connected to the Elasticsearch limit on maximum number of hits returned (<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html"><code>index.max_result_window</code> parameter</a>), which is 10,000 as of Elasticsearch 7.10. If you choose to increase this value, you will have to configure Elasticsearch accordingly, otherwise it will have no effect. Doing so may lead to very high memory consumption if the user actually wants to see these examples, so don't do it. If you want to look past the example number 10,000, it almost certainly means that you should narrow down your query or change the sorting method. For example, you want to look at older texts by switching on "sort by year" and going to the last page instead of setting year limits in the subcorpus selection. I don't know of anyone who would like to actually sift through more than 10,000 examples looking at each of them.</p>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="max_words_in_sentence" class="form-label">Maximum number of words in sentence</label>
-				<input type="number" class="form-control" id="max_words_in_sentence" value="{{ settings.max_words_in_sentence }}">
+				<input type="number" class="form-control" id="max_words_in_sentence" name="max_words_in_sentence" value="{{ settings.max_words_in_sentence }}">
 				<p class="explanation">Sentences can have any number of words, of course, but there is a problem with multi-word search. If you search for more than one word and set strict distances, tsakorpus builds a very large Elasticsearch query that says something like "if word 1 is A and word 2 is B, or word 2 is A and word 3 is B, etc.". In order to make such queries finite, tsakorpus has to know where to stop. If you set this value too high, this will slow down multi-word search. If you have sentences longer than this limit, the extra words will be available for single-word search and multi-word search without distances, but invisible for multi-word search with distances.</p>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="max_docs_retrieve" class="form-label">Maximum number of rows in "Select documents" tab of subcorpus selection window</label>
-				<input type="number" class="form-control" id="max_docs_retrieve" value="{{ settings.max_docs_retrieve }}">
+				<input type="number" class="form-control" id="max_docs_retrieve" name="max_docs_retrieve" value="{{ settings.max_docs_retrieve }}">
 				<p class="explanation">If you have too many documents, then too large number of rows may hang the browser.</p>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="query_timeout" class="form-label">Search timeout in seconds</label>
-				<input type="number" class="form-control" id="query_timeout" value="{{ settings.query_timeout }}">
+				<input type="number" class="form-control" id="query_timeout" name="query_timeout" value="{{ settings.query_timeout }}">
 				<p class="explanation">Queries whose execution time exceeds this limit will be terminated. This is a safeguard against unexpectedly heavy searches that can hang your server. The actual execution time may be somewhat longer than this limit because of implementation details, but not significantly so.</p>
 			</div>
 		</div>
@@ -292,22 +292,22 @@
 			<div class="mb-3 option_group">
 				<label for="interface_languages" class="form-label">Interface languages</label>
 				<p class="explanation">Codes of the languages the interface has to be available in. For each language in the list, the following translation files have to exist: (1) pyBabel <code>.po</code> translation files in <code>/search/web_app/translations/%LANGUAGE_CODE%/LC_MESSAGES/</code>; (2) help popup template <code>/search/web_app/templates/modals/help_dialogue_%LANGUAGE_CODE%.html</code>; (3) greeting alert <code>/search/web_app/templates/index/greeting_%LANGUAGE_CODE%.html</code>.</p>
-				<textarea class="form-control" id="interface_languages" wrap="hard">{{ settings.interface_languages|join('\n') }}</textarea>
+				<textarea class="form-control" id="interface_languages" name="interface_languages" wrap="hard">{{ settings.interface_languages|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="default_locale" class="form-label">Default interface language</label>
-				<input type="text" class="form-control" id="default_locale" value="{{ settings.default_locale }}">
+				<input type="text" class="form-control" id="default_locale" name="default_locale" value="{{ settings.default_locale }}">
 				<p class="explanation">The code of the language the interface opens in by default. This code should also be in the "Interface languages" list.</p>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="start_page_url" class="form-label">URL of the corpus start page</label>
-				<input type="text" class="form-control" id="start_page_url" value="{{ settings.start_page_url }}">
+				<input type="text" class="form-control" id="start_page_url" name="start_page_url" value="{{ settings.start_page_url }}">
 				<p class="explanation">Corpus name in the right upper corner will link to this URL. Do not forget to include <code>http[s]://</code> in it.</p>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="citation" class="form-label">How to cite the corpus</label>
 				<p class="explanation">Citation string for the corpus. May include HTML. Only one citation string is available at the moment; if you want to have it in multiple languages, just list all language versions here.</p>
-				<textarea class="form-control" id="citation" wrap="hard">{{ settings.citation }}</textarea>
+				<textarea class="form-control" id="citation" name="citation" wrap="hard">{{ settings.citation }}</textarea>
 			</div>
 		</div>
     </div>
@@ -321,19 +321,19 @@
     <div id="collapse7" class="accordion-collapse collapse" aria-labelledby="heading7" data-bs-parent="#setings_accordion">
 		<div class="accordion-body">
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="generate_dictionary" id="generate_dictionary" {% if settings.generate_dictionary %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="generate_dictionary" id="generate_dictionary" name="generate_dictionary" {% if settings.generate_dictionary %}checked{% endif %}>
 				<label class="form-check-label" for="generate_dictionary">
 				Generate an HTML dictionary for each language.
 				</label>
 			</div>
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="display_freq_rank" id="display_freq_rank" {% if settings.display_freq_rank %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="display_freq_rank" id="display_freq_rank" name="display_freq_rank" {% if settings.display_freq_rank %}checked{% endif %}>
 				<label class="form-check-label" for="display_freq_rank">
 				Display frequency rank / quantile column in word/lemma search.
 				</label>
 			</div>
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="word_search_display_gr" id="word_search_display_gr" {% if settings.word_search_display_gr %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="word_search_display_gr" id="word_search_display_gr" name="word_search_display_gr" {% if settings.word_search_display_gr %}checked{% endif %}>
 				<label class="form-check-label" for="word_search_display_gr">
 				Display grammar column in word/lemma search.
 				</label>
@@ -341,26 +341,26 @@
 			<div class="mb-3 option_group">
 				<label for="transliterations" class="form-label">Transliterations</label>
 				<p class="explanation">If automatic transliterations are available for your corpus, put their names here. Do not forget to include the "original" option that does not transliterate anything. Write one per line. The first option is default. For each transliteration, there should be a function in <code>/search/web_app/transliteration.py</code> named <code>trans_%TRANSLITERATION_NAME%_baseline</code> that takes the text and the name of the language as input and returns transliterated text.</p>
-				<textarea class="form-control" id="transliterations" wrap="hard">{{ settings.transliterations|join('\n') }}</textarea>
+				<textarea class="form-control" id="transliterations" name="transliterations" wrap="hard">{{ settings.transliterations|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="input_methods" class="form-label">Input methods</label>
 				<p class="explanation">Each input method, or user input transliteration, corresponds to a function that has to be applied to any value typed in any of the text fields of the search query form, such as <em>Word</em> or <em>Lemma</em>, before this value is passed to the search. The functions are allowed to make a regular expression out of the value. For each input method, there should be a function in <code>/search/web_app/transliteration.py</code> named <code>input_method_%INPUT_METHOD_NAME%</code> that takes the name of the query field, the text and the name of the language as input and returns transliterated text. Do not forget to include the "normal" option that does not transliterate anything. Write one per line. The first option is default.</p>
-				<textarea class="form-control" id="input_methods" wrap="hard">{{ settings.input_methods|join('\n') }}</textarea>
+				<textarea class="form-control" id="input_methods" name="input_methods" wrap="hard">{{ settings.input_methods|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="word_table_fields" class="form-label">Additional word/lemma search columns</label>
 				<p class="explanation">Names of additional word-level metadata fields (e.g. translations into a metalanguage) whose values should appear in separate columns in word/lemma search results. Write one per line.</p>
-				<textarea class="form-control" id="word_table_fields" wrap="hard">{{ settings.word_table_fields|join('\n') }}</textarea>
+				<textarea class="form-control" id="word_table_fields" name="word_table_fields" wrap="hard">{{ settings.word_table_fields|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="fulltext_page_size" class="form-label">Page size in full-text view</label>
-				<input type="number" class="form-control" id="fulltext_page_size" value="{{ settings.fulltext_page_size }}">
+				<input type="number" class="form-control" id="fulltext_page_size" name="fulltext_page_size" value="{{ settings.fulltext_page_size }}">
 				<p class="explanation">If full-text view is allowed, the texts are split into pages. This number determines how many sentences one page contains. Too high values may result in user's browser becoming less responsive or freezing.</p>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="author_metafield" class="form-label">Author metadata field</label>
-				<input type="text" class="form-control" id="author_metafield" value="{{ settings.author_metafield }}">
+				<input type="text" class="form-control" id="author_metafield" name="author_metafield" value="{{ settings.author_metafield }}">
 				<p class="explanation">When displaying search hits, all examples are headed by the values of "title", "author" and "year" metadata fields. If you want to have something other than "author" as the second most important field, type its name here.</p>
 			</div>
 			<div class="mb-3 option_group">
@@ -373,7 +373,7 @@
 				{% for key in settings.multiple_choice_fields %}
 				<div class="meta_column removable_metafield" data-nfield={{ loop.index }}>
 					<label for="{{ cur_field }}_{{ loop.index }}_key" class="form-label">Name of the multiple choice metadata field</label>
-					<input type="text" class="form-control" id="{{ cur_field }}_{{ loop.index }}_key" value="{{ key }}">
+					<input type="text" class="form-control" id="{{ cur_field }}_{{ loop.index }}_key" name="{{ cur_field }}_{{ loop.index }}_key" value="{{ key }}">
 					<div style="display: none" class="column_stub">
 						{% include "admin/tag_select_col.html" %}
 					</div>
@@ -435,7 +435,7 @@
 			<div class="mb-3 option_group">
 				<label for="default_values" class="form-label">Default metadata values</label>
 				<p class="explanation">Some metadata textboxes can be pre-populated with default values. Note that these values are not just placeholders: they will become part of the query if the user does not edit them. Add one line per metadata field, separate field name and its value by a colon (possibly with whitespaces). Currently, it only works for simple string-valued sentence metadata fields. <em>Important</em>: here, the textboxes should be called by the IDs they have in the HTML, e.g. <code>sent_meta_speaker</code> rather than <code>speaker</code> if <code>speaker</code> is a sentence-levele metadata field.</p>
-				<textarea class="form-control" id="default_values" wrap="hard">{% for k in settings.default_values %}{{ k }}: {{ settings.default_values[k] }}
+				<textarea class="form-control" id="default_values" name="default_values" wrap="hard">{% for k in settings.default_values %}{{ k }}: {{ settings.default_values[k] }}
 {% endfor %}</textarea>
 			</div>
 		</div>
@@ -452,15 +452,15 @@
 			<div class="mb-3 option_group">
 				<label for="languages" class="form-label">Languages / tiers in the corpus</label>
 				<p class="explanation">Names of the languages or tiers in your corpus data. These names are used in <code>categories.json</code> and as IDs in HTML elements, and can be used as keys in the <code>lang_props</code> dictionary (language-specific properties) and in other settings, see below. Write one per line. The number of lines <em>must</em> coincide with the number of different values of the <code>lang</code> property in corpus JSON files.</p>
-				<textarea class="form-control" id="languages" wrap="hard">{{ settings.languages|join('\n') }}</textarea>
+				<textarea class="form-control" id="languages" name="languages" wrap="hard">{{ settings.languages|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="rtl_languages" class="form-label">RTL languages</label>
 				<p class="explanation">Names of the languages written in a right-to-left script. Write one per line.</p>
-				<textarea class="form-control" id="rtl_languages" wrap="hard">{{ settings.rtl_languages|join('\n') }}</textarea>
+				<textarea class="form-control" id="rtl_languages" name="rtl_languages" wrap="hard">{{ settings.rtl_languages|join('\n') }}</textarea>
 			</div>
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="context_header_rtl" id="context_header_rtl" {% if settings.context_header_rtl %}checked{% endif %}>
+				<input class="form-check-input" type="checkbox" value="context_header_rtl" id="context_header_rtl" name="context_header_rtl" {% if settings.context_header_rtl %}checked{% endif %}>
 				<label class="form-check-label" for="context_header_rtl">
 				Search hit headers (title, author etc.) require a right-to-left script.
 				</label>
@@ -476,7 +476,7 @@
 				{% if "gramm_selection" in settings.lang_props[key] %}
 				<div class="meta_column removable_metafield" data-nfield={{ loop.index }}>
 					<label for="{{ cur_field }}_{{ loop.index }}_key" class="form-label">Language name</label>
-					<input type="text" class="form-control" id="{{ cur_field }}_{{ loop.index }}_key" value="{{ key }}">
+					<input type="text" class="form-control" id="{{ cur_field }}_{{ loop.index }}_key" name="{{ cur_field }}_{{ loop.index }}_key" value="{{ key }}">
 					<div style="display: none" class="column_stub">
 						{% include "admin/tag_select_col.html" %}
 					</div>
@@ -547,7 +547,7 @@
 				{% if "gloss_selection" in settings.lang_props[key] %}
 				<div class="meta_column removable_metafield" data-nfield={{ loop.index }}>
 					<label for="{{ cur_field }}_{{ loop.index }}_key" class="form-label">Language name</label>
-					<input type="text" class="form-control" id="{{ cur_field }}_{{ loop.index }}_key" value="{{ key }}">
+					<input type="text" class="form-control" id="{{ cur_field }}_{{ loop.index }}_key" name="{{ cur_field }}_{{ loop.index }}_key" value="{{ key }}">
 					<div style="display: none" class="column_stub">
 						{% include "admin/tag_select_col.html" %}
 					</div>
@@ -623,55 +623,55 @@
 				<label for="lang_props.word_fields" class="form-label">Enabled search fields for each language</label>
 				<p class="explanation">Each language/tier that does not support all of the word search fields (e.g. does not support Lemma search because it has no lemmatization) can appear in this dictionary as a key. The corresponding value is a list of all search fields that should be switched on when searching in this tier. This includes all main and additional word-level search fields, except for word form (<code>wf</code>), which is always available. When the user selects a tier, the fields not supported by it, as well as their labels, turn grey (although they are not technically disabled).</p>
 				<p class="explanation">Write one line per language/tier. Separate language/tier name and list of field names with a colon (possibly with whitespaces). Separate field names with a comma (possibly with whitespaces). If a language does not appear in this list, all search fields will be enabled for it.</p>
-				<textarea class="form-control" id="lang_props.word_fields" wrap="hard">{% for k in settings.lang_props %}{% if "word_fields" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].word_fields|join(', ') }}
+				<textarea class="form-control" id="lang_props.word_fields" name="lang_props.word_fields" wrap="hard">{% for k in settings.lang_props %}{% if "word_fields" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].word_fields|join(', ') }}
 {% endif %}{% endfor %}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="auto_switch_tiers" class="form-label">Automatically switch language if certain fields are filled</label>
 				<p class="explanation">If the user writes something in a field that is not supported by the language/tier which is currently chosen, you can force the interface to switch to another language.</p>
 				<p class="explanation">Write one field-language pair per line, separated by a colon (possibly with whitespaces).</p>
-				<textarea class="form-control" id="auto_switch_tiers" wrap="hard">{% for k in settings.auto_switch_tiers %}{{ k }}: {{ settings.auto_switch_tiers[k] }}
+				<textarea class="form-control" id="auto_switch_tiers" name="auto_switch_tiers" wrap="hard">{% for k in settings.auto_switch_tiers %}{{ k }}: {{ settings.auto_switch_tiers[k] }}
 {% endfor %}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="lang_props.gr_fields_order" class="form-label">Tag ordering</label>
 				<p class="explanation">By default, grammatical tags displayed next to a word will be sorted lexicographically. If you want to specify the order of tags, you can do so by listing the categories (as represented in <code>categories.json</code>) in the desired order.</p>
 				<p class="explanation">Write one line per language/tier. Separate language/tier name and its category ordering list with a colon (possibly with whitespaces). Separate category names with a comma (possibly with whitespaces).</p>
-				<textarea class="form-control" id="lang_props.gr_fields_order" wrap="hard">{% for k in settings.lang_props %}{% if "gr_fields_order" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].gr_fields_order|join(', ') }}
+				<textarea class="form-control" id="lang_props.gr_fields_order" name="lang_props.gr_fields_order" wrap="hard">{% for k in settings.lang_props %}{% if "gr_fields_order" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].gr_fields_order|join(', ') }}
 {% endif %}{% endfor %}</textarea>
 			<div class="mb-3 option_group">
 				<label for="lang_props.other_fields_order" class="form-label">Order of other fields</label>
 				<p class="explanation">Here you can set the order of non-grammatical analysis fields. If you choose to set the order for a language, then you must list <strong>all</strong> field names that exist in the corpus for that language.</p>
 				<p class="explanation">Write one line per language/tier. Separate language/tier name and its field ordering list with a colon (possibly with whitespaces). Separate field names with a comma (possibly with whitespaces).</p>
-				<textarea class="form-control" id="lang_props.other_fields_order" wrap="hard">{% for k in settings.lang_props %}{% if "other_fields_order" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].other_fields_order|join(', ') }}
+				<textarea class="form-control" id="lang_props.other_fields_order" name="lang_props.other_fields_order" wrap="hard">{% for k in settings.lang_props %}{% if "other_fields_order" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].other_fields_order|join(', ') }}
 {% endif %}{% endfor %}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="lang_props.dictionary_categories" class="form-label">Dictionary categories</label>
 				<p class="explanation">If you want to separate tags for dictionary/lexical categories (e.g. part of speech) from inflectional tags, you can list the categories for dictionary tags here. (It is currently impossible to treat a category differently depending on other tags the word has, e.g. treat gender as a lexical category for nouns, but as an inflectional category for adjectives. You might store them as different tags under different categories if you would still like to do so.) The dictionary tags will be displayed next to the lemma.</p>
 				<p class="explanation">Write one line per language/tier. Separate language/tier name and its dictionary category list with a colon (possibly with whitespaces). Separate category names with a comma (possibly with whitespaces).</p>
-				<textarea class="form-control" id="lang_props.dictionary_categories" wrap="hard">{% for k in settings.lang_props %}{% if "dictionary_categories" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].dictionary_categories|join(', ') }}
+				<textarea class="form-control" id="lang_props.dictionary_categories" name="lang_props.dictionary_categories" wrap="hard">{% for k in settings.lang_props %}{% if "dictionary_categories" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].dictionary_categories|join(', ') }}
 {% endif %}{% endfor %}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="lang_props.exclude_fields" class="form-label">Analysis fields to exclude</label>
 				<p class="explanation">If you want to hide some analysis fields from the analysis popups, you can list them here. However, if you don't want to see them, you'd probably want to think about why you have them in the JSONs in the first place.</p>
 				<p class="explanation">Write one line per language/tier. Separate language/tier name and its excluded fields list with a colon (possibly with whitespaces). Separate field names with a comma (possibly with whitespaces).</p>
-				<textarea class="form-control" id="lang_props.exclude_fields" wrap="hard">{% for k in settings.lang_props %}{% if "exclude_fields" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].exclude_fields|join(', ') }}
+				<textarea class="form-control" id="lang_props.exclude_fields" name="lang_props.exclude_fields" wrap="hard">{% for k in settings.lang_props %}{% if "exclude_fields" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].exclude_fields|join(', ') }}
 {% endif %}{% endfor %}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="lang_props.lexicographic_order" class="form-label">Lexicographic order</label>
 				<p class="explanation">By default, all characters are sorted accoring to their Unicode codepoint. This is relevant for "sort by word/lemma" options and the generated dictionary. If you want to have a different order of characters, you can list them here. All characters not on the list will be moved to the end.</p>
 				<p class="explanation">Write one line per language/tier. Separate language/tier name and its character list with a colon (possibly with whitespaces). Separate characters with a comma (possibly with whitespaces).</p>
-				<textarea class="form-control" id="lang_props.lexicographic_order" wrap="hard">{% for k in settings.lang_props %}{% if "lexicographic_order" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].lexicographic_order|join(', ') }}
+				<textarea class="form-control" id="lang_props.lexicographic_order" name="lang_props.lexicographic_order" wrap="hard">{% for k in settings.lang_props %}{% if "lexicographic_order" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].lexicographic_order|join(', ') }}
 {% endif %}{% endfor %}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="lang_props.gramm_shortcuts" class="form-label">Tag shortcuts</label>
 				<p class="explanation">You can create shortcuts for grammatical tags, for example "umbrella tags" that match multiple real tags at once, or traditional labels that are annotated differently in your data. For example, you can create a tag called <code>case</code>, which will match <code>nom</code>, <code>acc</code> and <code>dat</code>. Or a tag called <code>aorist</code> matching <code>pst,pfv</code>.</p>
 				<p class="explanation">Write language name on a new line, followed by a colon. All consequent lines referring to that language must start with at least one whitespace. Each such line must contain a key-value pair separated by a colon (possibly with whitespaces). The key is the shortcut (e.g. <code>case</code>). The value is the <strong>string or boolean expression</strong> it has to be replaced with, e.g. <code>(nom|acc|dat)</code>.</p>
-				<textarea class="form-control" id="lang_props.gramm_shortcuts" wrap="hard">{% for k in settings.lang_props %}{% if "gramm_shortcuts" in settings.lang_props[k] %}{{ k }}:{% for shortcut in settings.lang_props[k].gramm_shortcuts %}
+				<textarea class="form-control" id="lang_props.gramm_shortcuts" name="lang_props.gramm_shortcuts" wrap="hard">{% for k in settings.lang_props %}{% if "gramm_shortcuts" in settings.lang_props[k] %}{{ k }}:{% for shortcut in settings.lang_props[k].gramm_shortcuts %}
   {{ shortcut }}: {{ settings.lang_props[k].gramm_shortcuts[shortcut] }}{% endfor %}
 {% endif %}{% endfor %}</textarea>
 			</div>
@@ -679,7 +679,7 @@
 				<label for="lang_props.gloss_shortcuts" class="form-label">Gloss shortcuts</label>
 				<p class="explanation">If you have glosses, you can create gloss shortcuts, or "umbrella glosses" that match multiple real glosses at once. For example, you can create a gloss called <code>CASE</code>, which will match <code>NOM</code>, <code>ACC</code> and <code>DAT</code>.</p>
 				<p class="explanation">Write language name on a new line, followed by a colon. All consequent lines referring to that language must start with at least one whitespace. Each such line must contain a key-value pair separated by a colon (possibly with whitespaces). The key is the shortcut (e.g. <code>CASE</code>). The value is the <strong>string or regex</strong> it has to be replaced with, e.g. <code>(NOM|ACC|DAT)</code>.</p>
-				<textarea class="form-control" id="lang_props.gloss_shortcuts" wrap="hard">{% for k in settings.lang_props %}{% if "gloss_shortcuts" in settings.lang_props[k] %}{{ k }}:{% for shortcut in settings.lang_props[k].gloss_shortcuts %}
+				<textarea class="form-control" id="lang_props.gloss_shortcuts" name="lang_props.gloss_shortcuts" wrap="hard">{% for k in settings.lang_props %}{% if "gloss_shortcuts" in settings.lang_props[k] %}{{ k }}:{% for shortcut in settings.lang_props[k].gloss_shortcuts %}
   {{ shortcut }}: {{ settings.lang_props[k].gloss_shortcuts[shortcut] }}{% endfor %}
 {% endif %}{% endfor %}</textarea>
 			</div>
