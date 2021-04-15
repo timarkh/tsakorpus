@@ -44,13 +44,13 @@ List of parameters
 
 - ``default_values`` (dictionary) -- dictionary where keys are names of text boxes in the word search panel and values are the strings that should appear there by default. Currently, it only works for simple string-valued sentence-level metadata fields. The text boxes should be called by the IDs they have in the HTML, e.g. ``sent_meta_speaker`` rather than ``speaker`` if ``speaker`` is a sentence-levele metadata field.
 
-- ``detect_lemma_queries`` (Boolean) -- whether the search engine should recognize word queries which only look for one particular lemma (possibly with additional constraints) and lift the cap on the number of hits displayed. (The cap is actually increased to ``InterfaceQueryParser.maxQuerySize``, see ``search/search_engine/query_parser.py``.) Defaults to ``false``.
+- ``detect_lemma_queries`` (Boolean) -- whether the search engine should recognize word queries which only look for one particular lemma (possibly with additional constraints) and lift the cap on the number of hits displayed. (The cap is actually increased to ``InterfaceQueryParser.maxQuerySize``, see ``/search/search_engine/query_parser.py``.) Defaults to ``false``.
 
 - ``display_freq_rank`` (Boolean) -- whether the quantile / frequency rank column should be displayed for word/lemma query hits. Defaults to ``true``.
 
 - ``fulltext_search_enabled`` (Boolean) -- boolean value that determines whether a text box for full-text search should be displayed. Defaults to ``true``.
 
-- ``fulltext_view_enabled`` (Boolean) -- whether it is allowed to view entire annotated texts. If turned on, HTML rendering is generated for each text at indexation time (which can slow down the process significantly). Defaults to ``false``.
+- ``fulltext_view_enabled`` (Boolean) -- whether it is allowed to view entire annotated texts. If turned on, HTML rendering is generated for texts at indexation time (which can slow down the process significantly). Full texts are only generated for those JSON files that have ``fulltext_id`` metadata field filled in. The name of the resulting file is its value. Defaults to ``false``.
 
 - ``generate_dictionary`` (Boolean) -- whether a dictionary of lexemes should be generated at indexation time for each of the languages. If true, the dictionary is stored in the ``search/web_app/templates`` directory and could be accessed by clicking the book glyph in the web interface. Defaults to ``false``.
 
@@ -78,9 +78,11 @@ List of parameters
 
     - ``gloss_selection`` (dictionary) -- dictionary that describes what should appear in the Gloss selection popup. Currently, its only key is ``columns``, where the value is a list containing lists of tag descriptors, each of these inner lists representing a single column in the popup. Each descriptor is a dictionary with possible keys ``type`` (obligatory), ``value`` and ``tooltip``. The corresponding values are strings. ``type`` parameter can equal ``tag`` (description of a gloss tag), ``header`` (description of a header for a group of gloss tags), or ``separator`` (a line that separates one group of tags from another). ``value`` and ``tooltip`` determine what text will appear on the tag an on the tooltip.
 
-    - ``gloss_shortcuts`` (dictionary) -- dictionary where keys are shortcuts for gloss search and values are the regexes they should translate into when searching. The shortcuts can, for example, be umbrella tags like "case" that should be replaced by a disjunction of actual case tags like "(nom|gen|dat)". These transformations are applied to the contents of the gloss search input before further processing.
+    - ``gloss_shortcuts`` (dictionary) -- dictionary where keys are shortcuts for gloss search and values are the regexes they should translate into when searching. The shortcuts can, for example, be umbrella tags like ``CASE`` that should be replaced by a disjunction of actual case tags like ``(NOM|ACC|DAT)``. These transformations are applied to the contents of the Gloss search input before further processing.
 
     - ``gr_fields_order`` (list of strings) -- list of names of :doc:`category names </categories>` (without the ``gr.`` prefix) which defines in which order their values should be displayed in word analyses. (Since they are stored in a nested object, they are unordered in the database).
+
+    - ``gramm_shortcuts`` (dictionary) -- dictionary where keys are shortcuts for grammatical tags and values are the Boolean expressions they should translate into when searching. The shortcuts can, for example, be umbrella tags like ``case`` that should be replaced by a disjunction of actual case tags like ``(nom|gen|dat)``. Or they can stand for a traditional category label that is annotated differently in your data, e.g. ``aorist`` could translate into ``pst,pfv``. These transformations are applied to the contents of the Grammar search input before further processing.
 
     - ``gramm_selection`` (dictionary) -- what should appear in the Grammar selection popup. Has same contents as ``gloss_selecton``.
 

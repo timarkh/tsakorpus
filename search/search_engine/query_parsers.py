@@ -174,7 +174,12 @@ class InterfaceQueryParser:
             field += '.' + self.gramDict[lang][text]
             return {'match': {field: text}}
         except KeyError:
-            return {}
+            if (lang in self.settings.lang_props
+                    and 'gramm_shortcuts' in self.settings.lang_props[lang]
+                    and text in self.settings.lang_props[lang]['gramm_shortcuts']):
+                text = self.settings.lang_props[lang]['gramm_shortcuts'][text]
+                return self.make_simple_term_query(text, field, lang, keyword_query=keyword_query)
+        return {'match_none': {}}
 
     def make_bool_query(self, strQuery, field, lang, start=0, end=-1, keyword_query=False):
         """

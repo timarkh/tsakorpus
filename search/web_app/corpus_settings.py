@@ -74,7 +74,6 @@ class CorpusSettings:
         self.context_header_rtl = False
         self.categories = {}
         self.lang_props = {}
-        self.word_fields_by_tier = {}
         self.auto_switch_tiers = {}
 
         # Regexes etc.
@@ -90,6 +89,9 @@ class CorpusSettings:
         self.lemma_freq_by_rank = []     # number of lemmata for each frequency rank
         self.ready_for_work = False      # turns True when all initialization queries have been made
 
+        # Parameters restructured for convenience
+        self.word_fields_by_tier = {}
+
     def update_format(self):
         """
         Rename keys that have been changed since Tsakorpus 1.0.
@@ -103,6 +105,15 @@ class CorpusSettings:
                 for el in self.lang_props[lang]['gramm_selection']:
                     if 'type' in el and el['type'] in ('gramm', 'gloss'):
                         el['type'] = 'tag'
+        for lang in self.word_fields_by_tier:
+            if lang not in self.languages:
+                continue
+            if lang not in self.lang_props:
+                self.lang_props[lang] = {}
+            if 'word_fields' not in self.lang_props[lang]:
+                self.lang_props[lang]['word_fields'] = []
+            self.lang_props[lang]['word_fields'] = [f for f in sorted(set(self.lang_props[lang]['word_fields'])
+                                                                      | set(self.word_fields_by_tier[lang]))]
 
     def load_settings(self, fnameCorpus, fnameCategories):
         """
@@ -123,6 +134,18 @@ class CorpusSettings:
 
         if 'stat_options' not in self.search_meta:
             self.search_meta['stat_options'] = []
+
+        # Move data to self.word_fields_by_tier for convenience
+        self.word_fields_by_tier = {}
+        for lang in self.lang_props:
+            if 'word_fields' in self.lang_props[lang]:
+                self.word_fields_by_tier[lang] = self.lang_props[lang]['word_fields']
+
+        # Glosses are searched in lowercase (maybe that will change in the future)
+        for lang in self.lang_props:
+            if 'gloss_shortcuts' in self.lang_props[lang]:
+                for k, v in self.lang_props[lang]['gloss_shortcuts'].items():
+                    self.lang_props[lang]['gloss_shortcuts'][k.lower()] = v.lower()
 
     def as_dict(self):
         """

@@ -685,5 +685,4 @@ def setup_corpus():
 def setup_corpus_save_changes():
     if not request.host.strip('/').endswith(('0.0.0.0:7342', '127.0.0.1:7342')):
         return 'This page can only be accessed from localhost.', 403
-    print(request.form)
     return jsonify(result='OK')

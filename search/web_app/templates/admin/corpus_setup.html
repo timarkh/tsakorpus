@@ -30,7 +30,7 @@
 		<p class="text-center bd-highlight fs-2"><code>{{ filename }}</code></p>
 		<p>This page is only available in English and can only be accessed when you run <code>tsakorpus.wsgi</code> as a standalone application on port 7342. The default values will be based on the current contents of <code>/conf/corpus.json</code>. It is assumed that you already have JSON files ready for indexing in <code>/corpus/%CORPUS_NAME%</code>.</p>
 		<p>As Tsakorpus is designed for a multitude of formats and usage scenarios, there are a lot of options. Please be patient!</p>
-		<p><strong>Do not forget to save your changes by clicking the button in the last slide.</strong> You can also do that in the process, the page does not clos after you click the button.
+		<p><strong>Do not forget to save your changes by clicking the button in the last slide.</strong> You can also do that in the process, the page does not close after you click the button. Do not click <em>Back</em> in your browser, or you will lose your changes.
       </div>
     </div>
 </div>
@@ -73,27 +73,27 @@
     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#setings_accordion">
 		<div class="accordion-body">
 			<div class="form-check option_group">
-				<input class="form-check-input" type="checkbox" value="images" id="images" {% if settings.images %}checked{% endif %}>
-				<label class="form-check-label" for="images">
-				Does the corpus have aligned images?
-				</label>
-			</div>
-			<div class="form-check option_group">
 				<input class="form-check-input" type="checkbox" value="media" id="media" {% if settings.media %}checked{% endif %}>
 				<label class="form-check-label" for="media">
-				Does the corpus have aligned sound or video files?
+				Corpus has aligned sound or video files
 				</label>
 			</div>
 			<div class="form-check option_group">
 				<input class="form-check-input" type="checkbox" value="media_youtube" id="media_youtube" {% if settings.media_youtube %}checked{% endif %}>
 				<label class="form-check-label" for="media_youtube">
-				If there are sound or video files, are they stored on Youtube rather than locally?
+				If there are sound or video files, they are stored on Youtube rather than locally
 				</label>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="media_length" class="form-label">Media fragment length in seconds</label>
 				<input type="number" class="form-control" id="media_length" value="{{ settings.media_length }}">
 				<p class="explanation">If there are sound or video files in the corpus, they are cut into overlapping fragments during source files conversion. This is done so that when someone finds a sentence, they could listen to its immediate context without having to download the entire file. All such fragments, apart from the last ones, have the same length; the default is 60 seconds. Please enter the same value you used in <code>/src_convertors/corpus/conf_conversion</code>.</p>
+			</div>
+			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="images" id="images" {% if settings.images %}checked{% endif %}>
+				<label class="form-check-label" for="images">
+				Corpus has aligned images
+				</label>
 			</div>
 		</div>
     </div>
@@ -125,7 +125,7 @@
 			</div>
 			<div class="mb-3 option_group">
 				<label for="accidental_word_fields" class="form-label">Accidental word-level fields</label>
-				<p class="explanation">Names of non-essential additional word-level fields. These fields will not be taken into account when deciding whether two tokens represent the same word, whic will be reflected in the statistics. Write one per line.</p>
+				<p class="explanation">Names of non-essential additional word-level fields. These fields will not be taken into account when deciding whether two tokens represent the same word, which will be reflected in the statistics. Write one per line.</p>
 				<textarea class="form-control" id="accidental_word_fields" wrap="hard">{{ settings.accidental_word_fields|join('\n') }}</textarea>
 			</div>
 			<div class="mb-3 option_group">
@@ -618,33 +618,69 @@
 	</h2>
     <div id="collapse9" class="accordion-collapse collapse" aria-labelledby="heading9" data-bs-parent="#setings_accordion">
 		<div class="accordion-body">
+			<p class="explanation">Blank lines are allowed in these text boxes.</p>
 			<div class="mb-3 option_group">
-				<label for="word_fields_by_tier" class="form-label">Enabled search fields for each language</label>
-				<p class="explanation">Each language/tier that does not support all of the word search fields (e.g. does not support Lemma search because it has no lemmatization) can appear in this dictionary as a key. The corresponding value is a list of all search fields that should be switched on when searching in this tier. This includes all main and additional word-level search fields, except for word form (<code>wf</code>), which is always available. When the user selects a tier, the fields not supported by it, as well as their labels, turn grey (although they are not technically disabled). Write one line per language/tier. Separate language/tier name and list of field names with a colon (possibly with whitespaces). Separate field names with a comma (possibly with whitespaces). If a language does not appear in this list, all search fields will be enabled for it.</p>
-				<textarea class="form-control" id="word_fields_by_tier" wrap="hard">{% for k in settings.word_fields_by_tier %}{{ k }}: {{ settings.word_fields_by_tier[k]|join(', ') }}
-{% endfor %}</textarea>
+				<label for="lang_props.word_fields" class="form-label">Enabled search fields for each language</label>
+				<p class="explanation">Each language/tier that does not support all of the word search fields (e.g. does not support Lemma search because it has no lemmatization) can appear in this dictionary as a key. The corresponding value is a list of all search fields that should be switched on when searching in this tier. This includes all main and additional word-level search fields, except for word form (<code>wf</code>), which is always available. When the user selects a tier, the fields not supported by it, as well as their labels, turn grey (although they are not technically disabled).</p>
+				<p class="explanation">Write one line per language/tier. Separate language/tier name and list of field names with a colon (possibly with whitespaces). Separate field names with a comma (possibly with whitespaces). If a language does not appear in this list, all search fields will be enabled for it.</p>
+				<textarea class="form-control" id="lang_props.word_fields" wrap="hard">{% for k in settings.lang_props %}{% if "word_fields" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].word_fields|join(', ') }}
+{% endif %}{% endfor %}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="auto_switch_tiers" class="form-label">Automatically switch language if certain fields are filled</label>
-				<p class="explanation">If the user writes something in a field that is not supported by the language/tier which is currently chosen, you can force the interface to switch to another language. Write one field-language pair per line, separated by a colon (possibly with whitespaces).</p>
+				<p class="explanation">If the user writes something in a field that is not supported by the language/tier which is currently chosen, you can force the interface to switch to another language.</p>
+				<p class="explanation">Write one field-language pair per line, separated by a colon (possibly with whitespaces).</p>
 				<textarea class="form-control" id="auto_switch_tiers" wrap="hard">{% for k in settings.auto_switch_tiers %}{{ k }}: {{ settings.auto_switch_tiers[k] }}
 {% endfor %}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="lang_props.gr_fields_order" class="form-label">Tag ordering</label>
-				<p class="explanation">By default, grammatical tags displayed next to a word will be sorted lexicographically. If you want to specify the order of tags, you can do so by listing the categories (as represented in <code>categories.json</code>) in the desired order. Write one line per language/tier. Separate language/tier name and its category ordering list with a colon (possibly with whitespaces). Separate category names with a comma (possibly with whitespaces).</p>
+				<p class="explanation">By default, grammatical tags displayed next to a word will be sorted lexicographically. If you want to specify the order of tags, you can do so by listing the categories (as represented in <code>categories.json</code>) in the desired order.</p>
+				<p class="explanation">Write one line per language/tier. Separate language/tier name and its category ordering list with a colon (possibly with whitespaces). Separate category names with a comma (possibly with whitespaces).</p>
 				<textarea class="form-control" id="lang_props.gr_fields_order" wrap="hard">{% for k in settings.lang_props %}{% if "gr_fields_order" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].gr_fields_order|join(', ') }}
 {% endif %}{% endfor %}</textarea>
 			<div class="mb-3 option_group">
-				<label for="lang_props.other_fields_order" class="form-label">Ordering for other fields</label>
-				<p class="explanation">Here you can set the order for non-grammatical analysis fields. If you choose to set the order for a language, then you must list <strong>all</strong> field names that exist in the corpus for that language. Separate language/tier name and its field ordering list with a colon (possibly with whitespaces). Separate field names with a comma (possibly with whitespaces).</p>
+				<label for="lang_props.other_fields_order" class="form-label">Order of other fields</label>
+				<p class="explanation">Here you can set the order of non-grammatical analysis fields. If you choose to set the order for a language, then you must list <strong>all</strong> field names that exist in the corpus for that language.</p>
+				<p class="explanation">Write one line per language/tier. Separate language/tier name and its field ordering list with a colon (possibly with whitespaces). Separate field names with a comma (possibly with whitespaces).</p>
 				<textarea class="form-control" id="lang_props.other_fields_order" wrap="hard">{% for k in settings.lang_props %}{% if "other_fields_order" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].other_fields_order|join(', ') }}
 {% endif %}{% endfor %}</textarea>
 			</div>
 			<div class="mb-3 option_group">
 				<label for="lang_props.dictionary_categories" class="form-label">Dictionary categories</label>
-				<p class="explanation">If you want to separate tags for dictionary/lexical categories (e.g. part of speech) from inflectional tags, you can list the categories for dictionary tags here. (It is currently impossible to treat a category differently depending on other tags the word has, e.g. treat gender as a lexical category for nouns, but as an inflectional category for adjectives. You might store them as different tags under different categories if you would still like to do so.) The dictionary tags will be displayed next to the lemma. Write one line per language/tier. Separate language/tier name and its dictionary category list with a colon (possibly with whitespaces). Separate category names with a comma (possibly with whitespaces).</p>
+				<p class="explanation">If you want to separate tags for dictionary/lexical categories (e.g. part of speech) from inflectional tags, you can list the categories for dictionary tags here. (It is currently impossible to treat a category differently depending on other tags the word has, e.g. treat gender as a lexical category for nouns, but as an inflectional category for adjectives. You might store them as different tags under different categories if you would still like to do so.) The dictionary tags will be displayed next to the lemma.</p>
+				<p class="explanation">Write one line per language/tier. Separate language/tier name and its dictionary category list with a colon (possibly with whitespaces). Separate category names with a comma (possibly with whitespaces).</p>
 				<textarea class="form-control" id="lang_props.dictionary_categories" wrap="hard">{% for k in settings.lang_props %}{% if "dictionary_categories" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].dictionary_categories|join(', ') }}
+{% endif %}{% endfor %}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="lang_props.exclude_fields" class="form-label">Analysis fields to exclude</label>
+				<p class="explanation">If you want to hide some analysis fields from the analysis popups, you can list them here. However, if you don't want to see them, you'd probably want to think about why you have them in the JSONs in the first place.</p>
+				<p class="explanation">Write one line per language/tier. Separate language/tier name and its excluded fields list with a colon (possibly with whitespaces). Separate field names with a comma (possibly with whitespaces).</p>
+				<textarea class="form-control" id="lang_props.exclude_fields" wrap="hard">{% for k in settings.lang_props %}{% if "exclude_fields" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].exclude_fields|join(', ') }}
+{% endif %}{% endfor %}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="lang_props.lexicographic_order" class="form-label">Lexicographic order</label>
+				<p class="explanation">By default, all characters are sorted accoring to their Unicode codepoint. This is relevant for "sort by word/lemma" options and the generated dictionary. If you want to have a different order of characters, you can list them here. All characters not on the list will be moved to the end.</p>
+				<p class="explanation">Write one line per language/tier. Separate language/tier name and its character list with a colon (possibly with whitespaces). Separate characters with a comma (possibly with whitespaces).</p>
+				<textarea class="form-control" id="lang_props.lexicographic_order" wrap="hard">{% for k in settings.lang_props %}{% if "lexicographic_order" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].lexicographic_order|join(', ') }}
+{% endif %}{% endfor %}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="lang_props.gramm_shortcuts" class="form-label">Tag shortcuts</label>
+				<p class="explanation">You can create shortcuts for grammatical tags, for example "umbrella tags" that match multiple real tags at once, or traditional labels that are annotated differently in your data. For example, you can create a tag called <code>case</code>, which will match <code>nom</code>, <code>acc</code> and <code>dat</code>. Or a tag called <code>aorist</code> matching <code>pst,pfv</code>.</p>
+				<p class="explanation">Write language name on a new line, followed by a colon. All consequent lines referring to that language must start with at least one whitespace. Each such line must contain a key-value pair separated by a colon (possibly with whitespaces). The key is the shortcut (e.g. <code>case</code>). The value is the <strong>string or boolean expression</strong> it has to be replaced with, e.g. <code>(nom|acc|dat)</code>.</p>
+				<textarea class="form-control" id="lang_props.gramm_shortcuts" wrap="hard">{% for k in settings.lang_props %}{% if "gramm_shortcuts" in settings.lang_props[k] %}{{ k }}:{% for shortcut in settings.lang_props[k].gramm_shortcuts %}
+  {{ shortcut }}: {{ settings.lang_props[k].gramm_shortcuts[shortcut] }}{% endfor %}
+{% endif %}{% endfor %}</textarea>
+			</div>
+			<div class="mb-3 option_group">
+				<label for="lang_props.gloss_shortcuts" class="form-label">Gloss shortcuts</label>
+				<p class="explanation">If you have glosses, you can create gloss shortcuts, or "umbrella glosses" that match multiple real glosses at once. For example, you can create a gloss called <code>CASE</code>, which will match <code>NOM</code>, <code>ACC</code> and <code>DAT</code>.</p>
+				<p class="explanation">Write language name on a new line, followed by a colon. All consequent lines referring to that language must start with at least one whitespace. Each such line must contain a key-value pair separated by a colon (possibly with whitespaces). The key is the shortcut (e.g. <code>CASE</code>). The value is the <strong>string or regex</strong> it has to be replaced with, e.g. <code>(NOM|ACC|DAT)</code>.</p>
+				<textarea class="form-control" id="lang_props.gloss_shortcuts" wrap="hard">{% for k in settings.lang_props %}{% if "gloss_shortcuts" in settings.lang_props[k] %}{{ k }}:{% for shortcut in settings.lang_props[k].gloss_shortcuts %}
+  {{ shortcut }}: {{ settings.lang_props[k].gloss_shortcuts[shortcut] }}{% endfor %}
 {% endif %}{% endfor %}</textarea>
 			</div>
 		</div>
