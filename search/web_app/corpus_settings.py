@@ -7,6 +7,7 @@ defaults if some keys are absent in corpus.json.
 
 import json
 import copy
+import re
 
 
 class CorpusSettings:
@@ -109,7 +110,32 @@ class CorpusSettings:
             'word_table_fields',
             'accidental_word_fields',
             'languages',
-            'rtl_languages'
+            'rtl_languages',
+            'stat_options'
+        }
+
+        # dictionaries where values are strings
+        self.dict_sFields = {
+            'auto_switch_tiers',
+            'default_values'
+        }
+
+        # dictionaries where values are lists of strings,
+        # including elements of lang_props.
+        self.dict_lsFields = {
+            'dictionary_categories',
+            'exclude_fields',
+            'gr_fields_order',
+            'lexicographic_order',
+            'other_fields_order',
+            'word_fields'
+        }
+
+        # dictionaries where values are dictionaries {k: string},
+        # including elements of lang_props.
+        self.dict_dFields = {
+            'gramm_shortcuts',
+            'gloss_shortcuts'
         }
 
     def update_format(self):
@@ -187,6 +213,153 @@ class CorpusSettings:
                 dictSettings[k] = ''
         return dictSettings
 
+    def gui_str_to_dict(self, s, value_type='list'):
+        """
+        Process one input string that describes a dictionary.
+        """
+        d = {}
+        s = s.replace('\r', '').strip()
+        s = re.sub('\n\n+', '\n', s, flags=re.DOTALL)
+        if value_type == 'dict':
+            prevKey = ''
+            curData = {}
+            for line in s.split('\n'):
+                if not line.startswith(' '):
+                    curKey = line.strip(': ')
+                    if len(prevKey) > 0 and curKey != prevKey:
+                        d[prevKey] = curData
+                        curData = {}
+                    prevKey = curKey
+                else:
+                    line = line.strip()
+                    if ':' not in line:
+                        continue
+                    k, v = line.split(':')
+                    k = k.rstrip()
+                    v = v.lstrip()
+                    curData[k] = v
+            if len(curData) > 0:
+                d[prevKey] = curData
+        else:
+            for line in s.split('\n'):
+                line = line.strip()
+                if ':' not in line:
+                    continue
+                k, v = line.split(':')
+                k = k.rstrip()
+                v = v.lstrip()
+                if value_type == 'list':
+                    if len(v) <= 0:
+                        v = []
+                    else:
+                        v = [vp.strip() for vp in v.split(',')]
+                d[k] = v
+        return d
+
+    def extract_lang_props_values(self, data):
+        """
+        Extract values of lang_props dictionary from the
+        GUI form data.
+        """
+        langProps = {}
+        grammSel = {}
+        grammSelLangs = {}
+        glossSel = {}
+        glossSelLangs = {}
+        for k, v in data.items():
+            if not k.startswith('lang_props.') or '%' in k:
+                continue
+            k = k[len('lang_props.'):]
+            if k in self.dict_sFields:
+                curDict = self.gui_str_to_dict(v, value_type='string')
+                for lang in curDict:
+                    if lang not in langProps:
+                        langProps[lang] = {}
+                    langProps[lang][k] = curDict[lang]
+            elif k in self.dict_lsFields:
+                curDict = self.gui_str_to_dict(v, value_type='list')
+                for lang in curDict:
+                    if lang not in langProps:
+                        langProps[lang] = {}
+                    langProps[lang][k] = curDict[lang]
+            elif k in self.dict_dFields:
+                curDict = self.gui_str_to_dict(v, value_type='dict')
+                for lang in curDict:
+                    if lang not in langProps:
+                        langProps[lang] = {}
+                    langProps[lang][k] = curDict[lang]
+            elif k.startswith('gloss_selection_'):
+                m = re.search('gloss_selection_([0-9]+)[._]([a-z]+)', k)
+                if m is None:
+                    continue
+                nLang = m.group(1)
+                elType = m.group(2)
+                if nLang not in glossSel:
+                    glossSel[nLang] = {}
+                if elType == 'key':
+                    glossSelLangs[nLang] = v
+                    continue
+                elif elType == 'columns':
+                    m = re.search('gloss_selection_([0-9]+)\\.columns_([0-9]+)_([0-9]+)_([a-z]+)', k)
+                    if m is None:
+                        continue
+                    nCol = m.group(2)
+                    nRow = m.group(3)
+                    attr = m.group(4)
+                    if nCol not in glossSel[nLang]:
+                        glossSel[nLang][nCol] = {}
+                    if nRow not in glossSel[nLang][nCol]:
+                        glossSel[nLang][nCol][nRow] = {}
+                    glossSel[nLang][nCol][nRow][attr] = v
+            elif k.startswith('gramm_selection_'):
+                m = re.search('gramm_selection_([0-9]+)[._]([a-z]+)', k)
+                if m is None:
+                    continue
+                nLang = m.group(1)
+                elType = m.group(2)
+                if nLang not in grammSel:
+                    grammSel[nLang] = {}
+                if elType == 'key':
+                    grammSelLangs[nLang] = v
+                    continue
+                elif elType == 'columns':
+                    m = re.search('gramm_selection_([0-9]+)\\.columns_([0-9]+)_([0-9]+)_([a-z]+)', k)
+                    if m is None:
+                        continue
+                    nCol = m.group(2)
+                    nRow = m.group(3)
+                    attr = m.group(4)
+                    if nCol not in grammSel[nLang]:
+                        grammSel[nLang][nCol] = {}
+                    if nRow not in grammSel[nLang][nCol]:
+                        grammSel[nLang][nCol][nRow] = {}
+                    grammSel[nLang][nCol][nRow][attr] = v
+        for nLang in glossSelLangs:
+            langProps[glossSelLangs[nLang]] = {'gloss_selection': {'columns': []}}
+            for nCol in sorted(glossSel[nLang], key=lambda x: int(x)):
+                curCol = []
+                for nRow in sorted(glossSel[nLang][nCol], key=lambda x: int(x)):
+                    curEl = glossSel[nLang][nCol][nRow]
+                    if 'category' in curEl:
+                        del curEl['category']
+                    curCol.append(curEl)
+                langProps[glossSelLangs[nLang]]['gloss_selection']['columns'].append(curCol)
+        for nLang in grammSelLangs:
+            langProps[grammSelLangs[nLang]] = {'gramm_selection': {'columns': []}}
+            for nCol in sorted(grammSel[nLang], key=lambda x: int(x)):
+                curCol = []
+                for nRow in sorted(grammSel[nLang][nCol], key=lambda x: int(x)):
+                    curEl = grammSel[nLang][nCol][nRow]
+                    if 'type' in curEl and curEl['type'] in ('header', 'separator'):
+                        if 'category' in curEl:
+                            del curEl['category']
+                        if 'tooltip' in curEl:
+                            del curEl['tooltip']
+                    curCol.append(curEl)
+                langProps[grammSelLangs[nLang]]['gramm_selection']['columns'].append(curCol)
+
+        return langProps
+
     def processed_gui_settings(self, data):
         """
         Turn form data filled by the user in the configuration GUI to
@@ -206,7 +379,22 @@ class CorpusSettings:
                 dictSettings[f] = [v.strip() for v in data[f].replace('\r', '').strip().split('\n')]
             else:
                 dictSettings[f] = []
+        for f in self.dict_sFields:
+            if f in data and len(data[f]) > 0:
+                dictSettings[f] = self.gui_str_to_dict(data[f], value_type='string')
+            else:
+                dictSettings[f] = {}
+        for f in self.dict_lsFields:
+            if f in data and len(data[f]) > 0:
+                dictSettings[f] = self.gui_str_to_dict(data[f], value_type='list')
+            else:
+                dictSettings[f] = {}
+        dictSettings['lang_props'] = self.extract_lang_props_values(data)
         for k, v in data.items():
+            if k.startswith(('lang_props.', 'sent_meta.')):
+                continue
+            if '%' in k:
+                continue
             if k not in dictSettings:
                 dictSettings[k] = v
         return dictSettings
