@@ -112,7 +112,7 @@ class CorpusSettings:
             'accidental_word_fields',
             'languages',
             'rtl_languages',
-            'stat_options'
+            'search_meta.stat_options'
         }
 
         # dictionaries where values are strings
@@ -124,20 +124,21 @@ class CorpusSettings:
         # dictionaries where values are lists of strings,
         # including elements of lang_props.
         self.dict_lsFields = {
-            'dictionary_categories',
-            'exclude_fields',
-            'gr_fields_order',
-            'lexicographic_order',
-            'other_fields_order',
-            'word_fields'
+            'lang_props.dictionary_categories',
+            'lang_props.exclude_fields',
+            'lang_props.gr_fields_order',
+            'lang_props.lexicographic_order',
+            'lang_props.other_fields_order',
+            'lang_props.word_fields'
         }
 
         # dictionaries where values are dictionaries {k: string},
         # including elements of lang_props.
         self.dict_dFields = {
-            'gramm_shortcuts',
-            'gloss_shortcuts'
+            'lang_props.gramm_shortcuts',
+            'lang_props.gloss_shortcuts'
         }
+
 
     def update_format(self):
         """
@@ -271,19 +272,19 @@ class CorpusSettings:
             if not k.startswith('lang_props.') or '%' in k:
                 continue
             k = k[len('lang_props.'):]
-            if k in self.dict_sFields:
+            if 'lang_props.' + k in self.dict_sFields:
                 curDict = self.gui_str_to_dict(v, value_type='string')
                 for lang in curDict:
                     if lang not in langProps:
                         langProps[lang] = {}
                     langProps[lang][k] = curDict[lang]
-            elif k in self.dict_lsFields:
+            elif 'lang_props.' + k in self.dict_lsFields:
                 curDict = self.gui_str_to_dict(v, value_type='list')
                 for lang in curDict:
                     if lang not in langProps:
                         langProps[lang] = {}
                     langProps[lang][k] = curDict[lang]
-            elif k in self.dict_dFields:
+            elif 'lang_props.' + k in self.dict_dFields:
                 curDict = self.gui_str_to_dict(v, value_type='dict')
                 for lang in curDict:
                     if lang not in langProps:
@@ -395,6 +396,50 @@ class CorpusSettings:
             searchMeta['columns'].append(curCol)
         return searchMeta
 
+    def extract_multiple_choice_fields_values(self, data):
+        """
+        Extract values of multiple_choice_fields dictionary from the
+        GUI form data.
+        """
+        multipleChoiceFields = {}
+        fieldsTmp = {}
+        fieldNames = {}
+        for k, v in data.items():
+            if k.startswith('multiple_choice_fields_'):
+                m = re.search('multiple_choice_fields_([0-9]+)[._]([a-z]+)', k)
+                if m is None:
+                    continue
+                nField = m.group(1)
+                elType = m.group(2)
+                if nField not in fieldNames:
+                    fieldsTmp[nField] = {}
+                if elType == 'key':
+                    fieldNames[nField] = v
+                    continue
+                elif elType == 'columns':
+                    m = re.search('multiple_choice_fields_([0-9]+)\\.columns_([0-9]+)_([0-9]+)_([a-z]+)', k)
+                    if m is None:
+                        continue
+                    nCol = m.group(2)
+                    nRow = m.group(3)
+                    attr = m.group(4)
+                    if nCol not in fieldsTmp[nField]:
+                        fieldsTmp[nField][nCol] = {}
+                    if nRow not in fieldsTmp[nField][nCol]:
+                        fieldsTmp[nField][nCol][nRow] = {}
+                    fieldsTmp[nField][nCol][nRow][attr] = v
+
+        for nField in fieldNames:
+            multipleChoiceFields[fieldNames[nField]] = {'columns': []}
+            for nCol in sorted(fieldsTmp[nField], key=lambda x: int(x)):
+                curCol = []
+                for nRow in sorted(fieldsTmp[nField][nCol], key=lambda x: int(x)):
+                    curEl = fieldsTmp[nField][nCol][nRow]
+                    curCol.append(curEl)
+                multipleChoiceFields[fieldNames[nField]]['columns'].append(curCol)
+
+        return multipleChoiceFields
+
     def processed_gui_settings(self, data):
         """
         Turn form data filled by the user in the configuration GUI to
@@ -402,32 +447,43 @@ class CorpusSettings:
         """
         dictSettings = {}
         for f in self.booleanFields:
+            if f.startswith(('lang_props.', 'search_meta.')):
+                continue
             if f in data and len(data[f]) > 0:
                 dictSettings[f] = True
             else:
                 dictSettings[f] = False
         for f in self.integerFields:
+            if f.startswith(('lang_props.', 'search_meta.')):
+                continue
             if f in data and len(data[f]) > 0:
                 dictSettings[f] = int(data[f])
         for f in self.lsFields:
+            if f.startswith(('lang_props.', 'search_meta.')):
+                continue
             if f in data and len(data[f]) > 0:
                 dictSettings[f] = [v.strip() for v in data[f].replace('\r', '').strip().split('\n')]
             else:
                 dictSettings[f] = []
         for f in self.dict_sFields:
+            if f.startswith(('lang_props.', 'search_meta.')):
+                continue
             if f in data and len(data[f]) > 0:
                 dictSettings[f] = self.gui_str_to_dict(data[f], value_type='string')
             else:
                 dictSettings[f] = {}
         for f in self.dict_lsFields:
+            if f.startswith(('lang_props.', 'search_meta.')):
+                continue
             if f in data and len(data[f]) > 0:
                 dictSettings[f] = self.gui_str_to_dict(data[f], value_type='list')
             else:
                 dictSettings[f] = {}
         dictSettings['lang_props'] = self.extract_lang_props_values(data)
         dictSettings['search_meta'] = self.extract_search_meta_values(data)
+        dictSettings['multiple_choice_fields'] = self.extract_multiple_choice_fields_values(data)
         for k, v in data.items():
-            if k.startswith(('lang_props.', 'search_meta.')):
+            if k.startswith(('lang_props.', 'search_meta.', 'multiple_choice_fields_')):
                 continue
             if '%' in k:
                 continue

@@ -374,7 +374,7 @@
 			<div class="mb-3 option_group">
 				<p class="form-label">Multiple-choice fields</p>
 				<p class="explanation">A tag selection table is always present in the <em>Grammar</em> field, but you can also add one to any metadata search field that appears in the word query box. This makes sense for fields that have a limited number of values. The tag buttons are visually grouped into columns. The <em>category</em> text box is used for logical grouping of tags and can contain arbitrary strings, which will not be visible to the user. Whenever several tags from the same category are selected, they get into the query with a logical OR between them; tags from different categories are united with an AND.</p>
-				{% set cur_field = "settings.multiple_choice_fields" %}
+				{% set cur_field = "multiple_choice_fields" %}
 				<div style="display: none" class="metafield_stub">
 					{% include "admin/tag_select_metafield.html" %}
 				</div>
