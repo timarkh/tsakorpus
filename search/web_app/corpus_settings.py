@@ -361,6 +361,40 @@ class CorpusSettings:
 
         return langProps
 
+    def extract_search_meta_values(self, data):
+        """
+        Extract values of search_meta dictionary from the
+        GUI form data.
+        """
+        searchMetaColumns = {}
+        searchMeta = {'columns': [], 'stat_options': []}
+        for k, v in data.items():
+            if not k.startswith('search_meta.') or '%' in k:
+                continue
+            k = k[len('search_meta.'):]
+            if k == 'stat_options':
+                searchMeta['stat_options'] = [vp.strip() for vp in v.replace('\r', '').strip().split('\n')]
+            elif k.startswith('columns_'):
+                m = re.search('columns_([0-9]+)_([0-9]+)_([a-z]+)', k)
+                if m is None:
+                    continue
+                nCol = m.group(1)
+                nRow = m.group(2)
+                attr = m.group(3)
+                if nCol not in searchMetaColumns:
+                    searchMetaColumns[nCol] = {}
+                if nRow not in searchMetaColumns[nCol]:
+                    searchMetaColumns[nCol][nRow] = {}
+                searchMetaColumns[nCol][nRow][attr] = v
+
+        for nCol in sorted(searchMetaColumns, key=lambda x: int(x)):
+            curCol = []
+            for nRow in sorted(searchMetaColumns[nCol], key=lambda x: int(x)):
+                curEl = searchMetaColumns[nCol][nRow]
+                curCol.append(curEl)
+            searchMeta['columns'].append(curCol)
+        return searchMeta
+
     def processed_gui_settings(self, data):
         """
         Turn form data filled by the user in the configuration GUI to
@@ -391,8 +425,9 @@ class CorpusSettings:
             else:
                 dictSettings[f] = {}
         dictSettings['lang_props'] = self.extract_lang_props_values(data)
+        dictSettings['search_meta'] = self.extract_search_meta_values(data)
         for k, v in data.items():
-            if k.startswith(('lang_props.', 'sent_meta.')):
+            if k.startswith(('lang_props.', 'search_meta.')):
                 continue
             if '%' in k:
                 continue
