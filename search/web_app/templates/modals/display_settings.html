@@ -36,8 +36,8 @@
 						<div class="row">
 							<label for="viewing_mode" class="col-sm-6 col-form-label">{{ _('Viewing mode:') }}</label>
 							<select name="viewing_mode" id="viewing_mode" class="search_input">
-								<option value="standard">{{ _('view_standard') }}</option>
-								<option value="glossed">{{ _('view_glossed') }}</option>
+								<option value="standard" {% if default_view == "standard" %}selected{% endif %}>{{ _('view_standard') }}</option>
+								<option value="glossed" {% if default_view == "glossed" %}selected{% endif %}>{{ _('view_glossed') }}</option>
 							</select>
 						</div>
 						{% if transliterations and transliterations|length > 1 %}

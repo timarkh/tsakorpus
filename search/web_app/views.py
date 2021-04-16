@@ -55,6 +55,7 @@ def search_page():
                            generate_dictionary=settings.generate_dictionary,
                            citation=settings.citation,
                            start_page_url=settings.start_page_url,
+                           default_view=settings.default_view,
                            max_request_time=settings.query_timeout + 1,
                            max_page_size=MAX_PAGE_SIZE,
                            locales=settings.interface_languages,

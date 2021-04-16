@@ -44,6 +44,8 @@ List of parameters
 
 - ``default_values`` (dictionary) -- dictionary where keys are names of text boxes in the word search panel and values are the strings that should appear there by default. Currently, it only works for simple string-valued sentence-level metadata fields. The text boxes should be called by the IDs they have in the HTML, e.g. ``sent_meta_speaker`` rather than ``speaker`` if ``speaker`` is a sentence-levele metadata field.
 
+- ``default_view`` (string) -- whether the sentences are displayed as simple text with analysis popups (``standard``) or as inerlinear text with glosses (``glossed``). Defaults to ``standard``.
+
 - ``detect_lemma_queries`` (Boolean) -- whether the search engine should recognize word queries which only look for one particular lemma (possibly with additional constraints) and lift the cap on the number of hits displayed. (The cap is actually increased to ``InterfaceQueryParser.maxQuerySize``, see ``/search/search_engine/query_parser.py``.) Defaults to ``false``.
 
 - ``display_freq_rank`` (Boolean) -- whether the quantile / frequency rank column should be displayed for word/lemma query hits. Defaults to ``true``.
