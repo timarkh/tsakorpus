@@ -105,10 +105,13 @@ class MediaCutter:
                     break
                 if seg[1] / 1000 <= splitStart:
                     continue
-                seg = (str(max(splitStart, seg[0] / 1000)), str(min(splitStart + splitLength, seg[1] / 1000)))
+                segStart = max(splitStart, seg[0] / 1000)
+                segEnd = min(splitStart + splitLength, seg[1] / 1000)
+                seg = (str(segStart), str(segEnd),
+                       str(segEnd - segStart))
                 curPrivacySegments.append(seg)
             beepOut = ' '.join('-filter_complex "[0]volume=0:enable=\'between(t,' + seg[0] + ',' + seg[1] + ')\'[main];'
-                               'sine=d=5:f=880,adelay=' + seg[0] + 's,pan=stereo|FL=c0|FR=c0[beep];'
+                               'sine=d=' + seg[2] + ':f=880,adelay=' + seg[0] + 's,pan=stereo|FL=c0|FR=c0[beep];'
                                '[main][beep]amix=inputs=2"'
                                for seg in curPrivacySegments)
             if len(beepOut) > 0:
