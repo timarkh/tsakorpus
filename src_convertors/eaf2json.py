@@ -43,7 +43,7 @@ class Eaf2JSON(Txt2JSON):
         self.spanAnnoTiers = {}    # span annotation tier type -> {tier ID -> [(tli1, tli2, contents)}
         self.alignedSpanAnnoTiers = {}   # aID of a segment -> {span annotation tier ID -> contents}
         self.additionalWordFields = []   # names of additional word-level fields associated with some analysis tiers
-        self.privacySegments = []        # segments (start_ms, end_ms) that should be beeped out
+        self.privacySegments = {}        # segments (start_ms, end_ms) that should be beeped out, one list per source file
         self.rxIgnoreTokens = None
         self.set_ignore_tokens()
         self.usedMediaFiles = set()      # filenames of media fragments referenced in the JSONs
@@ -450,14 +450,16 @@ class Eaf2JSON(Txt2JSON):
             self.spanAnnoTiers[annoTierType][annoTierID].append((tli1, tli2, text))
         self.spanAnnoTiers[annoTierType][annoTierID].sort()
 
-    def add_privacy_segments(self, srcTree):
+    def add_privacy_segments(self, srcTree, srcFile):
         """
         Remember segments that should be beeped out because they
         contain sensitive data.
         """
-        if 'privacy_tier' not in self.corpusSettings:
+        if 'privacy_tier' not in self.corpusSettings or len(srcFile) <= 0:
             return
         privTierID = self.corpusSettings['privacy_tier']
+        if srcFile not in self.privacySegments:
+            self.privacySegments[srcFile] = []
 
         for tierNode in srcTree.xpath('/ANNOTATION_DOCUMENT/TIER'):
             if 'TIER_ID' not in tierNode.attrib:
@@ -475,7 +477,7 @@ class Eaf2JSON(Txt2JSON):
                         continue
                     tli1 = segData[2]
                     tli2 = segData[3]
-                    self.privacySegments.append((int(self.tlis[tli1]['time']), int(self.tlis[tli2]['time'])))
+                    self.privacySegments[srcFile].append((int(self.tlis[tli1]['time']), int(self.tlis[tli2]['time'])))
 
     def process_tier(self, tierNode, aID2pID, srcFile, alignedTier=False):
         """
@@ -838,7 +840,6 @@ class Eaf2JSON(Txt2JSON):
         textJSON = {'meta': curMeta, 'sentences': []}
         nTokens, nWords, nAnalyzed = 0, 0, 0
         self.spanAnnoTiers = {}
-        self.privacySegments = []
         srcTree = etree.parse(fnameSrc)
         self.tlis = self.get_tlis(srcTree)
         self.build_segment_tree(srcTree)
@@ -850,7 +851,7 @@ class Eaf2JSON(Txt2JSON):
         else:
             srcFile = ''
         textJSON['sentences'] = [s for s in self.get_sentences(srcTree, srcFile)]
-        self.add_privacy_segments(srcTree)
+        self.add_privacy_segments(srcTree, srcFile)
         self.add_span_annotations(textJSON['sentences'])
         # First sorting: sort sentences by language, but keep them sorted by speaker
         # (which they are now, since each speaker has a separate set of tiers in ELAN).
@@ -902,9 +903,12 @@ class Eaf2JSON(Txt2JSON):
                 if fileExt in self.mediaExtensions:
                     fname = os.path.abspath(os.path.join(path, fname))
                     print('Cutting media file', fname)
+                    privacySegments = []
+                    if fname in self.privacySegments:
+                        privacySegments = self.privacySegments[fname]
                     self.mc.cut_media(fname,
                                       usedFilenames=self.usedMediaFiles,
-                                      privacySegments=self.privacySegments)
+                                      privacySegments=privacySegments)
 
 
 if __name__ == '__main__':
