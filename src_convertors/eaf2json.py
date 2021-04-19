@@ -7,7 +7,6 @@ from lxml import etree
 from txt2json import Txt2JSON
 from media_operations import MediaCutter
 
-
 EAF_TIME_MULTIPLIER = 1000  # time stamps are in milliseconds
 
 
@@ -34,19 +33,19 @@ class Eaf2JSON(Txt2JSON):
         self.speakerMeta = self.load_speaker_meta()
         self.mc = MediaCutter(settings=self.corpusSettings)
         self.srcExt = 'eaf'
-        self.tlis = {}      # time labels
-        self.pID = 0        # id of last aligned segment
+        self.tlis = {}  # time labels
+        self.pID = 0  # id of last aligned segment
         self.glosses = set()
-        self.participants = {}     # main tier ID -> participant ID
-        self.segmentTree = {}      # aID -> (contents, parent aID, tli1, tli2)
+        self.participants = {}  # main tier ID -> participant ID
+        self.segmentTree = {}  # aID -> (contents, parent aID, tli1, tli2)
         self.segmentChildren = {}  # (aID, child tier type) -> [child aID]
-        self.spanAnnoTiers = {}    # span annotation tier type -> {tier ID -> [(tli1, tli2, contents)}
-        self.alignedSpanAnnoTiers = {}   # aID of a segment -> {span annotation tier ID -> contents}
-        self.additionalWordFields = []   # names of additional word-level fields associated with some analysis tiers
-        self.privacySegments = {}        # segments (start_ms, end_ms) that should be beeped out, one list per source file
+        self.spanAnnoTiers = {}  # span annotation tier type -> {tier ID -> [(tli1, tli2, contents)}
+        self.alignedSpanAnnoTiers = {}  # aID of a segment -> {span annotation tier ID -> contents}
+        self.additionalWordFields = []  # names of additional word-level fields associated with some analysis tiers
+        self.privacySegments = {}  # segments (start_ms, end_ms) that should be beeped out, one list per source file
         self.rxIgnoreTokens = None
         self.set_ignore_tokens()
-        self.usedMediaFiles = set()      # filenames of media fragments referenced in the JSONs
+        self.usedMediaFiles = set()  # filenames of media fragments referenced in the JSONs
 
     def set_ignore_tokens(self):
         """
@@ -148,7 +147,7 @@ class Eaf2JSON(Txt2JSON):
                 try:
                     rxTierID = re.compile(k)
                     if (rxTierID.search(tierNode.attrib['TIER_ID']) is not None
-                        or rxTierID.search(tierNode.attrib['LINGUISTIC_TYPE_REF']) is not None):
+                            or rxTierID.search(tierNode.attrib['LINGUISTIC_TYPE_REF']) is not None):
                         tierType = v
                         if tierType not in self.standardAnaTiers:
                             self.additionalWordFields.append(tierType)
@@ -534,7 +533,7 @@ class Eaf2JSON(Txt2JSON):
         langID = self.corpusSettings['languages'].index(lang)
 
         segments = tierNode.xpath('ANNOTATION/REF_ANNOTATION | ANNOTATION/ALIGNABLE_ANNOTATION')
-        
+
         for segNode in segments:
             if ('ANNOTATION_ID' not in segNode.attrib
                     or segNode.attrib['ANNOTATION_ID'] not in self.segmentTree):
@@ -738,7 +737,7 @@ class Eaf2JSON(Txt2JSON):
                         mainTiers.append(tierNode)
                         break
                     elif ('LINGUISTIC_TYPE_REF' in tierNode.attrib
-                            and re.search(tierRegex, tierNode.attrib['LINGUISTIC_TYPE_REF']) is not None):
+                          and re.search(tierRegex, tierNode.attrib['LINGUISTIC_TYPE_REF']) is not None):
                         mainTiers.append(tierNode)
                         break
                 except:
@@ -753,7 +752,7 @@ class Eaf2JSON(Txt2JSON):
                         alignedTiers.append(tierNode)
                         break
                     elif ('LINGUISTIC_TYPE_REF' in tierNode.attrib
-                            and re.search(tierRegex, tierNode.attrib['LINGUISTIC_TYPE_REF']) is not None):
+                          and re.search(tierRegex, tierNode.attrib['LINGUISTIC_TYPE_REF']) is not None):
                         alignedTiers.append(tierNode)
                         break
                 except:
@@ -765,7 +764,7 @@ class Eaf2JSON(Txt2JSON):
         #                                         '/ANNOTATION_DOCUMENT/TIER[@TIER_ID=\'' + x + '\']'
         #                                         for x in self.corpusSettings['aligned_tiers']) + ')'
         #     alignedTiers = srcTree.xpath(alignedTierTypes)
-        aID2pID = {}    # annotation ID -> (pID, tli1, tli2) correspondence
+        aID2pID = {}  # annotation ID -> (pID, tli1, tli2) correspondence
         for tier in mainTiers:
             for sent in self.process_tier(tier, aID2pID, srcFile, alignedTier=False):
                 yield sent
@@ -792,7 +791,7 @@ class Eaf2JSON(Txt2JSON):
                                                  'wtype': 'punct',
                                                  'next_word': 0})
                 sentences[i]['words'].insert(0, {'off_start': -len(speaker) - 2,
-                                                 'off_end': -len(speaker)-1,
+                                                 'off_end': -len(speaker) - 1,
                                                  'wf': '\n',
                                                  'wtype': 'punct',
                                                  'next_word': -1})
@@ -901,11 +900,11 @@ class Eaf2JSON(Txt2JSON):
             for fname in files:
                 fileExt = os.path.splitext(fname.lower())[1]
                 if fileExt in self.mediaExtensions:
-                    fname = os.path.abspath(os.path.join(path, fname))
-                    print('Cutting media file', fname)
                     privacySegments = []
                     if fname in self.privacySegments:
                         privacySegments = self.privacySegments[fname]
+                    fname = os.path.abspath(os.path.join(path, fname))
+                    print('Cutting media file', fname)
                     self.mc.cut_media(fname,
                                       usedFilenames=self.usedMediaFiles,
                                       privacySegments=privacySegments)
