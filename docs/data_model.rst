@@ -73,6 +73,7 @@ Each word in the ``words`` list is a dictionary with the following keys and valu
 - ``off_start``, ``off_end`` -- character offsets indicating to which segment of the ``text`` string the word corresponds. As mentioned earlier, this can be useful for multiple overlapping tokenization variants, or when the ``wf`` value is normalized for search.
 - ``next_word`` -- an integer or a list of integers indicating the index (in the ``words`` array) of the token immediately following the current token. This is also important for multiple tokenization variants.
 - ``sentence_index`` -- an integer or an array of integers (again, for multiple tokenizations) indicating the 0-based position of the token in the sentence, not counting the leading and the tail punctuation marks (which do not have to have this field).
+- ``sentence_index_neg`` -- same as ``sentence_index``, but used when the user enters a negative number in the *Position in sentence* field. Should equal *1* for the last word in the sentence, *2* for the one before the last, etc.
 - ``ana`` -- a list of possible annotation variants for this word. If the word has no annotation, this key may be omitted.
 
 Additionally, the word may have following fields which may be relevant for certain corpora:
@@ -92,6 +93,7 @@ Overall, a word dictionary looks like this:
     "off_end": ...,
     "next_word": ...,
     "sentence_index": ...,
+    "sentence_index_neg": ...,
     "ana": [...]           // optional
   }
 
@@ -188,7 +190,8 @@ Here is an example of a sentence. It contains both parallel alignment (the text 
         "off_start": 1,
         "off_end": 5,
         "next_word": 2,
-        "sentence_index": 0
+        "sentence_index": 0,
+        "sentence_index_neg": 3
       },
       {
         "wf": "]",
@@ -205,6 +208,7 @@ Here is an example of a sentence. It contains both parallel alignment (the text 
         "off_end": 12,
         "next_word": 4,
         "sentence_index": 2,
+        "sentence_index_neg": 2,
         "ana": [
           {
             "lex": "tačʼe",
@@ -225,6 +229,7 @@ Here is an example of a sentence. It contains both parallel alignment (the text 
         "off_end": 17,
         "next_word": 5,
         "sentence_index": 3,
+        "sentence_index_neg": 1,
         "ana": [
           {
             "lex": "ta",

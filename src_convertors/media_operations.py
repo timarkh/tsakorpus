@@ -24,6 +24,7 @@ class MediaCutter:
 
     def __init__(self, settings):
         self.settings = copy.deepcopy(settings)
+        self.privacySegments = []    # segments (start_ms, end_ms) that should be beeped out
 
     def get_media_name(self, fname, ts1, ts2, minTime=None, maxTime=None):
         """
@@ -98,18 +99,33 @@ class MediaCutter:
             splitStart = startOffset + splitLength * n
             splitStr += ' -ss ' + str(splitStart) + ' -i "' + fname + '"' + \
                         ' -t ' + str(splitLength)
+            curPrivacySegments = []
+            for seg in self.privacySegments:
+                if seg[0] / 1000 >= splitStart + splitLength:
+                    break
+                if seg[1] / 1000 <= splitStart:
+                    continue
+                seg = (str(max(splitStart, seg[0] / 1000)), str(min(splitStart + splitLength, seg[1] / 1000)))
+                curPrivacySegments.append(seg)
+            beepOut = ' '.join('-filter_complex "[0]volume=0:enable=\'between(t,' + seg[0] + ',' + seg[1] + ')\'[main];'
+                               'sine=d=5:f=880,adelay=' + seg[0] + 's,pan=stereo|FL=c0|FR=c0[beep];'
+                               '[main][beep]amix=inputs=2"'
+                               for seg in curPrivacySegments)
+            if len(beepOut) > 0:
+                print(beepOut)
+                beepOut = ' ' + beepOut + ' '
             if fname.lower().endswith('.mp4'):
                 splitStr += ' -vcodec copy -acodec copy'
                 newExt = '.mp4'
             elif fname.lower().endswith(('.avi', '.mts', '.mov', '.mp4')):
-                splitStr += ' -s 400x300 -vcodec libx264 -b:v 500k -acodec aac -ab 192k'
+                splitStr += ' -s 400x300 -vcodec libx264 -b:v 500k -acodec aac -ab 192k' + beepOut
                 newExt = '.mp4'
             elif fname.lower().endswith(('.wav', '.wma', '.mp3')):
                 # splitStr += " -ab 196k"
                 # newExt = '.mp3'
                 splitStr = ' -loop 1 -i ' + os.path.abspath('img/sound.png') +\
                            ' -ss ' + str(splitStart) + \
-                           ' -i "' + fname + '" -t ' + str(splitLength) + \
+                           ' -i "' + fname + '" -t ' + str(splitLength) + beepOut +\
                            ' -vcodec libx264 -tune stillimage -acodec aac' + \
                            ' -ab 192k -pix_fmt yuv420p -shortest '
                 newExt = '.mp4'
@@ -133,11 +149,13 @@ class MediaCutter:
             output = subprocess.Popen(splitCmd + splitStr, shell=True,
                                       stdout=subprocess.PIPE).stdout.read()
 
-    def cut_media(self, fname, usedFilenames=None):
+    def cut_media(self, fname, usedFilenames=None, privacySegments=None):
         """
         Cut media file into overlapping pieces whose length is specified
         in the settings. Write it to corpus/%corpus_name%/media.
         """
+        if privacySegments is not None:
+            self.privacySegments = privacySegments
         outDir = os.path.abspath(os.path.join(self.settings['corpus_dir'], 'media'))
         if not os.path.exists(outDir):
             os.makedirs(outDir)

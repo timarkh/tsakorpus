@@ -42,7 +42,7 @@ You should explain the convertor which tier contain which information. There are
 
 Note that the term *languages* in the case of ELAN files is synonymous with *(non-analysis) tiers*. For example, if you have a "reference tier", or a tier with an alternative orthography, they will have to be treated as different languages.
   
-- ``main_tiers`` is a list with the names of the top-level / time-aligned tiers. Normally, this array will contain only one name. There may be multiple such tiers in each file, each corresponding to one participant, but they normally have the same type and/or the same naming pattern, e.g. ``tx@.*`` or ``.*_Text``. "Main tiers" usually means "transcription tiers", but not always. For example, it is common to have the "reference tier" as a top-level tier and the transcription tier as its daughter in FieldWorks corpora. If you want to reorder the tiers in the web interface (e.g. make the transcription appear at the top and the sentence IDs on the bottom), you can do that by ordering the corresponding languages in the ``languages`` list.
+- ``main_tiers`` is a list with the names of the top-level / time-aligned tiers (except the privacy tier, see below). Normally, this array will contain only one name. There may be multiple such tiers in each file, each corresponding to one participant, but they normally have the same type and/or the same naming pattern, e.g. ``tx@.*`` or ``.*_Text``. "Main tiers" usually means "transcription tiers", but not always. For example, it is common to have the "reference tier" as a top-level tier and the transcription tier as its daughter in FieldWorks corpora. If you want to reorder the tiers in the web interface (e.g. make the transcription appear at the top and the sentence IDs on the bottom), you can do that by ordering the corresponding languages in the ``languages`` list.
 
 - ``aligned_tiers`` is a list with the names of translation/comment/transcription tiers that have a main tier as their parent.
 
@@ -55,11 +55,13 @@ Note that the term *languages* in the case of ELAN files is synonymous with *(no
    - ``parts`` for morpheme segmentation
    - ``gloss`` for glosses
 
-Annotations that belong to these tiers are processed in a special way, e.g. grammatical tags are sorted by category. Any other value (e.g. ``trans_en``) will be added to the analyses as a field with the same name, and the annotations will be transfered there without change.
+Annotations that belong to these tiers are processed in a special way, e.g. grammatical tags are sorted by category. Any other value (e.g. ``trans_en``) will be added to the analyses as a field with the same name, and the annotations will be transfered there without change. If you have glosses, but do not have grammatical tags, you can generate them with :doc:`gloss-to-tag rules </src_convertors_gloss>`.
 
 - ``tier_languages`` is a dictionary where keys are the names of the tier types (listed in ``main_tiers`` and ``analysis_tiers``) and the values are the names of their languages.
 
 - ``one_morph_per_cell`` (Boolean, optional; only if you have glossing) -- whether the annotation tiers contain one cell per morpheme/gloss (``true``) or the whole morpheme segmentation / glossing is written inside one cell with hyphens as separators (``false``). For example, if the morpheme segmentation of the German word *ge-schloss-en* is kept in three different cells (*ge-*, *schloss* and *-en*), this value should be set to true. Defaults to ``false``.
+
+- ``privacy_tier`` (string) -- type or ID (no regexes) of a time-aligned "privacy tier". The sound in the segments of this tier will be replaced with a beep when cutting the media files (regardless of the segment annotation). This can be used to hide sensitive data (e.g. personal data) from a recording without damaging the original file. Note that video is left as is, only the sound is changed.
 
 Here is an example of a relevant part of the ``conversion_settings.json`` file:
 

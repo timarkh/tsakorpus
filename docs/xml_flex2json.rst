@@ -3,7 +3,7 @@ FieldWorks convertor
 
 This document explains how to convert texts annotated in FieldWorks_ (FLEX) to Tsakorpus JSON. See general information about source convertors and their configuration files :doc:`here </src_convertors>`.
 
-Convertor: ``/src_convertors/xml_rnc2json.py``.
+Convertor: ``/src_convertors/xml_flex2json.py``.
 
 .. _FieldWorks: https://software.sil.org/fieldworks/
 

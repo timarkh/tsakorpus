@@ -43,9 +43,10 @@ class Eaf2JSON(Txt2JSON):
         self.spanAnnoTiers = {}    # span annotation tier type -> {tier ID -> [(tli1, tli2, contents)}
         self.alignedSpanAnnoTiers = {}   # aID of a segment -> {span annotation tier ID -> contents}
         self.additionalWordFields = []   # names of additional word-level fields associated with some analysis tiers
+        self.privacySegments = []        # segments (start_ms, end_ms) that should be beeped out
         self.rxIgnoreTokens = None
         self.set_ignore_tokens()
-        self.usedMediaFiles = set() # filenames of media fragments referenced in the JSONs
+        self.usedMediaFiles = set()      # filenames of media fragments referenced in the JSONs
 
     def set_ignore_tokens(self):
         """
@@ -449,6 +450,23 @@ class Eaf2JSON(Txt2JSON):
             self.spanAnnoTiers[annoTierType][annoTierID].append((tli1, tli2, text))
         self.spanAnnoTiers[annoTierType][annoTierID].sort()
 
+    def add_privacy_segments(self, tierNode):
+        """
+        Remember segments that should be beeped out because they
+        contain sensitive data.
+        """
+        segments = tierNode.xpath('ANNOTATION/ALIGNABLE_ANNOTATION')
+        for segNode in segments:
+            if ('ANNOTATION_ID' not in segNode.attrib
+                    or segNode.attrib['ANNOTATION_ID'] not in self.segmentTree):
+                continue
+            segData = self.segmentTree[segNode.attrib['ANNOTATION_ID']]
+            if segData[2] is None or segData[3] is None:
+                continue
+            tli1 = segData[2]
+            tli2 = segData[3]
+            self.privacySegments.append((self.tlis[tli1]['time'], self.tlis[tli2]['time']))
+
     def process_tier(self, tierNode, aID2pID, srcFile, alignedTier=False):
         """
         Extract segments from the tier node and iterate over them, returning
@@ -463,6 +481,13 @@ class Eaf2JSON(Txt2JSON):
         # check all tier ID regexes.
         if 'TIER_ID' not in tierNode.attrib:
             return
+
+        if 'privacy_tier' in self.corpusSettings:
+            privTierID = self.corpusSettings['privacy_tier']
+            if (tierNode.attrib['TIER_ID'] == privTierID or
+                    ('LINGUISTIC_TYPE_REF' in tierNode.attrib
+                     and tierNode.attrib['LINGUISTIC_TYPE_REF'] == privTierID)):
+                self.add_privacy_segments(tierNode)
 
         # Find out the participant (speaker) and save that information
         speaker = ''
@@ -872,7 +897,9 @@ class Eaf2JSON(Txt2JSON):
                 if fileExt in self.mediaExtensions:
                     fname = os.path.abspath(os.path.join(path, fname))
                     print('Cutting media file', fname)
-                    self.mc.cut_media(fname, usedFilenames=self.usedMediaFiles)
+                    self.mc.cut_media(fname,
+                                      usedFilenames=self.usedMediaFiles,
+                                      privacySegments=self.privacySegments)
 
 
 if __name__ == '__main__':

@@ -39,6 +39,7 @@ If the Tsakorpus repository (which is called an *upstream* repository with respe
 
     git fetch upstream
     git rebase upstream/master
+    git push -f origin master
 
 Make sure to `resolve all conflicts <https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line>`_ before you proceed.
 
