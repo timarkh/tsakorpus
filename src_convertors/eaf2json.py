@@ -450,22 +450,32 @@ class Eaf2JSON(Txt2JSON):
             self.spanAnnoTiers[annoTierType][annoTierID].append((tli1, tli2, text))
         self.spanAnnoTiers[annoTierType][annoTierID].sort()
 
-    def add_privacy_segments(self, tierNode):
+    def add_privacy_segments(self, srcTree):
         """
         Remember segments that should be beeped out because they
         contain sensitive data.
         """
-        segments = tierNode.xpath('ANNOTATION/ALIGNABLE_ANNOTATION')
-        for segNode in segments:
-            if ('ANNOTATION_ID' not in segNode.attrib
-                    or segNode.attrib['ANNOTATION_ID'] not in self.segmentTree):
+        if 'privacy_tier' not in self.corpusSettings:
+            return
+        privTierID = self.corpusSettings['privacy_tier']
+
+        for tierNode in srcTree.xpath('/ANNOTATION_DOCUMENT/TIER'):
+            if 'TIER_ID' not in tierNode.attrib:
                 continue
-            segData = self.segmentTree[segNode.attrib['ANNOTATION_ID']]
-            if segData[2] is None or segData[3] is None:
-                continue
-            tli1 = segData[2]
-            tli2 = segData[3]
-            self.privacySegments.append((self.tlis[tli1]['time'], self.tlis[tli2]['time']))
+            if (tierNode.attrib['TIER_ID'] == privTierID or
+                    ('LINGUISTIC_TYPE_REF' in tierNode.attrib
+                     and tierNode.attrib['LINGUISTIC_TYPE_REF'] == privTierID)):
+                segments = tierNode.xpath('ANNOTATION/ALIGNABLE_ANNOTATION')
+                for segNode in segments:
+                    if ('ANNOTATION_ID' not in segNode.attrib
+                            or segNode.attrib['ANNOTATION_ID'] not in self.segmentTree):
+                        continue
+                    segData = self.segmentTree[segNode.attrib['ANNOTATION_ID']]
+                    if segData[2] is None or segData[3] is None:
+                        continue
+                    tli1 = segData[2]
+                    tli2 = segData[3]
+                    self.privacySegments.append((self.tlis[tli1]['time'], self.tlis[tli2]['time']))
 
     def process_tier(self, tierNode, aID2pID, srcFile, alignedTier=False):
         """
@@ -481,13 +491,6 @@ class Eaf2JSON(Txt2JSON):
         # check all tier ID regexes.
         if 'TIER_ID' not in tierNode.attrib:
             return
-
-        if 'privacy_tier' in self.corpusSettings:
-            privTierID = self.corpusSettings['privacy_tier']
-            if (tierNode.attrib['TIER_ID'] == privTierID or
-                    ('LINGUISTIC_TYPE_REF' in tierNode.attrib
-                     and tierNode.attrib['LINGUISTIC_TYPE_REF'] == privTierID)):
-                self.add_privacy_segments(tierNode)
 
         # Find out the participant (speaker) and save that information
         speaker = ''
@@ -846,6 +849,7 @@ class Eaf2JSON(Txt2JSON):
         else:
             srcFile = ''
         textJSON['sentences'] = [s for s in self.get_sentences(srcTree, srcFile)]
+        self.add_privacy_segments(srcTree)
         self.add_span_annotations(textJSON['sentences'])
         # First sorting: sort sentences by language, but keep them sorted by speaker
         # (which they are now, since each speaker has a separate set of tiers in ELAN).
