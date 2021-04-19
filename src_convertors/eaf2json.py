@@ -475,7 +475,7 @@ class Eaf2JSON(Txt2JSON):
                         continue
                     tli1 = segData[2]
                     tli2 = segData[3]
-                    self.privacySegments.append((self.tlis[tli1]['time'], self.tlis[tli2]['time']))
+                    self.privacySegments.append((int(self.tlis[tli1]['time']), int(self.tlis[tli2]['time'])))
 
     def process_tier(self, tierNode, aID2pID, srcFile, alignedTier=False):
         """
