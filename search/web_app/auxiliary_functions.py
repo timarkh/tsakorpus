@@ -1,6 +1,5 @@
 import gzip
 from functools import wraps, update_wrapper
-import re
 import copy
 import math
 from flask import request, current_app, after_this_request, make_response
@@ -172,4 +171,3 @@ def remove_sensitive_data(hits):
                 del hit['_source']['prev_id']
             if 'next_id' in hit['_source']:
                 del hit['_source']['next_id']
-

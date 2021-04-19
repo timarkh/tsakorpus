@@ -1,8 +1,32 @@
 from flask import Flask
 from elasticsearch.exceptions import ConnectionError
+import sys
+import subprocess
 import os
 import re
 import random
+
+
+def compile_translations():
+    """
+    Compile flask_babel translations.
+    """
+    pythonPath = ''
+    for p in sys.path:
+        if re.search('Python3[^/\\\\]*[/\\\\]?$', p) is not None:
+            pythonPath = p
+            break
+    if len(pythonPath) <= 0:
+        pyBabelPath = 'pybabel'
+    else:
+        pyBabelPath = os.path.join(pythonPath, 'Scripts', 'pybabel')
+    try:
+        subprocess.run([pyBabelPath, 'compile',  '-d', 'translations_pybabel'], cwd='web_app', check=True)
+    except:
+        print('Could not compile translations with ' + pyBabelPath + ' .')
+    else:
+        print('Interface translations compiled.')
+
 
 SETTINGS_DIR = '../conf'
 MAX_PAGE_SIZE = 100     # maximum number of sentences per page
@@ -13,6 +37,8 @@ sessionData = {}        # session key -> dictionary with the data for current se
 random.seed()
 
 rxIndexAtEnd = re.compile('_[0-9]+$')
+
+compile_translations()
 
 # Read settings before we import anything else. Many modules
 # imported after this point reference the settings object,
@@ -56,7 +82,8 @@ app.secret_key = 'kkj6hd)^js7#dFQ'
 
 app.config.update(dict(
     LANGUAGES=settings.interface_languages,
-    BABEL_DEFAULT_LOCALE=settings.default_locale
+    BABEL_DEFAULT_LOCALE=settings.default_locale,
+    BABEL_TRANSLATION_DIRECTORIES='translations_pybabel'
 ))
 
 from .views import *

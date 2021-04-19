@@ -821,7 +821,7 @@ class Indexator:
         else:
             pyBabelPath = os.path.join(pythonPath, 'Scripts', 'pybabel')
         try:
-            subprocess.run([pyBabelPath, 'compile',  '-d', 'translations'], cwd='../search/web_app', check=True)
+            subprocess.run([pyBabelPath, 'compile',  '-d', 'translations_pybabel'], cwd='../search/web_app', check=True)
         except:
             print('Could not compile translations with ' + pyBabelPath + ' .')
         else:

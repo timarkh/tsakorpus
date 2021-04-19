@@ -38,3 +38,4 @@ venv/
 ENV/
 /corpus.json
 docs/_build
+**/messages.mo
