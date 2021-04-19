@@ -108,15 +108,14 @@ class MediaCutter:
                 segStart = max(splitStart, seg[0] / 1000)
                 segEnd = min(splitStart + splitLength, seg[1] / 1000)
                 seg = (str(segStart), str(segEnd),
-                       str(segEnd - segStart))
+                       str(segEnd - segStart), str(len(curPrivacySegments) + 1))
                 curPrivacySegments.append(seg)
-            beepOut = ' '.join('-filter_complex "[0]volume=0:enable=\'between(t,' + seg[0] + ',' + seg[1] + ')\'[main];'
-                               'sine=d=' + seg[2] + ':f=880,adelay=' + seg[0] + 's,pan=stereo|FL=c0|FR=c0[beep];'
-                               '[main][beep]amix=inputs=2"'
-                               for seg in curPrivacySegments)
+            beepOut = '; '.join('[out' + str(int(seg[3]) - 1) + ']volume=0:enable=\'between(t,' + seg[0] + ',' + seg[1] + ')\'[main' + seg[3] + '];'
+                                'sine=d=' + seg[2] + ':f=880[sine' + seg[2] + '];[sine' + seg[2] + ']adelay=' + str(float(seg[0]) * 1000) + '[beep' + seg[3] + '];'
+                                '[main' + seg[3] + '][beep' + seg[3] + ']amix=inputs=2[out' + seg[3] + ']'
+                                for seg in curPrivacySegments)
             if len(beepOut) > 0:
-                print(beepOut)
-                beepOut = ' ' + beepOut + ' '
+                beepOut = ' -filter_complex "[1]' + re.sub('\\[out[0-9]+\\]$', '', beepOut[6:]) + '" '
             if fname.lower().endswith('.mp4'):
                 splitStr += ' -vcodec copy -acodec copy'
                 newExt = '.mp4'
@@ -128,9 +127,9 @@ class MediaCutter:
                 # newExt = '.mp3'
                 splitStr = ' -loop 1 -i ' + os.path.abspath('img/sound.png') +\
                            ' -ss ' + str(splitStart) + \
-                           ' -i "' + fname + '" -t ' + str(splitLength) + beepOut +\
+                           ' -i "' + fname + '" -t ' + str(splitLength) +\
                            ' -vcodec libx264 -tune stillimage -acodec aac' + \
-                           ' -ab 192k -pix_fmt yuv420p -shortest '
+                           ' -ab 192k -pix_fmt yuv420p -shortest ' + beepOut
                 newExt = '.mp4'
             else:
                 print('Unknown file type: ' + fname)
