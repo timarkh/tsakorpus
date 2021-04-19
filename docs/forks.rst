@@ -21,14 +21,14 @@ Instead of creating a real fork, you can duplicate Tsakorpus repository and manu
 
 4. Run the following commands in the folder where you cloned it::
 
-    git remote add upstream git@github.com:timarkh/tsakorpus.git
+    git remote add upstream https://%YOUR_GITHUB_USERNAME%@github.com/timarkh/tsakorpus.git
     git remote set-url --push upstream DISABLE
 
 5. Add a ``corpus`` folder to ``/src_convertors`` and put all your source files and metadata there, as well as conversion settings (see :doc:`src_convertors`).
 
 6. Adjust settings in ``/conf`` (see :doc:`configuration`) and the interface translations in ``/search/web_app/translations`` (you should at least write the title of your corpus there; see :doc:`interface_languages`).
 
-7. Remove the ``/src_convertors/corpus/\*\*`` line from the ``.gitignore`` file, so that your corpus files can become part of the repository. If you only want to store the source corpus files (e.g. txt or ELAN transcriptions), but not the converted JSONs, you can modify ``.gitignore`` by including ``src_convertors/corpus/json/\*\*``. This usually makes sense because JSONs can be automatically generated from your source files.
+7. Remove the ``/src_convertors/corpus/**`` line from the ``.gitignore`` file, so that your corpus files can become part of the repository. If you only want to store the source corpus files (e.g. txt or ELAN transcriptions), but not the converted JSONs, you can modify ``.gitignore`` by including ``src_convertors/corpus/json/**``. This usually makes sense because JSONs can be automatically generated from your source files.
 
 After you are through with these steps, you can commit changes and continue working with the corpus. However, if you are familiar with shell scripts or a programming language like Python, it would make sense to add a script that would do all preprocessing steps for you. First of all, that means launching the right convertor on your source files and then moving the output to ``/corpus/%CORPUS_NAME%``. However, depending on the particularities of your corpus, it could do other preprocessing steps, e.g. compiling a word list and analyzing it before launching the source convertor. This way, you will save time on routine operations you need to perform every time before updating the corpus.
 

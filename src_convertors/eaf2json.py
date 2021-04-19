@@ -358,7 +358,8 @@ class Eaf2JSON(Txt2JSON):
             for ana in analyses:
                 self.tp.parser.process_gloss_in_ana(ana)
                 if 'gloss_index' in ana:
-                    self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0])
+                    if 'analysis_tiers' in self.corpusSettings and 'gramm' not in self.corpusSettings['analysis_tiers']:
+                        self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0])
         if len(analyses) <= 0:
             return [{}]
         return analyses
