@@ -49,6 +49,7 @@ class CorpusSettings:
         self.max_distance_filter = 200000
         self.max_hits_retrieve = 10000      # Increasing this value will have no effect unless you also reconfigure Elasticsearch
         self.query_timeout = 60
+        self.max_suggestions = 8
 
         # Interface options and tools
         self.interface_languages = ['en', 'ru']

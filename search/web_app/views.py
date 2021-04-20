@@ -48,6 +48,7 @@ def search_page():
                            year_sort_enabled=settings.year_sort_enabled,
                            debug=settings.debug,
                            subcorpus_selection=settings.search_meta,
+                           sentence_meta=settings.sentence_meta,
                            word_fields_by_tier=json.dumps(settings.word_fields_by_tier,
                                                           ensure_ascii=False, indent=-1),
                            auto_switch_tiers=json.dumps(settings.auto_switch_tiers,
@@ -181,8 +182,9 @@ def search_doc_json():
     return jsonify(hitsLog)
 
 
+@app.route('/doc_stats/<metaField>/<lang>')
 @app.route('/doc_stats/<metaField>')
-def get_doc_stats(metaField):
+def get_doc_stats(metaField, lang='all'):
     """
     Return JSON with basic statistics concerning the distribution
     of corpus documents by values of one metafield. This function
@@ -193,7 +195,10 @@ def get_doc_stats(metaField):
     query = copy_request_args()
     change_display_options(query)
     docIDs = subcorpus_ids(query)
-    buckets = get_buckets_for_doc_metafield(metaField, langID=-1, docIDs=docIDs)
+    langID = -1
+    if lang != 'all' and lang in settings.languages:
+        langID = settings.languages.index(lang)
+    buckets = get_buckets_for_doc_metafield(metaField, langID=langID, docIDs=docIDs)
     return jsonify(buckets)
 
 
@@ -410,6 +415,19 @@ def search_doc():
     hitsProcessed['media'] = settings.media
     hitsProcessed['images'] = settings.images
     return render_template('search_results/result_docs.html', data=hitsProcessed)
+
+
+@app.route('/autocomplete_meta/<metafield>')
+@jsonp
+def autocomplete_meta(metafield):
+    if 'query' not in request.args:
+        return jsonify({'query': '', 'suggestions': []})
+    query = request.args['query']
+    if metafield not in settings.viewable_meta:
+        return jsonify({'query': query, 'suggestions': []})
+    suggests = suggest_metafield(metafield, query)
+    return jsonify({'query': query,
+                    'suggestions': suggests})
 
 
 @app.route('/get_word_fields')

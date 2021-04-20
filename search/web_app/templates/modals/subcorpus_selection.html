@@ -18,7 +18,9 @@
 							<div class="subcorpus_column">
 							{% for option in col %}
 								{% if option.type == "input_text" %}
-									<input type="text" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) | capitalize }}" title="{{ _('metafield_' + option.name) | capitalize }}">
+									<div class="autocomplete_input_div">
+									<input type="text" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input subcorpus_autocomplete" form="search_main" placeholder="{{ _('metafield_' + option.name) | capitalize }}" title="{{ _('metafield_' + option.name) | capitalize }}">
+									</div>
 								{% elif option.type == "input_number" %}
 									<input type="number" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) | capitalize }}" title="{{ _('metafield_' + option.name) | capitalize }}">
 								{% elif option.type == "input_range" %}
@@ -42,12 +44,51 @@
 					</div>
 					<div id="subcorpus_stats" class="tab-pane fade" role="tabpanel">
 						<h4>{{ _('Selected subcorpus composition') }}</h4>
+						<label for="select_meta_stat">{{ _('Parameter: ') }}</label>
 						<select name="select_meta_stat" id="select_meta_stat" class="search_input" aria-labeledby="subcorpus_stats_link">
 						{% for stat_option in subcorpus_selection.stat_options %}
+						{% if stat_option not in sentence_meta %}
 							<option value="{{ stat_option }}">{{ _('metafield_' + stat_option) }}</option>
+						{% endif %}
 						{% endfor %}
 						</select>
+						{% if languages|length > 1 %}
+							<label for="select_meta_lang">{{ _('Language/tier:') }}</label>
+							<select name="select_meta_lang" id="select_meta_lang" class="search_input">
+							<option value="all">{{ _('langname_all') }}</option>
+							{% for lang in languages %}
+							<option value="{{ lang }}" {% if loop.index == 1 %}selected{% endif %}>{{ _('langname_' + lang) }}</option>
+							{% endfor %}
+							</select>
+						{% else %}
+							<select name="select_meta_lang" id="select_meta_lang" style="display: none; visibility: hidden; height: 0px">
+							{% for lang in languages %}
+							<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
+							{% endfor %}
+							</select>
+						{% endif %}
+						<div id="subcorpus_stats_max_bars" class="alert alert-warning" role="alert" style="display:none;">
+							<span class="bi bi-exclamation-triangle-fill" aria-hidden="true"></span>&nbsp; {{ _('A maximum of 25 metadata values can be displayed, sorted by the number of words in the relevant texts.') }}
+						</div>
 						<div id="subcorpus_stats_plot">{{ _('(please wait for the plot to load)') }}</div>
+						<table id="subcorpus_stats_table" class="table table-hover">
+							<thead>
+								<tr>
+									<th>{{ _('Value') }}</th>
+									<th>{{ _('Size in words') }}</th>
+									<th>{{ _('Number of documents') }}</th>
+								</tr>
+							</thead>
+							<tbody>
+
+							</tbody>
+						</table>
+						<div id="subcorpus_stats_wait" class="alert alert-warning" role="alert">
+							<span class="bi bi-exclamation-triangle-fill" aria-hidden="true"></span> {{ _('please wait for the plot to load') }}
+						</div>
+						<div id="subcorpus_stats_nothing_found" class="alert alert-danger" role="alert" style="display:none;">
+							<span class="bi bi-exclamation-triangle" aria-hidden="true"></span> {{ _('Nothing found.') }}
+						</div>
 					</div>
 				</div>
 			</div>

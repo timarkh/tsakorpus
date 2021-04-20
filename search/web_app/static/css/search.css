@@ -1245,6 +1245,11 @@ hr.separator {
   opacity: 0.7;
 }
 
+.bar_subcorpus {
+  fill: #006e0f;
+  opacity: 0.7;
+}
+
 .bar:hover {
 	opacity: 1;
 }
@@ -1532,4 +1537,17 @@ in different styles) */
 
 #greeting {
     max-width: 900px;
+}
+
+.autocomplete-suggestions {
+	padding: 7px;
+	margin-top: 25px;
+	font-size: 1.1em;
+	border-radius: 4px;
+	border: 1px solid gray;
+	background-color: white;
+}
+
+.autocomplete-suggestion:hover {
+	background-color: #edf5ff;
 }

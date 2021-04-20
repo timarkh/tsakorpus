@@ -152,6 +152,46 @@ def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=
     return buckets
 
 
+def suggest_metafield(fieldName, query):
+    """
+    Return autocomplete suggestions for a metafield based on a partial
+    query typed by the user.
+    """
+    if fieldName not in settings.search_meta['stat_options']:
+        return []
+    esQuery = {
+        'query': {
+            'prefix': {
+                fieldName: {
+                    'value': query
+                }
+            }
+        },
+        'size': 0,
+        'aggs': {
+            'metafield': {
+                'terms': {
+                    'field': fieldName + '_kw',
+                    'size': settings.max_suggestions
+                }
+            }
+        }
+    }
+    hits = sc.get_docs(esQuery)
+    if 'aggregations' not in hits or 'metafield' not in hits['aggregations']:
+        return {}
+    buckets = []
+    for bucket in hits['aggregations']['metafield']['buckets']:
+        bucketListItem = {'value': bucket['key'],
+                          'data': bucket['doc_count']}
+        buckets.append(bucketListItem)
+    buckets.sort(key=lambda b: (-b['data'], b['value']))
+    if len(buckets) > settings.max_suggestions:
+        buckets = buckets[:25]
+    print(buckets)
+    return buckets
+
+
 def get_buckets_for_sent_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=300):
     """
     Group all sentences into buckets, each corresponding to one

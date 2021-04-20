@@ -27,6 +27,7 @@ Tsakorpus was tested on Windows and Ubuntu. Its dependencies are the following:
 The following resources are used by tsakorpus, but do not need to be installed:
 
 * [jQuery](https://jquery.com/) library
+* [jQuery-Autocomplete](https://github.com/devbridge/jQuery-Autocomplete)
 * [video.js](http://videojs.com/) media player
 * [videojs-youtube](https://github.com/videojs/videojs-youtube) plugin
 * [bootstrap](http://getbootstrap.com/) toolkit
