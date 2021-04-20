@@ -1,0 +1,3 @@
+normal	normal
+strict	strict
+simplified	simplified

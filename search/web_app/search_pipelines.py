@@ -159,11 +159,15 @@ def suggest_metafield(fieldName, query):
     """
     if fieldName not in settings.search_meta['stat_options']:
         return []
+    if not fieldName.startswith('year'):
+        queryFieldName = fieldName + '_kw'
+    else:
+        queryFieldName = fieldName
     esQuery = {
         'query': {
-            'prefix': {
+            'wildcard': {
                 fieldName: {
-                    'value': query
+                    'value': '*' + query + '*'
                 }
             }
         },
@@ -171,7 +175,7 @@ def suggest_metafield(fieldName, query):
         'aggs': {
             'metafield': {
                 'terms': {
-                    'field': fieldName + '_kw',
+                    'field': queryFieldName,
                     'size': settings.max_suggestions
                 }
             }
@@ -187,8 +191,7 @@ def suggest_metafield(fieldName, query):
         buckets.append(bucketListItem)
     buckets.sort(key=lambda b: (-b['data'], b['value']))
     if len(buckets) > settings.max_suggestions:
-        buckets = buckets[:25]
-    print(buckets)
+        buckets = buckets[:settings.max_suggestions]
     return buckets
 
 

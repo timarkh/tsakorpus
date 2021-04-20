@@ -1,0 +1,69 @@
+account_type	Account type
+account_type_post	Account type (post-level)
+age	Age
+annotators	Annotators
+author	Author
+birth_place	Place of birth
+birth_year	Year of birth
+birthplace	Place of birth
+birthyear	Year of birth
+byear	Year of birth
+byear_post	Birth year (post-level)
+century	Century
+chronotop	Chronotope
+citation	Citation
+city	City
+city_post	Current place (post-level)
+collector	Collector
+country	Country
+date_trans	Date of translation
+dialect	Dialect
+gender	Gender
+genre	Genre
+genre_fi	Genre of fiction
+home_town	Home town
+home_town_post	Birth place (post-level)
+hometown	Home town
+issue	Issue
+lang	Original language
+lang_trans	Language of translation
+language	Language
+length	Length
+line	Line
+linguist	Linguist
+linguists	Linguists
+live_place	Place of living
+liveplace	Place of living
+medium	Medium
+occupation	Occupation
+origin	Place of origin
+orth	Orthography
+page	Page
+place	Place
+post_type	Post type
+profession	Profession
+publication	Publication
+published	Published
+region	Region
+sent_analyses	Sentence analyzed
+sex	Sex
+sex_post	Sex (post-level)
+speaker	Speaker
+speakers	Speakers
+sphere	Sphere
+style	Style
+subdialect	Subdialect
+subject	Subject
+tagging	Tagging
+title	Title
+title_en	Title in English
+title_ru	Title in Russian
+topic	Topic
+translator	Translator
+type	Type
+year	Year
+year_birth	Year of birth
+year_from	Year: from
+year_post	Year (post-level)
+year_publ	Publication year
+year_to	Year: to

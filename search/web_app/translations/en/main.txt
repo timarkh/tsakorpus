@@ -1,30 +1,3 @@
-# English translations for Tsakorpus.
-# Copyright (C) 2017-2021 Timofey Arkhangelskiy
-# This file is distributed under the same license as the Tsakorpus project.
-# Timofey Arkhangelskiy <timarkh@gmail.com>, 2017-2021.
-#
-msgid ""
-msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: timarkh@gmail.com\n"
-"POT-Creation-Date: 2021-04-20 17:03+0200\n"
-"PO-Revision-Date: 2017-09-20 17:03+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: en\n"
-"Language-Team: en <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.0\n"
-
-# ********  Please fill in the following strings:  ********
-#: templates/fulltext.html:4 templates/index.html:4
-#: templates/index/corpus_header.html:4 templates/index/corpus_header.html:6
-msgid "corpus_title"
-msgstr "(INSERT CORPUS TITLE IN messages.po)"
-
-# ******** The rest is more or less universal:  ********
 #: templates/index.html:4
 msgid "Corpus search page"
 msgstr "Corpus search page"
@@ -34,9 +7,8 @@ msgid "more_fields"
 msgstr "more fields"
 
 #: templates/index.html:20
-#, fuzzy
 msgid "fewer_fields"
-msgstr "more fields"
+msgstr "fewer fields"
 
 #: templates/index.html:21
 msgid "add_distance"
@@ -47,9 +19,8 @@ msgid "remove_word"
 msgstr "remove&nbsp;word"
 
 #: templates/index.html:23
-#, fuzzy
 msgid "Distance to word #"
-msgstr " Distance to word #"
+msgstr "Distance to word #"
 
 #: templates/index.html:24
 msgid "from "
@@ -77,13 +48,12 @@ msgid "Nothing found."
 msgstr "Nothing found."
 
 #: templates/index.html:30
-#, fuzzy
 msgid "Query word"
-msgstr "unique word"
+msgstr "Query word"
 
 #: templates/index.html:67
 msgid "Sorry, the server is experiencing technical issues. Please try again later."
-msgstr ""
+msgstr "Sorry, the server is experiencing technical issues. Please try again later."
 
 #: templates/index.html:68 templates/index/hidden_elements.html:12
 #: templates/index/hidden_elements.html:30
@@ -98,9 +68,8 @@ msgstr ""
 #: templates/modals/query_share_load.html:20
 #: templates/modals/subcorpus_selection.html:6
 #: templates/modals/word_stats.html:6
-#, fuzzy
 msgid "Close"
-msgstr "Gloss"
+msgstr "Close"
 
 #: templates/index/common_additional_search_fields.html:23
 msgid "Analyses: "
@@ -173,9 +142,8 @@ msgid "Dictionary_header"
 msgstr "Dictionary"
 
 #: templates/index/hidden_elements.html:57
-#, fuzzy
 msgid "Metadata_header"
-msgstr "speaker"
+msgstr "Metadata"
 
 #: templates/index/progress.html:6
 msgid "Max seconds left: "
@@ -183,11 +151,11 @@ msgstr "Max seconds left: "
 
 #: templates/index/query_area.html:8
 msgid "Options"
-msgstr ""
+msgstr "Options"
 
 #: templates/index/query_area.html:9 templates/modals/query_history.html:5
 msgid "Query history"
-msgstr ""
+msgstr "Query history"
 
 #: templates/index/query_area.html:11
 msgid "Show dictionary"
@@ -244,9 +212,8 @@ msgid "Precise match"
 msgstr "Precise match"
 
 #: templates/index/query_area.html:73
-#, fuzzy
 msgid "Words statistics"
-msgstr "Word statistics"
+msgstr "Words statistics"
 
 #: templates/index/query_area.html:75
 #: templates/modals/subcorpus_selection.html:5
@@ -267,7 +234,7 @@ msgstr "Back to search"
 
 #: templates/index/results_area.html:10
 msgid "Click on an example to see video."
-msgstr ""
+msgstr "Click on an example to see video."
 
 #: templates/modals/display_settings.html:5
 msgid "Additional search and display options"
@@ -299,7 +266,7 @@ msgstr "by frequency"
 
 #: templates/modals/display_settings.html:23
 msgid "by year (decreasing; sentence queries)"
-msgstr ""
+msgstr "by year (decreasing; sentence queries)"
 
 #: templates/modals/display_settings.html:26
 msgid "no sorting"
@@ -353,41 +320,36 @@ msgstr "Additional fields"
 
 #: templates/modals/query_history.html:10
 msgid "Click on"
-msgstr ""
+msgstr "Click on"
 
 #: templates/modals/query_history.html:10
 #: templates/modals/query_history.html:23
-#, fuzzy
 msgid "Repeat query"
-msgstr "Share query"
+msgstr "Repeat query"
 
 #: templates/modals/query_history.html:10
 msgid "to repeat a query."
-msgstr ""
+msgstr "to repeat a query."
 
 #: templates/modals/query_history.html:13
 msgid "You have not made any queries yet."
-msgstr ""
+msgstr "You have not made any queries yet."
 
 #: templates/modals/query_history.html:17
-#, fuzzy
 msgid "Word"
-msgstr "words"
+msgstr "Word"
 
 #: templates/modals/query_history.html:20
-#, fuzzy
 msgid "Subcorpus"
-msgstr "Clear subcorpus"
+msgstr "Subcorpus"
 
-# ******** The rest is more or less universal:  ********
 #: templates/modals/query_history.html:21
-#, fuzzy
 msgid "Search type"
-msgstr "Corpus search page"
+msgstr "Search type"
 
 #: templates/modals/query_history.html:22
 msgid "Time"
-msgstr ""
+msgstr "Time"
 
 #: templates/modals/query_share_load.html:5
 msgid "Share query"
@@ -406,22 +368,20 @@ msgid "Here you can load a corpus query someone sent you. Please enter the query
 msgstr "Here you can load a corpus query someone sent you. Please enter the query below:"
 
 #: templates/modals/select_gloss.html:5
-#, fuzzy
 msgid "word boundary"
-msgstr "word found,"
+msgstr "word boundary"
 
 #: templates/modals/select_gloss.html:6
-#, fuzzy
 msgid "any number of morphs"
-msgstr "any number of analyses"
+msgstr "any number of morphs"
 
 #: templates/modals/select_gloss.html:7
 msgid "any positive number of morphs"
-msgstr ""
+msgstr "any positive number of morphs"
 
 #: templates/modals/select_gloss.html:8
 msgid "any morph"
-msgstr ""
+msgstr "any morph"
 
 #: templates/modals/subcorpus_selection.html:10
 msgid "Specify parameters"
@@ -440,13 +400,12 @@ msgid "Select parameters"
 msgstr "Select parameters"
 
 #: templates/modals/subcorpus_selection.html:27
-#, fuzzy
 msgid "lower bound"
-msgstr "word found,"
+msgstr "lower found"
 
 #: templates/modals/subcorpus_selection.html:28
 msgid "upper bound"
-msgstr ""
+msgstr "upper bound"
 
 #: templates/modals/subcorpus_selection.html:42
 msgid "Select documents"
@@ -468,7 +427,7 @@ msgstr "Parameter: "
 #: templates/modals/subcorpus_selection.html:71
 #: templates/modals/word_stats.html:28
 msgid "A maximum of 25 metadata values can be displayed, sorted by the number of words in the relevant texts."
-msgstr ""
+msgstr "A maximum of 25 metadata values can be displayed, sorted by the number of words in the relevant texts."
 
 #: templates/modals/subcorpus_selection.html:73
 #: templates/modals/word_stats.html:81
@@ -476,24 +435,21 @@ msgid "(please wait for the plot to load)"
 msgstr "(please wait for the plot to load)"
 
 #: templates/modals/subcorpus_selection.html:77
-#, fuzzy
 msgid "Value"
-msgstr "M"
+msgstr "Value"
 
 #: templates/modals/subcorpus_selection.html:78
 msgid "Size in words"
-msgstr ""
+msgstr "Size in words"
 
 #: templates/modals/subcorpus_selection.html:79
-#, fuzzy
 msgid "Number of documents"
-msgstr "Select documents"
+msgstr "Number of documents"
 
 #: templates/modals/subcorpus_selection.html:87
 #: templates/modals/word_stats.html:52
-#, fuzzy
 msgid "please wait for the plot to load"
-msgstr "(please wait for the plot to load)"
+msgstr "please wait for the plot to load"
 
 #: templates/modals/subcorpus_selection.html:97
 msgid "Clear subcorpus"
@@ -528,24 +484,21 @@ msgid "compare words in the query"
 msgstr "compare words in the query"
 
 #: templates/modals/word_stats.html:35
-#, fuzzy
 msgid "Query word "
-msgstr "unique word"
+msgstr "Query word "
 
 #: templates/modals/word_stats.html:40
-#, fuzzy
 msgid "value"
-msgstr "M"
+msgstr "value"
 
 #: templates/modals/word_stats.html:43
-#, fuzzy
 msgid "frequency (ipm)"
-msgstr "by frequency"
+msgstr "frequency (ipm)"
 
 #: templates/modals/word_stats.html:44
 #, python-format
 msgid "90%% conf. int. "
-msgstr ""
+msgstr "90%% conf. int. "
 
 #: templates/modals/word_stats.html:59
 msgid "Distribution by frequency rank"
@@ -577,58 +530,56 @@ msgstr "logarithmic"
 
 #: templates/modals/word_stats.html:70
 msgid "Max y: "
-msgstr ""
+msgstr "Max y: "
 
 #: templates/modals/word_stats.html:72
 msgid "as in data"
-msgstr ""
+msgstr "as in data"
 
 #: templates/modals/word_stats.html:73
 #, python-format
 msgid "100%%"
-msgstr ""
+msgstr "100%%"
 
 #: templates/modals/word_stats.html:74
 #, python-format
 msgid "50%%"
-msgstr ""
+msgstr "50%%"
 
 #: templates/modals/word_stats.html:75
 #, python-format
 msgid "25%%"
-msgstr ""
+msgstr "25%%"
 
 #: templates/modals/word_stats.html:76
 #, python-format
 msgid "10%%"
-msgstr ""
+msgstr "10%%"
 
 #: templates/modals/word_stats.html:77
 #, python-format
 msgid "5%%"
-msgstr ""
+msgstr "5%%"
 
 #: templates/modals/word_stats.html:78
 #, python-format
 msgid "1%%"
-msgstr ""
+msgstr "1%%"
 
 #: templates/modals/word_stats.html:79
 #, python-format
 msgid "0.1%%"
-msgstr ""
+msgstr "0.1%%"
 
 #: templates/search_results/lemma_table_row.html:16
 #: templates/search_results/word_table_row.html:20
-#, fuzzy
 msgid "Search in corpus"
-msgstr "search"
+msgstr "Search in corpus"
 
 #: templates/search_results/lemma_table_row.html:17
 #: templates/search_results/word_table_row.html:21
-#, fuzzy
 msgid "Show statistics"
-msgstr "Word statistics"
+msgstr "Show statistics"
 
 #: templates/search_results/result_docs.html:1
 msgid "Filter result:"
@@ -682,7 +633,7 @@ msgstr "The search was not finished due to the query timeout. You only see parti
 
 #: templates/search_results/result_sentences.html:19
 msgid "Number of results found exceeds the maximum number of pages you can view."
-msgstr ""
+msgstr "Number of results found exceeds the maximum number of pages you can view."
 
 #: templates/search_results/result_sentences.html:24
 #: templates/search_results/result_words.html:28
@@ -691,11 +642,11 @@ msgstr "You are searching in a subcorpus."
 
 #: templates/search_results/result_sentences.html:45
 msgid "Copy example to clipboard"
-msgstr ""
+msgstr "Copy example to clipboard"
 
 #: templates/search_results/result_sentences.html:46
 msgid "Expand context"
-msgstr ""
+msgstr "Expand context"
 
 #: templates/search_results/result_sentences.html:60
 msgid "download as CSV"
@@ -756,9 +707,8 @@ msgid "word_th_freq. rank / quantile"
 msgstr "freq. rank /<br>quantile"
 
 #: templates/search_results/result_words.html:46
-#, fuzzy
 msgid "word_th_# forms"
-msgstr "# documents"
+msgstr "# forms"
 
 #: templates/search_results/result_words.html:48
 msgid "word_th_# sentences"
@@ -778,470 +728,4 @@ msgstr "statistics"
 
 #: templates/search_results/sentence_header.html:20
 msgid "Full text (opens in a new tab)"
-msgstr ""
-
-# Language names for the dropdown menu in search panel (please add all missing
-# languages that you have in the corpus):
-#~ msgid "langname_udmurt"
-#~ msgstr "Udmurt"
-
-#~ msgid "langname_komi"
-#~ msgstr "Komi"
-
-#~ msgid "langname_komi_zyrian"
-#~ msgstr "Komi-Zyrian"
-
-#~ msgid "langname_komi-zyrian"
-#~ msgstr "Komi-Zyrian"
-
-#~ msgid "langname_komi_permyak"
-#~ msgstr "Komi-Permyak"
-
-#~ msgid "langname_erzya"
-#~ msgstr "Erzya"
-
-#~ msgid "langname_moksha"
-#~ msgstr "Moksha"
-
-#~ msgid "langname_hill_mari"
-#~ msgstr "Hill Mari"
-
-#~ msgid "langname_meadow_mari"
-#~ msgstr "Meadow Mari"
-
-#~ msgid "langname_tatar"
-#~ msgstr "Tatar"
-
-#~ msgid "langname_bashkir"
-#~ msgstr "Bashkir"
-
-#~ msgid "langname_chuvash"
-#~ msgstr "Chuvash"
-
-#~ msgid "langname_nganasan"
-#~ msgstr "Nganasan"
-
-#~ msgid "langname_buryat"
-#~ msgstr "Buryat"
-
-#~ msgid "langname_kalmyk"
-#~ msgstr "Kalmyk"
-
-#~ msgid "langname_greek"
-#~ msgstr "Greek"
-
-#~ msgid "langname_tsakonian"
-#~ msgstr "Tsakonian"
-
-#~ msgid "langname_albanian"
-#~ msgstr "Albanian"
-
-#~ msgid "langname_acrhi"
-#~ msgstr "Archi"
-
-#~ msgid "langname_tsakhur"
-#~ msgstr "Tsakhur"
-
-#~ msgid "langname_dargwa"
-#~ msgstr "Dargwa"
-
-#~ msgid "langname_adyghe"
-#~ msgstr "Adyghe"
-
-#~ msgid "langname_romani"
-#~ msgstr "Romani"
-
-#~ msgid "langname_ossetic"
-#~ msgstr "Ossetic"
-
-#~ msgid "langname_ossetic_iron"
-#~ msgstr "Iron Ossetic"
-
-#~ msgid "langname_ossetic_digor"
-#~ msgstr "Digor Ossetic"
-
-#~ msgid "langname_english"
-#~ msgstr "English"
-
-#~ msgid "langname_german"
-#~ msgstr "German"
-
-#~ msgid "langname_french"
-#~ msgstr "French"
-
-#~ msgid "langname_armenian"
-#~ msgstr "Armenian"
-
-#~ msgid "langname_armenian_translit"
-#~ msgstr "Armenian (translit.)"
-
-#~ msgid "langname_belarusian"
-#~ msgstr "Belarusian"
-
-#~ msgid "langname_ukrainian"
-#~ msgstr "Ukrainian"
-
-#~ msgid "langname_latvian"
-#~ msgstr "Latvian"
-
-#~ msgid "langname_lithuanian"
-#~ msgstr "Lithuanian"
-
-#~ msgid "langname_estonian"
-#~ msgstr "Estonian"
-
-#~ msgid "langname_finnish"
-#~ msgstr "Finnish"
-
-#~ msgid "langname_italian"
-#~ msgstr "Italian"
-
-#~ msgid "langname_spanish"
-#~ msgstr "Spanish"
-
-#~ msgid "langname_bulgarian"
-#~ msgstr "Bulgarian"
-
-#~ msgid "langname_swedish"
-#~ msgstr "Swedish"
-
-#~ msgid "langname_polish"
-#~ msgstr "Polish"
-
-#~ msgid "langname_chinese"
-#~ msgstr "Chinese"
-
-#~ msgid "langname_selkup"
-#~ msgstr "Selkup"
-
-#~ msgid "langname_kamas"
-#~ msgstr "Kamas"
-
-#~ msgid "langname_comments"
-#~ msgstr "comments"
-
-#~ msgid "langname_positive"
-#~ msgstr "positive"
-
-#~ msgid "langname_negative"
-#~ msgstr "negative"
-
-#~ msgid "langname_undefined"
-#~ msgstr "undefined"
-
-# Transliteration names for the dropdown menu in search panel (please add all
-# missing languages that you have in the corpus):
-#~ msgid "translitname_original"
-#~ msgstr "original"
-
-#~ msgid "translitname_cyrillic"
-#~ msgstr "cyrillic"
-
-#~ msgid "translitname_latin"
-#~ msgstr "latin"
-
-#~ msgid "translitname_IPA"
-#~ msgstr "IPA"
-
-#~ msgid "translitname_UPA"
-#~ msgstr "UPA"
-
-#~ msgid "translitname_corpus"
-#~ msgstr "corpus"
-
-#~ msgid "translitname_dictionary"
-#~ msgstr "dictionary"
-
-# Names of input methods that define how string queries (for word, lemma etc.)
-# will be transformed before the query is performed:
-#~ msgid "inputmethod_normal"
-#~ msgstr "normal"
-
-#~ msgid "inputmethod_strict"
-#~ msgstr "strict"
-
-#~ msgid "inputmethod_simplified"
-#~ msgstr "simplified"
-
-# Names of the metadata fields you have in the corpus:
-#~ msgid "metafield_genre"
-#~ msgstr "genre"
-
-#~ msgid "metafield_year"
-#~ msgstr "year"
-
-#~ msgid "metafield_year_from"
-#~ msgstr "year: from"
-
-#~ msgid "metafield_year_to"
-#~ msgstr "year: to"
-
-#~ msgid "metafield_year_birth"
-#~ msgstr "year of birth"
-
-#~ msgid "metafield_year_publ"
-#~ msgstr "publication year"
-
-#~ msgid "metafield_title"
-#~ msgstr "title"
-
-#~ msgid "metafield_title_en"
-#~ msgstr "title in English"
-
-#~ msgid "metafield_title_myv"
-#~ msgstr "title in Erzya"
-
-#~ msgid "metafield_author"
-#~ msgstr "author"
-
-#~ msgid "metafield_topic"
-#~ msgstr "topic"
-
-#~ msgid "metafield_sex"
-#~ msgstr "sex"
-
-#~ msgid "metafield_gender"
-#~ msgstr "gender"
-
-#~ msgid "metafield_age"
-#~ msgstr "age"
-
-#~ msgid "metafield_origin"
-#~ msgstr "place of origin"
-
-#~ msgid "metafield_published"
-#~ msgstr "published"
-
-#~ msgid "metafield_issue"
-#~ msgstr "issue"
-
-#~ msgid "metafield_birthyear"
-#~ msgstr "year of birth"
-
-#~ msgid "metafield_byear"
-#~ msgstr "year of birth"
-
-#~ msgid "metafield_birthplace"
-#~ msgstr "place of birth"
-
-#~ msgid "metafield_profession"
-#~ msgstr "profession"
-
-#~ msgid "metafield_occupation"
-#~ msgstr "occupation"
-
-#~ msgid "metafield_liveplace"
-#~ msgstr "place of living"
-
-#~ msgid "metafield_home_town"
-#~ msgstr "home town"
-
-#~ msgid "metafield_city"
-#~ msgstr "city"
-
-#~ msgid "metafield_place"
-#~ msgstr "place"
-
-#~ msgid "metafield_region"
-#~ msgstr "region"
-
-#~ msgid "metafield_subject"
-#~ msgstr "subject"
-
-#~ msgid "metafield_style"
-#~ msgstr "style"
-
-#~ msgid "metafield_length"
-#~ msgstr "length"
-
-#~ msgid "metafield_annotators"
-#~ msgstr "annotators"
-
-#~ msgid "metafield_language"
-#~ msgstr "language"
-
-#~ msgid "metafield_orth"
-#~ msgstr "orthography"
-
-#~ msgid "metafield_year_post"
-#~ msgstr "Year (post-level)"
-
-#~ msgid "metafield_sex_post"
-#~ msgstr "Sex (post-level)"
-
-#~ msgid "metafield_city_post"
-#~ msgstr "Current place (post-level)"
-
-#~ msgid "metafield_home_town_post"
-#~ msgstr "Birth place (post-level)"
-
-#~ msgid "metafield_account_type_post"
-#~ msgstr "Account type (post-level)"
-
-#~ msgid "metafield_byear_post"
-#~ msgstr "Birth year (post-level)"
-
-#~ msgid "metafield_post_type"
-#~ msgstr "Post type"
-
-#~ msgid "metafield_account_type"
-#~ msgstr "Account type"
-
-#~ msgid "metafield_page"
-#~ msgstr "Page"
-
-#~ msgid "metafield_line"
-#~ msgstr "Line"
-
-#~ msgid "metafield_type"
-#~ msgstr "Type"
-
-#~ msgid "metafield_sphere"
-#~ msgstr "Sphere"
-
-#~ msgid "metafield_chronotop"
-#~ msgstr "Chronotope"
-
-#~ msgid "metafield_genre_fi"
-#~ msgstr "Genre of fiction"
-
-#~ msgid "metafield_publication"
-#~ msgstr "Publication"
-
-#~ msgid "metafield_medium"
-#~ msgstr "Medium"
-
-#~ msgid "metafield_country"
-#~ msgstr "Country"
-
-#~ msgid "metafield_tagging"
-#~ msgstr "Tagging"
-
-#~ msgid "metafield_translator"
-#~ msgstr "Translator"
-
-#~ msgid "metafield_lang"
-#~ msgstr "Original language"
-
-#~ msgid "metafield_lang_trans"
-#~ msgstr "Language of translation"
-
-#~ msgid "metafield_date_trans"
-#~ msgstr "Date of translation"
-
-#~ msgid "metafield_sent_analyses"
-#~ msgstr "Sentence analyzed"
-
-# Names of the metadata values you have in the corpus:
-#~ msgid "metavalue_press"
-#~ msgstr "press"
-
-#~ msgid "metavalue_fiction"
-#~ msgstr "fiction"
-
-#~ msgid "metavalue_nonfiction"
-#~ msgstr "non-fiction"
-
-#~ msgid "metavalue_wikipedia"
-#~ msgstr "Wikipedia"
-
-#~ msgid "metavalue_religion"
-#~ msgstr "religion"
-
-#~ msgid "metavalue_oral"
-#~ msgstr "oral"
-
-#~ msgid "metavalue_written"
-#~ msgstr "written"
-
-#~ msgid "metavalue_poetry"
-#~ msgstr "poetry"
-
-#~ msgid "metavalue_novel"
-#~ msgstr "novel"
-
-#~ msgid "metavalue_story"
-#~ msgstr "story"
-
-#~ msgid "metavalue_dialogue"
-#~ msgstr "dialogue"
-
-#~ msgid "metavalue_monologue"
-#~ msgstr "monologue"
-
-#~ msgid "metavalue_interview"
-#~ msgstr "interview"
-
-#~ msgid "metavalue_essay"
-#~ msgstr "essay"
-
-#~ msgid "metavalue_male"
-#~ msgstr "male"
-
-#~ msgid "metavalue_female"
-#~ msgstr "female"
-
-#~ msgid "metavalue_F"
-#~ msgstr "F"
-
-#~ msgid "metavalue_experiment"
-#~ msgstr "experiment"
-
-#~ msgid "metavalue_unique"
-#~ msgstr "unambiguously"
-
-#~ msgid "metavalue_complete"
-#~ msgstr "completely, but ambiguously"
-
-#~ msgid "metavalue_incomplete"
-#~ msgstr "incompletely"
-
-# Names of additional word-level annotation fields:
-#~ msgid "wordfield_trans_ru"
-#~ msgstr "translation (RU)"
-
-#~ msgid "wordfield_trans_en"
-#~ msgstr "translation (EN)"
-
-#~ msgid "wordfield_lex2"
-#~ msgstr "2nd lemma"
-
-#~ msgid "wordfield_trans_ru2"
-#~ msgstr "2nd transl. (RU)"
-
-#~ msgid "wordfield_trans_en2"
-#~ msgstr "2nd transl. (EN)"
-
-#~ msgid "wordfield_logogram"
-#~ msgstr "logogram"
-
-#~ msgid "wordfield_transcription"
-#~ msgstr "transcription"
-
-#~ msgid "wordfield_segment"
-#~ msgstr "segment"
-
-#~ msgid "Query"
-#~ msgstr "Query"
-
-#~ msgid "Language:"
-#~ msgstr "Language:"
-
-#~ msgid "(Place for results)"
-#~ msgstr "(Place for results)"
-
-#~ msgid "word_th_transcription"
-#~ msgstr "transcription"
-
-#~ msgid "langname_beserman"
-#~ msgstr "Beserman"
-
-#~ msgid "word_th_trans_en"
-#~ msgstr "translation (EN)"
-
-#~ msgid "langname_russian"
-#~ msgstr "Russian"
-
-#~ msgid "less_fields"
-#~ msgstr "less fields"
-
+msgstr "Full text (opens in a new tab)"

@@ -1,0 +1,63 @@
+all	all
+undefined	undefined
+comments	comments
+positive	positive
+negative	negative
+notes	notes
+note	notes
+ref	ID
+id	ID
+
+abaza	Abaza
+acrhi	Archi
+adyghe	Adyghe
+albanian	Albanian
+armenian	Armenian
+armenian_translit	Armenian (translit.)
+bashkir	Bashkir
+belarusian	Belarusian
+beserman	Beserman
+bulgarian	Bulgarian
+buryat	Buryat
+chinese	Chinese
+chuvash	Chuvash
+dargwa	Dargwa
+english	English
+english_note	English (note)
+erzya	Erzya
+estonian	Estonian
+finnish	Finnish
+french	French
+hungarian	Hungarian
+german	German
+greek	Greek
+hill_mari	Hill Mari
+italian	Italian
+kalmyk	Kalmyk
+kamas	Kamas
+kazakh	Kazakh
+komi	Komi
+komi-zyrian	Komi-Zyrian
+komi_permyak	Komi-Permyak
+komi_zyrian	Komi-Zyrian
+latvian	Latvian
+lithuanian	Lithuanian
+meadow_mari	Meadow Mari
+moksha	Moksha
+nganasan	Nganasan
+ossetic	Ossetic
+ossetic_digor	Digor Ossetic
+ossetic_iron	Iron Ossetic
+polish	Polish
+romani	Romani
+russian	Russian
+selkup	Selkup
+spanish	Spanish
+swedish	Swedish
+tatar	Tatar
+tsakhur	Tsakhur
+tsakonian	Tsakonian
+udmurt	Udmurt
+ukrainian	Ukrainian
+yakut	Yakut
+yiddish	Yiddish

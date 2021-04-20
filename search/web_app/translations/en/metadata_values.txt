@@ -1,0 +1,22 @@
+F	F
+M	M
+complete	completely, but ambiguously
+dialogue	dialogue
+essay	essay
+experiment	experiment
+female	female
+fiction	fiction
+incomplete	incompletely
+interview	interview
+male	male
+monologue	monologue
+nonfiction	non-fiction
+novel	novel
+oral	oral
+poetry	poetry
+press	press
+religion	religion
+story	story
+unique	unambiguously
+wikipedia	Wikipedia
+written	written
