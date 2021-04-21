@@ -68,7 +68,12 @@
   "languages": ["beserman", "russian"],
   "transliterations": ["original", "cyrillic", "UPA"],
   "input_methods": ["normal"],
-  "interface_languages": {"en": "English", "ru": "Russian"},
+  "interface_languages": [
+    "en",
+    "ru",
+	"zh",
+	"sq"
+  ],
   "all_language_search_enabled": false,
   "gloss_search_enabled": true,
   "ambiguous_analyses": true,

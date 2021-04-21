@@ -19,7 +19,9 @@ One way of configuring the parameters is manually editing ``/conf/corpus.json``.
 
 However, a more human-friendly way of configuring your corpus is doing that through a simple web interface. To do so, launch ``/search/tsakorpus.wsgi`` as a Python file on your local machine. You do not have to have Elasticsearch running. This will start a local web-server. Open your browser and type ``http://127.0.0.1:7342/config``. You will see a configuration page. Note that it is only accessible from your local machine.
 
-This page contains (almost) all possible parameters separated into rubrics. Fill in the boxes with the values you need and click "Save" in the bottom slide. You can save the page many times. After you click the button, a new ``corpus.json`` file will appear in Tsakorpus root (*not* in ``/conf``). When you are ready, move it to ``/conf``. Filling all relevant boxes (especially those related to tag selection tables) can take a lot of time; please be patient.
+This page contains (almost) all possible parameters separated into rubrics. Fill in the boxes with the values you need and click "Save" in the bottom slide. You can save the page many times. After you click the button, a new ``corpus.json`` file will appear in ``/USER_CONFIG`` (*not* in ``/conf``). When you are ready, move it to ``/conf``. Filling all relevant boxes (especially those related to tag selection tables) can take a lot of time; please be patient.
+
+Apart from ``corpus.json``, it will generate :doc:`translation files </interface_translations>` in ``/USER_CONFIG/translations``. Edit them and replace files in ``/search/web_app/translations/`` with them in your :doc:`fork </forks>`.
 
 List of parameters
 ------------------
@@ -41,6 +43,8 @@ List of parameters
 - ``corpus_name`` (string, **obligatory**) -- name of the corpus, which determines the name of Elasticsearch indexes used for indexing or searching. The indexes used by the corpus are ``%corpus_name%.docs``, ``%corpus_name%.words`` and ``%corpus_name%.sentences``.
 
 - ``debug`` (Boolean) -- whether additional debug elements, such as "Show JSON query / Show JSON response", are turned on in the web interface. Defaults to ``false``.
+
+- ``default_locale`` (string) -- code of the default :doc:`interface language </interface_languages>`.
 
 - ``default_values`` (dictionary) -- dictionary where keys are names of text boxes in the word search panel and values are the strings that should appear there by default. Currently, it only works for simple string-valued sentence-level metadata fields. The text boxes should be called by the IDs they have in the HTML, e.g. ``sent_meta_speaker`` rather than ``speaker`` if ``speaker`` is a sentence-levele metadata field.
 
@@ -66,7 +70,7 @@ List of parameters
 
 - ``integer_meta_fields`` (list of strings) -- names of the sentence-level metadata fields that have integer values and therefore should be represented by ranges rather than by single text boxes in the query interface.
 
-- ``interface_languages`` (dictionary) -- dictionary with all available web interface languages. The keys are the codes of the languages, the values are their names.
+- ``interface_languages`` (list of strings) -- list with codes of all available web interface languages.
 
 - ``keep_lemma_order`` (Boolean) -- whether the order of multiple analyses should be kept when a string with the lemmata is concatenated for displaying. Defaults to ``false``. For example, if a word has 3 analyses with the lemmara *B*, *A* and *B*, ``false`` means that the output string of lemmata will look like *A/B*, and ``true``, *B/A/B*. The latter may be needed if multiple analyses actually refer to different parts of a graphic word, e.g. host and clitics if they are represented as a single token.
 

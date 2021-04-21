@@ -29,8 +29,8 @@ def generate_po(lang):
     Generate a messages.po translation file for pybabel based on
     the contents of translations/lang
     """
-    srcDir = os.path.join('translations', lang)
-    targetDir = os.path.join('translations_pybabel', lang, 'LC_MESSAGES')
+    srcDir = os.path.join('web_app/translations', lang)
+    targetDir = os.path.join('web_app/translations_pybabel', lang, 'LC_MESSAGES')
     if not os.path.exists(srcDir):
         return
     if not os.path.exists(targetDir):
@@ -59,7 +59,7 @@ def generate_po(lang):
                                                       'wordfield_'))
             for k in sorted(dictMessages):
                 fOut.write('msgid "' + k.replace('\n', '\\n').replace('"', '&quot;').replace('%', '%%') + '"\n')
-                fOut.write('msgstr "' + k.replace('\n', '\\n').replace('"', '&quot;').replace('%', '%%') + '"\n\n')
+                fOut.write('msgstr "' + dictMessages[k].replace('\n', '\\n').replace('"', '&quot;').replace('%', '%%') + '"\n\n')
         except:
             print('Something went wrong when generating interface translations.')
 

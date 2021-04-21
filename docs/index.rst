@@ -109,6 +109,7 @@ The software is distributed under MIT license.
    indexator
    interface_languages
    transliteration
+   input_methods
    styles
 
 

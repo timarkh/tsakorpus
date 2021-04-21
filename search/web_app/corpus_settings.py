@@ -143,6 +143,15 @@ class CorpusSettings:
             'lang_props.gloss_shortcuts'
         }
 
+        # Fields that should never be saved to corpus.json.
+        self.hiddenFields = {
+            'ready_for_work',
+            'corpus_size',
+            'word_freq_by_rank',
+            'lemma_freq_by_rank',
+            'categories'
+        }
+
     def update_format(self):
         """
         Rename keys that have been changed since Tsakorpus 1.0.
@@ -203,16 +212,9 @@ class CorpusSettings:
         Return current settings as a dictionary. Only include
         parameters relevant for corpus.json.
         """
-        badFields = {
-            'ready_for_work',
-            'corpus_size',
-            'word_freq_by_rank',
-            'lemma_freq_by_rank',
-            'categories'
-        }
         dictSettings = copy.deepcopy(vars(self))
         for k in [_ for _ in dictSettings.keys()]:
-            if k in badFields:
+            if k in self.hiddenFields:
                 del dictSettings[k]
             elif dictSettings[k] is None:
                 dictSettings[k] = ''
@@ -452,6 +454,8 @@ class CorpusSettings:
         for f in self.booleanFields:
             if f.startswith(('lang_props.', 'search_meta.')):
                 continue
+            if f in self.hiddenFields:
+                continue
             if f in data and len(data[f]) > 0:
                 dictSettings[f] = True
             else:
@@ -459,10 +463,14 @@ class CorpusSettings:
         for f in self.integerFields:
             if f.startswith(('lang_props.', 'search_meta.')):
                 continue
+            if f in self.hiddenFields:
+                continue
             if f in data and len(data[f]) > 0:
                 dictSettings[f] = int(data[f])
         for f in self.lsFields:
             if f.startswith(('lang_props.', 'search_meta.')):
+                continue
+            if f in self.hiddenFields:
                 continue
             if f in data and len(data[f]) > 0:
                 dictSettings[f] = [v.strip() for v in data[f].replace('\r', '').strip().split('\n')]
@@ -471,12 +479,16 @@ class CorpusSettings:
         for f in self.dict_sFields:
             if f.startswith(('lang_props.', 'search_meta.')):
                 continue
+            if f in self.hiddenFields:
+                continue
             if f in data and len(data[f]) > 0:
                 dictSettings[f] = self.gui_str_to_dict(data[f], value_type='string')
             else:
                 dictSettings[f] = {}
         for f in self.dict_lsFields:
             if f.startswith(('lang_props.', 'search_meta.')):
+                continue
+            if f in self.hiddenFields:
                 continue
             if f in data and len(data[f]) > 0:
                 dictSettings[f] = self.gui_str_to_dict(data[f], value_type='list')

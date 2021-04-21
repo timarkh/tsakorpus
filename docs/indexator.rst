@@ -25,7 +25,8 @@ What indexator does
 -------------------
 
 1. It creates three Elasticsearch indexes called ``%corpus_name%.sentences``, ``%corpus_name%.docs`` and ``%corpus_name%.words``. If indexes with such names already exist, the indexator will ask you for permission to proceed. Use the ``-y`` option to overwrite existing indexes without asking.
-2. It compiles your PyBabel translations of the interface.
-3. It puts the contents of your JSON files to the indexes. Sentences are transfered to the database almost without changes.
-4. It calculates word and lemma statistics and puts it to the indexes. The statistics is kept in memory during the indexation, so the larger your corpus, the more memory indexation will require.
-5. It generates full-text representations and dictionaries, if you chose so in the configuration.
+2. It puts the contents of your JSON files to the indexes. Sentences are transfered to the database almost without changes.
+3. It calculates word and lemma statistics and puts it to the indexes. The statistics is kept in memory during the indexation, so the larger your corpus, the more memory indexation will require.
+4. It generates full-text representations and dictionaries, if you chose so in the configuration.
+
+PyBabel :doc:`translations of the interface </interface_languages>`, which used to be compiled at indexation time, are now generated and compiled each time the corpus app is launched.

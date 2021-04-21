@@ -28,6 +28,7 @@
 		<h3>Corpus setup</h3>
 		<p class="lead">This is a corpus setup page. You can use it to create a <code>corpus.json</code> file that you will move to the <code>/conf</code> directory before indexing your corpus. You can also edit <code>corpus.json</code> manually. After you are finished, the settings will be saved in this file:</p>
 		<p class="text-center bd-highlight fs-2"><code>{{ filename }}</code></p>
+		<p>Additionally, interface translation files will be generated in the same folder. They will include all additions to the default translation files that your corpus needs (e.g. corpus-specific tooltips and metadata field names). Edit them and replace files in <code>/search/web_app/translations/</code> with them.</p>
 		<p>This page is only available in English and can only be accessed when you run <code>tsakorpus.wsgi</code> as a standalone application on port 7342. The default values will be based on the current contents of <code>/conf/corpus.json</code>. It is assumed that you already have JSON files ready for indexing in <code>/corpus/%CORPUS_NAME%</code>.</p>
 		<p>As Tsakorpus is designed for a multitude of formats and usage scenarios, there are a lot of options. Please be patient!</p>
 		<p><strong>Do not forget to save your changes by clicking the button in the last slide.</strong> You can also do that in the process, the page does not close after you click the button. Do not click <em>Back</em> in your browser, or you will lose your changes.
