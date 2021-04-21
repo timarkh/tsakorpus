@@ -8,6 +8,9 @@ defaults if some keys are absent in corpus.json.
 import json
 import copy
 import re
+import os
+import shutil
+from . import load_csv_translations
 
 
 class CorpusSettings:
@@ -139,7 +142,6 @@ class CorpusSettings:
             'lang_props.gramm_shortcuts',
             'lang_props.gloss_shortcuts'
         }
-
 
     def update_format(self):
         """
@@ -503,3 +505,86 @@ class CorpusSettings:
             dictSettings = self.processed_gui_settings(data)
         with open(fname, 'w', encoding='utf-8') as fOut:
             json.dump(dictSettings, fOut, sort_keys=True, ensure_ascii=False, indent=2)
+
+    def write_translation_csv(self, existingTranslations, values, fnameOut):
+        """
+        Write one tab-delimited translation file based on the values that need
+        to be translated and data from an existing translation file.
+        """
+        with open(fnameOut, 'w', encoding='utf-8') as fOut:
+            for k in sorted(existingTranslations):
+                fOut.write(k + '\t' + existingTranslations[k] + '\n')
+            fOut.write('\n')
+            for v in sorted(values):
+                v = v.replace('\t', ' ').replace('\n', '\\n')
+                if v not in existingTranslations:
+                    fOut.write(v + '\t' + v + '\n')
+
+    def prepare_translation(self, dirname, langSrc, langTarget, data):
+        """
+        Generate corpus-specific translation files for one
+        language (langTarget) based on the existing translation
+        (langSrc) and the data entered by the user.
+        """
+        srcDir = os.path.join('translations', langSrc)
+        targetDir = os.path.join(dirname, langTarget)
+        shutil.copy2(os.path.join(srcDir, 'header.txt'),
+                     os.path.join(targetDir, 'header.txt'))
+        shutil.copy2(os.path.join(srcDir, 'main.txt'),
+                     os.path.join(targetDir, 'main.txt'))
+        shutil.copy2(os.path.join(srcDir, 'corpus-specific.txt'),
+                     os.path.join(targetDir, 'corpus-specific.txt'))
+        inputMethods = load_csv_translations(os.path.join(srcDir, 'input_methods.txt'))
+        languages = load_csv_translations(os.path.join(srcDir, 'languages.txt'))
+        metaFields = load_csv_translations(os.path.join(srcDir, 'metadata_fields.txt'))
+        metaValues = load_csv_translations(os.path.join(srcDir, 'metadata_values.txt'))
+        tooltips = load_csv_translations(os.path.join(srcDir, 'tooltips.txt'))
+        transliterations = load_csv_translations(os.path.join(srcDir, 'transliterations.txt'))
+        wordFields = load_csv_translations(os.path.join(srcDir, 'word_fields.txt'))
+        self.write_translation_csv(inputMethods, data['input_methods'],
+                                   os.path.join(targetDir, 'input_methods.txt'))
+        self.write_translation_csv(languages, data['languages'],
+                                   os.path.join(targetDir, 'languages.txt'))
+        self.write_translation_csv(metaFields, list(set(data['viewable_meta']) | set(data['sentence_meta'])),
+                                   os.path.join(targetDir, 'metadata_fields.txt'))
+        self.write_translation_csv(metaValues, [v
+                                                for field in data['sentence_meta_values']
+                                                for v in data['sentence_meta_values'][field]],
+                                   os.path.join(targetDir, 'metadata_values.txt'))
+        self.write_translation_csv(transliterations, data['transliterations'],
+                                   os.path.join(targetDir, 'transliterations.txt'))
+        self.write_translation_csv(wordFields, data['word_fields'],
+                                   os.path.join(targetDir, 'word_fields.txt'))
+        newTooltips = set()
+        for lang in data['lang_props']:
+            if ('gramm_selection' in data['lang_props'][lang]
+                    and 'columns' in data['lang_props'][lang]['gramm_selection']):
+                for col in data['lang_props'][lang]['gramm_selection']['columns']:
+                    for el in col:
+                        if 'tooltip' in el:
+                            newTooltips.add(el['tooltip'])
+            if ('gloss_selection' in data['lang_props'][lang]
+                    and 'columns' in data['lang_props'][lang]['gloss_selection']):
+                for col in data['lang_props'][lang]['gloss_selection']['columns']:
+                    for el in col:
+                        if 'tooltip' in el:
+                            newTooltips.add(el['tooltip'])
+        if 'multiple_choice_fields' in data and 'columns' in data['multiple_choice_fields']:
+            for col in data['multiple_choice_fields']['columns']:
+                for el in col:
+                    if 'tooltip' in el:
+                        newTooltips.add(el['tooltip'])
+        self.write_translation_csv(tooltips, list(newTooltips),
+                                   os.path.join(targetDir, 'tooltips.txt'))
+
+    def prepare_translations(self, dirname, data=None):
+        """
+        Generate corpus-specific translation files based on the
+        data eneterd by the user.
+        """
+        dictSettings = self.processed_gui_settings(data)
+        for interfaceLang in dictSettings['interface_languages']:
+            langSrc = interfaceLang
+            if not os.path.exists(os.path.join('translations', interfaceLang)):
+                langSrc = 'en'
+            self.prepare_translation(dirname, langSrc, interfaceLang, dictSettings)

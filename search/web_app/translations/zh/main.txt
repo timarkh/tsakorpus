@@ -1,85 +1,59 @@
-# Albanian translations for Tsakorpus.
-# Copyright (C) 2017-2021 Maria Morozova
-# This file is distributed under the same license as the Tsakorpus project.
-# Maria Morozova <morozovamaria86@gmail.com>, 2017-2021.
-#
-msgid ""
-msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: timarkh@gmail.com\n"
-"POT-Creation-Date: 2021-04-20 17:03+0200\n"
-"PO-Revision-Date: 2017-09-20 17:03+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: sq\n"
-"Language-Team: sq <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.0\n"
-
-# ********  Please fill in the following strings:  ********
-#: templates/fulltext.html:4 templates/index.html:4
-#: templates/index/corpus_header.html:4 templates/index/corpus_header.html:6
-msgid "corpus_title"
-msgstr "Korpusi Nacional i Gjuhës Shqipe"
-
 # ******** The rest is more or less universal:  ********
 #: templates/index.html:4
 msgid "Corpus search page"
-msgstr "Faqja e kërkimit"
+msgstr "在语料库内搜索"
 
 #: templates/index.html:19 templates/index/query_area.html:54
 msgid "more_fields"
-msgstr "më shumë rreshta"
+msgstr "显示所有字段"
 
 #: templates/index.html:20
 #, fuzzy
 msgid "fewer_fields"
-msgstr "më shumë rreshta"
+msgstr "显示所有字段"
 
 #: templates/index.html:21
 msgid "add_distance"
-msgstr "shtimi i distancës"
+msgstr "补充&nbsp;间距"
 
 #: templates/index.html:22
 msgid "remove_word"
-msgstr "pastrimi i fjalës"
+msgstr "删除&nbsp;单词"
 
 #: templates/index.html:23
 #, fuzzy
 msgid "Distance to word #"
-msgstr " Distanca deri në fjalën No."
+msgstr " 到单词№的间距"
 
 #: templates/index.html:24
 msgid "from "
-msgstr "nga "
+msgstr "从 "
 
 #: templates/index.html:25
 msgid "to "
-msgstr "deri në "
+msgstr "到 "
 
 #: templates/index.html:26
 msgid "Select combinations of tags"
-msgstr "Zgjedhja e kombinacioneve të tag-ëve"
+msgstr "语法标签选择"
 
 #: templates/index.html:27
 msgid "Select glosses"
-msgstr "Zgjedhja e glosave"
+msgstr "注释选择"
 
 #: templates/index.html:28
 msgid "the query"
-msgstr "i kërkimit"
+msgstr "查询"
 
 #: templates/index.html:29 templates/modals/subcorpus_selection.html:90
 #: templates/modals/word_stats.html:55
 msgid "Nothing found."
-msgstr "Asgjë nuk është gjetur."
+msgstr "未搜索到."
 
 #: templates/index.html:30
 #, fuzzy
 msgid "Query word"
-msgstr "vetëm një fjalë"
+msgstr "单一词形"
 
 #: templates/index.html:67
 msgid "Sorry, the server is experiencing technical issues. Please try again later."
@@ -100,86 +74,86 @@ msgstr ""
 #: templates/modals/word_stats.html:6
 #, fuzzy
 msgid "Close"
-msgstr "Glosat"
+msgstr "注释"
 
 #: templates/index/common_additional_search_fields.html:23
 msgid "Analyses: "
-msgstr "Analiza: "
+msgstr "区分: "
 
 #: templates/index/common_additional_search_fields.html:24
 msgid "any number of analyses"
-msgstr "çfarëdo numri analizash"
+msgstr "任意数量"
 
 #: templates/index/common_additional_search_fields.html:26
 msgid "only ambiguous"
-msgstr "vetëm me homonimi"
+msgstr "仅同音异义词"
 
 #: templates/index/common_additional_search_fields.html:27
 msgid "only non-ambiguous"
-msgstr "vetëm pa homonimi"
+msgstr "仅同义词"
 
 #: templates/index/common_additional_search_fields.html:28
 #: templates/index/common_additional_search_fields.html:30
 msgid "only with analysis"
-msgstr "vetëm me anotim"
+msgstr "仅有区分的"
 
 #: templates/index/common_additional_search_fields.html:32
 msgid "only without analysis"
-msgstr "vetëm pa anotim"
+msgstr "仅未区分的"
 
 #: templates/index/common_additional_search_fields.html:34
 msgid "Position in sentence: "
-msgstr "Pozicioni në fjali: "
+msgstr "句子中的位置: "
 
 #: templates/index/corpus_header.html:9
 msgid "Corpus name"
-msgstr "Emri i korpusit"
+msgstr "语料库名称"
 
 #: templates/index/corpus_header.html:25
 #: templates/index/hidden_elements.html:72
 msgid "How to cite"
-msgstr ""
+msgstr "怎么引用语料库"
 
 #: templates/index/corpus_header.html:28 templates/index/greeting_en.html:9
 #: templates/index/greeting_ru.html:9
 msgid "Show help"
-msgstr "Ndihmë"
+msgstr "显示说明"
 
 #: templates/index/greeting_en.html:5 templates/index/greeting_ru.html:5
 #: templates/index/query_area.html:70
 msgid "Search sentences"
-msgstr "Kërkimi i fjalive"
+msgstr "句子查询"
 
 #: templates/index/greeting_en.html:6 templates/index/greeting_ru.html:6
 #: templates/index/query_area.html:71
 msgid "Search words"
-msgstr "Kërkimi i fjalëve"
+msgstr "单词查询"
 
 #: templates/index/greeting_en.html:6 templates/index/greeting_ru.html:6
 #: templates/index/query_area.html:72
 msgid "Search lemmata"
-msgstr "Kërkimi i lemma-ve"
+msgstr "/ 义项"
 
 #: templates/index/hidden_elements.html:19
 msgid "Cancel"
-msgstr "Anulim"
+msgstr "取消"
 
 #: templates/index/hidden_elements.html:29
 msgid "Help"
-msgstr "Ndihmë"
+msgstr "帮助"
 
 #: templates/index/hidden_elements.html:43
 msgid "Dictionary_header"
-msgstr "Fjalor"
+msgstr "词典"
 
 #: templates/index/hidden_elements.html:57
 #, fuzzy
 msgid "Metadata_header"
-msgstr "folësi"
+msgstr "说话人"
 
 #: templates/index/progress.html:6
 msgid "Max seconds left: "
-msgstr "Sekondave deri në fund të kërkimit (maksimum): "
+msgstr "最多剩余秒数: "
 
 #: templates/index/query_area.html:8
 msgid "Options"
@@ -191,79 +165,79 @@ msgstr ""
 
 #: templates/index/query_area.html:11
 msgid "Show dictionary"
-msgstr "Shfaqja e fjalorit"
+msgstr "显示词典"
 
 #: templates/index/query_area.html:19
 msgid "Word_header"
-msgstr "Fjalë"
+msgstr "单词"
 
 #: templates/index/query_area.html:19
 msgid "Number_sign"
-msgstr "No."
+msgstr "№"
 
 #: templates/index/query_area.html:20
 msgid "Word:"
-msgstr "Fjalë:"
+msgstr "单词:"
 
 #: templates/index/query_area.html:21
 msgid "Lemma:"
-msgstr "Lemma:"
+msgstr "词条:"
 
 #: templates/index/query_area.html:22
 msgid "Grammar:"
-msgstr "Gramatikë:"
+msgstr "语法:"
 
 #: templates/index/query_area.html:26
 msgid "Gloss:"
-msgstr "Glosat:"
+msgstr "注释:"
 
 #: templates/index/query_area.html:31
 #: templates/modals/subcorpus_selection.html:56
 msgid "Language/tier:"
-msgstr "Gjuhë/shtresë:"
+msgstr "语言:"
 
 #: templates/index/query_area.html:36
 #: templates/modals/subcorpus_selection.html:58
 msgid "langname_all"
-msgstr "all"
+msgstr "任意"
 
 #: templates/index/query_area.html:49
 msgid "negative_query"
-msgstr "kërkimi negativ"
+msgstr "否定&nbsp;查询"
 
 #: templates/index/query_area.html:51
 msgid "add_word"
-msgstr "shtimi i fjalës"
+msgstr "补充单词"
 
 #: templates/index/query_area.html:61
 msgid "Full-text search:"
-msgstr "Kërkimi i plotë:"
+msgstr "全文搜索:"
 
 #: templates/index/query_area.html:63
 msgid "Precise match"
-msgstr "Përshtatja e plotë"
+msgstr "精确匹配"
 
 #: templates/index/query_area.html:73
 #, fuzzy
 msgid "Words statistics"
-msgstr "Statistika e fjalëve"
+msgstr "词形统计"
 
 #: templates/index/query_area.html:75
 #: templates/modals/subcorpus_selection.html:5
 msgid "Select subcorpus"
-msgstr "Zgjedhja e nënkorpusit"
+msgstr "子语料库选择"
 
 #: templates/index/query_area.html:77
 msgid "Share this query"
-msgstr "Dërgimi i këtij kërkimi"
+msgstr "转发此查询"
 
 #: templates/index/query_area.html:78
 msgid "Load external query"
-msgstr "Shkarkimi i kërkimit të jashtëm"
+msgstr "加载外部查询"
 
 #: templates/index/query_area.html:97
 msgid "Back to search"
-msgstr "Kthimi tek rezultatet e kërkimit"
+msgstr "返回到搜索"
 
 #: templates/index/results_area.html:10
 msgid "Click on an example to see video."
@@ -271,31 +245,31 @@ msgstr ""
 
 #: templates/modals/display_settings.html:5
 msgid "Additional search and display options"
-msgstr "Opcionet plotësuese të kërkimit dhe shfaqjes"
+msgstr "搜索和显示的补充设置"
 
 #: templates/modals/display_settings.html:12
 msgid "Results per page:"
-msgstr "Rezultateve në një faqe:"
+msgstr "页面中的上下文:"
 
 #: templates/modals/display_settings.html:16
 msgid "Sorting:"
-msgstr "Renditja:"
+msgstr "分类"
 
 #: templates/modals/display_settings.html:18
 msgid "random"
-msgstr "random"
+msgstr "随机"
 
 #: templates/modals/display_settings.html:19
 msgid "by word (word queries)"
-msgstr "sipas fjalës (për kërkimet e fjalëve)"
+msgstr "按照词形 (单词搜索)"
 
 #: templates/modals/display_settings.html:20
 msgid "by lemma (word queries)"
-msgstr "sipas lemma-s (për kërkimet e fjalëve)"
+msgstr "按照词条 (单词搜索)"
 
 #: templates/modals/display_settings.html:21
 msgid "by frequency"
-msgstr "sipas dëndurisë"
+msgstr "按照频率"
 
 #: templates/modals/display_settings.html:23
 msgid "by year (decreasing; sentence queries)"
@@ -303,53 +277,53 @@ msgstr ""
 
 #: templates/modals/display_settings.html:26
 msgid "no sorting"
-msgstr "pa renditje"
+msgstr "未分类"
 
 #: templates/modals/display_settings.html:32
 msgid "Word distance requirements are strict"
-msgstr "Distanca midis fjalëve në përputhje të plotë me parametrat e kërkimit"
+msgstr "仅按照查询中的词间距"
 
 #: templates/modals/display_settings.html:37
 msgid "Viewing mode:"
-msgstr "Shfaqja e rezultateve:"
+msgstr "预览:"
 
 #: templates/modals/display_settings.html:39
 msgid "view_standard"
-msgstr "standard"
+msgstr "常规的"
 
 #: templates/modals/display_settings.html:40
 msgid "view_glossed"
-msgstr "me glosa"
+msgstr "注释"
 
 #: templates/modals/display_settings.html:45
 msgid "Transliteration: "
-msgstr "Transliterim: "
+msgstr "音译: "
 
 #: templates/modals/display_settings.html:55
 msgid "Character input method: "
-msgstr "Mënyra e shtypjes së karaktereve: "
+msgstr "符号输入方式: "
 
 #: templates/modals/display_settings.html:65
 msgid "Annotation layers in glossed mode:"
-msgstr "Shtresat e anotimit në regjimin e glosave:"
+msgstr "注释模式下的标记层:"
 
 #: templates/modals/display_settings.html:68
 #: templates/modals/query_history.html:18
 msgid "Lemma"
-msgstr "Lemma"
+msgstr "词条"
 
 #: templates/modals/display_settings.html:72
 #: templates/modals/query_history.html:19
 msgid "Grammar"
-msgstr "Gramatikë"
+msgstr "语法"
 
 #: templates/modals/display_settings.html:77
 msgid "Gloss"
-msgstr "Glosat"
+msgstr "注释"
 
 #: templates/modals/display_settings.html:82
 msgid "Additional fields"
-msgstr "Rreshtat ndihmëse"
+msgstr "高级搜索"
 
 #: templates/modals/query_history.html:10
 msgid "Click on"
@@ -359,7 +333,7 @@ msgstr ""
 #: templates/modals/query_history.html:23
 #, fuzzy
 msgid "Repeat query"
-msgstr "Dërgimi i kërkimit"
+msgstr "转发查询"
 
 #: templates/modals/query_history.html:10
 msgid "to repeat a query."
@@ -372,18 +346,18 @@ msgstr ""
 #: templates/modals/query_history.html:17
 #, fuzzy
 msgid "Word"
-msgstr "fjalë"
+msgstr "词形"
 
 #: templates/modals/query_history.html:20
 #, fuzzy
 msgid "Subcorpus"
-msgstr "Pastrimi i nënkorpusit"
+msgstr "清除子语料库"
 
 # ******** The rest is more or less universal:  ********
 #: templates/modals/query_history.html:21
 #, fuzzy
 msgid "Search type"
-msgstr "Faqja e kërkimit"
+msgstr "在语料库内搜索"
 
 #: templates/modals/query_history.html:22
 msgid "Time"
@@ -391,29 +365,29 @@ msgstr ""
 
 #: templates/modals/query_share_load.html:5
 msgid "Share query"
-msgstr "Dërgimi i kërkimit"
+msgstr "转发查询"
 
 #: templates/modals/query_share_load.html:9
 msgid "If you want to share your query with someone, send them the text you see below. The person who loads this query will see the same results in the same order, unless the corpus has been re-indexed."
-msgstr "Nëse ju dëshironi t'ia dërgoni dikujt kërkimin tuaj, kopjojeni dhe dërgojani tekstin më poshtë. Njeriu që do të shkarkojë këtë kërkim do të shohë rezultatet e njëjta të renditura në të njëjtën mënyrë, nëse Korpusi nuk ishte ri-indeksuar që nga ajo kohë."
+msgstr "如果要发送查询，请复制并发送下文。任何加载此类查询的人都将看到同样顺序的结果，除非此后又对该语料库进行了重新索引。"
 
 #: templates/modals/query_share_load.html:19
 msgid "Load query"
-msgstr "Shkarkimi i kërkimit"
+msgstr "加载查询"
 
 #: templates/modals/query_share_load.html:23
 msgid "Here you can load a corpus query someone sent you. Please enter the query below:"
-msgstr "Këtu ju mund të shkarkoni kërkimin të cilin dikush ju ka dërguar juve. Ju lutemi ta shtypni kërkimin në rreshtin më poshtë:"
+msgstr "此处可以加载您发送的对语料库的查询。在下面区域输入:"
 
 #: templates/modals/select_gloss.html:5
 #, fuzzy
 msgid "word boundary"
-msgstr "fjalë,"
+msgstr "单词,"
 
 #: templates/modals/select_gloss.html:6
 #, fuzzy
 msgid "any number of morphs"
-msgstr "çfarëdo numri analizash"
+msgstr "任意数量"
 
 #: templates/modals/select_gloss.html:7
 msgid "any positive number of morphs"
@@ -425,24 +399,24 @@ msgstr ""
 
 #: templates/modals/subcorpus_selection.html:10
 msgid "Specify parameters"
-msgstr "Zgjedhja e parametrave"
+msgstr "参数选择"
 
 #: templates/modals/subcorpus_selection.html:11
 msgid "Choose from a list"
-msgstr "Zgjedhja nga lista"
+msgstr "在列表中选择"
 
 #: templates/modals/subcorpus_selection.html:12
 msgid "Subcorpus statistics"
-msgstr "Statistika e nënkorpusit"
+msgstr "子语料库数据"
 
 #: templates/modals/subcorpus_selection.html:16
 msgid "Select parameters"
-msgstr "Zgjedhja e parametrave"
+msgstr "选择参数"
 
 #: templates/modals/subcorpus_selection.html:27
 #, fuzzy
 msgid "lower bound"
-msgstr "fjalë,"
+msgstr "单词,"
 
 #: templates/modals/subcorpus_selection.html:28
 msgid "upper bound"
@@ -450,20 +424,20 @@ msgstr ""
 
 #: templates/modals/subcorpus_selection.html:42
 msgid "Select documents"
-msgstr "Zgjedhja e dokumenteve"
+msgstr "选择文本"
 
 #: templates/modals/subcorpus_selection.html:43
 msgid "(please wait for the document list to load)"
-msgstr "(Ju lutemi të prisni derisa të përfundojë shkarkimi i listës së dokumenteve)"
+msgstr "(文本列表正在加载,请稍等)"
 
 #: templates/modals/subcorpus_selection.html:46
 msgid "Selected subcorpus composition"
-msgstr "Përmbajtja e nënkorpusit të zgjedhur"
+msgstr "已选子语料库的组成"
 
 #: templates/modals/subcorpus_selection.html:47
 #: templates/modals/word_stats.html:16
 msgid "Parameter: "
-msgstr "Parametër: "
+msgstr "参数: "
 
 #: templates/modals/subcorpus_selection.html:71
 #: templates/modals/word_stats.html:28
@@ -473,75 +447,75 @@ msgstr ""
 #: templates/modals/subcorpus_selection.html:73
 #: templates/modals/word_stats.html:81
 msgid "(please wait for the plot to load)"
-msgstr "(Ju lutemi të prisni derisa të përfundojë shkarkimi i grafikut)"
+msgstr "(图表正在加载,请稍等)"
 
 #: templates/modals/subcorpus_selection.html:77
 #, fuzzy
 msgid "Value"
-msgstr "M"
+msgstr "男"
 
 #: templates/modals/subcorpus_selection.html:78
 #, fuzzy
 msgid "Size in words"
-msgstr "fjalë të ndryshme"
+msgstr "不同词形"
 
 #: templates/modals/subcorpus_selection.html:79
 #, fuzzy
 msgid "Number of documents"
-msgstr "Zgjedhja e dokumenteve"
+msgstr "选择文本"
 
 #: templates/modals/subcorpus_selection.html:87
 #: templates/modals/word_stats.html:52
 #, fuzzy
 msgid "please wait for the plot to load"
-msgstr "(Ju lutemi të prisni derisa të përfundojë shkarkimi i grafikut)"
+msgstr "(图表正在加载,请稍等)"
 
 #: templates/modals/subcorpus_selection.html:97
 msgid "Clear subcorpus"
-msgstr "Pastrimi i nënkorpusit"
+msgstr "清除子语料库"
 
 #: templates/modals/word_stats.html:5
 msgid "Word statistics header"
-msgstr "Statistika e fjalëve"
+msgstr "词形统计"
 
 #: templates/modals/word_stats.html:10
 msgid "By metadata values"
-msgstr "Sipas shënimeve metatekstuale"
+msgstr "按照原数据意义"
 
 #: templates/modals/word_stats.html:11
 msgid "By frequency"
-msgstr "Sipas dendurisë"
+msgstr "按照频率"
 
 #: templates/modals/word_stats.html:15
 msgid "Word statistics for "
-msgstr "Statistika për"
+msgstr "统计"
 
 #: templates/modals/word_stats.html:22
 msgid "Query type: "
-msgstr "Tipi i kërkimit: "
+msgstr "查询类型: "
 
 #: templates/modals/word_stats.html:24
 msgid "search the whole query"
-msgstr "gjetja e gjithë kërkimit"
+msgstr "搜索整个查询"
 
 #: templates/modals/word_stats.html:25
 msgid "compare words in the query"
-msgstr "krahasimi i fjalëve në kërkimin"
+msgstr "比较查询中的单词"
 
 #: templates/modals/word_stats.html:35
 #, fuzzy
 msgid "Query word "
-msgstr "vetëm një fjalë"
+msgstr "单一词形"
 
 #: templates/modals/word_stats.html:40
 #, fuzzy
 msgid "value"
-msgstr "M"
+msgstr "男"
 
 #: templates/modals/word_stats.html:43
 #, fuzzy
 msgid "frequency (ipm)"
-msgstr "sipas dëndurisë"
+msgstr "按照频率"
 
 #: templates/modals/word_stats.html:44
 #, python-format
@@ -550,31 +524,31 @@ msgstr ""
 
 #: templates/modals/word_stats.html:59
 msgid "Distribution by frequency rank"
-msgstr "Distribucioni i fjalëve sipas rangut të dendurisë"
+msgstr "按频率等级排列单词"
 
 #: templates/modals/word_stats.html:60
 msgid "Explanation for frequency distributions"
-msgstr "<p>Grafiku më poshtë paraqet të dhënat si vijon. Në rrezen <i>x</i> janë rangjet e dendurisë, d.m.th. pozicionet në listën e plotë të të gjitha fjalëve / lemmave të Korpusit, të renditura sipas dendurisë, ose frekuencës së përdorimit (nga më e lartë deri më të ulët). Nëse ka disa fjalë/lemma me të njëjtën denduri të përdorimit, ato kanë të njëjtin rang, baras me mesataren aritmetike i numrave të pozicioneve të tyre. Për çdo rang të dendurisë <i>r</i>, <strong>grafiku tregon në rrezen <i>y</i> përpjesëtimin e fjalëve/lemma-ve që përputhen me kërkimin tuaj me të gjitha fjalët/lemma-t me rangun e dendurisë më të ulët ose të barabartë me <i>r</i>.</strong> Në veçanti, pika mu në anën e majtë tregon përpjesëtimin e fjalëve/lemma-ve të tilla me të gjithë tipat (fjalët e ndryshme) në Korpus. Për sa u përket lemma-ve, numërohen të gjitha lemma-t që kanë së paku një fjalëformë, e cila përputhet me kërkimin tuaj.</p><p>Zhgjedhja e nënkorpusit dhe të gjitha fjalët e kërkimit të kombinuar, përveç së parës, nuk merren parasysh në këtë grafik.</p>"
+msgstr "<p>下面的图表安排如下。<i></i>轴上是频率等级排列，即以频率降序排列的词形/词条在完整列表中的位置编。 如果几种词形/词条频率乡土，则它们都被列入相同的排序等级，等于其位置编号的算术平均值。对于<i>y</i>轴上的每个排序 <i>r</i> <strong> откладывается 取值于满足查询的词形/词条在所有排序未超过<i>r</i>.</strong>的词形/词条中的比例。其中，图表上最右边的点表明这类词形/词条在所有语料库中的比例。在搜索词条时考虑到至少具有一个满足查询的词形的词条。</p><p>此图表不考虑子集的选择以及第一个单词除外的查询中的所有单词。</p>"
 
 #: templates/modals/word_stats.html:62
 msgid "words"
-msgstr "fjalë"
+msgstr "词形"
 
 #: templates/modals/word_stats.html:63
 msgid "lemmata"
-msgstr "lemma"
+msgstr "词条"
 
 #: templates/modals/word_stats.html:65
 msgid "Scale of the x axis: "
-msgstr "Shkalla në rrezen x: "
+msgstr "X轴刻度: "
 
 #: templates/modals/word_stats.html:67
 msgid "linear"
-msgstr "lineare"
+msgstr "线性的"
 
 #: templates/modals/word_stats.html:68
 msgid "logarithmic"
-msgstr "llogaritmike"
+msgstr "对数的"
 
 #: templates/modals/word_stats.html:70
 msgid "Max y: "
@@ -623,69 +597,69 @@ msgstr ""
 #: templates/search_results/word_table_row.html:20
 #, fuzzy
 msgid "Search in corpus"
-msgstr "kërkim"
+msgstr "搜索"
 
 #: templates/search_results/lemma_table_row.html:17
 #: templates/search_results/word_table_row.html:21
 #, fuzzy
 msgid "Show statistics"
-msgstr "Statistika e fjalëve"
+msgstr "词形统计"
 
 #: templates/search_results/result_docs.html:1
 msgid "Filter result:"
-msgstr "Rezultatet e përzgjedhura:"
+msgstr " 删选结果:"
 
 #: templates/search_results/result_docs.html:2
 #, fuzzy
 msgid "document with"
 msgid_plural "documents with"
-msgstr[0] "dokument me"
+msgstr[0] "带……的文件"
 msgstr[1] ""
 
 #: templates/search_results/result_docs.html:3
 #, fuzzy
 msgid "word found,"
 msgid_plural "words found,"
-msgstr[0] "fjalë,"
+msgstr[0] "单词,"
 msgstr[1] ""
 
 #: templates/search_results/result_docs.html:4
 msgid "of the entire corpus."
-msgstr "nga i gjithë korpusi."
+msgstr "来自所有语料库."
 
 #: templates/search_results/result_sentences.html:2
 #: templates/search_results/result_words.html:3
 #, fuzzy
 msgid "Search result:"
 msgid_plural "Search result:"
-msgstr[0] "Rezultati i kërkimit:"
+msgstr[0] "搜索结果: 已找到"
 msgstr[1] ""
 
 #: templates/search_results/result_sentences.html:3
 #, fuzzy
 msgid "occurrence"
 msgid_plural "occurrences"
-msgstr[0] "fjalëformë"
+msgstr[0] "词形"
 msgstr[1] ""
 
 #: templates/search_results/result_sentences.html:4
 #, fuzzy
 msgid "sentence found in approximately"
 msgid_plural "sentences found in approximately"
-msgstr[0] "fjali të gjetura në afro"
+msgstr[0] "句子大概在"
 msgstr[1] ""
 
 #: templates/search_results/result_sentences.html:5
 #, fuzzy
 msgid "in_document"
 msgid_plural "in_documents"
-msgstr[0] "dokument(e)"
+msgstr[0] "文件中"
 msgstr[1] ""
 
 #: templates/search_results/result_sentences.html:9
 #: templates/search_results/result_words.html:18
 msgid "The search was not finished due to the query timeout. You only see partial results."
-msgstr "Kërkimi nuk është përfunduar sepse mbaroi afati i pritjes. Vetëm një pjesë e rezultateve është paraqitur."
+msgstr "等待时间结束,搜索已完成. 未显示所有结果."
 
 #: templates/search_results/result_sentences.html:19
 msgid "Number of results found exceeds the maximum number of pages you can view."
@@ -694,7 +668,7 @@ msgstr ""
 #: templates/search_results/result_sentences.html:24
 #: templates/search_results/result_words.html:28
 msgid "You are searching in a subcorpus."
-msgstr "Ju kërkoni në nënkorpusin e zhgjedhur."
+msgstr "您在子语料库中搜索."
 
 #: templates/search_results/result_sentences.html:45
 msgid "Copy example to clipboard"
@@ -706,86 +680,86 @@ msgstr ""
 
 #: templates/search_results/result_sentences.html:60
 msgid "download as CSV"
-msgstr "shkarkimi në formatin CSV"
+msgstr "加载为 CSV格式"
 
 #: templates/search_results/result_sentences.html:61
 msgid "download as XLSX"
-msgstr "shkarkimi në formatin XLSX"
+msgstr "加载为 XLSX格式"
 
 #: templates/search_results/result_words.html:5
 #, fuzzy
 msgid "unique word"
 msgid_plural "different words"
-msgstr[0] "vetëm një fjalë"
+msgstr[0] "单一词形"
 msgstr[1] ""
 
 #: templates/search_results/result_words.html:7
 #, fuzzy
 msgid "unique lemma"
 msgid_plural "different lemmata"
-msgstr[0] "vetëm një fjalë"
+msgstr[0] "单一词形"
 msgstr[1] ""
 
 #: templates/search_results/result_words.html:9
 msgid "in approximately"
-msgstr "në afro"
+msgstr "大概在"
 
 #: templates/search_results/result_words.html:9
 #, fuzzy
 msgid "document found,"
 msgid_plural "documents found,"
-msgstr[0] "dokument,"
+msgstr[0] "文件,"
 msgstr[1] ""
 
 #: templates/search_results/result_words.html:11
 msgid "total frequency:"
-msgstr "Denduria e përgjithshme e përdorimit:"
+msgstr "总频率:"
 
 #: templates/search_results/result_words.html:13
 #, fuzzy
 msgid "total frequency of found word forms:"
-msgstr "Denduria e përgjithshme e përdorimit:"
+msgstr "总频率:"
 
 #: templates/search_results/result_words.html:34
 msgid "word_th_word"
-msgstr "fjalë"
+msgstr "单词"
 
 #: templates/search_results/result_words.html:34
 msgid "word_th_lemma"
-msgstr "lemma"
+msgstr "词条"
 
 #: templates/search_results/result_words.html:36
 msgid "word_th_gr"
-msgstr "gramatikë"
+msgstr "语法"
 
 #: templates/search_results/result_words.html:41
 msgid "word_th_frequency"
-msgstr "denduri"
+msgstr "频率"
 
 #: templates/search_results/result_words.html:43
 msgid "word_th_freq. rank / quantile"
-msgstr "rangu i dendurisë /<br>quantile"
+msgstr "频率排序 /<br>分位点"
 
 #: templates/search_results/result_words.html:46
 #, fuzzy
 msgid "word_th_# forms"
-msgstr "numri i dokumenteve"
+msgstr "文件数量"
 
 #: templates/search_results/result_words.html:48
 msgid "word_th_# sentences"
-msgstr "numri i fjalive"
+msgstr "句子数量"
 
 #: templates/search_results/result_words.html:49
 msgid "word_th_# documents"
-msgstr "numri i dokumenteve"
+msgstr "文件数量"
 
 #: templates/search_results/result_words.html:50
 msgid "word_th_search in corpus"
-msgstr "kërkim"
+msgstr "搜索"
 
 #: templates/search_results/result_words.html:51
 msgid "word_th_word stats"
-msgstr "statistikë"
+msgstr "统计"
 
 #: templates/search_results/sentence_header.html:20
 msgid "Full text (opens in a new tab)"
@@ -794,495 +768,513 @@ msgstr ""
 # Language names for the dropdown menu in search panel (please add all missing
 # languages that you have in the corpus):
 #~ msgid "langname_udmurt"
-#~ msgstr "Udmurt"
+#~ msgstr "乌德穆尔特语"
 
 #~ msgid "langname_komi"
-#~ msgstr "Komi"
+#~ msgstr "科米语"
 
 #~ msgid "langname_komi_zyrian"
-#~ msgstr "Komi-Zyrian"
+#~ msgstr "科米-济良斯克语"
+
+#~ msgid "langname_komi-zyrian"
+#~ msgstr "科米-济良斯克语"
 
 #~ msgid "langname_komi_permyak"
-#~ msgstr "Komi-Permyak"
+#~ msgstr "科米-贝尔米语"
 
 #~ msgid "langname_erzya"
-#~ msgstr "Erzya"
+#~ msgstr "厄尔茨亚语"
 
 #~ msgid "langname_moksha"
-#~ msgstr "Moksha"
+#~ msgstr "莫克沙语 "
 
 #~ msgid "langname_hill_mari"
-#~ msgstr "Hill Mari"
+#~ msgstr "山地马里语"
 
 #~ msgid "langname_meadow_mari"
-#~ msgstr "Meadow Mari"
+#~ msgstr "草原马里语"
 
 #~ msgid "langname_tatar"
-#~ msgstr "Tatar"
+#~ msgstr "鞑靼语"
 
 #~ msgid "langname_bashkir"
-#~ msgstr "Bashkir"
+#~ msgstr "巴什基尔语"
 
 #~ msgid "langname_chuvash"
-#~ msgstr "Chuvash"
+#~ msgstr "楚瓦什语"
 
 #~ msgid "langname_nganasan"
-#~ msgstr "Nganasan"
+#~ msgstr "亚恩加纳桑语"
 
 #~ msgid "langname_buryat"
-#~ msgstr "Buryat"
+#~ msgstr "布里亚特语"
 
 #~ msgid "langname_kalmyk"
-#~ msgstr "Kalmyk"
+#~ msgstr "卡尔梅克语"
 
 #~ msgid "langname_greek"
-#~ msgstr "Greek"
+#~ msgstr "希腊语"
 
 #~ msgid "langname_tsakonian"
-#~ msgstr "Tsakonian"
+#~ msgstr "tsakonian"
 
 #~ msgid "langname_albanian"
-#~ msgstr "Shqipe"
+#~ msgstr "阿尔巴尼亚语"
 
 #~ msgid "langname_acrhi"
-#~ msgstr "Archi"
+#~ msgstr "阿尔奇语"
 
 #~ msgid "langname_tsakhur"
-#~ msgstr "Tsakhur"
+#~ msgstr "查库尔语"
 
 #~ msgid "langname_dargwa"
-#~ msgstr "Dargwa"
+#~ msgstr "达尔金语"
 
 #~ msgid "langname_adyghe"
-#~ msgstr "Adyghe"
+#~ msgstr "阿迪格语"
 
 #~ msgid "langname_romani"
-#~ msgstr "Romani"
+#~ msgstr "吉普赛语"
 
 #~ msgid "langname_ossetic"
-#~ msgstr "Ossetic"
+#~ msgstr "奥塞梯语"
 
 #~ msgid "langname_ossetic_iron"
-#~ msgstr "Iron Ossetic"
+#~ msgstr "伊龙方言"
 
 #~ msgid "langname_ossetic_digor"
-#~ msgstr "Digor Ossetic"
+#~ msgstr "迪戈尔方言"
 
 #~ msgid "langname_english"
-#~ msgstr "English"
+#~ msgstr "英语"
 
 #~ msgid "langname_german"
-#~ msgstr "German"
+#~ msgstr "德语"
 
 #~ msgid "langname_french"
-#~ msgstr "French"
+#~ msgstr "法语"
 
 #~ msgid "langname_armenian"
-#~ msgstr "Armenian"
+#~ msgstr "亚美尼亚语"
 
 #~ msgid "langname_armenian_translit"
-#~ msgstr "Armenian (translit.)"
+#~ msgstr "亚美尼亚语（音译）"
 
 #~ msgid "langname_belarusian"
-#~ msgstr "Belarusian"
+#~ msgstr "白俄语"
 
 #~ msgid "langname_ukrainian"
-#~ msgstr "Ukrainian"
+#~ msgstr "乌克兰语"
 
 #~ msgid "langname_latvian"
-#~ msgstr "Latvian"
+#~ msgstr "拉脱维亚语"
 
 #~ msgid "langname_lithuanian"
-#~ msgstr "Lithuanian"
+#~ msgstr "立陶宛语"
 
 #~ msgid "langname_estonian"
-#~ msgstr "Estonian"
+#~ msgstr "爱沙尼亚语"
 
 #~ msgid "langname_finnish"
-#~ msgstr "Finnish"
+#~ msgstr "芬兰语"
 
 #~ msgid "langname_italian"
-#~ msgstr "Italian"
+#~ msgstr "意大利语"
 
 #~ msgid "langname_spanish"
-#~ msgstr "Spanish"
+#~ msgstr "西班牙语"
 
 #~ msgid "langname_bulgarian"
-#~ msgstr "Bulgarian"
+#~ msgstr "保加利亚语"
 
 #~ msgid "langname_swedish"
-#~ msgstr "Swedish"
+#~ msgstr "瑞典语"
 
 #~ msgid "langname_polish"
-#~ msgstr "Polish"
+#~ msgstr "波兰语"
 
 #~ msgid "langname_chinese"
-#~ msgstr "Chinese"
+#~ msgstr "汉语"
 
 #~ msgid "langname_selkup"
-#~ msgstr "Selkup"
+#~ msgstr "塞尔库普语"
 
 #~ msgid "langname_kamas"
-#~ msgstr "Kamas"
+#~ msgstr "卡马斯语"
 
 #~ msgid "langname_comments"
-#~ msgstr "comments"
+#~ msgstr "注解"
 
 #~ msgid "langname_positive"
-#~ msgstr "positive"
+#~ msgstr "积极"
 
 #~ msgid "langname_negative"
-#~ msgstr "negative"
+#~ msgstr "消极"
 
 #~ msgid "langname_undefined"
-#~ msgstr "undefined"
+#~ msgstr "未定义"
 
 # Transliteration names for the dropdown menu in search panel (please add all
 # missing languages that you have in the corpus):
 #~ msgid "translitname_original"
-#~ msgstr "origjinal"
+#~ msgstr "原文"
 
 #~ msgid "translitname_cyrillic"
-#~ msgstr "cirilik"
+#~ msgstr "基里尔字母"
 
 #~ msgid "translitname_latin"
-#~ msgstr "latin"
+#~ msgstr "拉丁字母"
 
 #~ msgid "translitname_IPA"
-#~ msgstr "IPA"
+#~ msgstr "国际音标"
 
 #~ msgid "translitname_UPA"
 #~ msgstr "UPA"
 
 #~ msgid "translitname_corpus"
-#~ msgstr "korpus"
+#~ msgstr "语料库"
 
 #~ msgid "translitname_dictionary"
-#~ msgstr "fjalor"
+#~ msgstr "词典"
 
 # Names of input methods that define how string queries (for word, lemma etc.)
 # will be transformed before the query is performed:
 #~ msgid "inputmethod_normal"
-#~ msgstr "normal"
+#~ msgstr "常规的"
 
 #~ msgid "inputmethod_strict"
-#~ msgstr "i përpiktë"
+#~ msgstr "精确的"
+
+#~ msgid "inputmethod_simplified"
+#~ msgstr "简化的"
 
 # Names of the metadata fields you have in the corpus:
 #~ msgid "metafield_genre"
-#~ msgstr "zhanri"
+#~ msgstr "体裁"
 
 #~ msgid "metafield_year"
-#~ msgstr "viti"
+#~ msgstr "年份"
 
 #~ msgid "metafield_year_from"
-#~ msgstr "viti: nga"
+#~ msgstr "年: 从"
 
 #~ msgid "metafield_year_to"
-#~ msgstr "viti: deri në"
+#~ msgstr "年: 到"
 
 #~ msgid "metafield_year_birth"
-#~ msgstr "viti i lindjes"
+#~ msgstr "作者出生年份"
 
 #~ msgid "metafield_year_publ"
-#~ msgstr "viti i botimit"
+#~ msgstr "出版年份"
 
 #~ msgid "metafield_title"
-#~ msgstr "titulli"
+#~ msgstr "标题"
+
+#~ msgid "metafield_title_en"
+#~ msgstr "标题（英）"
+
+#~ msgid "metafield_title_myv"
+#~ msgstr "标题（厄尔茨亚语）"
 
 #~ msgid "metafield_author"
-#~ msgstr "autori"
+#~ msgstr "作者"
 
 #~ msgid "metafield_topic"
-#~ msgstr "subjekti"
+#~ msgstr "主题"
 
 #~ msgid "metafield_sex"
-#~ msgstr "seksi"
+#~ msgstr "性别"
 
 #~ msgid "metafield_gender"
-#~ msgstr "gjinia"
+#~ msgstr "性别"
 
 #~ msgid "metafield_age"
-#~ msgstr "mosha"
+#~ msgstr "年龄"
 
 #~ msgid "metafield_origin"
-#~ msgstr "vendlindja"
+#~ msgstr "出生地"
 
 #~ msgid "metafield_published"
-#~ msgstr "botuar në"
+#~ msgstr "出版于"
 
 #~ msgid "metafield_issue"
-#~ msgstr "vëllimi"
+#~ msgstr "版"
 
 #~ msgid "metafield_birthyear"
-#~ msgstr "datëlindja"
+#~ msgstr "出生年份"
 
 #~ msgid "metafield_byear"
-#~ msgstr "datëlindja"
+#~ msgstr "出生年份"
 
 #~ msgid "metafield_birthplace"
-#~ msgstr "vendlindja"
+#~ msgstr "出生地"
 
 #~ msgid "metafield_profession"
-#~ msgstr "profesioni"
+#~ msgstr "专业"
 
 #~ msgid "metafield_occupation"
-#~ msgstr "zanati"
+#~ msgstr "职业"
 
 #~ msgid "metafield_liveplace"
-#~ msgstr "vendbanimi"
+#~ msgstr "居住地"
 
 #~ msgid "metafield_home_town"
-#~ msgstr "qyteti i banimit"
+#~ msgstr "出生地"
 
 #~ msgid "metafield_city"
-#~ msgstr "qyteti"
+#~ msgstr "城市"
 
 #~ msgid "metafield_place"
-#~ msgstr "vendi"
+#~ msgstr "位置"
 
 #~ msgid "metafield_region"
-#~ msgstr "rajoni"
+#~ msgstr "区域"
 
 #~ msgid "metafield_subject"
-#~ msgstr "subjekti"
+#~ msgstr "主题"
 
 #~ msgid "metafield_style"
-#~ msgstr "stili"
+#~ msgstr "风格"
 
 #~ msgid "metafield_length"
-#~ msgstr "gjatësia"
+#~ msgstr "长度"
 
 #~ msgid "metafield_annotators"
-#~ msgstr "anotuesit"
+#~ msgstr "注解者"
 
 #~ msgid "metafield_language"
-#~ msgstr "gjuha"
+#~ msgstr "语言"
 
 #~ msgid "metafield_orth"
-#~ msgstr "ortografia"
+#~ msgstr "拼写"
 
 #~ msgid "metafield_year_post"
-#~ msgstr "viti (postim)"
+#~ msgstr "年 （职务）"
 
 #~ msgid "metafield_sex_post"
-#~ msgstr "seksi (postim)"
+#~ msgstr "性别 （职务）"
 
 #~ msgid "metafield_city_post"
-#~ msgstr "vendi (postim)"
+#~ msgstr "居住地（职务）"
 
 #~ msgid "metafield_home_town_post"
-#~ msgstr "vendlindja (postim)"
+#~ msgstr "出生地 （职务）"
 
 #~ msgid "metafield_account_type_post"
-#~ msgstr "tipi i llogarisë (postim)"
+#~ msgstr "账户类型（职务）"
 
 #~ msgid "metafield_byear_post"
-#~ msgstr "datëlindja (postim)"
+#~ msgstr "出生年 （职务）"
 
 #~ msgid "metafield_post_type"
-#~ msgstr "tipi i postimit"
+#~ msgstr "职务类别"
 
 #~ msgid "metafield_account_type"
-#~ msgstr "tipi i llogarisë"
+#~ msgstr "账户类型"
 
 #~ msgid "metafield_page"
-#~ msgstr "faqja"
+#~ msgstr "页"
 
 #~ msgid "metafield_line"
-#~ msgstr "rreshti"
+#~ msgstr "行"
 
 #~ msgid "metafield_type"
-#~ msgstr "tipi"
+#~ msgstr "类型"
 
 #~ msgid "metafield_sphere"
-#~ msgstr "sfera e funksionimit"
+#~ msgstr "领域"
 
 #~ msgid "metafield_chronotop"
-#~ msgstr "vendi dhe koha e veprimit"
+#~ msgstr "时空"
 
 #~ msgid "metafield_genre_fi"
-#~ msgstr "zhanri i letërsisë"
+#~ msgstr "文学作品体裁"
 
 #~ msgid "metafield_publication"
-#~ msgstr "botimi"
+#~ msgstr "出版物"
 
 #~ msgid "metafield_medium"
-#~ msgstr "tipi i mbajtësit"
+#~ msgstr "媒介"
 
 #~ msgid "metafield_country"
-#~ msgstr "vendi"
+#~ msgstr "国家"
 
 #~ msgid "metafield_tagging"
-#~ msgstr "anotimi"
+#~ msgstr "标记"
 
 #~ msgid "metafield_translator"
-#~ msgstr "përkthyesi"
+#~ msgstr "翻译"
 
 #~ msgid "metafield_lang"
-#~ msgstr "gjuha e origjinalit"
+#~ msgstr "原文语言"
 
 #~ msgid "metafield_lang_trans"
-#~ msgstr "gjuha e përkthimit"
+#~ msgstr "译文语言"
 
 #~ msgid "metafield_date_trans"
-#~ msgstr "data e përkthimit"
+#~ msgstr "翻译日期"
 
 #~ msgid "metafield_sent_analyses"
-#~ msgstr "analiza e fjalisë"
+#~ msgstr "句子分析"
 
 # Names of the metadata values you have in the corpus:
 #~ msgid "metavalue_press"
-#~ msgstr "shtypi"
+#~ msgstr "刊物"
 
 #~ msgid "metavalue_fiction"
-#~ msgstr "tekstet letrare"
+#~ msgstr "小说类文学作品/虚构小说"
 
 #~ msgid "metavalue_nonfiction"
-#~ msgstr "tekstet joletrare"
+#~ msgstr "非小说类文学作品/纪实小说"
 
 #~ msgid "metavalue_wikipedia"
-#~ msgstr "Wikipedia"
+#~ msgstr "维基百科"
 
 #~ msgid "metavalue_religion"
-#~ msgstr "fetare"
+#~ msgstr "宗教的"
 
 #~ msgid "metavalue_oral"
-#~ msgstr "gojore"
+#~ msgstr "口头的"
 
 #~ msgid "metavalue_written"
-#~ msgstr "të shkruara"
+#~ msgstr "书面的"
 
 #~ msgid "metavalue_poetry"
-#~ msgstr "poezi"
+#~ msgstr "诗歌"
 
 #~ msgid "metavalue_novel"
-#~ msgstr "roman"
+#~ msgstr "长篇小说"
 
 #~ msgid "metavalue_story"
-#~ msgstr "tregim i shkurtër"
+#~ msgstr "短篇小说"
 
 #~ msgid "metavalue_dialogue"
-#~ msgstr "dialog"
+#~ msgstr "对话"
 
 #~ msgid "metavalue_monologue"
-#~ msgstr "monolog"
+#~ msgstr "独白"
 
 #~ msgid "metavalue_interview"
-#~ msgstr "intervistë"
+#~ msgstr "访谈"
 
 #~ msgid "metavalue_essay"
-#~ msgstr "ese"
+#~ msgstr "随笔"
 
 #~ msgid "metavalue_male"
-#~ msgstr "mashkull"
+#~ msgstr "男性"
 
 #~ msgid "metavalue_female"
-#~ msgstr "femër"
+#~ msgstr "女性"
 
 #~ msgid "metavalue_F"
-#~ msgstr "F"
+#~ msgstr "女"
 
 #~ msgid "metavalue_experiment"
-#~ msgstr "eksperiment"
+#~ msgstr "实验"
 
 #~ msgid "metavalue_unique"
-#~ msgstr "vetëm pa homonimi"
+#~ msgstr "单义的"
 
 #~ msgid "metavalue_complete"
-#~ msgstr "tërësisht, por me homonimi"
+#~ msgstr "完整但同音多义的"
 
 #~ msgid "metavalue_incomplete"
-#~ msgstr "pjesërisht"
+#~ msgstr "不完整的"
 
 # Names of additional word-level annotation fields:
 #~ msgid "wordfield_trans_ru"
-#~ msgstr "përkthim (RU)"
+#~ msgstr "翻译（俄）"
 
 #~ msgid "wordfield_trans_en"
-#~ msgstr "përkthim (EN)"
+#~ msgstr "翻译（英）"
 
 #~ msgid "wordfield_lex2"
-#~ msgstr "lemma 2"
+#~ msgstr "词条 2"
 
 #~ msgid "wordfield_trans_ru2"
-#~ msgstr "përkthim 2 (RU)"
+#~ msgstr "翻译 2 （俄）"
 
 #~ msgid "wordfield_trans_en2"
-#~ msgstr "përkthim 2 (EN)"
+#~ msgstr "翻译 2（英）"
 
 #~ msgid "wordfield_logogram"
-#~ msgstr "logogram"
+#~ msgstr "简写字符"
 
 #~ msgid "wordfield_transcription"
-#~ msgstr "transkriptim"
+#~ msgstr "拼音"
 
 #~ msgid "wordfield_segment"
-#~ msgstr "segment"
+#~ msgstr "节"
 
 #~ msgid "Query"
-#~ msgstr "Kërkim"
+#~ msgstr "查询"
 
 #~ msgid "Language:"
-#~ msgstr "Gjuhë:"
+#~ msgstr "语言:"
 
 #~ msgid "(Place for results)"
-#~ msgstr "(Këtu do të shfaqen rezultatet)"
+#~ msgstr "(结果显示处.)"
 
 #~ msgid "documents_1 with"
-#~ msgstr "dokument me"
+#~ msgstr "带……的文件"
 
 #~ msgid "documents_2-4 with"
-#~ msgstr "dokumente me"
+#~ msgstr "带……的文件"
 
 #~ msgid "documents with"
-#~ msgstr "dokumente me"
+#~ msgstr "带……的文件"
 
 #~ msgid "words_1 found,"
-#~ msgstr "fjalë,"
+#~ msgstr "单词,"
 
 #~ msgid "words_2-4 found,"
-#~ msgstr "fjalë,"
+#~ msgstr "单词,"
 
 #~ msgid "words found,"
-#~ msgstr "fjalë,"
+#~ msgstr "单词,"
 
 #~ msgid "different words_1"
-#~ msgstr "një fjalë"
+#~ msgstr "单一词形"
 
 #~ msgid "different words_2-4"
-#~ msgstr "fjalë të ndryshme"
+#~ msgstr "不同词形"
 
 #~ msgid "documents_1 found,"
-#~ msgstr "dokument,"
+#~ msgstr "文件,"
 
 #~ msgid "documents_2-4 found,"
-#~ msgstr "dokumente,"
+#~ msgstr "文件,"
 
 #~ msgid "documents found,"
-#~ msgstr "dokumente,"
+#~ msgstr "文件,"
 
 #~ msgid "word_th_transcription"
-#~ msgstr "transkriptim"
+#~ msgstr "音译."
 
 #~ msgid "occurrence_1"
-#~ msgstr "fjalëformë"
+#~ msgstr "词形"
 
 #~ msgid "occurrences_2-4"
-#~ msgstr "fjalëforma"
+#~ msgstr "词形"
 
 #~ msgid "occurrences"
-#~ msgstr "fjalëforma"
+#~ msgstr "词形"
+
+#~ msgid "contacts"
+#~ msgstr "联系"
+
+#~ msgid "support"
+#~ msgstr "项目受以下单位资助： 俄罗斯国家研究型高等经济大学“大学生联合科研创新项目竞赛”框架下的学生学术发展中心"
 
 #~ msgid "langname_beserman"
 #~ msgstr "Beserman"
 
 #~ msgid "word_th_trans_en"
-#~ msgstr "përkthim (EN)"
+#~ msgstr "翻译 (英)"
 
 #~ msgid "langname_russian"
-#~ msgstr "Russian"
+#~ msgstr "俄语"
 
 #~ msgid "less_fields"
-#~ msgstr "më pak rreshta"
+#~ msgstr "删除字段"
 

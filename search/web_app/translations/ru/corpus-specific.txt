@@ -1,0 +1,1 @@
+corpus_title	(ВВЕДИТЕ НАЗВАНИЕ КОРПУСА в translations/ru/corpus-specific.txt)

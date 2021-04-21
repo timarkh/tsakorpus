@@ -7,6 +7,63 @@ import re
 import random
 
 
+def load_csv_translations(fname, pfx=''):
+    """
+    Load translations from a tab-delimited file. Add prefix
+    to the keys. Return a dictionary.
+    """
+    translations = {}
+    with open(fname, 'r', encoding='utf-8-sig') as fIn:
+        for line in fIn:
+            line = line.strip('\r\n ')
+            if len(line) <= 2 or line.count('\t') != 1:
+                continue
+            key, value = line.split('\t')
+            key = pfx + key
+            translations[key] = value
+    return translations
+
+
+def generate_po(lang):
+    """
+    Generate a messages.po translation file for pybabel based on
+    the contents of translations/lang
+    """
+    srcDir = os.path.join('translations', lang)
+    targetDir = os.path.join('translations_pybabel', lang, 'LC_MESSAGES')
+    if not os.path.exists(srcDir):
+        return
+    if not os.path.exists(targetDir):
+        os.makedirs(targetDir)
+    with open(os.path.join(targetDir, 'messages.po'), 'w', encoding='utf-8') as fOut:
+        try:
+            with open(os.path.join(srcDir, 'header.txt'), 'r', encoding='utf-8') as fIn:
+                fOut.write(fIn.read() + '\n')
+            with open(os.path.join(srcDir, 'main.txt'), 'r', encoding='utf-8') as fIn:
+                fOut.write(fIn.read() + '\n\n')
+            dictMessages = {}
+            dictMessages.update(load_csv_translations(os.path.join(srcDir, 'corpus-specific.txt'), ''))
+            dictMessages.update(load_csv_translations(os.path.join(srcDir, 'input_methods.txt'),
+                                                      'inputmethod_'))
+            dictMessages.update(load_csv_translations(os.path.join(srcDir, 'languages.txt'),
+                                                      'langname_'))
+            dictMessages.update(load_csv_translations(os.path.join(srcDir, 'metadata_fields.txt'),
+                                                      'metafield_'))
+            dictMessages.update(load_csv_translations(os.path.join(srcDir, 'metadata_values.txt'),
+                                                      'metavalue_'))
+            dictMessages.update(load_csv_translations(os.path.join(srcDir, 'tooltips.txt'),
+                                                      'tooltip_'))
+            dictMessages.update(load_csv_translations(os.path.join(srcDir, 'transliterations.txt'),
+                                                      'translitname_'))
+            dictMessages.update(load_csv_translations(os.path.join(srcDir, 'word_fields.txt'),
+                                                      'wordfield_'))
+            for k in sorted(dictMessages):
+                fOut.write('msgid "' + k.replace('\n', '\\n').replace('"', '&quot;').replace('%', '%%') + '"\n')
+                fOut.write('msgstr "' + k.replace('\n', '\\n').replace('"', '&quot;').replace('%', '%%') + '"\n\n')
+        except:
+            print('Something went wrong when generating interface translations.')
+
+
 def compile_translations():
     """
     Compile flask_babel translations.
@@ -38,7 +95,6 @@ random.seed()
 
 rxIndexAtEnd = re.compile('_[0-9]+$')
 
-compile_translations()
 
 # Read settings before we import anything else. Many modules
 # imported after this point reference the settings object,
@@ -47,6 +103,11 @@ from .corpus_settings import CorpusSettings
 settings = CorpusSettings()
 settings.load_settings(os.path.join(SETTINGS_DIR, 'corpus.json'),
                        os.path.join(SETTINGS_DIR, 'categories.json'))
+
+# Prepare pybabel translations
+for lang in settings.interface_languages:
+    generate_po(lang)
+compile_translations()
 
 # Continue with module imports. Beware that there are other
 # circular import issues, so the order of imported modules

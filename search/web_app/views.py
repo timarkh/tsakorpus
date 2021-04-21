@@ -9,6 +9,7 @@ import copy
 import re
 import time
 import os
+import shutil
 import uuid
 import xlsxwriter
 from werkzeug.utils import secure_filename
@@ -696,7 +697,7 @@ def setup_corpus():
     if not request.host.strip('/').endswith(('0.0.0.0:7342', '127.0.0.1:7342')):
         return 'This page can only be accessed from localhost.', 403
     return render_template('admin/corpus_setup.html',
-                           filename=os.path.abspath('../corpus.json'),
+                           filename=os.path.abspath('../USER_CONFIG/corpus.json'),
                            settings=settings.as_dict())
 
 
@@ -705,5 +706,9 @@ def setup_corpus_save_changes():
     if not request.host.strip('/').endswith(('0.0.0.0:7342', '127.0.0.1:7342')):
         return 'This page can only be accessed from localhost.', 403
     data = request.form.to_dict()
-    settings.save_settings(os.path.abspath('../corpus.json'), data=data)
+    if os.path.exists('../USER_CONFIG'):
+        shutil.rmtree('../USER_CONFIG')
+    os.makedirs('../USER_CONFIG/translations')
+    settings.save_settings(os.path.abspath('../USER_CONFIG/corpus.json'), data=data)
+    settings.prepare_translations(os.path.abspath('../USER_CONFIG/translations'), data=data)
     return jsonify(result='OK')
