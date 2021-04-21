@@ -39,3 +39,4 @@ ENV/
 /corpus.json
 docs/_build
 **/messages.mo
+USER_CONFIG/
