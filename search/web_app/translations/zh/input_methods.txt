@@ -1,0 +1,3 @@
+inputmethod_normal	常规的
+inputmethod_strict	精确的
+inputmethod_simplified	简化的

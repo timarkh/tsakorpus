@@ -1,0 +1,8 @@
+lex2	词条 2
+logogram	简写字符
+segment	节
+trans_en	翻译（英）
+trans_en2	翻译 2（英）
+trans_ru	翻译（俄）
+trans_ru2	翻译 2 （俄）
+transcription	拼音

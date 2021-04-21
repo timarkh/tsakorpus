@@ -1,0 +1,7 @@
+IPA	国际音标
+UPA	UPA
+corpus	语料库
+cyrillic	基里尔字母
+dictionary	词典
+latin	拉丁字母
+original	原文

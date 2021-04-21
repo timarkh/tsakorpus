@@ -1,0 +1,58 @@
+account_type	账户类型
+account_type_post	账户类型（职务）
+age	年龄
+annotators	注解者
+author	作者
+birth_place	出生地
+birth_year	出生年份
+birthplace	出生地
+birthyear	出生年份
+byear	出生年份
+byear_post	出生年 （职务）
+chronotop	时空
+city	城市
+city_post	居住地（职务）
+country	国家
+date_trans	翻译日期
+gender	性别
+genre	体裁
+genre_fi	文学作品体裁
+home_town	出生地
+home_town_post	出生地 （职务）
+issue	版
+lang	原文语言
+lang_trans	译文语言
+language	语言
+length	长度
+line	行
+live_place	居住地
+liveplace	居住地
+medium	媒介
+occupation	职业
+origin	出生地
+orth	拼写
+page	页
+place	位置
+post_type	职务类别
+profession	专业
+publication	出版物
+published	出版于
+region	区域
+sent_analyses	句子分析
+sex	性别
+sex_post	性别 （职务）
+sphere	领域
+style	风格
+subject	主题
+tagging	标记
+title	标题
+title_en	标题（英）
+topic	主题
+translator	翻译
+type	类型
+year	年份
+year_birth	作者出生年份
+year_from	年: 从
+year_post	年 （职务）
+year_publ	出版年份
+year_to	年: 到
