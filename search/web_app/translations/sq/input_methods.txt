@@ -1,0 +1,3 @@
+normal	normal
+strict	i përpiktë
+simplified	simplified

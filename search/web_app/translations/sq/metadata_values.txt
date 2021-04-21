@@ -1,0 +1,22 @@
+F	F
+M	M
+complete	tërësisht, por me homonimi
+dialogue	dialog
+essay	ese
+experiment	eksperiment
+female	femër
+fiction	tekstet letrare
+incomplete	pjesërisht
+interview	intervistë
+male	mashkull
+monologue	monolog
+nonfiction	tekstet joletrare
+novel	roman
+oral	gojore
+poetry	poezi
+press	shtypi
+religion	fetare
+story	tregim i shkurtër
+unique	vetëm pa homonimi
+wikipedia	Wikipedia
+written	të shkruara

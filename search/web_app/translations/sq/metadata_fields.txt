@@ -1,0 +1,58 @@
+account_type	tipi i llogarisë
+account_type_post	tipi i llogarisë (postim)
+age	mosha
+annotators	anotuesit
+author	autori
+birth_place	vendlindja
+birth_year	datëlindja
+birthplace	vendlindja
+birthyear	datëlindja
+byear	datëlindja
+byear_post	datëlindja (postim)
+chronotop	vendi dhe koha e veprimit
+city	qyteti
+city_post	vendi (postim)
+country	vendi
+date_trans	data e përkthimit
+gender	gjinia
+genre	zhanri
+genre_fi	zhanri i letërsisë
+home_town	qyteti i banimit
+home_town_post	vendlindja (postim)
+hometown	qyteti i banimit
+issue	vëllimi
+lang	gjuha e origjinalit
+lang_trans	gjuha e përkthimit
+language	gjuha
+length	gjatësia
+line	rreshti
+live_place	vendbanimi
+liveplace	vendbanimi
+medium	tipi i mbajtësit
+occupation	zanati
+origin	vendlindja
+orth	ortografia
+page	faqja
+place	vendi
+post_type	tipi i postimit
+profession	profesioni
+publication	botimi
+published	botuar në
+region	rajoni
+sent_analyses	analiza e fjalisë
+sex	seksi
+sex_post	seksi (postim)
+sphere	sfera e funksionimit
+style	stili
+subject	subjekti
+tagging	anotimi
+title	titulli
+topic	subjekti
+translator	përkthyesi
+type	tipi
+year	viti
+year_birth	viti i lindjes
+year_from	viti: nga
+year_post	viti (postim)
+year_publ	viti i botimit
+year_to	viti: deri në

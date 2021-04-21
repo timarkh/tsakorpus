@@ -1,0 +1,7 @@
+IPA	IPA
+UPA	UPA
+corpus	korpus
+cyrillic	cirilik
+dictionary	fjalor
+latin	latin
+original	origjinal
