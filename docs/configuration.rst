@@ -86,7 +86,7 @@ List of parameters
 
     - ``gramm_shortcuts`` (dictionary) -- dictionary where keys are shortcuts for grammatical tags and values are the Boolean expressions they should translate into when searching. The shortcuts can, for example, be umbrella tags like ``case`` that should be replaced by a disjunction of actual case tags like ``(nom|gen|dat)``. Or they can stand for a traditional category label that is annotated differently in your data, e.g. ``aorist`` could translate into ``pst,pfv``. These transformations are applied to the contents of the Grammar search input before further processing.
 
-    - ``gramm_selection`` (dictionary) -- what should appear in the Grammar selection popup. Has same contents as ``gloss_selecton``.
+    - ``gramm_selection`` (dictionary) -- what should appear in the Grammar selection popup. Has almost the same structure as ``gloss_selecton``. Its only key is ``columns``, where the value is a list containing lists of tag descriptors, each of these inner lists representing a single column in the popup. Each descriptor is a dictionary with possible keys ``type`` (obligatory), ``value``, ``category`` and ``tooltip``. The corresponding values are strings. ``type`` parameter can equal ``tag`` (description of a tag), ``header`` (description of a header for a group of gloss tags), or ``separator`` (a line that separates one group of tags from another). ``value`` and ``tooltip`` determine what text will appear on the tag an on the tooltip. ``category`` is used for logical grouping of tags and can contain arbitrary strings (not necessarily those that you have in :doc:`categories.json </categories>`), which will not be visible to the user. Whenever several tags from the same category are selected, they get into the query with a logical *OR* between them; tags from different categories are united with an *AND*.
 
     - ``lexical_fields`` (list of strings) -- names of non-grammatical analysis fields that should appear in analysis popups between the lines with dictionary categories and (inflectional) grammatical categories. Defaults to empty list. All fields that do not belong to this list are displayed below the grammatical line.
 
@@ -111,6 +111,8 @@ List of parameters
 - ``media_youtube`` (Boolean) -- if ``media`` is true, determines whether the media files are stored on Youtube. Since plain audio/video files and Youtube videos require different player settings, all your media files have to be either uploaded to Youtube, or stored as media files on the server.
 
 - ``media`` (Boolean) -- whether the corpus contains any aligned media (sound or video) files and, therefore, whether the media player should appear next to the search results.
+
+- ``multiple_choice_fields`` (dictionary) -- describes tag selection tables for word-level fields other that *Grammar* or *Gloss* and sentence-level metadata fields. Keys are field names, values are structured in the same way as ``gramm_selection`` above.
 
 - ``negative_search_enabled`` (Boolean) -- whether the negative search button should be present in the word query form. Defaults to ``true``.
 

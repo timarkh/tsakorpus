@@ -1,0 +1,30 @@
+F	Ж
+M	М
+complete	полностью, но с омонимией
+dialogue	диалог
+essay	эссе
+experiment	эксперимент
+female	женский
+fiction	художественные
+incomplete	не полностью
+interview	интервью
+male	мужской
+monologue	монолог
+movie	фильм
+nonfiction	нехудожественные
+novel	роман
+oral	устные
+original	оригинал
+poetry	поэзия
+press	пресса
+prose	проза
+public	публичные
+religion	религиозные
+science	научные
+song	песня
+spontaneous	спонтанные
+story	рассказ
+unique	однозначно
+translated	перевод
+wikipedia	Википедия
+written	письменные

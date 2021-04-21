@@ -40,3 +40,4 @@ ENV/
 docs/_build
 **/messages.mo
 USER_CONFIG/
+**/desktop.ini

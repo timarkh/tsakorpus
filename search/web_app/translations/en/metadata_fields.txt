@@ -38,6 +38,7 @@ medium	Medium
 occupation	Occupation
 origin	Place of origin
 orth	Orthography
+orthography	Orthography
 page	Page
 place	Place
 post_type	Post type

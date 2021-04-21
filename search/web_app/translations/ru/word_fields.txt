@@ -1,0 +1,12 @@
+trans_ru	перевод (RU)
+trans_en	перевод (EN)
+trans_de	перевод (DE)
+trans_fr	перевод (FR)
+lex2	лемма 2
+trans_ru2	перевод 2 (RU)
+trans_en2	перевод 2 (EN)
+trans_de2	перевод 2 (DE)
+trans_fr2	перевод 2 (FR)
+logogram	логограмма
+transcription	транскрипция
+segment	сегмент

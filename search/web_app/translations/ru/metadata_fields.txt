@@ -1,0 +1,70 @@
+account_type	тип аккаунта
+account_type_post	вид аккаунта (пост)
+age	возраст
+annotators	разметчики
+author	автор
+birth_place	место рождения
+birth_year	год рождения
+birthplace	место рождения
+birthyear	год рождения
+byear	год рождения
+byear_post	год рождения (пост)
+century	век
+chronotop	время и место действия
+citation	ссылка
+city	город
+city_post	место проживания (пост)
+collector	собиратель
+country	страна
+date_trans	дата перевода
+dialect	диалект
+gender	пол
+genre	жанр
+genre_fi	жанр худ. литературы
+home_town	место рождения
+home_town_post	место рождения (пост)
+hometown	место рождения
+issue	выпуск
+lang	язык оригинала
+lang_trans	язык перевода
+language	язык
+length	длина
+line	строка
+linguist	лингвист
+linguists	лингвисты
+live_place	место проживания
+liveplace	место проживания
+medium	тип носителя
+occupation	род занятий
+origin	место рождения
+orth	орфография
+orthography	орфография
+page	страница
+place	место
+post_type	тип поста
+profession	профессия
+publication	издание
+published	опубликовано
+region	регион
+sent_analyses	Разбор предложения
+sex	пол
+sex_post	пол (пост)
+speaker	говорящий
+speakers	говорящие
+sphere	сфера функционирования
+style	стиль
+subdialect	говор
+subject	предмет
+tagging	разметка
+title	заголовок
+title_en	заголовок (английский)
+title_ru	заголовок (русский)
+topic	тема
+translator	переводчик
+type	тип
+year	год
+year_birth	год рождения автора
+year_from	год: от
+year_post	год (пост)
+year_publ	год публикации
+year_to	год: до
