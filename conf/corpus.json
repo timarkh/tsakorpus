@@ -63,6 +63,10 @@
   "sentence_meta_values": {
     "speaker_type": ["native", "linguist"]
   },
+  "keyboards": {
+    "beserman": "beserman",
+    "russian": "russian"
+  },
   "generate_dictionary": true,
   "fulltext_view_enabled": true,
   "use_nonpersistent_fulltext_id": true,

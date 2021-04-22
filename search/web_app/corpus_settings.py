@@ -60,6 +60,7 @@ class CorpusSettings:
         self.default_locale = 'en'
         self.transliterations = None
         self.input_methods = None
+        self.keyboards = {}
         self.generate_dictionary = False
         self.author_metafield = None
         self.line_plot_meta = ['year']    # metadata fields whose statistics can be displayed on a line plot

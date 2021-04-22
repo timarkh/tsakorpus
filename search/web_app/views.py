@@ -40,6 +40,8 @@ def search_page():
                            all_lang_search=settings.all_language_search_enabled,
                            transliterations=settings.transliterations,
                            input_methods=settings.input_methods,
+                           keyboards_by_tier=json.dumps(settings.keyboards,
+                                                        ensure_ascii=False, indent=-1),
                            media=settings.media,
                            video=settings.video,
                            images=settings.images,

@@ -369,6 +369,7 @@ function assign_input_events() {
 	$('.toggle_glossed_layer').click(toggle_glossed_layer);
 	$(".tier_select").change(change_tier);
 	assign_tooltips();
+	initialize_keyboards();
 }
 
 function assign_show_hide() {

@@ -417,6 +417,7 @@ function change_tier(e) {
 			$(this).addClass('disabled_search_input');
 		}
 	});
+	initialize_keyboards();
 }
 
 function toggle_full_image() {

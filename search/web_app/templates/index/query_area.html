@@ -17,8 +17,8 @@
 					<div class="word_search" id="first_word">
 						<div class="word_search_l">
 							<div class="query_word_header"><div class="circle circle_w1"></div>{{ _('Word_header') }} {{ _('Number_sign') }}1</div>
-							<span id="_label_wf1" class="search_label">{{ _('Word:') }}</span> <input type="text" class="search_input" name="wf1" id="wf1"><br>
-							<span id="_label_lex1" class="search_label">{{ _('Lemma:') }}</span> <input type="text" class="search_input" name="lex1" id="lex1"><br>
+							<span id="_label_wf1" class="search_label">{{ _('Word:') }}</span> <input type="text" class="search_input virtual-keyboard" data-kioskboard-type="keyboard" data-kioskboard-specialcharacters="true" name="wf1" id="wf1"><br>
+							<span id="_label_lex1" class="search_label">{{ _('Lemma:') }}</span> <input type="text" class="search_input virtual-keyboard" data-kioskboard-type="keyboard" data-kioskboard-specialcharacters="true" name="lex1" id="lex1"><br>
 							<span id="_label_gr1" class="search_label">{{ _('Grammar:') }}</span> <input type="text" class="search_input gram_selector_input" name="gr1" id="gr1"><span class="gram_selector_link bi bi-table" data-field="gr" data-nword="1"></span><br>
 							<input type="hidden" class="search_input" name="w_id1" id="w_id1">
 							<input type="hidden" class="search_input" name="l_id1" id="l_id1">
@@ -37,7 +37,7 @@
 								{% endif %}
 								</select>
 							{% else %}
-								<select name="lang1" id="lang1" style="display: none; visibility: hidden; height: 0px">
+								<select name="lang1" id="lang1" class="tier_select" style="display: none; visibility: hidden; height: 0px">
 								{% for lang in languages %}
 								<option value="{{ lang }}">{{ _('langname_' + lang) }}</option>
 								{% endfor %}
@@ -59,7 +59,7 @@
 				<br>
 	{% if fulltext_search_enabled %}
 				<label for="txt">{{ _('Full-text search:') }}</label>
-				<input type="text" class="search_input" name="txt" id="txt">
+				<input type="text" class="search_input virtual-keyboard" data-kioskboard-type="keyboard" data-kioskboard-specialcharacters="true" name="txt" id="txt">
 				<input type="checkbox" name="precise" id="precise" checked> <label for="precise">{{ _('Precise match') }}</label><br>
 	{% endif %}
 			</div>

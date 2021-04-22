@@ -11,6 +11,7 @@
 	<script src="static/autocomplete_devbridge/jquery.autocomplete.min.js"></script>
 	<script type='text/javascript' src='static/bootstrap-5.0.0-beta1-dist/js/bootstrap.bundle.min.js'></script>
 	<script type='text/javascript' src='static/js/common_interface_functions.js'></script>
+	<script type='text/javascript' src='static/js/virtual_keyboards.js'></script>
 	<script type='text/javascript' src='static/js/result_parser.js'></script>
 	<script type='text/javascript' src='static/js/json_loaders.js'></script>
 	<script type='text/javascript' src='static/js/query_share_load.js'></script>
@@ -30,6 +31,7 @@
 	var queryWordCaption = "{{ _('Query word') }}";
 	var autoSwitchTiers = {{ auto_switch_tiers|safe }};
 	var wordFieldsByTier = {{ word_fields_by_tier|safe }};
+	var keyboardsByTier = {{ keyboards_by_tier|safe }};
 	</script>
 	<!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,400i" rel="stylesheet"> -->
 	{% if media %}
@@ -40,6 +42,10 @@
 	{% if youtube %}
 	<script src="static/js/videojs-youtube.js"></script>
 	{% endif %}
+	{% endif %}
+	{% if keyboards_by_tier != '{}' %}
+	<link rel="stylesheet" href="static/kioskboard-1.4.0/kioskboard-1.4.0.min.css" />
+	<script src="static/kioskboard-1.4.0/kioskboard-1.4.0.js"></script>
 	{% endif %}
 	{% include "head_add.html" ignore missing %}
 </head>
