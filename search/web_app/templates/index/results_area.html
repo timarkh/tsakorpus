@@ -1,5 +1,6 @@
 <div id="lower_part">
 	{% if media %}
+	{% if video %}
 	<div id="media_div" style="display: none">
 		<video id="src_player" class="video-js" type='video/mpeg' controls preload="auto" width="400" height="300" data-setup='{ {% if youtube %}"techOrder": ["youtube"]{% endif %} }'>
 		<p class="vjs-no-js">
@@ -11,12 +12,25 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Close') }}"></button>
 		</div>
 	</div>
+	{% else %}
+	<div id="media_div" class="media_div_novideo" style="display: none">
+		<video id="src_player" class="video-js" type='video/mpeg' controls preload="auto" width="100%" height="50" data-setup='{ {% if youtube %}"techOrder": ["youtube"]{% endif %} }'>
+		<p class="vjs-no-js">
+		To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
+		</p>
+		</video>
+		<div id="video_prompt" class="alert alert-warning alert-dismissible fade show video_prompt_novideo" role="alert">
+			<p>{{ _('Click on an example to listen.') }}</p>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Close') }}"></button>
+		</div>
+	</div>
+	{% endif %}
 	{% endif %}
 	{% if images %}
 	<div id="image_div" style="display: none">
 	</div>
 	{% endif %}
-	<div id="search_results">
+	<div id="search_results"{% if not video %}class="search_results_novideo"{% endif %}>
 		{% if debug %}
 			<pre><code id="debug_code">
 			</code></pre>

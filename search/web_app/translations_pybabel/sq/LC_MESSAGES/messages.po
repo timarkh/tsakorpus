@@ -255,6 +255,10 @@ msgstr "Kthehu te kërkimi"
 msgid "Click on an example to see video."
 msgstr "Kliko shembullin për të parë video / për të dëgjuar audio."
 
+#: templates/index/results_area.html:10
+msgid "Click on an example to see video."
+msgstr "Kliko shembullin për të dëgjuar audio."
+
 #: templates/modals/display_settings.html:5
 msgid "Additional search and display options"
 msgstr "Opsionet shtesë të kërkimit dhe shfaqjes së rezultateve"

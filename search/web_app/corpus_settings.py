@@ -26,6 +26,7 @@ class CorpusSettings:
         # Corpus type
         self.images = False
         self.media = False
+        self.video = False
         self.media_length = 60
         self.media_youtube = False
 

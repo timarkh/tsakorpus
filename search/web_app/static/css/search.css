@@ -770,11 +770,22 @@ hr.separator {
 	font-weight: bold;
 }
 
+
+.search_results_novideo {
+	height: calc(100% - 70px) !important;
+}
+
 #media_div {
 	width: 450px;
 	padding: 10px;
 	float: left;
 	display: inline-block;
+}
+
+.media_div_novideo {
+	max-width: 1100px!important;
+	width: 100%!important;
+	float: none!important;
 }
 
 #image_div {
@@ -1437,6 +1448,24 @@ in different styles) */
 
 #video_prompt {
 	margin: -170px 35px auto 5px;
+}
+
+.video_prompt_novideo {
+	margin: -45px 20px 20px 5px !important;
+	padding: 10px!important;
+}
+
+.video_prompt_novideo p {
+	margin: 0!important;
+	padding: 0!important;
+}
+
+.video_prompt_novideo button {
+	padding: 15px!important;
+}
+
+.src_player-dimensions {
+	width: 100%;
 }
 
 .info_icon {

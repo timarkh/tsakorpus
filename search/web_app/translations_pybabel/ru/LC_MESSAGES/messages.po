@@ -256,6 +256,10 @@ msgstr "Вернуться к поиску"
 msgid "Click on an example to see video."
 msgstr "Чтобы прослушать какой-нибудь пример, нажмите на него."
 
+#: templates/index/results_area.html:10
+msgid "Click on an example to listen."
+msgstr "Чтобы прослушать какой-нибудь пример, нажмите на него."
+
 #: templates/modals/display_settings.html:5
 msgid "Additional search and display options"
 msgstr "Дополнительные настройки поиска и отображения"

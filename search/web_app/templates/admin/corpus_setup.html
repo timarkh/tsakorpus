@@ -80,6 +80,13 @@
 				</label>
 			</div>
 			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="video" id="video" name="video" {% if settings.video %}checked{% endif %}>
+				<label class="form-check-label" for="video">
+				(If the previous checkbox is checked) Corpus has aligned video files
+				</label>
+				<p class="explanation">If it only has aligned sound files, the player will be thin and will be located above the search results, not to the left of them.</p>
+			</div>
+			<div class="form-check option_group">
 				<input class="form-check-input" type="checkbox" value="media_youtube" id="media_youtube" name="media_youtube" {% if settings.media_youtube %}checked{% endif %}>
 				<label class="form-check-label" for="media_youtube">
 				If there are sound or video files, they are stored on Youtube rather than locally

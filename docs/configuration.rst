@@ -114,7 +114,7 @@ List of parameters
 
 - ``media_youtube`` (Boolean) -- if ``media`` is true, determines whether the media files are stored on Youtube. Since plain audio/video files and Youtube videos require different player settings, all your media files have to be either uploaded to Youtube, or stored as media files on the server.
 
-- ``media`` (Boolean) -- whether the corpus contains any aligned media (sound or video) files and, therefore, whether the media player should appear next to the search results.
+- ``media`` (Boolean) -- whether the corpus contains any aligned media (sound or video) files and, therefore, whether the media player should appear next to the search results. Defaults to ``false``. See also the ``video`` option.
 
 - ``multiple_choice_fields`` (dictionary) -- describes tag selection tables for word-level fields other that *Grammar* or *Gloss* and sentence-level metadata fields. Keys are field names, values are structured in the same way as ``gramm_selection`` above.
 
@@ -140,6 +140,8 @@ List of parameters
 - ``start_page_url`` (string) -- a string with the URL of the start page of the corpus, if there is one. It is used to link the header of the search page to the start page.
 
 - ``transliterations`` (list of strings) -- list of supported transliterations. For each transliteration, there should be a function in ``/search/web_app/transliteration.py`` named ``trans_%TRANSLITERATION_NAME%_baseline`` that takes the text and the name of the language as input and returns transliterated text.
+
+- ``video`` (Boolean) -- whether the corpus has aligned video files. Defaults to ``false``. If it does, do not forget to set ``media`` to ``true``.
 
 - ``viewable_meta`` (list of strings) -- names of the document-level metadata fields that should be shown in search results.
 

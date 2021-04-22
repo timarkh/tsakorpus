@@ -41,6 +41,7 @@ def search_page():
                            transliterations=settings.transliterations,
                            input_methods=settings.input_methods,
                            media=settings.media,
+                           video=settings.video,
                            images=settings.images,
                            youtube=settings.media_youtube,
                            gloss_search_enabled=settings.gloss_search_enabled,
@@ -676,6 +677,7 @@ def help_dialogue():
     l = get_locale()
     return render_template('modals/help_dialogue_' + l + '.html',
                            media=settings.media,
+                           video=settings.video,
                            gloss_search_enabled=settings.gloss_search_enabled)
 
 

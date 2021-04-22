@@ -4,6 +4,7 @@
   "input_format": "json",
   "debug": false,
   "media": true,
+  "video": true,
   "media_length": 60,
   "max_context_expand": 10,
   "max_distance_filter": 200000,
