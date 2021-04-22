@@ -5,14 +5,11 @@ function url_exists(url, callback) {
   });
 }
 
-function initialize_keyboard(lang, wordNum) {
-	keysJsonUrl = 'static/kioskboard-1.4.0/kioskboard-keys-' + lang + '.json';
+function initialize_keyboard(kbLang, wordNum) {
+	let keysJsonUrl = 'static/kioskboard-1.4.0/kioskboard-keys-' + kbLang + '.json';
 	url_exists(keysJsonUrl, function(exists) {
   		if (exists) {
-  			let curKeyboard = {};
-  			curKeyboard = $.extend(true, curKeyboard, KioskBoard);
-  			alert(JSON.stringify(curKeyboard));
-			curKeyboard.Run('#wf' + wordNum, {
+  			let curKeyboard = new KioskBoard({
 			  /*!
 			  * Required
 			  * Have to define an Array of Objects for the custom keys. Hint: Each object creates a row element (HTML) on the keyboard.
@@ -82,6 +79,7 @@ function initialize_keyboard(lang, wordNum) {
 			  // Scrolls the document to the top of the input/textarea element. The default value is "true" as before. Prevented when "false"
 			  autoScroll: true,
 			});
+			curKeyboard.Run('#wf' + wordNum);
 		}
 	});
 }
@@ -90,15 +88,15 @@ function initialize_keyboards() {
 	// First, replace elements with their copies to clear KioskBoard
 	// event handlers.
 	$('.virtual-keyboard').each(function(index) {
-		var new_element = this.cloneNode(true);
+		let new_element = this.cloneNode(true);
 		this.parentNode.replaceChild(new_element, this);
 	})
 	// Then assign new keyboards.
 	$('.tier_select').each(function (index) {
-		var wordNum = $(this).attr('id').replace(/^.*[^0-9]/g, '');
-		var curTier = $('#lang' + wordNum.toString() + ' option:selected').val();
+		let wordNum = $(this).attr('id').replace(/^.*[^0-9]/g, '');
+		let curTier = $('#lang' + wordNum.toString() + ' option:selected').val();
 		if (curTier in keyboardsByTier) {
-			var kbLang = keyboardsByTier[curTier];
+			let kbLang = keyboardsByTier[curTier];
 			initialize_keyboard(kbLang, wordNum);
 		}
 	});
