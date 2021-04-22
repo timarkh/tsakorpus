@@ -1241,7 +1241,7 @@ msgid "translitname_cyrillic"
 msgstr "cirilik"
 
 msgid "translitname_dictionary"
-msgstr "fjalor"
+msgstr "fjalorth"
 
 msgid "translitname_latin"
 msgstr "latin"

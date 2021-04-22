@@ -30,7 +30,7 @@ There are a number of files that have to be translated. All messages and short c
 Messages and captions
 ~~~~~~~~~~~~~~~~~~~~~
 
-Each language folder in ``/search/web_app/translations/`` contains a number of files that describe interface messages and captions. Each time you launch the corpus on the server, these files are joined in a special way to produce a single ``messages.po`` file and its compiled version, ``messages.mo``.
+Each language folder in ``/search/web_app/translations/`` contains a number of files that describe interface messages and captions. Each time you launch the corpus on the server, these files are joined in a special way to produce a single Flask-Babel translation file called ``messages.po`` and its compiled version, ``messages.mo``. The idea is that whenever you have some text in the HTML templates of the corpus that should look different in different languages, you write an expression like ``{{ _('Some text') }}`` instead of just ``Some text``. This placeholder is replaced by the translation found in the language-specific ``message.mo`` file under the key ``"Some text"``, depending on the language the user shooses.
 
 - ``header.txt`` contains the header of the ``messages.po`` file and includes basic metadata and plural settings. You do not have to translate it, just add your name and language code and configure the plural rules. Plural rules describe how many different forms a message can have depending on the numerical value that goes with it. E.g. for English, there are usually two options: *1 sentence found*, but *2 sentences found*. This is how a corresponding rule looks like::
 
@@ -48,7 +48,7 @@ Each language folder in ``/search/web_app/translations/`` contains a number of f
     msgid "remove_word"
     msgstr "remove&nbsp;word"
 
-  This rule describes an English translation for a label called ``remove_word``. Translations can contain HTML. Make sure you do not have quotation marks inside a translation. A comment preceding the rule tells us where exactly this label can be found.
+  This rule describes an English translation for a label called ``remove_word``. Translations must be quoted and can contain HTML tags and entities. Make sure you do not have quotation marks inside a translation. A comment preceding the rule tells us where exactly this label can be found.
 
   For messages that have multiple number versions, you have to specify as many ``msgstr[...]`` strings as there are singular/plural form in your interface language. Here is an English example::
 
@@ -72,6 +72,19 @@ All the rest are tab-delimited files with two columns: key on the left and value
 - ``metadata_values.txt`` contains names of your metadata values. **Important**: as of now, these translations are only used for sentence-level selector fields, i.e. those values that are described in the ``sentence_meta_values`` parameter in :doc:`corpus.json </configuration>`. In all other contexts, the values are displayed as is.
 - ``tooltips.txt`` translates tooltips in your gloss and tag selection popups.
 
+When adding contents of these files to the single ``messages.po`` file, prefixes are added to their keys:
+
+- ``langname_`` for language names;
+- ``wordfield_`` for additional word-level annotation fields;
+- ``translitname_`` for transliteration names;
+- ``inputmethod_``: for input method names;
+- ``metafield_`` for metadata field names;
+- ``metavalue_`` for metadata value names;
+- ``tooltip_`` for tooltips.
+
+So a placeholder for a language called ``klingon`` will look like ``{{ _('langname_klingon' )}}`` in the HTML templates.
+
+
 HTML templates
 ~~~~~~~~~~~~~~
 
@@ -83,4 +96,3 @@ Adjusting existing translations for your corpus
 You will probably have many corpus-specific messages, e.g. tooltips in tag selection popups or language names. You have to add them to the tab-delimited files in ``/search/web_app/translations/`` (see above). Unless you want to change some default interface messages such as "Search sentences" or "Show statistics", you will not have to edit ``main.txt`` and ``header.txt`` in language folders.
 
 A more user-friendly way of configuring translations for your corpus is running the ``config`` page (see :doc:`configuration </configuration>`). When you save the configuration, language folders with all necessary keys will be generatedin ``/USER_CONFIG/translations``. Edit them and replace files in ``/search/web_app/translations/`` with them in your :doc:`fork </forks>`.
-
