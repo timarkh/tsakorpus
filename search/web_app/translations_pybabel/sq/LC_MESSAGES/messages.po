@@ -23,23 +23,23 @@ msgstr "Faqja e kërkimit"
 
 #: templates/index.html:19 templates/index/query_area.html:54
 msgid "more_fields"
-msgstr "më shumë rreshta"
+msgstr "më shumë fusha kërkimi"
 
 #: templates/index.html:20
 msgid "fewer_fields"
-msgstr "më pak rreshta"
+msgstr "më pak fusha kërkimi"
 
 #: templates/index.html:21
 msgid "add_distance"
-msgstr "shtimi i distancës"
+msgstr "distanca ndërmjet fjalëve"
 
 #: templates/index.html:22
 msgid "remove_word"
-msgstr "pastrimi i fjalës"
+msgstr "fshi fjalën"
 
 #: templates/index.html:23
 msgid "Distance to word #"
-msgstr "Distanca deri në fjalën No."
+msgstr "distanca deri në fjalën No."
 
 #: templates/index.html:24
 msgid "from "
@@ -51,7 +51,7 @@ msgstr "deri në "
 
 #: templates/index.html:26
 msgid "Select combinations of tags"
-msgstr "Zgjedhja e kombinacioneve të tag-ëve"
+msgstr "Zgjedhja e tag-ëve"
 
 #: templates/index.html:27
 msgid "Select glosses"
@@ -64,15 +64,15 @@ msgstr "i kërkimit"
 #: templates/index.html:29 templates/modals/subcorpus_selection.html:90
 #: templates/modals/word_stats.html:55
 msgid "Nothing found."
-msgstr "Asgjë nuk është gjetur."
+msgstr "Nuk u gjet asnjë rezultat."
 
 #: templates/index.html:30
 msgid "Query word"
-msgstr "Query word"
+msgstr "Fjalë kërkimi"
 
 #: templates/index.html:67
-msgid "Sorry, the server is experiencing technical issues. Please try again later."
-msgstr "Sorry, the server is experiencing technical issues. Please try again later."
+msgid "Sorry, the server is experiencing technical issues. Please try again later#: templates/index.html:4
+msgstr "Na falni, serveri ka një problem teknik të përkohshëm. Ju lutemi të provoni përsëri më vonë."
 
 #: templates/index.html:68 templates/index/hidden_elements.html:12
 #: templates/index/hidden_elements.html:30
@@ -88,36 +88,36 @@ msgstr "Sorry, the server is experiencing technical issues. Please try again lat
 #: templates/modals/subcorpus_selection.html:6
 #: templates/modals/word_stats.html:6
 msgid "Close"
-msgstr "Close"
+msgstr "Mbyll"
 
 #: templates/index/common_additional_search_fields.html:23
 msgid "Analyses: "
-msgstr "Analiza: "
+msgstr "Numri i analizave të fjalës: "
 
 #: templates/index/common_additional_search_fields.html:24
 msgid "any number of analyses"
-msgstr "çfarëdo numri analizash"
+msgstr "pa dallim"
 
 #: templates/index/common_additional_search_fields.html:26
 msgid "only ambiguous"
-msgstr "vetëm me homonimi"
+msgstr "vetëm fjalët me disa analiza"
 
 #: templates/index/common_additional_search_fields.html:27
 msgid "only non-ambiguous"
-msgstr "vetëm pa homonimi"
+msgstr "vetëm fjalët me një analizë"
 
 #: templates/index/common_additional_search_fields.html:28
 #: templates/index/common_additional_search_fields.html:30
 msgid "only with analysis"
-msgstr "vetëm me anotim"
+msgstr "vetëm fjalët me anotim"
 
 #: templates/index/common_additional_search_fields.html:32
 msgid "only without analysis"
-msgstr "vetëm pa anotim"
+msgstr "vetëm fjalët pa anotim"
 
 #: templates/index/common_additional_search_fields.html:34
 msgid "Position in sentence: "
-msgstr "Pozicioni në fjali: "
+msgstr "Pozicion në fjali: "
 
 #: templates/index/corpus_header.html:9
 msgid "Corpus name"
@@ -126,7 +126,7 @@ msgstr "Emri i korpusit"
 #: templates/index/corpus_header.html:25
 #: templates/index/hidden_elements.html:72
 msgid "How to cite"
-msgstr "How to cite"
+msgstr "Referimi"
 
 #: templates/index/corpus_header.html:28 templates/index/greeting_en.html:9
 #: templates/index/greeting_ru.html:9
@@ -146,11 +146,11 @@ msgstr "Kërkimi i fjalëve"
 #: templates/index/greeting_en.html:6 templates/index/greeting_ru.html:6
 #: templates/index/query_area.html:72
 msgid "Search lemmata"
-msgstr "Kërkimi i lemma-ve"
+msgstr "/ i lemma-ve"
 
 #: templates/index/hidden_elements.html:19
 msgid "Cancel"
-msgstr "Anulim"
+msgstr "Anulo"
 
 #: templates/index/hidden_elements.html:29
 msgid "Help"
@@ -158,7 +158,7 @@ msgstr "Ndihmë"
 
 #: templates/index/hidden_elements.html:43
 msgid "Dictionary_header"
-msgstr "Fjalor"
+msgstr "Fjalorth"
 
 #: templates/index/hidden_elements.html:57
 msgid "Metadata_header"
@@ -166,23 +166,23 @@ msgstr "Metadata"
 
 #: templates/index/progress.html:6
 msgid "Max seconds left: "
-msgstr "Sekondave deri në fund të kërkimit (maksimum): "
+msgstr "Sekondat deri në fund të kërkimit (maksimum): "
 
 #: templates/index/query_area.html:8
 msgid "Options"
-msgstr "Options"
+msgstr "Opsionet"
 
 #: templates/index/query_area.html:9 templates/modals/query_history.html:5
 msgid "Query history"
-msgstr "Query history"
+msgstr "Historia e kërkimit"
 
 #: templates/index/query_area.html:11
 msgid "Show dictionary"
-msgstr "Shfaqja e fjalorit"
+msgstr "Trego fjalorthin"
 
 #: templates/index/query_area.html:19
 msgid "Word_header"
-msgstr "Fjalë"
+msgstr "Fjala"
 
 #: templates/index/query_area.html:19
 msgid "Number_sign"
@@ -202,7 +202,7 @@ msgstr "Gramatikë:"
 
 #: templates/index/query_area.html:26
 msgid "Gloss:"
-msgstr "Glosat:"
+msgstr "<abbr title="shënimet sqaruese">Glosat</abbr>:"
 
 #: templates/index/query_area.html:31
 #: templates/modals/subcorpus_selection.html:56
@@ -212,7 +212,7 @@ msgstr "Gjuhë/shtresë:"
 #: templates/index/query_area.html:36
 #: templates/modals/subcorpus_selection.html:58
 msgid "langname_all"
-msgstr "all"
+msgstr "të gjitha"
 
 #: templates/index/query_area.html:49
 msgid "negative_query"
@@ -220,11 +220,11 @@ msgstr "kërkimi negativ"
 
 #: templates/index/query_area.html:51
 msgid "add_word"
-msgstr "shtimi i fjalës"
+msgstr "shto fjalën tjetër"
 
 #: templates/index/query_area.html:61
 msgid "Full-text search:"
-msgstr "Kërkimi i plotë:"
+msgstr "Kërkimi sipas tekstit të plotë:"
 
 #: templates/index/query_area.html:63
 msgid "Precise match"
@@ -241,27 +241,27 @@ msgstr "Zgjedhja e nënkorpusit"
 
 #: templates/index/query_area.html:77
 msgid "Share this query"
-msgstr "Dërgimi i këtij kërkimi"
+msgstr "Ndaje këtë kërkim"
 
 #: templates/index/query_area.html:78
 msgid "Load external query"
-msgstr "Shkarkimi i kërkimit të jashtëm"
+msgstr "Ngarko kërkimin nga jashtë"
 
 #: templates/index/query_area.html:97
 msgid "Back to search"
-msgstr "Kthimi tek rezultatet e kërkimit"
+msgstr "Kthehu te kërkimi"
 
 #: templates/index/results_area.html:10
 msgid "Click on an example to see video."
-msgstr "Click on an example to see video."
+msgstr "Kliko shembullin për të parë video / për të dëgjuar audio."
 
 #: templates/modals/display_settings.html:5
 msgid "Additional search and display options"
-msgstr "Opcionet plotësuese të kërkimit dhe shfaqjes"
+msgstr "Opsionet shtesë të kërkimit dhe shfaqjes së rezultateve"
 
 #: templates/modals/display_settings.html:12
 msgid "Results per page:"
-msgstr "Rezultateve në një faqe:"
+msgstr "Numri i rezultateve në faqe:"
 
 #: templates/modals/display_settings.html:16
 msgid "Sorting:"
@@ -269,7 +269,7 @@ msgstr "Renditja:"
 
 #: templates/modals/display_settings.html:18
 msgid "random"
-msgstr "random"
+msgstr "e rastësishme"
 
 #: templates/modals/display_settings.html:19
 msgid "by word (word queries)"
@@ -281,11 +281,11 @@ msgstr "sipas lemma-s (për kërkimet e fjalëve)"
 
 #: templates/modals/display_settings.html:21
 msgid "by frequency"
-msgstr "sipas dëndurisë"
+msgstr "sipas dëndurisë së përdorimit"
 
 #: templates/modals/display_settings.html:23
 msgid "by year (decreasing; sentence queries)"
-msgstr "by year (decreasing; sentence queries)"
+msgstr "sipas vitit (nga më i ri te më i vjetri; për kërkimin e fjalive)"
 
 #: templates/modals/display_settings.html:26
 msgid "no sorting"
@@ -293,7 +293,7 @@ msgstr "pa renditje"
 
 #: templates/modals/display_settings.html:32
 msgid "Word distance requirements are strict"
-msgstr "Distanca midis fjalëve në përputhje të plotë me parametrat e kërkimit"
+msgstr "Distanca midis fjalëve si në kërkim"
 
 #: templates/modals/display_settings.html:37
 msgid "Viewing mode:"
@@ -313,11 +313,11 @@ msgstr "Transliterim: "
 
 #: templates/modals/display_settings.html:55
 msgid "Character input method: "
-msgstr "Mënyra e shtypjes së karaktereve: "
+msgstr "Mënyra e futjes së karaktereve: "
 
 #: templates/modals/display_settings.html:65
 msgid "Annotation layers in glossed mode:"
-msgstr "Shtresat e anotimit në regjimin e glosave:"
+msgstr "Shtresat e anotimit në regjimin me glosa:"
 
 #: templates/modals/display_settings.html:68
 #: templates/modals/query_history.html:18
@@ -335,24 +335,24 @@ msgstr "Glosat"
 
 #: templates/modals/display_settings.html:82
 msgid "Additional fields"
-msgstr "Rreshtat ndihmëse"
+msgstr "Fushat shtesë"
 
 #: templates/modals/query_history.html:10
 msgid "Click on"
-msgstr "Click on"
+msgstr "Kliko"
 
 #: templates/modals/query_history.html:10
 #: templates/modals/query_history.html:23
 msgid "Repeat query"
-msgstr "Repeat query"
+msgstr "Përsërit kërkimin"
 
 #: templates/modals/query_history.html:10
 msgid "to repeat a query."
-msgstr "to repeat a query."
+msgstr "për të përsëritur kërkimin."
 
 #: templates/modals/query_history.html:13
 msgid "You have not made any queries yet."
-msgstr "You have not made any queries yet."
+msgstr "Nuk keni bërë asnjë kërkim."
 
 #: templates/modals/query_history.html:17
 msgid "Word"
@@ -360,48 +360,47 @@ msgstr "Fjalë"
 
 #: templates/modals/query_history.html:20
 msgid "Subcorpus"
-msgstr "Subcorpus"
+msgstr "Nënkorpus"
 
-# ******** The rest is more or less universal:  ********
 #: templates/modals/query_history.html:21
 msgid "Search type"
-msgstr "Search type"
+msgstr "Tipi i kërkimit"
 
 #: templates/modals/query_history.html:22
 msgid "Time"
-msgstr "Time"
+msgstr "Koha"
 
 #: templates/modals/query_share_load.html:5
 msgid "Share query"
-msgstr "Dërgimi i kërkimit"
+msgstr "Ndaje kërkimin"
 
 #: templates/modals/query_share_load.html:9
 msgid "If you want to share your query with someone, send them the text you see below. The person who loads this query will see the same results in the same order, unless the corpus has been re-indexed."
-msgstr "Nëse ju dëshironi t'ia dërgoni dikujt kërkimin tuaj, kopjojeni dhe dërgojani tekstin më poshtë. Njeriu që do të shkarkojë këtë kërkim do të shohë rezultatet e njëjta të renditura në të njëjtën mënyrë, nëse Korpusi nuk ishte ri-indeksuar që nga ajo kohë."
+msgstr "Nëse ju dëshironi ta ndani kërkimin tuaj me dikë, kopjojeni dhe dërgojani linkun më poshtë. Duke përdorur këtë link, do të shfaqen rezultatet e njëjta të renditura në të njëjtën mënyrë, nëse Korpusi nuk është ri-indeksuar që nga ajo kohë."
 
 #: templates/modals/query_share_load.html:19
 msgid "Load query"
-msgstr "Shkarkimi i kërkimit"
+msgstr "Ngarko kërkimin"
 
 #: templates/modals/query_share_load.html:23
 msgid "Here you can load a corpus query someone sent you. Please enter the query below:"
-msgstr "Këtu ju mund të shkarkoni kërkimin të cilin dikush ju ka dërguar juve. Ju lutemi ta shtypni kërkimin në rreshtin më poshtë:"
+msgstr "Këtu ju mund të përdorni linkun e kërkimit të marrë nga jashtë. Ju lutemi ta futeni linkun më poshtë:"
 
 #: templates/modals/select_gloss.html:5
 msgid "word boundary"
-msgstr "word boundary"
+msgstr "kufiri i fjalës"
 
 #: templates/modals/select_gloss.html:6
 msgid "any number of morphs"
-msgstr "any number of morphs"
+msgstr "çdo numër i morfemave"
 
 #: templates/modals/select_gloss.html:7
 msgid "any positive number of morphs"
-msgstr "any positive number of morphs"
+msgstr "çdo numër jo zero i morfemave"
 
 #: templates/modals/select_gloss.html:8
 msgid "any morph"
-msgstr "any morph"
+msgstr "çdo morfemë"
 
 #: templates/modals/subcorpus_selection.html:10
 msgid "Specify parameters"
@@ -421,11 +420,11 @@ msgstr "Zgjedhja e parametrave"
 
 #: templates/modals/subcorpus_selection.html:27
 msgid "lower bound"
-msgstr "lower bound"
+msgstr "kufiri i poshtëm"
 
 #: templates/modals/subcorpus_selection.html:28
 msgid "upper bound"
-msgstr "upper bound"
+msgstr "kufiri i sipërm"
 
 #: templates/modals/subcorpus_selection.html:42
 msgid "Select documents"
@@ -433,7 +432,7 @@ msgstr "Zgjedhja e dokumenteve"
 
 #: templates/modals/subcorpus_selection.html:43
 msgid "(please wait for the document list to load)"
-msgstr "(Ju lutemi të prisni derisa të përfundojë shkarkimi i listës së dokumenteve)"
+msgstr "(Ju lutemi të prisni derisa të përfundojë formimi i listës së dokumenteve)"
 
 #: templates/modals/subcorpus_selection.html:46
 msgid "Selected subcorpus composition"
@@ -447,33 +446,33 @@ msgstr "Parametër: "
 #: templates/modals/subcorpus_selection.html:71
 #: templates/modals/word_stats.html:28
 msgid "A maximum of 25 metadata values can be displayed, sorted by the number of words in the relevant texts."
-msgstr "A maximum of 25 metadata values can be displayed, sorted by the number of words in the relevant texts."
+msgstr "Mund të shfaqet maksimumi prej 25 vlerave, të renditura sipas numrit të fjalëve në tekste të zgjedhura."
 
 #: templates/modals/subcorpus_selection.html:73
 #: templates/modals/word_stats.html:81
 msgid "(please wait for the plot to load)"
-msgstr "(Ju lutemi të prisni derisa të përfundojë shkarkimi i grafikut)"
+msgstr "(Ju lutemi të prisni derisa të përfundojë ndërtimi i grafikut)"
 
 #: templates/modals/subcorpus_selection.html:77
 msgid "Value"
-msgstr "Value"
+msgstr "Vlera"
 
 #: templates/modals/subcorpus_selection.html:78
 msgid "Size in words"
-msgstr "Size in words"
+msgstr "Numri i fjalëve"
 
 #: templates/modals/subcorpus_selection.html:79
 msgid "Number of documents"
-msgstr "Number of documents"
+msgstr "Numri i dokumenteve"
 
 #: templates/modals/subcorpus_selection.html:87
 #: templates/modals/word_stats.html:52
 msgid "please wait for the plot to load"
-msgstr "(Ju lutemi të prisni derisa të përfundojë shkarkimi i grafikut)"
+msgstr "(Ju lutemi të prisni derisa të përfundojë ndërtimi i grafikut)"
 
 #: templates/modals/subcorpus_selection.html:97
 msgid "Clear subcorpus"
-msgstr "Pastrimi i nënkorpusit"
+msgstr "Pastro nënkorpusin"
 
 #: templates/modals/word_stats.html:5
 msgid "Word statistics header"
@@ -481,11 +480,11 @@ msgstr "Statistika e fjalëve"
 
 #: templates/modals/word_stats.html:10
 msgid "By metadata values"
-msgstr "Sipas shënimeve metatekstuale"
+msgstr "Sipas të dhënave metatekstuale"
 
 #: templates/modals/word_stats.html:11
 msgid "By frequency"
-msgstr "Sipas dendurisë"
+msgstr "Sipas dendurisë së përdorimit"
 
 #: templates/modals/word_stats.html:15
 msgid "Word statistics for "
@@ -497,28 +496,28 @@ msgstr "Tipi i kërkimit: "
 
 #: templates/modals/word_stats.html:24
 msgid "search the whole query"
-msgstr "gjetja e gjithë kërkimit"
+msgstr "gjej të gjithë kërkimin"
 
 #: templates/modals/word_stats.html:25
 msgid "compare words in the query"
-msgstr "krahasimi i fjalëve në kërkimin"
+msgstr "krahaso fjalët në kërkimin"
 
 #: templates/modals/word_stats.html:35
 msgid "Query word "
-msgstr "Query word "
+msgstr "Fjala e kërkuar "
 
 #: templates/modals/word_stats.html:40
 msgid "value"
-msgstr "value"
+msgstr "vlera"
 
 #: templates/modals/word_stats.html:43
 msgid "frequency (ipm)"
-msgstr "frequency (ipm)"
+msgstr "denduria relative (ipm)"
 
 #: templates/modals/word_stats.html:44
 #, python-format
 msgid "90%% conf. int. "
-msgstr "90%% conf. int. "
+msgstr "int. besueshmërie 90%% "
 
 #: templates/modals/word_stats.html:59
 msgid "Distribution by frequency rank"
@@ -530,11 +529,11 @@ msgstr "<p>Grafiku më poshtë paraqet të dhënat si vijon. Në rrezen <i>x</i>
 
 #: templates/modals/word_stats.html:62
 msgid "words"
-msgstr "fjalë"
+msgstr "fjalët"
 
 #: templates/modals/word_stats.html:63
 msgid "lemmata"
-msgstr "lemma"
+msgstr "lemma-t"
 
 #: templates/modals/word_stats.html:65
 msgid "Scale of the x axis: "
@@ -554,7 +553,7 @@ msgstr "Max y: "
 
 #: templates/modals/word_stats.html:72
 msgid "as in data"
-msgstr "as in data"
+msgstr "si në të dhënat"
 
 #: templates/modals/word_stats.html:73
 #, python-format
@@ -594,12 +593,12 @@ msgstr "0.1%%"
 #: templates/search_results/lemma_table_row.html:16
 #: templates/search_results/word_table_row.html:20
 msgid "Search in corpus"
-msgstr "Search in corpu"
+msgstr "Kërkimi në Korpus"
 
 #: templates/search_results/lemma_table_row.html:17
 #: templates/search_results/word_table_row.html:21
 msgid "Show statistics"
-msgstr "Show statistics"
+msgstr "Trego statistikën"
 
 #: templates/search_results/result_docs.html:1
 msgid "Filter result:"
@@ -619,7 +618,7 @@ msgstr[1] "fjalë,"
 
 #: templates/search_results/result_docs.html:4
 msgid "of the entire corpus."
-msgstr "nga i gjithë korpusi."
+msgstr "nga i gjithë Korpusi."
 
 #: templates/search_results/result_sentences.html:2
 #: templates/search_results/result_words.html:3
@@ -649,44 +648,44 @@ msgstr[1] "dokumente"
 #: templates/search_results/result_sentences.html:9
 #: templates/search_results/result_words.html:18
 msgid "The search was not finished due to the query timeout. You only see partial results."
-msgstr "Kërkimi nuk është përfunduar sepse mbaroi afati i pritjes. Vetëm një pjesë e rezultateve është paraqitur."
+msgstr "Kërkimi nuk është përfunduar për shkak të mbarimit të afatit të ekzekutimit. Rezultatet e paraqitura janë të pjesshme."
 
 #: templates/search_results/result_sentences.html:19
 msgid "Number of results found exceeds the maximum number of pages you can view."
-msgstr "Number of results found exceeds the maximum number of pages you can view."
+msgstr "Numri i rezultateve të gjetura tejkalon numrin maksimal të faqeve që mund të shfletoni."
 
 #: templates/search_results/result_sentences.html:24
 #: templates/search_results/result_words.html:28
 msgid "You are searching in a subcorpus."
-msgstr "Ju kërkoni në nënkorpusin e zhgjedhur."
+msgstr "Ju po kërkoni në nënkorpus."
 
 #: templates/search_results/result_sentences.html:45
 msgid "Copy example to clipboard"
-msgstr "Copy example to clipboard"
+msgstr "Kopjo shembullin në klipbord"
 
 #: templates/search_results/result_sentences.html:46
 msgid "Expand context"
-msgstr "Expand context"
+msgstr "Zgjero kontekstin"
 
 #: templates/search_results/result_sentences.html:60
 msgid "download as CSV"
-msgstr "shkarkimi në formatin CSV"
+msgstr "Shkarko CSV"
 
 #: templates/search_results/result_sentences.html:61
 msgid "download as XLSX"
-msgstr "shkarkimi në formatin XLSX"
+msgstr "shkarko XLSX"
 
 #: templates/search_results/result_words.html:5
 msgid "unique word"
 msgid_plural "different words"
-msgstr[0] "një fjalë"
+msgstr[0] "fjala unike"
 msgstr[1] "fjalë të ndryshme"
 
 #: templates/search_results/result_words.html:7
 msgid "unique lemma"
 msgid_plural "different lemmata"
-msgstr[0] "unique lemma"
-msgstr[1] "different lemmata"
+msgstr[0] "lemma unike"
+msgstr[1] "lemma të ndryshme"
 
 #: templates/search_results/result_words.html:9
 msgid "in approximately"
@@ -695,8 +694,8 @@ msgstr "në afro"
 #: templates/search_results/result_words.html:9
 msgid "document found,"
 msgid_plural "documents found,"
-msgstr[0] "document found,"
-msgstr[1] "documents found,"
+msgstr[0] "dokumente të gjetura,"
+msgstr[1] "dokumente të gjetura,"
 
 #: templates/search_results/result_words.html:11
 msgid "total frequency:"
@@ -704,7 +703,7 @@ msgstr "Denduria e përgjithshme e përdorimit:"
 
 #: templates/search_results/result_words.html:13
 msgid "total frequency of found word forms:"
-msgstr "total frequency of found word forms:"
+msgstr "denduria e përgjithshme e fjalëformave të gjetura:"
 
 #: templates/search_results/result_words.html:34
 msgid "word_th_word"
@@ -724,11 +723,11 @@ msgstr "denduri"
 
 #: templates/search_results/result_words.html:43
 msgid "word_th_freq. rank / quantile"
-msgstr "rangu i dendurisë /<br>quantile"
+msgstr "rangu i dendurisë / kuantil"
 
 #: templates/search_results/result_words.html:46
 msgid "word_th_# forms"
-msgstr "# forms"
+msgstr "numri i formave"
 
 #: templates/search_results/result_words.html:48
 msgid "word_th_# sentences"
@@ -748,20 +747,20 @@ msgstr "statistikë"
 
 #: templates/search_results/sentence_header.html:20
 msgid "Full text (opens in a new tab)"
-msgstr "Full text (opens in a new tab)"
+msgstr "Teksti i plotë (hapet në skedën e re)"
 
 
 msgid "corpus_title"
 msgstr "Korpusi Nacional i Gjuhës Shqipe"
 
 msgid "inputmethod_normal"
-msgstr "normal"
+msgstr "normale"
 
 msgid "inputmethod_simplified"
-msgstr "simplified"
+msgstr "e thjeshtuar"
 
 msgid "inputmethod_strict"
-msgstr "i përpiktë"
+msgstr "e përpiktë"
 
 msgid "langname_abaza"
 msgstr "Abaza"
@@ -770,130 +769,133 @@ msgid "langname_acrhi"
 msgstr "Archi"
 
 msgid "langname_adyghe"
-msgstr "Adyghe"
+msgstr "adigisht"
 
 msgid "langname_albanian"
-msgstr "Shqipe"
+msgstr "shqip"
 
 msgid "langname_all"
-msgstr "all"
+msgstr "të gjitha"
 
 msgid "langname_armenian"
-msgstr "Armene"
+msgstr "armenisht"
 
 msgid "langname_armenian_translit"
-msgstr "Armene (translit.)"
+msgstr "armenisht (translit.)"
 
 msgid "langname_bashkir"
-msgstr "Bashkir"
+msgstr "bashkirisht"
 
 msgid "langname_belarusian"
-msgstr "Belarusian"
+msgstr "bjellorusisht"
 
 msgid "langname_beserman"
-msgstr "Beserman"
+msgstr "besermanisht"
 
 msgid "langname_bulgarian"
-msgstr "Bulgarian"
+msgstr "bullgarisht"
 
 msgid "langname_buryat"
-msgstr "Buryat"
+msgstr "burjatisht"
 
 msgid "langname_chinese"
-msgstr "Chinese"
+msgstr "kinezisht"
 
 msgid "langname_chuvash"
-msgstr "Chuvash"
+msgstr "çuvashisht"
 
 msgid "langname_comments"
-msgstr "comments"
+msgstr "komentet"
 
 msgid "langname_dargwa"
 msgstr "Dargwa"
 
 msgid "langname_english"
-msgstr "Angleze"
+msgstr "anglisht"
 
 msgid "langname_english_note"
-msgstr "English (note)"
+msgstr "anglisht (note)"
 
 msgid "langname_erzya"
-msgstr "Erzya"
+msgstr "erzjaisht"
 
 msgid "langname_estonian"
-msgstr "Estonian"
+msgstr "estonisht"
 
 msgid "langname_finnish"
-msgstr "Finnish"
+msgstr "finlandisht"
 
 msgid "langname_french"
-msgstr "French"
+msgstr "frëngjisht"
 
 msgid "langname_german"
-msgstr "German"
+msgstr "gjermanisht"
 
 msgid "langname_greek"
-msgstr "Greke"
+msgstr "greqisht"
 
 msgid "langname_hill_mari"
 msgstr "Hill Mari"
 
 msgid "langname_hungarian"
-msgstr "Hungarian"
+msgstr "hungarisht"
 
 msgid "langname_id"
 msgstr "ID"
 
 msgid "langname_italian"
-msgstr "Italiane"
+msgstr "italisht"
 
 msgid "langname_kalmyk"
-msgstr "Kalmyk"
+msgstr "kalmikisht"
 
 msgid "langname_kamas"
-msgstr "Kamas"
+msgstr "kamasisht"
 
 msgid "langname_kazakh"
-msgstr "Kazakh"
+msgstr "kazakisht"
 
 msgid "langname_komi"
-msgstr "Komi"
+msgstr "komisht"
 
 msgid "langname_komi-zyrian"
-msgstr "Komi-Zyrian"
+msgstr "komi-zirjanisht"
 
 msgid "langname_komi_permyak"
-msgstr "Komi-Permyak"
+msgstr "komi-permjakisht"
 
 msgid "langname_komi_zyrian"
-msgstr "Komi-Zyrian"
+msgstr "komi-zirjanisht"
 
 msgid "langname_latvian"
-msgstr "Latvian"
+msgstr "letonisht"
 
 msgid "langname_lithuanian"
-msgstr "Lithuanian"
+msgstr "lituanisht"
 
 msgid "langname_meadow_mari"
 msgstr "Meadow Mari"
 
 msgid "langname_moksha"
-msgstr "Moksha"
+msgstr "mokshaisht"
 
 msgid "langname_negative"
 msgstr "negative"
 
 msgid "langname_nganasan"
-msgstr "Nganasan"
+msgstr "nganasanisht"
+
+msgid "langname_normal"
+msgstr "normale"
 
 msgid "langname_note"
-msgstr "notes"
+msgstr "shënimi"
 
 msgid "langname_notes"
-msgstr "notes"
+msgstr "shënimet"
 
 msgid "langname_ossetic"
-msgstr "Ossetic"
+msgstr "osetisht"
 
 msgid "langname_ossetic_digor"
 msgstr "Digor Ossetic"
@@ -902,58 +904,64 @@ msgid "langname_ossetic_iron"
 msgstr "Iron Ossetic"
 
 msgid "langname_polish"
-msgstr "Polish"
+msgstr "polonisht"
 
 msgid "langname_positive"
-msgstr "positive"
+msgstr "pozitive"
 
 msgid "langname_ref"
-msgstr "ID"
+msgstr "ref"
 
 msgid "langname_romani"
 msgstr "Romani"
 
 msgid "langname_russian"
-msgstr "Ruse"
+msgstr "rusisht"
 
 msgid "langname_selkup"
-msgstr "Selkup"
+msgstr "selkupisht"
+
+msgid "langname_simplified"
+msgstr "e thjeshtuar"
 
 msgid "langname_spanish"
-msgstr "Spanish"
+msgstr "spanisht"
+
+msgid "langname_strict"
+msgstr "e përpiktë"
 
 msgid "langname_swedish"
-msgstr "Swedish"
+msgstr "suedisht"
 
 msgid "langname_tatar"
-msgstr "Tatar"
+msgstr "tatarisht"
 
 msgid "langname_tsakhur"
-msgstr "Tsakhur"
+msgstr "cahurisht"
 
 msgid "langname_tsakonian"
-msgstr "Tsakonian"
+msgstr "cakonisht"
 
 msgid "langname_udmurt"
-msgstr "Udmurt"
+msgstr "udmurtisht"
 
 msgid "langname_ukrainian"
-msgstr "Ukrainian"
+msgstr "ukrainisht"
 
 msgid "langname_undefined"
-msgstr "undefined"
+msgstr "e papërcaktuar"
 
 msgid "langname_yakut"
-msgstr "Yakut"
+msgstr "jakutisht"
 
 msgid "langname_yiddish"
-msgstr "Yiddish"
+msgstr "jidisht"
 
 msgid "metafield_account_type"
 msgstr "tipi i llogarisë"
 
 msgid "metafield_account_type_post"
-msgstr "tipi i llogarisë (postim)"
+msgstr "lloji i llogarisë (postim)"
 
 msgid "metafield_age"
 msgstr "mosha"
@@ -982,8 +990,14 @@ msgstr "datëlindja"
 msgid "metafield_byear_post"
 msgstr "datëlindja (postim)"
 
+msgid "metafield_century"
+msgstr "shekulli"
+
 msgid "metafield_chronotop"
 msgstr "vendi dhe koha e veprimit"
+
+msgid "metafield_citation"
+msgstr "citimi"
 
 msgid "metafield_city"
 msgstr "qyteti"
@@ -991,11 +1005,17 @@ msgstr "qyteti"
 msgid "metafield_city_post"
 msgstr "vendi (postim)"
 
+msgid "metafield_collector"
+msgstr "mbledhësi"
+
 msgid "metafield_country"
 msgstr "vendi"
 
 msgid "metafield_date_trans"
 msgstr "data e përkthimit"
+
+msgid "metafield_dialect"
+msgstr "dialekti"
 
 msgid "metafield_gender"
 msgstr "gjinia"
@@ -1007,13 +1027,13 @@ msgid "metafield_genre_fi"
 msgstr "zhanri i letërsisë"
 
 msgid "metafield_home_town"
-msgstr "qyteti i banimit"
+msgstr "qyteti i lindjes"
 
 msgid "metafield_home_town_post"
 msgstr "vendlindja (postim)"
 
 msgid "metafield_hometown"
-msgstr "qyteti i banimit"
+msgstr "qyteti i lindjes"
 
 msgid "metafield_issue"
 msgstr "vëllimi"
@@ -1043,7 +1063,7 @@ msgid "metafield_medium"
 msgstr "tipi i mbajtësit"
 
 msgid "metafield_occupation"
-msgstr "zanati"
+msgstr "profesioni"
 
 msgid "metafield_origin"
 msgstr "vendlindja"
@@ -1067,7 +1087,7 @@ msgid "metafield_publication"
 msgstr "botimi"
 
 msgid "metafield_published"
-msgstr "botuar në"
+msgstr "botuar"
 
 msgid "metafield_region"
 msgstr "rajoni"
@@ -1081,11 +1101,20 @@ msgstr "seksi"
 msgid "metafield_sex_post"
 msgstr "seksi (postim)"
 
+msgid "metafield_speaker"
+msgstr "folësi"
+
+msgid "metafield_speakers"
+msgstr "folësit"
+
 msgid "metafield_sphere"
 msgstr "sfera e funksionimit"
 
 msgid "metafield_style"
 msgstr "stili"
+
+msgid "metafield_subdialect"
+msgstr "e folmja"
 
 msgid "metafield_subject"
 msgstr "subjekti"
@@ -1096,8 +1125,14 @@ msgstr "anotimi"
 msgid "metafield_title"
 msgstr "titulli"
 
+msgid "metafield_title_en"
+msgstr "titulli (anglisht)"
+
+msgid "metafield_title_ru"
+msgstr "titulli (rusisht)"
+
 msgid "metafield_topic"
-msgstr "subjekti"
+msgstr "tema"
 
 msgid "metafield_translator"
 msgstr "përkthyesi"
@@ -1130,7 +1165,7 @@ msgid "metavalue_M"
 msgstr "M"
 
 msgid "metavalue_complete"
-msgstr "tërësisht, por me homonimi"
+msgstr "plotësisht, por me homonimi"
 
 msgid "metavalue_dialogue"
 msgstr "dialog"
@@ -1148,7 +1183,7 @@ msgid "metavalue_fiction"
 msgstr "tekstet letrare"
 
 msgid "metavalue_incomplete"
-msgstr "pjesërisht"
+msgstr "jo plotësisht"
 
 msgid "metavalue_interview"
 msgstr "intervistë"
@@ -1166,7 +1201,7 @@ msgid "metavalue_novel"
 msgstr "roman"
 
 msgid "metavalue_oral"
-msgstr "gojore"
+msgstr "tekstet gojore"
 
 msgid "metavalue_poetry"
 msgstr "poezi"
@@ -1178,7 +1213,7 @@ msgid "metavalue_religion"
 msgstr "fetare"
 
 msgid "metavalue_story"
-msgstr "tregim i shkurtër"
+msgstr "tregim"
 
 msgid "metavalue_unique"
 msgstr "vetëm pa homonimi"
@@ -1187,7 +1222,7 @@ msgid "metavalue_wikipedia"
 msgstr "Wikipedia"
 
 msgid "metavalue_written"
-msgstr "të shkruara"
+msgstr "tekstet e shkruara"
 
 msgid "translitname_IPA"
 msgstr "IPA"
@@ -1211,7 +1246,7 @@ msgid "translitname_original"
 msgstr "origjinal"
 
 msgid "wordfield_lex2"
-msgstr "Lemma 2"
+msgstr "lemma 2"
 
 msgid "wordfield_logogram"
 msgstr "logogram"

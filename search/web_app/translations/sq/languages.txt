@@ -1,63 +1,66 @@
-all	all
-undefined	undefined
-comments	comments
-positive	positive
+normal	normale
+strict	e përpiktë
+simplified	e thjeshtuar
+all	të gjitha
+undefined	e papërcaktuar
+comments	komentet
+positive	pozitive
 negative	negative
-notes	notes
-note	notes
-ref	ID
+notes	shënimet
+note	shënimi
+ref	ref
 id	ID
 
 abaza	Abaza
 acrhi	Archi
-adyghe	Adyghe
-albanian	Shqipe
-armenian	Armene
-armenian_translit	Armene (translit.)
-bashkir	Bashkir
-belarusian	Belarusian
-beserman	Beserman
-bulgarian	Bulgarian
-buryat	Buryat
-chinese	Chinese
-chuvash	Chuvash
+adyghe	adigisht
+albanian	shqip
+armenian	armenisht
+armenian_translit	armenisht (translit.)
+bashkir	bashkirisht
+belarusian	bjellorusisht
+beserman	besermanisht
+bulgarian	bullgarisht
+buryat	burjatisht
+chinese	kinezisht
+chuvash	çuvashisht
 dargwa	Dargwa
-english	Angleze
-english_note	English (note)
-erzya	Erzya
-estonian	Estonian
-finnish	Finnish
-french	French
-hungarian	Hungarian
-german	German
-greek	Greke
+english	anglisht
+english_note	anglisht (note)
+erzya	erzjaisht
+estonian	estonisht
+finnish	finlandisht
+french	frëngjisht
+hungarian	hungarisht
+german	gjermanisht
+greek	greqisht
 hill_mari	Hill Mari
-italian	Italiane
-kalmyk	Kalmyk
-kamas	Kamas
-kazakh	Kazakh
-komi	Komi
-komi-zyrian	Komi-Zyrian
-komi_permyak	Komi-Permyak
-komi_zyrian	Komi-Zyrian
-latvian	Latvian
-lithuanian	Lithuanian
+italian	italisht
+kalmyk	kalmikisht
+kamas	kamasisht
+kazakh	kazakisht
+komi	komisht
+komi-zyrian	komi-zirjanisht
+komi_permyak	komi-permjakisht
+komi_zyrian	komi-zirjanisht
+latvian	letonisht
+lithuanian	lituanisht
 meadow_mari	Meadow Mari
-moksha	Moksha
-nganasan	Nganasan
-ossetic	Ossetic
+moksha	mokshaisht
+nganasan	nganasanisht
+ossetic	osetisht
 ossetic_digor	Digor Ossetic
 ossetic_iron	Iron Ossetic
-polish	Polish
+polish	polonisht
 romani	Romani
-russian	Ruse
-selkup	Selkup
-spanish	Spanish
-swedish	Swedish
-tatar	Tatar
-tsakhur	Tsakhur
-tsakonian	Tsakonian
-udmurt	Udmurt
-ukrainian	Ukrainian
-yakut	Yakut
-yiddish	Yiddish
+russian	rusisht
+selkup	selkupisht
+spanish	spanisht
+swedish	suedisht
+tatar	tatarisht
+tsakhur	cahurisht
+tsakonian	cakonisht
+udmurt	udmurtisht
+ukrainian	ukrainisht
+yakut	jakutisht
+yiddish	jidisht

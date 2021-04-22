@@ -1,22 +1,22 @@
 F	F
 M	M
-complete	tërësisht, por me homonimi
+complete	plotësisht, por me homonimi
 dialogue	dialog
 essay	ese
 experiment	eksperiment
 female	femër
 fiction	tekstet letrare
-incomplete	pjesërisht
+incomplete	jo plotësisht
 interview	intervistë
 male	mashkull
 monologue	monolog
 nonfiction	tekstet joletrare
 novel	roman
-oral	gojore
+oral	tekstet gojore
 poetry	poezi
 press	shtypi
 religion	fetare
-story	tregim i shkurtër
+story	tregim
 unique	vetëm pa homonimi
 wikipedia	Wikipedia
-written	të shkruara
+written	tekstet e shkruara
