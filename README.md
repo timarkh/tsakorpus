@@ -32,6 +32,7 @@ The following resources are used by tsakorpus, but do not need to be installed:
 * [videojs-youtube](https://github.com/videojs/videojs-youtube) plugin
 * [bootstrap](http://getbootstrap.com/) toolkit
 * [D3.js](https://d3js.org/) visualization library
+* [KioskBoard](https://github.com/furcan/KioskBoard) virtual keyboard
 
 ## License
 
