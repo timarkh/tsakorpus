@@ -372,6 +372,22 @@ function assign_input_events() {
 	$(".tier_select").change(change_tier);
 	assign_tooltips();
 	initialize_keyboards();
+	assign_autocomplete();
+}
+
+function assign_autocomplete() {
+	$(".word_autocomplete").each(function () {
+		let wordNum = $(this).attr('id').replace(/^.*[^0-9]/g, '');
+		let field = $(this).attr('id').replace(/[0-9]*$/g, '');
+		let curTier = $('#lang' + wordNum.toString() + ' option:selected').val();
+		$(this).autocomplete({
+			serviceUrl: '/autocomplete_word/' + curTier + '/' + field,
+			minChars: 2,
+			width: 260,
+			orientation: "auto",
+			appendTo: $(this).parent()
+		});
+	});
 }
 
 function assign_show_hide() {

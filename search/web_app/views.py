@@ -289,7 +289,11 @@ def get_word_stats(searchType, metaField):
         return jsonify([])
 
     htmlQuery = copy_request_args()
-    change_display_options(htmlQuery)
+    if (('l_id1' not in htmlQuery or len(htmlQuery['l_id1']) <= 0)
+             and ('w_id1' not in htmlQuery or len(htmlQuery['w_id1']) <= 0)):
+        # If this URL was called from a word/lemma table, then we
+        # have to be able to continue serving words/lemmata further down the list
+        change_display_options(htmlQuery)
     langID = -1
     if 'lang1' in htmlQuery and htmlQuery['lang1'] in settings.languages:
         langID = settings.languages.index(htmlQuery['lang1'])
@@ -430,6 +434,19 @@ def autocomplete_meta(metafield):
     if metafield not in settings.viewable_meta:
         return jsonify({'query': query, 'suggestions': []})
     suggests = suggest_metafield(metafield, query)
+    return jsonify({'query': query,
+                    'suggestions': suggests})
+
+
+@app.route('/autocomplete_word/<lang>/<field>')
+@jsonp
+def autocomplete_word(lang, field):
+    if ('query' not in request.args
+            or lang not in settings.languages
+            or field not in ('wf', 'lex')):
+        return jsonify({'query': '', 'suggestions': []})
+    query = request.args['query']
+    suggests = suggest_word(lang, field, query)
     return jsonify({'query': query,
                     'suggestions': suggests})
 

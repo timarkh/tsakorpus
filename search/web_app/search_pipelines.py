@@ -195,6 +195,76 @@ def suggest_metafield(fieldName, query):
     return buckets
 
 
+def suggest_word(lang, fieldName, query):
+    """
+    Return autocomplete suggestions for a word or lemma field
+    based on a partial query typed by the user.
+    """
+    if lang not in settings.languages:
+        return []
+    wtype = 'word'
+    if fieldName == 'lex':
+        wtype = 'lemma'
+    langID = settings.languages.index(lang)
+    esQuery = {
+        'query': {
+            'bool': {
+                'must': [
+                    {
+                        'bool': {
+                            'must': [
+                                {
+                                    'match': {
+                                        'wtype': wtype
+                                    }
+                                },
+                                {
+                                    'wildcard': {
+                                        'wf': query + '*'
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        'term': {
+                            'lang': langID
+                        }
+                    }
+                ]
+            }
+        },
+        '_source': ['wf', 'freq'],
+        'size': settings.max_suggestions * 2,   # perform limited bucketing afterwards to save time
+        'sort': {
+            'freq': {
+                'order': 'desc'
+            }
+        }
+    }
+    hits = sc.get_words(esQuery)
+    if 'hits' not in hits or 'hits' not in hits['hits']:
+        return {}
+    dictSuggestions = {}
+    for word in hits['hits']['hits']:
+        if '_source' not in word or 'wf' not in word['_source']:
+            continue
+        wf = word['_source']['wf']
+        freq = word['_source']['freq']
+        if wf not in dictSuggestions:
+            dictSuggestions[wf] = freq
+        else:
+            dictSuggestions[wf] += freq
+    suggestions = []
+    for wf in sorted(dictSuggestions, key=lambda w: (-dictSuggestions[w], w)):
+        if len(suggestions) >= settings.max_suggestions:
+            break
+        suggestion = {'value': wf,
+                      'data': dictSuggestions[wf]}
+        suggestions.append(suggestion)
+    return suggestions
+
+
 def get_buckets_for_sent_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=300):
     """
     Group all sentences into buckets, each corresponding to one

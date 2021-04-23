@@ -9,22 +9,15 @@ function initialize_keyboard(keysJsonUrl, textboxSelector) {
 	let curKeyboard = new KioskBoard({
 	  keysArrayOfObjects: null,
 	  keysJsonUrl: keysJsonUrl,
-	  // Language Code (ISO 639-1) for custom keys (for language support) => e.g. "en" || "tr" || "es" || "de" || "fr" etc.
-	  // language: 'en',
 
 	  // The theme of keyboard => "light" || "dark" || "flat" || "material" || "oldschool"
 	  theme: 'light',
 
-	  // Uppercase or lowercase to start. Uppercase when "true"
 	  capsLockActive: false,
-
-	  // Allow or prevent real/physical keyboard usage. Prevented when "false"
 	  allowRealKeyboard: true,
 
 	  // CSS animations for opening or closing the keyboard
 	  cssAnimations: true,
-
-	  // CSS animations duration as millisecond
 	  cssAnimationsDuration: 360,
 
 	  // CSS animations style for opening or closing the keyboard => "slide" || "fade"
@@ -35,21 +28,10 @@ function initialize_keyboard(keysJsonUrl, textboxSelector) {
 
 	  // Text of the space key (spacebar). Without text => " "
 	  keysSpacebarText: ' ',
-
-	  // Font family of the keys
 	  keysFontFamily: 'sans-serif',
-
-	  // Font size of the keys
 	  keysFontSize: '22px',
-
-	  // Font weight of the keys
 	  keysFontWeight: 'normal',
-
-	  // Size of the icon keys
 	  keysIconSize: '25px',
-
-	  // v1.1.0 and the next versions
-	  // Allow or prevent mobile keyboard usage. Prevented when "false"
 	  allowMobileKeyboard: true,
 
 	  // v1.3.0 and the next versions
@@ -97,6 +79,7 @@ function disable_keyboards() {
 	});
 	$(".search_input").unbind('keydown');
 	$(".search_input").on("keydown", search_if_enter);
+	assign_autocomplete();
 }
 
 function initialize_keyboards() {

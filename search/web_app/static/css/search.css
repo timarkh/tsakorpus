@@ -1577,6 +1577,10 @@ in different styles) */
 	background-color: white;
 }
 
+.autocomplete_word_input_div .autocomplete-suggestions {
+	margin-top: 0;
+}
+
 .autocomplete-suggestion:hover {
 	background-color: #edf5ff;
 }

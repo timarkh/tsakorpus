@@ -32,19 +32,6 @@ var subcorpus_bar = null;
 			});
 		});
 	}
-
-	function autocomplete_metafield(request, response) {
-		$.ajax({
-			url: "autocomplete_meta/" + $(this).attr("id"),
-			dataType: "jsonp",
-			data: {
-				term: request.term
-			},
-			success: function(data) {
-				response(data);
-			}
-		});
-	}
 	
 	function assign_document_list_events() {
 		$(".doc_toggle_chk").unbind('change');
