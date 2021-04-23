@@ -9,7 +9,7 @@ When your corpus JSON files are ready, they must be indexed in Elasticsearch bef
 1. :doc:`Configure the corpus </configuration>` by filling out a configuration page in the browser or editing ``/conf/corpus.json``.
 2. Edit :doc:`categories.json </categories>` (or copy an existing one) and put it to ``/conf``.
 3. Make sure all interface messages are :doc:`translated </interface_languages>` into all interface languages.
-4. Make sure all :doc:`transliteration methods </transliteration>` mentioned in ``corpus.json`` exist.
+4. Make sure all :doc:`transliterations </transliteration>`, :doc:`input methods </input_methods>` and :doc:`virtual keyboards </keyboards>` mentioned in ``corpus.json`` exist.
 5. Put the JSON files to ``/corpus/%corpus_name%``.
 6. If you have media files cut by the source convertors, put them to ``/search/media/%corpus_name%`` or symlink this folder to the place where they are stored.
 7. Run ``/indexator/indexator.py``.
