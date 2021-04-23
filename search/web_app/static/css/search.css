@@ -1583,6 +1583,7 @@ in different styles) */
 
 .autocomplete-suggestion:hover {
 	background-color: #edf5ff;
+	cursor: pointer;
 }
 
 .keyboards_on {

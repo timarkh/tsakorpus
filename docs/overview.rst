@@ -52,6 +52,7 @@ If you have a corpus in one of several accepted formats, this is the typical pip
     - You configure indexing and search by filling out a configuration page in the browser or editing ``/conf/corpus.json`` and copy the ``categories.json`` to ``/conf``.
     - You manually adjust and/or add interface translations by editing ``messages.po`` files in language subdirectories of ``/search/web_app/translations`` (see :doc:`interface_languages`).
     - If you want to use custom transliteration for input or output, you have to edit the scripts in ``/search/transliterators`` and ``/search/web_app/transliteration.py`` (see :doc:`transliteration </transliteration>`).
+    - If you want to add virtual keyboard(s), you have to edit keyboard files in ``/search/web_app/static/keyboards`` (see :doc:`keyboards`).
     - You put the JSON files to the appropriate folder inside ``/corpus``.
     - You run ``/indexator/indexator.py``.
     - If you are setting up the corpus for the first time, you set up apache/nginx/... configuration files, so that some URL resolves to your corpus, and switch it on.

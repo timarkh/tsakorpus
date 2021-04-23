@@ -66,19 +66,23 @@ Tsakorpus was tested on Ubuntu and Windows. Its dependencies are the following:
 .. _apache2 with wsgi: https://flask.palletsprojects.com/en/1.1.x/deploying/mod_wsgi/
 .. _nginx: https://flask.palletsprojects.com/en/1.1.x/deploying/fastcgi/#configuring-nginx
 
-The following resources are used by Tsakorpus, but do not need to be installed:
+The following resources are used by Tsakorpus (sometimes adapted), but do not need to be installed:
 
 - jQuery_
+- `jQuery-Autocomplete`_
 - video.js_ media player
 - videojs-youtube_ plugin
 - `Bootstrap 5.0`_ toolkit
 - D3.js_ visualization library
+- KioskBoard_ virtual keyboard
 
 .. _jQuery: https://jquery.com/
+.. _jQuery-Autocomplete: https://github.com/devbridge/jQuery-Autocomplete
 .. _video.js: http://videojs.com/
 .. _videojs-youtube: https://github.com/videojs/videojs-youtube
 .. _Bootstrap 5.0: http://getbootstrap.com/
 .. _D3.js: https://d3js.org/
+.. _KioskBoard: https://github.com/furcan/KioskBoard
 
 License
 -------
@@ -110,6 +114,7 @@ The software is distributed under MIT license.
    interface_languages
    transliteration
    input_methods
+   keyboards
    styles
 
 

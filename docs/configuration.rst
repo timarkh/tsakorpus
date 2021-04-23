@@ -21,7 +21,7 @@ However, a more human-friendly way of configuring your corpus is doing that thro
 
 This page contains (almost) all possible parameters separated into rubrics. Fill in the boxes with the values you need and click "Save" in the bottom slide. You can save the page many times. After you click the button, a new ``corpus.json`` file will appear in ``/USER_CONFIG`` (*not* in ``/conf``). When you are ready, move it to ``/conf``. Filling all relevant boxes (especially those related to tag selection tables) can take a lot of time; please be patient.
 
-Apart from ``corpus.json``, it will generate :doc:`translation files </interface_translations>` in ``/USER_CONFIG/translations``. Edit them and replace files in ``/search/web_app/translations/`` with them in your :doc:`fork </forks>`.
+Apart from ``corpus.json``, it will generate :doc:`translation files </interface_languages>` in ``/USER_CONFIG/translations``. Edit them and replace files in ``/search/web_app/translations/`` with them in your :doc:`fork </forks>`.
 
 List of parameters
 ------------------
@@ -73,6 +73,8 @@ List of parameters
 - ``interface_languages`` (list of strings) -- list with codes of all available web interface languages.
 
 - ``keep_lemma_order`` (Boolean) -- whether the order of multiple analyses should be kept when a string with the lemmata is concatenated for displaying. Defaults to ``false``. For example, if a word has 3 analyses with the lemmara *B*, *A* and *B*, ``false`` means that the output string of lemmata will look like *A/B*, and ``true``, *B/A/B*. The latter may be needed if multiple analyses actually refer to different parts of a graphic word, e.g. host and clitics if they are represented as a single token.
+
+- ``keyboards`` (dictionary) -- defines virtual keyboards for all or some of the languages of the corpus. Keys are language names, and values are IDs of the keyboard files in ``/search/web_app/static/keyboards``. See :doc:`keyboards` for details. If a virtual keyboard exists for a language, it can be switched on in *Word*, *Lemma* and *Full-text search* text boxes by clicking on a keyboard sign.
 
 - ``kw_word_fields`` (list of strings) -- list with names of the word-level analysis fields that should be treated as keywords rather than text, except ``lex``, ``parts``, ``gloss`` and the grammatical fields that start with ``gr.``. Full-text search in these fields will be impossible. Defaults to empty list.
 
