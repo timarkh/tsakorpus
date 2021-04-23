@@ -51,6 +51,12 @@ function show_dictionary(e) {
 		});
 }
 
+function toggle_keyboards(e) {
+	// Switch virtual keyboards on or off
+	$('#enable_virtual_keyboard').toggleClass('keyboards_on');
+	initialize_keyboards();
+}
+
 function hide_settings(e) {
 	$('#display_settings').modal('hide');
 }

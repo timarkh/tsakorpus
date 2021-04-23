@@ -305,42 +305,27 @@ class KioskBoard {
           specialCharacterKey = '<span style="font-family:' + fontFamily + ',sans-serif;font-weight:' + fontWeight + ';font-size:' + fontSize + ';" class="kioskboard-key-specialcharacter">' + kioskBoardIconSpecialCharacters(specialKeyWidth, specialKeyHeight, keysIconColor) + '</span>';
           /* eslint-disable */
           var specialKeysObject = {
-            "0": "!",
-            "1": "'",
-            "2": "^",
-            "3": "#",
-            "4": "+",
-            "5": "$",
-            "6": "%",
-            "7": "½",
-            "8": "&",
-            "9": "/",
-            "10": "{",
-            "11": "}",
-            "12": "(",
-            "13": ")",
-            "14": "[",
-            "15": "]",
-            "16": "=",
-            "17": "*",
-            "18": "?",
-            "19": "\\",
-            "20": "-",
-            "21": "_",
-            "22": "|",
-            "23": "@",
-            "24": "€",
-            "25": "₺",
-            "26": "~",
-            "27": "æ",
-            "28": "ß",
-            "29": "<",
-            "30": ">",
-            "31": ",",
-            "32": ";",
-            "33": ".",
-            "34": ":",
-            "35": "`"
+            "0": "*",
+            "1": "+",
+            "2": "?",
+            "3": ".",
+            "4": ".*",
+            "5": ".+",
+            "6": "(",
+            "7": ")",
+            "8": "|",
+            "9": "[",
+            "10": "]",
+            "11": "{",
+            "12": "}",
+            "13": "^",
+            "14": "$",
+            "15": ",",
+            "16": "~",
+            "17": "=",
+            "18": "-",
+            "19": "/",
+            "20": "@"
           };
           /* eslint-enable */
 
@@ -506,12 +491,13 @@ class KioskBoard {
         // event for input element trigger change: end
 
         // input element keypress listener: begin
-        theInput.addEventListener('keypress', function (e) {
+        theInput.addEventListener('input', function (e) {
           // if: allowed real keyboard use
           var allowRealKeyboard = opt.allowRealKeyboard === true;
           if (allowRealKeyboard) {
             // update theInputValArray on keypress
             theInputValArray = this.value.split('');
+			theInputSelIndex = this.selectionStart || (this.value || '').length;
           }
           // else: stop
           else {
@@ -564,7 +550,9 @@ class KioskBoard {
                 input.value = theInputValArray.join('');
 
                 // set next selection index
-                input.setSelectionRange(theInputSelIndex + 1, theInputSelIndex + 1);
+                input.setSelectionRange(theInputSelIndex + keyValue.length, theInputSelIndex + keyValue.length);
+				theInputValArray = input.value.split('');
+				theInputSelIndex = input.selectionStart || (input.value || '').length;
 
                 // input trigger change event for update the value
                 input.dispatchEvent(changeEvent);

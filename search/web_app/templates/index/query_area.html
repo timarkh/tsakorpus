@@ -10,6 +10,9 @@
 				{% if generate_dictionary %}
 					<a id="show_dictionary" class="bi bi-journal-bookmark-fill link_icon" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Show dictionary') }}"></a>
 				{% endif %}
+				{% if keyboards_by_tier != '{}' %}
+					<a id="enable_virtual_keyboard" class="bi bi-keyboard-fill link_icon" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Virtual keyboard') }}"></a>
+				{% endif %}
 	        </div>
 	        <!-- Tab panes -->
 	        <div class="tab-content">

@@ -1580,3 +1580,7 @@ in different styles) */
 .autocomplete-suggestion:hover {
 	background-color: #edf5ff;
 }
+
+.keyboards_on {
+	border: 1px solid;
+}

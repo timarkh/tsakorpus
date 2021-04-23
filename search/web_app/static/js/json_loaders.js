@@ -332,6 +332,7 @@ function assign_input_events() {
 	$(".neg_query").unbind('click');
 	$("#show_help").unbind('click');
 	$("#show_dictionary").unbind('click');
+	$("#enable_virtual_keyboard").unbind('click');
 	$("#show_settings").unbind('click');
 	$("#show_history").unbind('click');
 	$("#cite_corpus").unbind('click');
@@ -355,6 +356,7 @@ function assign_input_events() {
 	$(".neg_query").click(negative_query_span);
 	$("#show_help").click(show_help);
 	$("#show_dictionary").click(show_dictionary);
+	$("#enable_virtual_keyboard").click(toggle_keyboards);
 	$("#show_settings").click(show_settings);
 	$("#show_history").click(show_history);
 	$("#cite_corpus").click(show_citation);
