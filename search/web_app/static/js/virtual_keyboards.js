@@ -94,7 +94,9 @@ function disable_keyboards() {
 	$('.virtual-keyboard').each(function(index) {
 		let new_element = this.cloneNode(true);
 		this.parentNode.replaceChild(new_element, this);
-	})
+	});
+	$(".search_input").unbind('keydown');
+	$(".search_input").on("keydown", search_if_enter);
 }
 
 function initialize_keyboards() {

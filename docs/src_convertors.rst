@@ -64,6 +64,10 @@ In most cases, it is expected that metadata for your texts (such as title, autho
 
 - ``meta_fields`` (list of strings) -- list of metadata field names. The values for the listed fields should appear in the metadata file in the same order: value for the first field in the first column, and so on. The name of the first metadata field should be ``filename``. In the metadata file, it corresponds to the first column that contains the name of the file being described by that line.
 
+- ``integer_meta_fields`` (list of strings) -- list of metadata fields whose values have to interpreted as integers rather than strings. All fields that start with ``year`` are included in this list automatically. See the eponymous parameter in :doc:`corpus configuration </configuration>`.
+
+- ``notokenize_meta_fields`` (list of strings) -- list of metadata fields whose string values should not be tokenized by Elasticsearch. This affects how they can be searched. E.g. if you search for ``newspaper`` in a tokenized field, values like ``press,newspaper`` will appear in the search. If the field is not tokenized, only ``newspaper`` will match. Tokenized type works well for tag-like fields such as genre, while non-tokenized type can be useful for full-text fields such as author or title. The field ``title`` is always included in this list.
+
 - ``meta_files_ext`` (Boolean) -- whether the filenames in the metadata file have extensions.
 
 - ``meta_files_dir`` (Boolean) -- whether the filenames in the metadata file have full paths rooted by ``/src_convertors/corpus/%ext%``. If it is set to ``false``, it is assumed that the names of the source files are unique regardless of where they exist within the subtree.

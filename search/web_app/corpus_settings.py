@@ -10,7 +10,8 @@ import copy
 import re
 import os
 import shutil
-from . import load_csv_translations
+if __name__.startswith('web_app.'):
+    from . import load_csv_translations
 
 
 class CorpusSettings:

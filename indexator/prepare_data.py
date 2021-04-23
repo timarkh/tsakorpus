@@ -60,6 +60,11 @@ class PrepareData:
                         'tokenizer': 'standard',
                         'char_filter': [],
                         'filter': ['lowercase']
+                    },
+                    'lowercase_normalizer_notokenize': {
+                        'type': 'pattern',
+                        'pattern': '[|]',
+                        'lowercase': True
                     }
                 }
             }
@@ -177,8 +182,16 @@ class PrepareData:
                 m['n_words_' + lang] = {'type': 'integer'}
                 m['n_sents_' + lang] = {'type': 'integer'}
         for meta in self.settings['viewable_meta']:
-            if meta.startswith('year'):
+            if meta.startswith('year') or ('integer_meta_fields' in self.settings
+                                           and meta in self.settings['integer_meta_fields']):
                 m[meta] = {'type': 'integer'}
+            elif meta == 'title' or ('notokenize_meta_fields' in self.settings
+                                     and meta in self.settings['notokenize_meta_fields']):
+                m[meta] = {
+                    'type': 'text',
+                    'analyzer': 'lowercase_normalizer_notokenize'
+                }
+                m[meta + '_kw'] = {'type': 'keyword'}
             else:
                 m[meta] = {
                     'type': 'text',

@@ -7,7 +7,9 @@
 		<thead>
 			<th>&nbsp;</th>
 			{% for f in data.metafields %}
+				{% if f not in sentence_meta %}
 				<th>{{ _('metafield_' + f) }}</th>
+				{% endif %}
 			{% endfor %}
 		</thead>
 		<tbody>

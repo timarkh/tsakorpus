@@ -32,10 +32,14 @@ class InterfaceQueryParser:
         self.wr = WordRelations(settings_dir, rp=rp)
         self.docMetaFields = ['author', 'title', 'genre']
         self.docMetaFields += [f for f in self.settings.viewable_meta
-                               if f not in self.docMetaFields and f != 'filename']
+                               if f not in self.docMetaFields and f != 'filename'
+                               and f not in settings.sentence_meta]
         self.docMetaFields += [f for f in self.settings.search_meta['stat_options']
-                               if f not in self.docMetaFields and f != 'filename']
-        kwMetaFields = [f + '_kw' for f in self.docMetaFields if not f.startswith('year')]
+                               if f not in self.docMetaFields and f != 'filename'
+                               and f not in settings.sentence_meta]
+        kwMetaFields = [f + '_kw' for f in self.docMetaFields
+                        if not f.startswith('year')
+                        and f not in self.settings.integer_meta_fields]
         self.docMetaFields += kwMetaFields
         self.rp = rp    # ResponseProcessor instance
         # for g in self.gramDict:
