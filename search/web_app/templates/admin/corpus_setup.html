@@ -380,6 +380,13 @@
 				<p class="explanation">When displaying search hits, all examples are headed by the values of "title", "author" and "year" metadata fields. If you want to have something other than "author" as the second most important field, type its name here.</p>
 			</div>
 			<div class="mb-3 option_group">
+				<label for="keyboards" class="form-label">Virtual keyboards</label>
+				<p class="explanation">You can define virtual keyboards for all or some of your languages. Here you have to tell Tsakorpus which keyboard ID corresponds to which languages. For each keyboard ID you mention, there should be a JSON file with its description called <code>kioskboard-keys-%KEYBOARD_ID%.json</code> (or files called <code>kioskboard-keys-%KEYBOARD_ID%__%INPUT_METHOD_NAME%.json</code> for different input methods) in <code>/search/web_app/static/keyboards</code>.</p>
+				<p class="explanation">Write one language-keyboard pair per line, separated by a colon (possibly with whitespaces).</p>
+				<textarea class="form-control" id="keyboards" name="keyboards" wrap="hard">{% for k in settings.keyboards %}{{ k }}: {{ settings.keyboards[k] }}
+{% endfor %}</textarea>
+			</div>
+			<div class="mb-3 option_group">
 				<p class="form-label">Multiple-choice fields</p>
 				<p class="explanation">A tag selection table is always present in the <em>Grammar</em> field, but you can also add one to any metadata search field that appears in the word query box. This makes sense for fields that have a limited number of values. The tag buttons are visually grouped into columns. The <em>category</em> text box is used for logical grouping of tags and can contain arbitrary strings, which will not be visible to the user. Whenever several tags from the same category are selected, they get into the query with a logical OR between them; tags from different categories are united with an AND.</p>
 				{% set cur_field = "multiple_choice_fields" %}

@@ -729,6 +729,7 @@ def setup_corpus_save_changes():
     data = request.form.to_dict()
     if os.path.exists('../USER_CONFIG'):
         shutil.rmtree('../USER_CONFIG')
+    time.sleep(0.5)
     os.makedirs('../USER_CONFIG/translations')
     settings.save_settings(os.path.abspath('../USER_CONFIG/corpus.json'), data=data)
     settings.prepare_translations(os.path.abspath('../USER_CONFIG/translations'), data=data)

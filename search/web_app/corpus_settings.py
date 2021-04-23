@@ -125,7 +125,8 @@ class CorpusSettings:
         # dictionaries where values are strings
         self.dict_sFields = {
             'auto_switch_tiers',
-            'default_values'
+            'default_values',
+            'keyboards'
         }
 
         # dictionaries where values are lists of strings,
