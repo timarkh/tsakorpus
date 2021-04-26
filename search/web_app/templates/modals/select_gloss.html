@@ -14,13 +14,13 @@
 		{% if gl.type == "gloss" %}
 			<div class="switchable_gramm" data-cat="{{ gl.category|safe }}" data-gloss="{{ gl.value|safe }}">{{ gl.value|safe }}
 			{% if gl.tooltip %}
-				<span class="tooltip_prompt alert alert-warning">{{ gl.tooltip|safe }}</span>
+				<span class="tooltip_prompt alert alert-warning">{{ _('tooltip_' + gl.tooltip)|safe }}</span>
 			{% endif %}
 			</div>
 		{% elif gl.type == "separator" %}
 			<hr class="separator gloss_separator">
 		{% elif gl.type == "header" %}
-			<div class="gloss_header">{{ gl.value|safe }}</div>
+			<div class="gloss_header">{{ _('tooltip_' + gl.value)|safe }}</div>
 		{% endif %}
 		{% endfor %}
 		</div>

@@ -70,7 +70,7 @@ All the rest are tab-delimited files with two columns: key on the left and value
 - ``input_methods.txt`` contains names of :doc:`input methods </input_methods>` you have.
 - ``metadata_fields.txt`` contains names of your metadata fields.
 - ``metadata_values.txt`` contains names of your metadata values. **Important**: as of now, these translations are only used for sentence-level selector fields, i.e. those values that are described in the ``sentence_meta_values`` parameter in :doc:`corpus.json </configuration>`. In all other contexts, the values are displayed as is.
-- ``tooltips.txt`` translates tooltips in your gloss and tag selection popups.
+- ``tooltips.txt`` translates tooltips and headers in your gloss and tag selection popups.
 
 When adding contents of these files to the single ``messages.po`` file, prefixes are added to their keys:
 
@@ -80,7 +80,7 @@ When adding contents of these files to the single ``messages.po`` file, prefixes
 - ``inputmethod_``: for input method names;
 - ``metafield_`` for metadata field names;
 - ``metavalue_`` for metadata value names;
-- ``tooltip_`` for tooltips.
+- ``tooltip_`` for tooltips and headers.
 
 So a placeholder for a language called ``klingon`` will look like ``{{ _('langname_klingon' )}}`` in the HTML templates.
 

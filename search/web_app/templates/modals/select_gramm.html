@@ -7,13 +7,13 @@
 	{% if tag.type == "gramm" or tag.type == "tag" %}
 		<div class="switchable_gramm" data-cat="{{ tag.category|safe }}" data-grammtag="{{ tag.value|safe }}">{{ tag.value|safe }}
 		{% if tag.tooltip %}
-			<span class="tooltip_prompt alert alert-warning">{{ tag.tooltip|safe }}</span>
+			<span class="tooltip_prompt alert alert-warning">{{ _('tooltip_' + tag.tooltip)|safe }}</span>
 		{% endif %}
 		</div>
 	{% elif tag.type == "separator" %}
 		<hr class="separator gloss_separator">
 	{% elif tag.type == "header" %}
-		<div class="gloss_header">{{ tag.value|safe }}</div>
+		<div class="gloss_header">{{ _('tooltip_' + tag.value)|safe }}</div>
 	{% endif %}
 	{% endfor %}
 	</div>

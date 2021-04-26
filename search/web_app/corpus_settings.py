@@ -582,17 +582,23 @@ class CorpusSettings:
                     for el in col:
                         if 'tooltip' in el:
                             newTooltips.add(el['tooltip'])
+                        elif 'type' in el and 'value' in el and el['type'] == 'header':
+                            newTooltips.add(el['value'])
             if ('gloss_selection' in data['lang_props'][lang]
                     and 'columns' in data['lang_props'][lang]['gloss_selection']):
                 for col in data['lang_props'][lang]['gloss_selection']['columns']:
                     for el in col:
                         if 'tooltip' in el:
                             newTooltips.add(el['tooltip'])
+                        elif 'type' in el and 'value' in el and el['type'] == 'header':
+                            newTooltips.add(el['value'])
         if 'multiple_choice_fields' in data and 'columns' in data['multiple_choice_fields']:
             for col in data['multiple_choice_fields']['columns']:
                 for el in col:
                     if 'tooltip' in el:
                         newTooltips.add(el['tooltip'])
+                    elif 'type' in el and 'value' in el and el['type'] == 'header':
+                        newTooltips.add(el['value'])
         self.write_translation_csv(tooltips, list(newTooltips),
                                    os.path.join(targetDir, 'tooltips.txt'))
 
