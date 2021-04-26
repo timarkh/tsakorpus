@@ -346,7 +346,9 @@ class CorpusSettings:
                         grammSel[nLang][nCol][nRow] = {}
                     grammSel[nLang][nCol][nRow][attr] = v
         for nLang in glossSelLangs:
-            langProps[glossSelLangs[nLang]] = {'gloss_selection': {'columns': []}}
+            if glossSelLangs[nLang] not in langProps:
+                langProps[glossSelLangs[nLang]] = {}
+            langProps[glossSelLangs[nLang]]['gloss_selection'] = {'columns': []}
             for nCol in sorted(glossSel[nLang], key=lambda x: int(x)):
                 curCol = []
                 for nRow in sorted(glossSel[nLang][nCol], key=lambda x: int(x)):
@@ -356,7 +358,9 @@ class CorpusSettings:
                     curCol.append(curEl)
                 langProps[glossSelLangs[nLang]]['gloss_selection']['columns'].append(curCol)
         for nLang in grammSelLangs:
-            langProps[grammSelLangs[nLang]] = {'gramm_selection': {'columns': []}}
+            if grammSelLangs[nLang] not in langProps:
+                langProps[grammSelLangs[nLang]] = {}
+            langProps[grammSelLangs[nLang]]['gramm_selection'] = {'columns': []}
             for nCol in sorted(grammSel[nLang], key=lambda x: int(x)):
                 curCol = []
                 for nRow in sorted(grammSel[nLang][nCol], key=lambda x: int(x)):
