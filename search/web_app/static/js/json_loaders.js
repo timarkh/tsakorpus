@@ -592,12 +592,12 @@ function search_if_enter(e) {
     else {
     	// Autoswitch tiers
     	let wordNum = $(e.target).attr('id').replace(/^.*[^0-9]/g, '');
-    	let field = $(e.target).attr('id').replace(/^[^0-9]*$/g, '');
-    	if (field in keyboardsByTier) {
-    		let langSwitch = keyboardsByTier[field];
+    	let field = $(e.target).attr('id').replace(/[0-9]*$/g, '');
+    	if (field in autoSwitchTiers) {
+    		let langSwitch = autoSwitchTiers[field];
     		let curTier = $('#lang' + wordNum.toString() + ' option:selected').val();
     		if (curTier != langSwitch) {
-    			$('#lang' + wordNum.toString()).val(curTier);
+    			$('#lang' + wordNum.toString()).val(langSwitch).change();
     		}
     	}
     }
