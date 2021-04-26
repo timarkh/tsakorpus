@@ -76,22 +76,6 @@ function kioskBoardExtendObjects() {
 }
 // KioskBoard: Extend Options: end
 
-// KioskBoard: Check Array of Objects: begin
-function kioskBoardCheckArrayOfObjects(array) {
-  if (Array.isArray(array) && array.length > 0) {
-    var firstChild = array[0];
-    if (typeof firstChild === 'object' && !Array.isArray(firstChild)) {
-      for (var key in firstChild) {
-        if (Object.prototype.hasOwnProperty.call(firstChild, key)) {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
-}
-// KioskBoard: Check Array of Objects: end
-
 // KioskBoard: Console Error Function: begin
 function kioskBoardConsoleError(errorMessage) {
   return console.error('%c KioskBoard (Error) ', 'padding:2px;border-radius:20px;color:#fff;background:#f44336', '\n' + errorMessage);
@@ -217,7 +201,7 @@ class KioskBoard {
     var objectHasKeys = false;
 
     // Step 1: check the "keysArrayOfObjects": begin
-    if (kioskBoardCheckArrayOfObjects(keysArrayOfObjects)) {
+    if (Array.isArray(keysArrayOfObjects) && keysArrayOfObjects.length > 0) {
       // object has keys
       objectHasKeys = true;
       // cache the array
@@ -239,6 +223,11 @@ class KioskBoard {
 
     // Functions: Create Keyboard and AppendTo: begin
     var createKeyboardAndAppendTo = function (data, input) {
+      // transform list of lists to the original Kioskboard format
+      for (var iRow = 0; iRow < data.length; iRow++) {
+        data[iRow] = Object.assign({}, data[iRow]);
+      }
+
       // all inputs
       var allInputs = [];
       allInputs.push(input);
@@ -772,13 +761,7 @@ class KioskBoard {
               var data = this.responseText || []; // data
               if (typeof data === 'string' && data.length > 0) {
                 var parsedData = JSON.parse(data); // JSON parse data
-                if (kioskBoardCheckArrayOfObjects(parsedData)) {
-                  // kioskBoardCachedKeys = parsedData; // cache the keys
-                  createKeyboardAndAppendTo(parsedData, input); // create the keyboard
-                } else {
-                  kioskBoardConsoleError('Array of objects of the keys are not valid. \n\nVisit to learn more: ' + kioskBoardGithubUrl);
-                  return false;
-                }
+                createKeyboardAndAppendTo(parsedData, input); // create the keyboard
               }
             } else {
               kioskBoardConsoleError('XMLHttpRequest has been failed. Please check your URL path or protocol.');

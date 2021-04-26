@@ -45,7 +45,7 @@ function add_keyboard(kbLang, wordNum, inputMethod) {
 	if (inputMethod.length > 0) {
 		inputMethod = '__' + inputMethod;
 	}
-	let keysJsonUrl = 'static/keyboards/kioskboard-keys-' + kbLang + inputMethod + '.json';
+	let keysJsonUrl = 'static/keyboards/keyboard-' + kbLang + inputMethod + '.json';
 	let textboxSelector = '';
 	if (wordNum > 1) {
 		textboxSelector = '#wsearch_' + wordNum + ' .virtual-keyboard';
@@ -60,7 +60,7 @@ function add_keyboard(kbLang, wordNum, inputMethod) {
 		}
 		else {
 			// Try keyboard without input method specified
-			keysJsonUrl = 'static/keyboards/kioskboard-keys-' + kbLang + '.json';
+			keysJsonUrl = 'static/keyboards/keyboard-' + kbLang + '.json';
 			url_exists(keysJsonUrl, function(exists) {
 				if (exists) {
 					initialize_keyboard(keysJsonUrl, textboxSelector);
