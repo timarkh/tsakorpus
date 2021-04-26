@@ -589,6 +589,18 @@ function search_if_enter(e) {
 	if (e.keyCode == 13) {
        $('#search_sent').click();        
     }
+    else {
+    	// Autoswitch tiers
+    	let wordNum = $(e.target).attr('id').replace(/^.*[^0-9]/g, '');
+    	let field = $(e.target).attr('id').replace(/^[^0-9]*$/g, '');
+    	if (field in keyboardsByTier) {
+    		let langSwitch = keyboardsByTier[field];
+    		let curTier = $('#lang' + wordNum.toString() + ' option:selected').val();
+    		if (curTier != langSwitch) {
+    			$('#lang' + wordNum.toString()).val(curTier);
+    		}
+    	}
+    }
 }
 
 function search_if_query() {
