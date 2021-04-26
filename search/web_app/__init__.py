@@ -1,5 +1,5 @@
 from flask import Flask
-from elasticsearch.exceptions import ConnectionError
+from elasticsearch.exceptions import ConnectionError, NotFoundError
 import sys
 import subprocess
 import os
@@ -128,7 +128,7 @@ try:
         # number of lemmata for each frequency rank
         settings.lemma_freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_lemma_freq_by_rank(lang)))
     settings.ready_for_work = True
-except ConnectionError:
+except (ConnectionError, NotFoundError):
     # Elasticsearch is down
     settings.corpus_size = 0
     for lang in settings.languages:
