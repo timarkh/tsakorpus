@@ -67,6 +67,7 @@ class Indexator:
         self.goodWordFields += ['gr.' + v for lang in categories
                                 for v in categories[lang].values()]
         self.goodWordFields = set(self.goodWordFields)
+        self.characterRegexes = {}
 
         self.pd = PrepareData()
         self.es = Elasticsearch()
@@ -261,6 +262,27 @@ class Indexator:
             return 'complete'
         return 'unique'
 
+    def character_regex(self, lang):
+        """
+        Regex for splitting text into characters. Takes into account
+        multicharacter sequences (digraphs etc.) defined in lang_props.lexicographic_order.
+        """
+        if lang in self.characterRegexes:
+            return self.characterRegexes[lang]   # cache
+        if lang not in self.settings['lang_props'] or 'lexicographic_order' not in self.settings['lang_props'][lang]:
+            self.characterRegexes[lang] = re.compile('.')
+            return self.characterRegexes[lang]
+        rxChars = '(' + '|'.join(re.escape(c.lower())
+                                 for c in sorted(self.settings['lang_props'][lang]['lexicographic_order'],
+                                                 key=lambda x: (-len(x), x))
+                                 if len(c) > 1)
+        if len(rxChars) > 1:
+            rxChars += '|'
+        rxChars += '.)'
+        rxChars = re.compile(rxChars)
+        self.characterRegexes[lang] = rxChars
+        return rxChars
+
     def make_sorting_function(self, lang):
         """
         Return a function that can be used for sorting tokens
@@ -273,13 +295,14 @@ class Indexator:
                             (i, self.settings['lang_props'][lang]['lexicographic_order'][i])
                         for i in range(len(self.settings['lang_props'][lang]['lexicographic_order']))}
             maxIndex = len(dictSort)
+            rxChars = self.character_regex(lang)
 
             def charReplaceFunction(c):
                 if c in dictSort:
                     return dictSort[c]
                 return (maxIndex, c)
 
-            sortingFunction = lambda x: [charReplaceFunction(c) for c in x.lower()]
+            sortingFunction = lambda x: [charReplaceFunction(c) for c in rxChars.findall(x.lower())]
         return sortingFunction
 
     def sort_words(self, lang):
@@ -621,7 +644,11 @@ class Indexator:
             for lemma, grdic, trans in sorted(lexFreqs, key=lambda x: (sortingFunction(x[0].lower()), -lexFreqs[x])):
                 if len(lemma) <= 0:
                     continue
-                curLetter = lemma.lower()[0]
+                mChar = self.character_regex(self.languages[langID]).search(lemma.lower())
+                if mChar is None:
+                    curLetter = '*'
+                else:
+                    curLetter = mChar.group(0)
                 if curLetter != prevLetter:
                     if prevLetter != '':
                         fOut.write('</tbody>\n</table>\n')

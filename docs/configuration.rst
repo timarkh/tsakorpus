@@ -96,7 +96,7 @@ List of parameters
 
     - ``lexical_fields`` (list of strings) -- names of non-grammatical analysis fields that should appear in analysis popups between the lines with dictionary categories and (inflectional) grammatical categories. Defaults to empty list. All fields that do not belong to this list are displayed below the grammatical line.
 
-    - ``lexicographic_order`` (list of strings) -- list of characters ordered alphabetically for sorting words and lemmata. If absent, standard Unicode ordering is applied.
+    - ``lexicographic_order`` (list of strings) -- list of characters ordered alphabetically for sorting words and lemmata. If absent, standard Unicode ordering is applied. "Characters" are actually arbitrary strings and may include e.g. digraphs.
 
     - ``other_fields_order`` (list of strings) -- list of names of non-grammatical analysis fields which defines in which order their values should be displayed in word analyses. If the field is missing, the fields are sorted alphabetically. If present, this field must contain all field names that exist in the corpus.
 
