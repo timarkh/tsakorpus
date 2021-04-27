@@ -226,6 +226,12 @@
     <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="heading5" data-bs-parent="#setings_accordion">
 		<div class="accordion-body">
 			<div class="form-check option_group">
+				<input class="form-check-input" type="checkbox" value="wf_lowercase" id="wf_lowercase" name="wf_lowercase" {% if settings.wf_lowercase %}checked{% endif %}>
+				<label class="form-check-label" for="wf_lowercase">
+				Word search should be case-insensitive. If checked, all word forms will be lowercased before indexing.
+				</label>
+			</div>
+			<div class="form-check option_group">
 				<input class="form-check-input" type="checkbox" value="all_language_search_enabled" id="all_language_search_enabled" name="all_language_search_enabled" {% if settings.all_language_search_enabled %}checked{% endif %}>
 				<label class="form-check-label" for="all_language_search_enabled">
 				If there are multiple tiers/languages in the corpus, "search in all languages" option is available.
@@ -337,8 +343,8 @@
 			<div class="form-check option_group">
 				<label for="default_view" class="form-label">Default view</label>
 				<select class="form-select" id="default_view" name="default_view">
-				  <option value="json" {% if settings.default_view == "standard" %}selected{% endif %}>standard</option>
-				  <option value="json-gzip" {% if settings.default_view == "glossed" %}selected{% endif %}>glossed</option>
+				  <option value="standard" {% if settings.default_view == "standard" %}selected{% endif %}>standard</option>
+				  <option value="glossed" {% if settings.default_view == "glossed" %}selected{% endif %}>glossed</option>
 				</select>
 				<p class="explanation">In sentence search, the analyses are displayed either in a popup when you hover your mouse pointer over a word, or as interlinear glossing beneath the text. Choose "glossed" to turn on glossed view by default. The user can change this setting in the Settings dialogue.</p>
 			</div>
