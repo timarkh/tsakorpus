@@ -14,11 +14,13 @@ Tsakorpus supports corpora with morphological annotation, special gloss search, 
 
 All documentation is available [here](https://tsakorpus.readthedocs.io/en/latest/). If you are not sure if Tsakorpus is what you need, read the [FAQ](https://tsakorpus.readthedocs.io/en/latest/faq.html). If you want to set up a corpus, start [here](https://tsakorpus.readthedocs.io/en/latest/overview.html).
 
+Feel free to ask questions or discuss Tsakorpus [on the Discussions page](https://github.com/timarkh/tsakorpus/discussions/) or post [issues](https://github.com/timarkh/tsakorpus/issues).
+
 ## Requirements
 
 Tsakorpus was tested on Windows and Ubuntu. Its dependencies are the following:
 
-* elasticsearch 7.x (tested on 7.6 and 7.10)
+* elasticsearch 7.x (tested on 7.6, 7.7, 7.10, 7.12)
 * python >= 3.5
 * python modules: elasticsearch 7.x, flask, lxml, ijson, Flask-Babel, xlsxwriter (you can use requirements.txt)
 * for converting media-aligned corpora: ffmpeg
