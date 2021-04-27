@@ -1,0 +1,46 @@
+/* Predefined styles for certain tiers 
+(add styles for your languages/tiers if
+different languages should be displayed
+in different styles) */
+
+.sent_lang_ref {
+	font-size: 70%;
+	color: #777777;
+}
+
+.sent_lang_english_note {
+	color: #444444;
+}
+
+
+/* Styles for annotation spans */
+
+.style_i {
+	font-style: italic;
+}
+
+.style_b {
+	font-weight: bold;
+}
+
+.style_sup {
+	vertical-align: super;
+	font-size: smaller;
+}
+
+.style_sub {
+	vertical-align: sub;
+	font-size: smaller;
+}
+
+.style_txt_h1 {
+	font-size: 150%;
+}
+
+.style_txt_h2 {
+	font-size: 125%;
+}
+
+.style_txt_h3 {
+	font-size: 110%;
+}
