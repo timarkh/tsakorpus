@@ -429,6 +429,8 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
                 else:
                     if newBucket['n_sents'] > 0:
                         newBucket['n_sents'] = hits['hits']['total']['value'] / newBucket['n_sents'] * 100
+            elif newBucket['n_words'] <= 0:
+                newBucket['n_words_conf_int'] = [0.0, 0.0]
             curWordBuckets.append(newBucket)
         results.append(curWordBuckets)
     return results
