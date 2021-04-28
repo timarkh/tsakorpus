@@ -328,12 +328,13 @@ class Eaf2JSON(Txt2JSON):
                 for k in totalAna:
                     for ana in analyses:
                         if k in ['lex'] or k.startswith('gr.'):
-                            if len(totalAna[k]) <= 0:
-                                totalAna[k] = ana[k]
-                            elif type(totalAna[k]) == str and totalAna[k] != ana[k]:
-                                totalAna[k] = [totalAna[k], ana[k]]
-                            elif type(totalAna[k]) == list and ana[k] not in totalAna[k]:
-                                totalAna[k].append(ana[k])
+                            if k in ana:
+                                if len(totalAna[k]) <= 0:
+                                    totalAna[k] = ana[k]
+                                elif type(totalAna[k]) == str and totalAna[k] != ana[k]:
+                                    totalAna[k] = [totalAna[k], ana[k]]
+                                elif type(totalAna[k]) == list and ana[k] not in totalAna[k]:
+                                    totalAna[k].append(ana[k])
                         else:
                             if len(totalAna[k]) > 0 and k not in ['parts']:
                                 totalAna[k] += '-'
