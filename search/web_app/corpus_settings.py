@@ -93,6 +93,9 @@ class CorpusSettings:
         self.search_remove_whitespaces = True
         self.detect_lemma_queries = False
 
+        # Server configuration
+        self.session_cookie_domain = None
+
         # Statistics calculated at runtime
         self.corpus_size = 0
         self.word_freq_by_rank = []      # number of word types for each frequency rank

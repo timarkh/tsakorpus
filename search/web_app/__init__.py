@@ -147,4 +147,7 @@ app.config.update(dict(
     BABEL_TRANSLATION_DIRECTORIES='translations_pybabel'
 ))
 
+if settings.session_cookie_domain is not None and len(settings.session_cookie_domain) > 0:
+    app.config['SESSION_COOKIE_DOMAIN'] = settings.session_cookie_domain
+
 from .views import *

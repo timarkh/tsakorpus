@@ -139,6 +139,8 @@ List of parameters
 
 - ``sentence_meta`` (list of strings) -- list with names of the sentence-level metadata fields that should be available in word-level search queries.
 
+- ``session_cookie_domain`` (string) -- value of the Flask's ``SESSION_COOKIE_DOMAIN`` parameter, if different from the base domain name of your resource. You may want to set it if you have multiple corpora on different subdomains.
+
 - ``start_page_url`` (string) -- a string with the URL of the start page of the corpus, if there is one. It is used to link the header of the search page to the start page.
 
 - ``transliterations`` (list of strings) -- list of supported transliterations. For each transliteration, there should be a function in ``/search/web_app/transliteration.py`` named ``trans_%TRANSLITERATION_NAME%_baseline`` that takes the text and the name of the language as input and returns transliterated text.
