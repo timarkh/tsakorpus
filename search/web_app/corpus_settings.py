@@ -194,10 +194,12 @@ class CorpusSettings:
             self.categories = json.load(fCategories)
         self.update_format()
 
-        # Add empty dictionary for each language absent in categories.json:
+        # Add empty dictionary for each language absent in categories.json and lang_props:
         for lang in self.languages:
             if lang not in self.categories:
                 self.categories[lang] = {}
+            if lang not in self.lang_props:
+                self.lang_props[lang] = {}
 
         if 'stat_options' not in self.search_meta:
             self.search_meta['stat_options'] = []
