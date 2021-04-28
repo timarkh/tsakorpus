@@ -796,7 +796,9 @@ class Indexator:
                 self.es.index(index=self.name + '.docs',
                               id=self.dID,
                               body=shortMeta)
-        if self.settings['fulltext_view_enabled'] and 'fulltext_id' in meta:
+        if ('fulltext_view_enabled' in self.settings
+                and self.settings['fulltext_view_enabled']
+                and 'fulltext_id' in meta):
             fnameOut = meta['fulltext_id'] + '.json'
             self.j2h.process_file(fname,
                                   os.path.join('../search/corpus_html',
