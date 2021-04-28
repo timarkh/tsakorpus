@@ -808,7 +808,8 @@ def find_sent_context(curSentData, n):
                 curCxLang[side] = expandedContext['languages'][langReal]['text']
                 if settings.media:
                     sentView.relativize_src_alignment(expandedContext, curSentData['src_alignment_files'])
-                    context['src_alignment'].update(expandedContext['src_alignment'])
+                    if 'src_alignment' in expandedContext:
+                        context['src_alignment'].update(expandedContext['src_alignment'])
                 cur_search_context().last_sent_num = lastSentNum
             else:
                 curCxLang[side] = ''
