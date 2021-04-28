@@ -228,9 +228,20 @@ class Splitter:
                 or not self.settings['sentence_segmentation']
                 or 'sent_end_punc' not in self.settings):
             return
+        langs2resegment = [i for i in range(len(self.settings['languages']))]
+        if 'sentence_segmentation_languages' in self.settings:
+            langs2resegment = [i for i in range(len(self.settings['languages']))
+                               if self.settings['languages'][i] in self.settings['sentence_segmentation_languages']]
+        langs2resegment = set(langs2resegment)
         for i in range(len(sentences) - 1, 0, -1):
             sentenceR = sentences[i]
             sentenceL = sentences[i - 1]
+            if 'lang' not in sentenceL or 'lang' in sentenceR:
+                continue
+            if sentenceL['lang'] not in langs2resegment:
+                continue
+            if sentenceR['lang'] not in langs2resegment:
+                continue
             if ('text' in sentenceL
                     and not self.rxSentEnd.search(sentenceL['text'])
                     and sentenceL['lang'] == sentenceR['lang']

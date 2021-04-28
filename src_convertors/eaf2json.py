@@ -777,9 +777,18 @@ class Eaf2JSON(Txt2JSON):
         Add the name/code of the speaker in the beginning of every
         sentence that starts the turn.
         """
+        if 'insert_speaker_marks' in self.corpusSettings and not self.corpusSettings['insert_speaker_marks']:
+            return
+        langs2process = [i for i in range(len(self.corpusSettings['languages']))]
+        if 'speaker_marks_languages' in self.corpusSettings:
+            langs2process = [i for i in range(len(self.corpusSettings['languages']))
+                               if self.corpusSettings['languages'][i] in self.corpusSettings['speaker_marks_languages']]
+        langs2process = set(langs2process)
         prevSpeaker = ''
         for i in range(len(sentences)):
             if 'meta' not in sentences[i] or 'speaker' not in sentences[i]['meta']:
+                continue
+            if 'lang' in sentences[i] and sentences[i]['lang'] not in langs2process:
                 continue
             speaker = '[' + sentences[i]['meta']['speaker'] + ']'
             addOffset = len(speaker) + 2

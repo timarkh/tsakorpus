@@ -96,6 +96,12 @@ Other configuration
 
 - ``sentence_segmentation`` (Boolean, optional) -- whether the convertor should resegment your text into sentences based on sentence-final punctuation set in ``sent_end_punc``. If ``false``, the time-aligned segments are treated as sentences. Defaults to ``false``.
 
+- ``sentence_segmentation_languages`` (list of strings, optional) -- if ``sentence_segmentation`` is set to ``true``, you can list languages for which sentence segmentation ahould take place. By default, sentences in all languages will be segmented.
+
+- ``insert_speaker_marks`` (Boolean, optional) -- whether speaker marks (i.e. contents of the ``PARTICIPANT`` attribute of ELAN tiers) in brackets should be prepended at the start of each turn. Speaker marks in the linearized transcription make it easier for the user to understand who is saying what without listening to the sound file. Defaults to ``true``.
+
+- ``speaker_marks_languages`` (list of strings, optional) -- if ``insert_speaker_marks`` is ``true``, you can list languages for which speaker marks should be inserted. By default, sentences in all languages are processed.
+
 Span annotations
 ~~~~~~~~~~~~~~~~
 
