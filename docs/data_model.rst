@@ -152,7 +152,7 @@ The ``off_start_src`` and ``off_end_src`` parameters are numbers (float) that de
 Style spans
 -----------
 
-The baseline of the sentence may contain segments that should be displayed in a style other than the default, e.g. in italics or in superscript. Each dictionary in the ``style_spans`` list represents one such segment. It looks like this:
+The baseline of the sentence may contain :doc:`style spans </styles>`, i.e. segments that should be displayed in a style other than the default, e.g. in italics or in superscript. Each dictionary in the ``style_spans`` list represents one such segment. It looks like this:
 
 .. code-block:: javascript
   :linenos:
@@ -160,10 +160,11 @@ The baseline of the sentence may contain segments that should be displayed in a 
   {
     "off_start": ...,
     "off_end": ...,
-    "span_class": "..."
+    "span_class": "...",
+    "tooltip_text": "..."  // optional
   }
 
-The ``off_start`` and ``off_end`` parameters are integers that define the offset of the relevant segment in the ``text`` value in characters. ``span_class`` is a string that defines the style. When displayed in a search hit, the relevant segment is put inside a ``<span>`` element with the ``class`` attribute set to ``style_%SPAN_CLASS%``. For example, if ``span_class`` equals ``i``, the actual span tag will look like ``<span class="style_i">``. The classes should be defined in ``/search/web_app/static/css/search.css``. Predefined classes are ``style_i`` (italics), ``style_b`` (bold), ``style_sup`` (superscript), ``style_sub`` (subscript), and ``style_txt_hX`` for ``X`` = ``1``, ``2`` and ``3`` (headers). See :doc:`styles` for more.
+The ``off_start`` and ``off_end`` parameters are integers that define the offset of the relevant segment in the ``text`` value in characters. ``span_class`` is a string that defines the style. When displayed in a search hit, the relevant segment is put inside a ``<span>`` element with the ``class`` attribute set to ``style_%SPAN_CLASS%``. For example, if ``span_class`` equals ``i``, the actual span tag will look like ``<span class="style_i">``. The classes should be defined in ``/search/web_app/static/css/span_styles.css``. Predefined classes are ``style_i`` (italics), ``style_b`` (bold), ``style_sup`` (superscript), ``style_sub`` (subscript), and ``style_txt_hX`` for ``X`` = ``1``, ``2`` and ``3`` (headers). ``tooltip_text`` can be used to display a tooltip for that span. See :doc:`styles` for more.
 
 
 Sentence example
