@@ -41,3 +41,13 @@ docs/_build
 **/messages.mo
 USER_CONFIG/
 **/desktop.ini
+*.zip
+*.7z
+*.rar
+*.gz
+*.docx
+*.min.css.map
+*.min.js.map
+conf/categories_*.json
+conf/corpus_*.json
+messages.pot
