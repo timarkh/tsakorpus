@@ -1,0 +1,1 @@
+This folder contains translation files (messages.po and messages.mo) for Flask-Babel. It is populated automatically each time you launch the Tsakorpus app based on the translation files in /search/web_app/translations.

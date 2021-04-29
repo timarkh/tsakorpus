@@ -9,6 +9,7 @@ search/tmp/**
 search/img/**
 search/corpus_html/**
 src_convertors/error.log
+src_convertors/error_*.log
 docs_doxygen/**
 search/web_app/templates/dictionaries/**
 .Python
@@ -39,6 +40,7 @@ ENV/
 /corpus.json
 docs/_build
 **/messages.mo
+**/messages.po
 USER_CONFIG/
 **/desktop.ini
 *.zip
