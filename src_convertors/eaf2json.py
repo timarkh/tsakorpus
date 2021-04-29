@@ -448,7 +448,9 @@ class Eaf2JSON(Txt2JSON):
             tli2 = segData[3]
             text = segData[0]
             self.spanAnnoTiers[annoTierType][annoTierID].append((tli1, tli2, text))
-        self.spanAnnoTiers[annoTierType][annoTierID].sort()
+        self.spanAnnoTiers[annoTierType][annoTierID].sort(
+            key=lambda x: (float(self.tlis[x[0]]['time']), float(self.tlis[x[1]]['time']), x[2])
+        )
 
     def add_privacy_segments(self, srcTree, srcFile):
         """
@@ -660,10 +662,10 @@ class Eaf2JSON(Txt2JSON):
                     curSentenceStart = curSentence['src_alignment'][0]['true_off_start_src']
                     curSentenceEnd = curSentenceStart + (float(curSentence['src_alignment'][0]['off_end_src'])
                                                          - float(curSentence['src_alignment'][0]['off_start_src']))
-                    if curSpanStart >= curSentenceEnd - 0.1 or len(curSentence['words']) <= 0:
+                    if curSpanStart >= curSentenceEnd - 0.03 or len(curSentence['words']) <= 0:
                         iSentence += 1
                         continue
-                    elif curSpanEnd <= curSentenceStart + 0.1:
+                    elif curSpanEnd <= curSentenceStart + 0.03:
                         iSpan += 1
                         continue
 
@@ -693,11 +695,13 @@ class Eaf2JSON(Txt2JSON):
                         if curSpanStart <= tokenStart and tokenEnd <= curSpanEnd:
                             tokensInvolvedOrig.append(iToken)
                     # Find which actual token numbers correspond to the original ones.
-                    for iToken in range(len(curSentence['words'])):
-                        curToken = curSentence['words'][iToken]
-                        if (('n_orig' in curToken and curToken['n_orig'] in tokensInvolvedOrig)
-                                or ('n_orig' not in curToken and iToken in tokensInvolvedOrig)):
-                            tokensInvolved.append(iToken)
+                    if any('n_orig' in t for t in curSentence['words']):
+                        for iToken in range(len(curSentence['words'])):
+                            curToken = curSentence['words'][iToken]
+                            if 'n_orig' in curToken and curToken['n_orig'] in tokensInvolvedOrig:
+                                tokensInvolved.append(iToken)
+                    else:
+                        tokensInvolved = tokensInvolvedOrig     # I'm not sure this is really necessary
                     if (len(tokensInvolved) > 0
                             and 'styles' in curRules
                             and curSpanValue in curRules['styles']):
@@ -819,6 +823,10 @@ class Eaf2JSON(Txt2JSON):
                         if sa['off_start_sent'] > 0:
                             sa['off_start_sent'] += addOffset
                         sa['off_end_sent'] += addOffset
+                if 'style_spans' in sentences[i]:
+                    for ss in sentences[i]['style_spans']:
+                        ss['off_start'] += addOffset
+                        ss['off_end'] += addOffset
             prevSpeaker = sentences[i]['meta']['speaker']
             if 'last' in sentences[i] and sentences[i]['last']:
                 prevSpeaker = ''
