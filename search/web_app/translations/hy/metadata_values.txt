@@ -1,0 +1,30 @@
+F	Ի
+M	Ա
+complete	ամբողջությամբ, բայց համանունությամբ
+dialogue	երկխոսություն
+essay	էսսե
+experiment	փորձ
+female	կին
+fiction	գեղարվեստական
+incomplete	ոչ ամբողջովին
+interview	հարցազրույց
+male	տղամարդ
+monologue	մենախոսություն
+movie	ֆիլմ
+nonfiction	ոչգեղարվեստական
+novel	վեպ
+oral	բանավոր
+original	բնագիր
+poetry	բանաստեղծություն
+press	մամուլ
+prose	արձակ
+public	հասարակական
+religion	եկեղեցական
+science	գիտական
+song	երգ
+spontaneous	սպոնտան
+story	պատմվածք
+translated	թարգմանված
+unique	միանշանակ
+wikipedia	Վիկիպեդիա
+written	գրավոր

@@ -1,0 +1,6 @@
+original	բնագիր
+cyrillic	կյուրեղագիր
+latin	լատինատառ
+IPA	ՄՀԱ
+corpus	կորպուսային
+dictionary	բառարանային

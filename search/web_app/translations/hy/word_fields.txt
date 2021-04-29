@@ -1,0 +1,12 @@
+trans_ru	թարգմանություն (RU)
+trans_en	թարգմանություն (EN)
+trans_de	թարգմանություն (DE)
+trans_fr	թարգմանություն (FR)
+lex2	բառույթ 2
+trans_ru2	թարգմանություն 2 (RU)
+trans_en2	թարգմանություն 2 (EN)
+trans_de2	թարգմանություն 2 (DE)
+trans_fr2	թարգմանություն 2 (FR)
+logogram	լոգոգրամ
+transcription	վերծանում
+segment	հատված

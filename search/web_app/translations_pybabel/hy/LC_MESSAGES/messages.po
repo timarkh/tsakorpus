@@ -1,7 +1,7 @@
-# English translations for Tsakorpus.
-# Copyright (C) 2017-2021 Timofey Arkhangelskiy
+# Eastern Armenian translations for Tsakorpus.
+# Copyright (C) 2021 Victoria Khurshudyan
 # This file is distributed under the same license as the Tsakorpus project.
-# Timofey Arkhangelskiy <timarkh@gmail.com>, 2017-2021.
+# Victoria Khurshudyan <victoria.khurshudyan@inalco.fr>, 2021.
 #
 msgid ""
 msgstr ""
@@ -10,8 +10,8 @@ msgstr ""
 "POT-Creation-Date: 2021-04-20 16:59+0200\n"
 "PO-Revision-Date: 2017-09-20 17:03+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: en\n"
-"Language-Team: en <LL@li.org>\n"
+"Language: hy\n"
+"Language-Team: hy <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -20,60 +20,60 @@ msgstr ""
 
 #: templates/index.html:4
 msgid "Corpus search page"
-msgstr "Corpus search page"
+msgstr "Որոնում"
 
 #: templates/index.html:19 templates/index/query_area.html:54
 msgid "more_fields"
-msgstr "more fields"
+msgstr "ընդլայնել"
 
 #: templates/index.html:20
 msgid "fewer_fields"
-msgstr "fewer fields"
+msgstr "թաքցնել"
 
 #: templates/index.html:21
 msgid "add_distance"
-msgstr "add&nbsp;distance"
+msgstr "ընդլայնել&nbsp;հեռավորություն"
 
 #: templates/index.html:22
 msgid "remove_word"
-msgstr "remove&nbsp;word"
+msgstr "ջնջել&nbsp;բառ"
 
 #: templates/index.html:23
 msgid "Distance to word #"
-msgstr "Distance to word #"
+msgstr "Հեռավորություն մինչև # բառ"
 
 #: templates/index.html:24
 msgid "from "
-msgstr "from "
+msgstr "-ից "
 
 #: templates/index.html:25
 msgid "to "
-msgstr "to "
+msgstr "մինչև "
 
 #: templates/index.html:26
 msgid "Select combinations of tags"
-msgstr "Select combinations of tags"
+msgstr "Ընտրել պիտակների համակցում"
 
 #: templates/index.html:27
 msgid "Select glosses"
-msgstr "Select glosses"
+msgstr "Ընտրել գլոսսաներ"
 
 #: templates/index.html:28
 msgid "the query"
-msgstr "the query"
+msgstr "հարցում"
 
 #: templates/index.html:29 templates/modals/subcorpus_selection.html:90
 #: templates/modals/word_stats.html:55
 msgid "Nothing found."
-msgstr "Nothing found."
+msgstr "Ոչինչ չգտնվեց։"
 
 #: templates/index.html:30
 msgid "Query word"
-msgstr "Query word"
+msgstr "Բառի հարցում"
 
 #: templates/index.html:67
 msgid "Sorry, the server is experiencing technical issues. Please try again later."
-msgstr "Sorry, the server is experiencing technical issues. Please try again later."
+msgstr "Ներողություն, ժամանակվոր տեխնիկական խնդիրների պատճառով սերվերն անհասանելի է։ Խնդրվում քիչ ավելի ուշ կրկին փորձել։"
 
 #: templates/index.html:68 templates/index/hidden_elements.html:12
 #: templates/index/hidden_elements.html:30
@@ -89,101 +89,101 @@ msgstr "Sorry, the server is experiencing technical issues. Please try again lat
 #: templates/modals/subcorpus_selection.html:6
 #: templates/modals/word_stats.html:6
 msgid "Close"
-msgstr "Close"
+msgstr "Փակել"
 
 #: templates/index/common_additional_search_fields.html:23
 msgid "Analyses: "
-msgstr "Analyses: "
+msgstr "Վերլուծություններ՝ "
 
 #: templates/index/common_additional_search_fields.html:24
 msgid "any number of analyses"
-msgstr "any number of analyses"
+msgstr "ցանկացած քանակի"
 
 #: templates/index/common_additional_search_fields.html:26
 msgid "only ambiguous"
-msgstr "only ambiguous"
+msgstr "միայն համանուն"
 
 #: templates/index/common_additional_search_fields.html:27
 msgid "only non-ambiguous"
-msgstr "only non-ambiguous"
+msgstr "միայն ոչ համանուն"
 
 #: templates/index/common_additional_search_fields.html:28
 #: templates/index/common_additional_search_fields.html:30
 msgid "only with analysis"
-msgstr "only with analysis"
+msgstr "միայն վերլուծված"
 
 #: templates/index/common_additional_search_fields.html:32
 msgid "only without analysis"
-msgstr "only without analysis"
+msgstr "միայն չվերլուծված"
 
 #: templates/index/common_additional_search_fields.html:34
 msgid "Position in sentence: "
-msgstr "Position in sentence: "
+msgstr "Դիրքը նախադասության մեջ՝ "
 
 #: templates/index/corpus_header.html:9
 msgid "Corpus name"
-msgstr "Corpus name"
+msgstr "Կորպուսի անվանումը"
 
 #: templates/index/corpus_header.html:25
 #: templates/index/hidden_elements.html:72
 msgid "How to cite"
-msgstr "How to cite the corpus"
+msgstr "Ինչպես մեջբերել կորպուսը"
 
 #: templates/index/corpus_header.html:28 templates/index/greeting_en.html:9
 #: templates/index/greeting_ru.html:9
 msgid "Show help"
-msgstr "Show help"
+msgstr "Ուղեցույց"
 
 #: templates/index/greeting_en.html:5 templates/index/greeting_ru.html:5
 #: templates/index/query_area.html:70
 msgid "Search sentences"
-msgstr "Search sentences"
+msgstr "Նախադասությունների որոնում"
 
 #: templates/index/greeting_en.html:6 templates/index/greeting_ru.html:6
 #: templates/index/query_area.html:71
 msgid "Search words"
-msgstr "Search words"
+msgstr "Բառերի /"
 
 #: templates/index/greeting_en.html:6 templates/index/greeting_ru.html:6
 #: templates/index/query_area.html:72
 msgid "Search lemmata"
-msgstr "/ lemmata"
+msgstr " բառույթի որոնում"
 
 #: templates/index/hidden_elements.html:19
 msgid "Cancel"
-msgstr "Cancel"
+msgstr "Չեղարկել"
 
 #: templates/index/hidden_elements.html:29
 msgid "Help"
-msgstr "Help"
+msgstr "Ուղեցույց"
 
 #: templates/index/hidden_elements.html:43
 msgid "Dictionary_header"
-msgstr "Dictionary"
+msgstr "Բառարան"
 
 #: templates/index/hidden_elements.html:57
 msgid "Metadata_header"
-msgstr "Metadata"
+msgstr "Մետատեքստային տվյալներ"
 
 #: templates/index/progress.html:6
 msgid "Max seconds left: "
-msgstr "Max seconds left: "
+msgstr "Մնում է (առավելագույնը)՝ վայրկյան"
 
 #: templates/index/query_area.html:8
 msgid "Options"
-msgstr "Options"
+msgstr "Չափանիշներ"
 
 #: templates/index/query_area.html:9 templates/modals/query_history.html:5
 msgid "Query history"
-msgstr "Query history"
+msgstr "Հարցման պատմություն"
 
 #: templates/index/query_area.html:11
 msgid "Show dictionary"
-msgstr "Show dictionary"
+msgstr "Ցույց տալ բառարանը"
 
 #: templates/index/query_area.html:19
 msgid "Word_header"
-msgstr "Word"
+msgstr "Բառ"
 
 #: templates/index/query_area.html:19
 msgid "Number_sign"
@@ -191,374 +191,370 @@ msgstr "#"
 
 #: templates/index/query_area.html:20
 msgid "Word:"
-msgstr "Word:"
+msgstr "Բառ՝"
 
 #: templates/index/query_area.html:21
 msgid "Lemma:"
-msgstr "Lemma:"
+msgstr "Բառույթ՝"
 
 #: templates/index/query_area.html:22
 msgid "Grammar:"
-msgstr "Grammar:"
+msgstr "Քերականություն՝"
 
 #: templates/index/query_area.html:26
 msgid "Gloss:"
-msgstr "Gloss:"
+msgstr "Գլոսսաներ՝"
 
 #: templates/index/query_area.html:31
 #: templates/modals/subcorpus_selection.html:56
 msgid "Language/tier:"
-msgstr "Language/tier:"
+msgstr "Լեզու/շերտ՝"
 
 #: templates/index/query_area.html:36
 #: templates/modals/subcorpus_selection.html:58
 msgid "langname_all"
-msgstr "all"
+msgstr "ցանկացած"
 
 #: templates/index/query_area.html:49
 msgid "negative_query"
-msgstr "negative&nbsp;query"
+msgstr "բացասական&nbsp;հարցում"
 
 #: templates/index/query_area.html:51
 msgid "add_word"
-msgstr "add word"
+msgstr "ավելացնել բառ"
 
 #: templates/index/query_area.html:61
 msgid "Full-text search:"
-msgstr "Full-text search:"
+msgstr "Ամբողջական տեքստի որոնում՝"
 
 #: templates/index/query_area.html:63
 msgid "Precise match"
-msgstr "Precise match"
+msgstr "Ճշգրիտ համապատասխանում"
 
 #: templates/index/query_area.html:73
 msgid "Words statistics"
-msgstr "Words statistics"
+msgstr "Վիճակագրություն ըստ բառաձևի"
 
 #: templates/index/query_area.html:75
 #: templates/modals/subcorpus_selection.html:5
 msgid "Select subcorpus"
-msgstr "Select subcorpus"
+msgstr "Ընտրել ենթակորպուս"
 
 #: templates/index/query_area.html:77
 msgid "Share this query"
-msgstr "Share this query"
+msgstr "Ուղարկել հարցումը"
 
 #: templates/index/query_area.html:78
 msgid "Load external query"
-msgstr "Load external query"
+msgstr "Բեռնել արտաքին հարցում"
 
 #: templates/index/query_area.html:97
 msgid "Back to search"
-msgstr "Back to search"
+msgstr "Վերադառնալ որոնման"
 
 #: templates/index/results_area.html:10
 msgid "Click on an example to see video."
-msgstr "Click on an example to see video."
-
-#: templates/index/results_area.html:10
-msgid "Click on an example to listen."
-msgstr "Click on an example to listen."
+msgstr "Սեղմեցեք օրինակի վրա այն լսելու համար։"
 
 #: templates/modals/display_settings.html:5
 msgid "Additional search and display options"
-msgstr "Additional search and display options"
+msgstr "Որոնման և արտածման լրացուցիչ չափանիշներ"
 
 #: templates/modals/display_settings.html:12
 msgid "Results per page:"
-msgstr "Results per page:"
+msgstr "Արդյունքների քանակը մեկ էջում՝"
 
 #: templates/modals/display_settings.html:16
 msgid "Sorting:"
-msgstr "Sorting:"
+msgstr "Տեսակավորել ըստ՝"
 
 #: templates/modals/display_settings.html:18
 msgid "random"
-msgstr "random"
+msgstr "պատահական"
 
 #: templates/modals/display_settings.html:19
 msgid "by word (word queries)"
-msgstr "by word (word queries)"
+msgstr "բառաձևի (բառի հարցում)"
 
 #: templates/modals/display_settings.html:20
 msgid "by lemma (word queries)"
-msgstr "by lemma (word queries)"
+msgstr "բառույթի (բառի հարցում)"
 
 #: templates/modals/display_settings.html:21
 msgid "by frequency"
-msgstr "by frequency"
+msgstr "հաճախականության"
 
 #: templates/modals/display_settings.html:23
 msgid "by year (decreasing; sentence queries)"
-msgstr "by year (decreasing; sentence queries)"
+msgstr "տարեթվի (նվազող, նախադասության հարցում)"
 
 #: templates/modals/display_settings.html:26
 msgid "no sorting"
-msgstr "no sorting"
+msgstr "չտեսակավորել"
 
 #: templates/modals/display_settings.html:32
 msgid "Word distance requirements are strict"
-msgstr "Word distance requirements are strict"
+msgstr "Բառերի միջև հեռավորությունը միայն ինչպես հարցման մեջ"
 
 #: templates/modals/display_settings.html:37
 msgid "Viewing mode:"
-msgstr "View:"
+msgstr "Արտածում՝"
 
 #: templates/modals/display_settings.html:39
 msgid "view_standard"
-msgstr "standard"
+msgstr "հասարակ"
 
 #: templates/modals/display_settings.html:40
 msgid "view_glossed"
-msgstr "glossed"
+msgstr "վերլուծված"
 
 #: templates/modals/display_settings.html:45
 msgid "Transliteration: "
-msgstr "Transliteration: "
+msgstr "Տառադարձում՝ "
 
 #: templates/modals/display_settings.html:55
 msgid "Character input method: "
-msgstr "Character input method: "
+msgstr "Գրանշանների մուտքագրման ձևը՝ "
 
 #: templates/modals/display_settings.html:65
 msgid "Annotation layers in glossed mode:"
-msgstr "Annotation layers in glossed mode:"
+msgstr "Վերլուծության շերտերը գլոսսաներով՝"
 
 #: templates/modals/display_settings.html:68
 #: templates/modals/query_history.html:18
 msgid "Lemma"
-msgstr "Lemma"
+msgstr "Բառույթ"
 
 #: templates/modals/display_settings.html:72
 #: templates/modals/query_history.html:19
 msgid "Grammar"
-msgstr "Grammar"
+msgstr "Քերականություն"
 
 #: templates/modals/display_settings.html:77
 msgid "Gloss"
-msgstr "Gloss"
+msgstr "Գլոսսա"
 
 #: templates/modals/display_settings.html:82
 msgid "Additional fields"
-msgstr "Additional fields"
+msgstr "Լրացուցիչ տողեր"
 
 #: templates/modals/query_history.html:10
 msgid "Click on"
-msgstr "Click on"
+msgstr "Սեղմել"
 
 #: templates/modals/query_history.html:10
 #: templates/modals/query_history.html:23
 msgid "Repeat query"
-msgstr "Repeat query"
+msgstr "Կրկնել հարցումը"
 
 #: templates/modals/query_history.html:10
 msgid "to repeat a query."
-msgstr "to repeat a query."
+msgstr "հարցումը կրկնելու համար։"
 
 #: templates/modals/query_history.html:13
 msgid "You have not made any queries yet."
-msgstr "You have not made any queries yet."
+msgstr "Դուք առայժմ ոչինչ չեք որոնել։"
 
 #: templates/modals/query_history.html:17
 msgid "Word"
-msgstr "Word"
+msgstr "Բառաձև"
 
 #: templates/modals/query_history.html:20
 msgid "Subcorpus"
-msgstr "Subcorpus"
+msgstr "Ենթակորպուս"
 
 #: templates/modals/query_history.html:21
 msgid "Search type"
-msgstr "Search type"
+msgstr "Որոնման տեսակ"
 
 #: templates/modals/query_history.html:22
 msgid "Time"
-msgstr "Time"
+msgstr "Ժամանակ"
 
 #: templates/modals/query_share_load.html:5
 msgid "Share query"
-msgstr "Share query"
+msgstr "Ուղարկել հարցումը"
 
 #: templates/modals/query_share_load.html:9
 msgid "If you want to share your query with someone, send them the text you see below. The person who loads this query will see the same results in the same order, unless the corpus has been re-indexed."
-msgstr "If you want to share your query with someone, send them the text you see below. The person who loads this query will see the same results in the same order, unless the corpus has been re-indexed."
+msgstr "Եթե ուզում եք որևէ մեկին ուղարկել ձեր հարցումը, ուղարկեք ստորև նշված տեքստը։ Հարցումը բեռնողը կտեսնի նույն արդյունքները նույն կարգով, միայն եթե կորպուսը չի վերաինդեքսավորվել այդ ընթացքում։"
 
 #: templates/modals/query_share_load.html:19
 msgid "Load query"
-msgstr "Load query"
+msgstr "Բեռնել հարցում"
 
 #: templates/modals/query_share_load.html:23
 msgid "Here you can load a corpus query someone sent you. Please enter the query below:"
-msgstr "Here you can load a corpus query someone sent you. Please enter the query below:"
+msgstr "Այստեղ կարելի է բեռնել որևէ մեկի կողմից ուղարկված հարցում կորպուսում։ Խնդրվում է հարցումը մուտքագրել ստորև՝"
 
 #: templates/modals/select_gloss.html:5
 msgid "word boundary"
-msgstr "word boundary"
+msgstr "բառի սահման"
 
 #: templates/modals/select_gloss.html:6
 msgid "any number of morphs"
-msgstr "any number of morphs"
+msgstr "ձևույթների ցանկացած քանակ"
 
 #: templates/modals/select_gloss.html:7
 msgid "any positive number of morphs"
-msgstr "any positive number of morphs"
+msgstr "ձևույթների ցանկացած դրական թիվ"
 
 #: templates/modals/select_gloss.html:8
 msgid "any morph"
-msgstr "any morph"
+msgstr "ցանկացած ձևույթ"
 
 #: templates/modals/subcorpus_selection.html:10
 msgid "Specify parameters"
-msgstr "Specify parameters"
+msgstr "Մանրամասնել չափանիշներ"
 
 #: templates/modals/subcorpus_selection.html:11
 msgid "Choose from a list"
-msgstr "Choose from a list"
+msgstr "Ընտրել ցանկից"
 
 #: templates/modals/subcorpus_selection.html:12
 msgid "Subcorpus statistics"
-msgstr "Subcorpus statistics"
+msgstr "Ենթակորպուսի վիճակագրություն"
 
 #: templates/modals/subcorpus_selection.html:16
 msgid "Select parameters"
-msgstr "Select parameters"
+msgstr "Ընտրել չափանիչներ"
 
 #: templates/modals/subcorpus_selection.html:27
 msgid "lower bound"
-msgstr "lower bound"
+msgstr "ստորին սահման"
 
 #: templates/modals/subcorpus_selection.html:28
 msgid "upper bound"
-msgstr "upper bound"
+msgstr "վերին սահման"
 
 #: templates/modals/subcorpus_selection.html:42
 msgid "Select documents"
-msgstr "Select documents"
+msgstr "Ընտրել տեքստեր"
 
 #: templates/modals/subcorpus_selection.html:43
 msgid "(please wait for the document list to load)"
-msgstr "(please wait for the document list to load)"
+msgstr "(խնդրվում է սպասել տեքստերի ցանկի բեռնմանը)"
 
 #: templates/modals/subcorpus_selection.html:46
 msgid "Selected subcorpus composition"
-msgstr "Selected subcorpus composition"
+msgstr "Ընտրված ենթակորպուսի բովանդակություն"
 
 #: templates/modals/subcorpus_selection.html:47
 #: templates/modals/word_stats.html:16
 msgid "Parameter: "
-msgstr "Parameter: "
+msgstr "Չափանիչ՝ "
 
 #: templates/modals/subcorpus_selection.html:71
 #: templates/modals/word_stats.html:28
 msgid "A maximum of 25 metadata values can be displayed, sorted by the number of words in the relevant texts."
-msgstr "A maximum of 25 metadata values can be displayed, sorted by the number of words in the relevant texts."
+msgstr "Ցույց տրված արժեքների առավելագույն քանակը 25 է։ Նրանք տեսակավորված են ըստ համապատասխան տեքստերում գտնված բառաքանակի։"
 
 #: templates/modals/subcorpus_selection.html:73
 #: templates/modals/word_stats.html:81
 msgid "(please wait for the plot to load)"
-msgstr "(please wait for the plot to load)"
+msgstr "(սպասեցեք, գծապատկերը բեռնվում է)"
 
 #: templates/modals/subcorpus_selection.html:77
 msgid "Value"
-msgstr "Value"
+msgstr "Արժեք"
 
 #: templates/modals/subcorpus_selection.html:78
 msgid "Size in words"
-msgstr "Size in words"
+msgstr "Բառերի ծավալ"
 
 #: templates/modals/subcorpus_selection.html:79
 msgid "Number of documents"
-msgstr "Number of documents"
+msgstr "Տեքստերի քանակ"
 
 #: templates/modals/subcorpus_selection.html:87
 #: templates/modals/word_stats.html:52
 msgid "please wait for the plot to load"
-msgstr "please wait for the plot to load"
+msgstr "սպասեցեք, գծապատկերը բեռնվում է"
 
 #: templates/modals/subcorpus_selection.html:97
 msgid "Clear subcorpus"
-msgstr "Clear subcorpus"
+msgstr "Ջնջել ենթակորպուսը"
 
 #: templates/modals/word_stats.html:5
 msgid "Word statistics header"
-msgstr "Word statistics"
+msgstr "Վիճակագրություն ըստ բառաձևերի"
 
 #: templates/modals/word_stats.html:10
 msgid "By metadata values"
-msgstr "By metadata values"
+msgstr "Ըստ մետատեքստային տվյալների"
 
 #: templates/modals/word_stats.html:11
 msgid "By frequency"
-msgstr "By frequency"
+msgstr "Ըստ հաճախականության"
 
 #: templates/modals/word_stats.html:15
 msgid "Word statistics for "
-msgstr "Word statistics for "
+msgstr "Վիճակագրություն՝"
 
 #: templates/modals/word_stats.html:22
 msgid "Query type: "
-msgstr "Query type: "
+msgstr "Հարցման տեսակի համար"
 
 #: templates/modals/word_stats.html:24
 msgid "search the whole query"
-msgstr "search the whole query"
+msgstr "փնտրել ամբողջական հարցումը"
 
 #: templates/modals/word_stats.html:25
 msgid "compare words in the query"
-msgstr "compare words in the query"
+msgstr "համեմատել հարցման բառերը"
 
 #: templates/modals/word_stats.html:35
 msgid "Query word "
-msgstr "Query word "
+msgstr "Հարցման բառ "
 
 #: templates/modals/word_stats.html:40
 msgid "value"
-msgstr "value"
+msgstr "արժեք"
 
 #: templates/modals/word_stats.html:43
 msgid "frequency (ipm)"
-msgstr "frequency (ipm)"
+msgstr "հաճախականություն (մեկ միլիոն բառի վրա)"
 
 #: templates/modals/word_stats.html:44
 #, python-format
 msgid "90%% conf. int. "
-msgstr "90%% conf. int. "
+msgstr "90%% վստահության միջակայք "
 
 #: templates/modals/word_stats.html:59
 msgid "Distribution by frequency rank"
-msgstr "Distribution by frequency rank"
+msgstr "Բառերի բաշխումն ըստ հաճախականության կարգի"
 
 #: templates/modals/word_stats.html:60
 msgid "Explanation for frequency distributions"
-msgstr "<p>The plot below works as follows. On the <i>x</i> axis, you see frequency ranks, i.e. positions in the full list of all word forms / lemmata of the corpus, ordered by decreasing frequency. If multiple words/lemmata have the same frequency, they get the same rank equal to the average of their positions. For each frequency rank <i>r</i>, <strong>the plot shows the proportion of words/lemmata that conform to your query (each word counts only once) among all words with frequency rank less or equal to <i>r</i></strong> on the <i>y</i> axis. The rightmost point, therefore, shows the total proportion of such words/lemmata among all types (different words) in the corpus. In the case of lemmata, all lemmata that have at least one word form conforming to the query are counted.</p><p>The subcorpus constraints and all words in the query, except the first one, are not taken into account here.</p>"
+msgstr "<p>Ստորև բերված գծապատկերը կազմված է հետևյալ կերպ։ <i>x</i>առանցքի վրա տեղադրված են հաճախականության կարգերը, այսինքն՝ դիրքերը ըստ կորպուսի բոլոր բառաձևերի / բառույթների ամբողջական ցանկի մեջ, որոնք դասավորված են ըստ նվազող հաճախականության։ Եթե մեկից ավելի բառաձևեր / բառույթներ ունեն նույն հաճախականությունը, նրանք ստանում են նույն կարգը, որը հավասար է նրանց դիրքերի միջինին։ Յուրաքանչյուր հաճախականության կարգի համար <i>r</i>, <strong>գծապատկերը ցույց է տալիս հարցմանը համապատասխանող բառաձևերի / բառույթների չափաբաժինը  (յուրաքանչյուր բառաձև հաշվի է առնվում միայն մեկ անգամ) բոլոր բառաձևերի մեջ, որոնց հաճախականության կարգը նվազ կամ հավասար է <i>r</i></strong> <i>y</i> առանցքի վրա։ Մասնավորապես գծապատկերի ամենաջ մասում գտնվող կետը ցույց է տալիս նման բառաձևերի / բառույթների ընդհանուր չափաբաժինը բոլոր տեսակների մեջ (տարբեր բառաձևեր) կորպուսում։ Բառույթների որոնման դեպքում հաշվի են առնվում բոլոր բառույթները, որոնք ունեն հարցմանը համապատասխանող առնվազն մեկ բառաձև։  </p><p>Ենթակորպուսի սահմանափակումները և հարցման բոլոր բառաձևերը, բացառությամբ առաջինի, այստեղ հաշվի են առնվում։</p>"
 
 #: templates/modals/word_stats.html:62
 msgid "words"
-msgstr "words"
+msgstr "բառաձևեր"
 
 #: templates/modals/word_stats.html:63
 msgid "lemmata"
-msgstr "lemmata"
+msgstr "բառույթներ"
 
 #: templates/modals/word_stats.html:65
 msgid "Scale of the x axis: "
-msgstr "Scale of the x axis: "
+msgstr "x առանցքի սանդղակ՝ "
 
 #: templates/modals/word_stats.html:67
 msgid "linear"
-msgstr "linear"
+msgstr "գծային"
 
 #: templates/modals/word_stats.html:68
 msgid "logarithmic"
-msgstr "logarithmic"
+msgstr "լոգարիթմական"
 
 #: templates/modals/word_stats.html:70
 msgid "Max y: "
-msgstr "Max y: "
+msgstr "Առավելագույնը y՝ "
 
 #: templates/modals/word_stats.html:72
 msgid "as in data"
-msgstr "as in data"
+msgstr "ինչպես տվյալներում"
 
 #: templates/modals/word_stats.html:73
 #, python-format
@@ -598,715 +594,712 @@ msgstr "0.1%%"
 #: templates/search_results/lemma_table_row.html:16
 #: templates/search_results/word_table_row.html:20
 msgid "Search in corpus"
-msgstr "Search in corpus"
+msgstr "Որոնում"
 
 #: templates/search_results/lemma_table_row.html:17
 #: templates/search_results/word_table_row.html:21
 msgid "Show statistics"
-msgstr "Show statistics"
+msgstr "Ցույց տալ վիճակագրությունը"
 
 #: templates/search_results/result_docs.html:1
 msgid "Filter result:"
-msgstr "Filter result:"
+msgstr "Արդյունքները ֆիլտրել՝"
 
 #: templates/search_results/result_docs.html:2
 msgid "document with"
 msgid_plural "documents with"
 msgstr[0] "document with"
-msgstr[1] "documents with"
+msgstr[1] "տեքստ, որը պարունակում է"
 
 #: templates/search_results/result_docs.html:3
 msgid "word found,"
 msgid_plural "words found,"
 msgstr[0] "word found,"
-msgstr[1] "words found,"
+msgstr[1] "գտնված բառեր,"
 
 #: templates/search_results/result_docs.html:4
 msgid "of the entire corpus."
-msgstr "of the entire corpus."
+msgstr "ամբողջ կորպուսից։"
 
 #: templates/search_results/result_sentences.html:2
 #: templates/search_results/result_words.html:3
 msgid "Search result:"
 msgid_plural "Search result:"
-msgstr[0] "Search result:"
-msgstr[1] "Search result:"
+msgstr[0] "Որոնման արդյունքներ. գտնվել է՝"
+msgstr[1] "Որոնման արդյունքներ. գտնվել է՝"
 
 #: templates/search_results/result_sentences.html:3
 msgid "occurrence"
 msgid_plural "occurrences"
-msgstr[0] "occurrence"
-msgstr[1] "occurrences"
+msgstr[0] "բառաձև"
+msgstr[1] "բառաձև"
 
 #: templates/search_results/result_sentences.html:4
 msgid "sentence found in approximately"
 msgid_plural "sentences found in approximately"
-msgstr[0] "sentence found in approximately"
-msgstr[1] "sentences found in approximately"
+msgstr[0] "գտնված նախադասություն մոտավորապես"
+msgstr[1] "գտնված նախադասություն մոտավորապես"
 
 #: templates/search_results/result_sentences.html:5
 msgid "in_document"
 msgid_plural "in_documents"
-msgstr[0] "document"
-msgstr[1] "documents"
+msgstr[0] "տեքստի մեջ"
+msgstr[1] "տեքստի մեջ"
 
 #: templates/search_results/result_sentences.html:9
 #: templates/search_results/result_words.html:18
 msgid "The search was not finished due to the query timeout. You only see partial results."
-msgstr "The search was not finished due to the query timeout. You only see partial results."
+msgstr "Որոնումն անավարտ է, քանի որ հարցման ժամանակը սպառվել է։ Արդյունքները ցուցադրված են մասնակի։"
 
 #: templates/search_results/result_sentences.html:19
 msgid "Number of results found exceeds the maximum number of pages you can view."
-msgstr "Number of results found exceeds the maximum number of pages you can view."
+msgstr "Գտնված արդյունքների քանակը գերազանցում է առավելագույն թույլատրելի էջերի քանակին։"
 
 #: templates/search_results/result_sentences.html:24
 #: templates/search_results/result_words.html:28
 msgid "You are searching in a subcorpus."
-msgstr "You are searching in a subcorpus."
+msgstr "Դուք որոնում եք ենթակորպուսի մեջ։"
 
 #: templates/search_results/result_sentences.html:45
 msgid "Copy example to clipboard"
-msgstr "Copy example to clipboard"
+msgstr "Ընդօրինակել օրինակը"
 
 #: templates/search_results/result_sentences.html:46
 msgid "Expand context"
-msgstr "Expand context"
+msgstr "Ընդլայնել համատեքստը"
 
 #: templates/search_results/result_sentences.html:60
 msgid "download as CSV"
-msgstr "download as CSV"
+msgstr "ներբեռնել որպես CSV"
 
 #: templates/search_results/result_sentences.html:61
 msgid "download as XLSX"
-msgstr "download as XLSX"
+msgstr "ներբեռնել որպես XLSX"
 
 #: templates/search_results/result_words.html:5
 msgid "unique word"
 msgid_plural "different words"
-msgstr[0] "unique word"
-msgstr[1] "different words"
+msgstr[0] "եզակի բառաձև"
+msgstr[1] "տարբեր բառաձևեր"
 
 #: templates/search_results/result_words.html:7
 msgid "unique lemma"
 msgid_plural "different lemmata"
-msgstr[0] "unique lemma"
-msgstr[1] "different lemmata"
+msgstr[0] "եզակի բառույթ"
+msgstr[1] "տարբեր բառույթներ"
 
 #: templates/search_results/result_words.html:9
 msgid "in approximately"
-msgstr "in approximately"
+msgstr "մոտավորապես"
 
 #: templates/search_results/result_words.html:9
 msgid "document found,"
 msgid_plural "documents found,"
-msgstr[0] "document found,"
-msgstr[1] "documents found,"
+msgstr[0] "տեքստի մեջ,"
+msgstr[1] "տեքստի մեջ,"
 
 #: templates/search_results/result_words.html:11
 msgid "total frequency:"
-msgstr "total frequency:"
+msgstr "ընդհանուր հաճախականություն՝"
 
 #: templates/search_results/result_words.html:13
 msgid "total frequency of found word forms:"
-msgstr "total frequency of found word forms:"
+msgstr "բառաձևերի ընդհանուր հաճախականություն՝"
 
 #: templates/search_results/result_words.html:34
 msgid "word_th_word"
-msgstr "word"
+msgstr "բառ"
 
 #: templates/search_results/result_words.html:34
 msgid "word_th_lemma"
-msgstr "lemma"
+msgstr "բառույթ"
 
 #: templates/search_results/result_words.html:36
 msgid "word_th_gr"
-msgstr "grammar"
+msgstr "քերականություն"
 
 #: templates/search_results/result_words.html:41
 msgid "word_th_frequency"
-msgstr "freq"
+msgstr "հաճախականություն"
 
 #: templates/search_results/result_words.html:43
 msgid "word_th_freq. rank / quantile"
-msgstr "freq. rank /<br>quantile"
+msgstr "հաճախականության կարգ / քվանտիլ"
 
 #: templates/search_results/result_words.html:46
 msgid "word_th_# forms"
-msgstr "# forms"
+msgstr "բառաձևերի քանակ"
 
 #: templates/search_results/result_words.html:48
 msgid "word_th_# sentences"
-msgstr "# sentences"
+msgstr "նախադասությունների քանակ"
 
 #: templates/search_results/result_words.html:49
 msgid "word_th_# documents"
-msgstr "# documents"
+msgstr "տեքստերի քանակ"
 
 #: templates/search_results/result_words.html:50
 msgid "word_th_search in corpus"
-msgstr "search"
+msgstr "որոնել"
 
 #: templates/search_results/result_words.html:51
 msgid "word_th_word stats"
-msgstr "statistics"
+msgstr "վիճակագրություն"
 
 #: templates/search_results/sentence_header.html:20
 msgid "Full text (opens in a new tab)"
-msgstr "Full text (opens in a new tab)"
+msgstr "Ամբողջական տեքստ (կբացվի նոր էջում)"
 
 
 msgid "corpus_title"
-msgstr "(INSERT CORPUS TITLE IN translations/en/corpus-specific.txt)"
+msgstr "(Մուտքագրեք կորպուսի անվանումն այստեղ՝ translations/en/corpus-specific.txt)"
 
 msgid "inputmethod_normal"
-msgstr "normal"
+msgstr "հասարակ"
 
 msgid "inputmethod_simplified"
-msgstr "simplified"
+msgstr "պարզեցված"
 
 msgid "inputmethod_strict"
-msgstr "strict"
+msgstr "ճշգրիտ"
 
 msgid "langname_abaza"
-msgstr "Abaza"
+msgstr "աբազերեն"
 
 msgid "langname_acrhi"
-msgstr "Archi"
+msgstr "արչի"
 
 msgid "langname_adyghe"
-msgstr "Adyghe"
+msgstr "ադըղեերեն"
 
 msgid "langname_albanian"
-msgstr "Albanian"
+msgstr "ալբաներեն"
 
 msgid "langname_all"
 msgstr "all"
 
 msgid "langname_armenian"
-msgstr "Armenian"
+msgstr "հայերեն"
 
 msgid "langname_armenian_translit"
-msgstr "Armenian (translit.)"
+msgstr "հայերեն (տառադարձված)"
 
 msgid "langname_bashkir"
-msgstr "Bashkir"
+msgstr "բաշկիրերեն"
 
 msgid "langname_belarusian"
-msgstr "Belarusian"
+msgstr "բելառուսերեն"
 
 msgid "langname_beserman"
-msgstr "Beserman"
+msgstr "բեսերմաներեն"
 
 msgid "langname_bulgarian"
-msgstr "Bulgarian"
+msgstr "բուլղարերեն"
 
 msgid "langname_buryat"
-msgstr "Buryat"
+msgstr "բուրյաթերեն"
 
 msgid "langname_chinese"
-msgstr "Chinese"
+msgstr "չինարեն"
 
 msgid "langname_chuvash"
-msgstr "Chuvash"
+msgstr "չուվաշերեն"
 
 msgid "langname_comments"
-msgstr "comments"
+msgstr "դիտողություններ"
 
 msgid "langname_dargwa"
-msgstr "Dargwa"
+msgstr "դարգիներեն"
 
 msgid "langname_english"
-msgstr "English"
+msgstr "անգլերեն"
 
 msgid "langname_english_note"
-msgstr "English (note)"
+msgstr "անգլերեն (դիտարկումներ)"
 
 msgid "langname_erzya"
-msgstr "Erzya"
+msgstr "էրզյաներեն"
 
 msgid "langname_estonian"
-msgstr "Estonian"
+msgstr "էստոներեն"
 
 msgid "langname_finnish"
-msgstr "Finnish"
+msgstr "ֆիններեն"
 
 msgid "langname_french"
-msgstr "French"
+msgstr "ֆրանսերեն"
 
 msgid "langname_german"
-msgstr "German"
+msgstr "գերմաներեն"
 
 msgid "langname_greek"
-msgstr "Greek"
+msgstr "հունարեն"
 
 msgid "langname_hill_mari"
-msgstr "Hill Mari"
+msgstr "լեռնամարիերեն"
 
 msgid "langname_hungarian"
-msgstr "Hungarian"
+msgstr "հունգարերեն"
 
 msgid "langname_id"
 msgstr "ID"
 
 msgid "langname_italian"
-msgstr "Italian"
+msgstr "իտալերեն"
 
 msgid "langname_kalmyk"
-msgstr "Kalmyk"
+msgstr "կալմիկերեն"
 
 msgid "langname_kamas"
-msgstr "Kamas"
+msgstr "կամասերեն"
 
 msgid "langname_kazakh"
-msgstr "Kazakh"
+msgstr "ղազախերեն"
 
 msgid "langname_komi"
-msgstr "Komi"
+msgstr "կոմիերեն"
 
 msgid "langname_komi-zyrian"
-msgstr "Komi-Zyrian"
+msgstr "կոմի-զիրյաներեն"
 
 msgid "langname_komi_permyak"
-msgstr "Komi-Permyak"
+msgstr "կոմի-պերմյակերեն"
 
 msgid "langname_komi_zyrian"
-msgstr "Komi-Zyrian"
+msgstr "կոմի-զիրյաներեն"
 
 msgid "langname_latvian"
-msgstr "Latvian"
+msgstr "լատիշերեն"
 
 msgid "langname_lithuanian"
-msgstr "Lithuanian"
+msgstr "լիտվերեն"
 
 msgid "langname_meadow_mari"
-msgstr "Meadow Mari"
+msgstr "մարգագետնային մարիերեն"
 
 msgid "langname_moksha"
-msgstr "Moksha"
+msgstr "մոկշաերեն"
 
 msgid "langname_negative"
-msgstr "negative"
+msgstr "բացասական"
 
 msgid "langname_nganasan"
-msgstr "Nganasan"
+msgstr "նգանասաներեն"
 
 msgid "langname_note"
-msgstr "notes"
+msgstr "դիտարկումներ"
 
 msgid "langname_notes"
-msgstr "notes"
+msgstr "դիտարկումներ"
 
 msgid "langname_ossetic"
-msgstr "Ossetic"
+msgstr "օսերեն"
 
 msgid "langname_ossetic_digor"
-msgstr "Digor Ossetic"
+msgstr "դիգորերեն"
 
 msgid "langname_ossetic_iron"
-msgstr "Iron Ossetic"
+msgstr "իրոներեն"
 
 msgid "langname_polish"
-msgstr "Polish"
+msgstr "լեհերեն"
 
 msgid "langname_positive"
-msgstr "positive"
+msgstr "դրական"
 
 msgid "langname_ref"
 msgstr "ID"
 
 msgid "langname_romani"
-msgstr "Romani"
+msgstr "գնչուերեն"
 
 msgid "langname_russian"
-msgstr "Russian"
+msgstr "ռուսերեն"
 
 msgid "langname_selkup"
-msgstr "Selkup"
+msgstr "սելկուպերեն"
 
 msgid "langname_spanish"
-msgstr "Spanish"
+msgstr "իսպաներեն"
 
 msgid "langname_swedish"
-msgstr "Swedish"
+msgstr "շվեդերեն"
 
 msgid "langname_tatar"
-msgstr "Tatar"
+msgstr "թաթարերեն"
 
 msgid "langname_tsakhur"
-msgstr "Tsakhur"
+msgstr "ցախուրերեն"
 
 msgid "langname_tsakonian"
-msgstr "Tsakonian"
+msgstr "ցակոներեն"
 
 msgid "langname_udmurt"
-msgstr "Udmurt"
+msgstr "ուդմուրտերեն"
 
 msgid "langname_ukrainian"
-msgstr "Ukrainian"
+msgstr "ուկրաիներեն"
 
 msgid "langname_undefined"
-msgstr "undefined"
+msgstr "անորոշ"
 
 msgid "langname_yakut"
-msgstr "Yakut"
+msgstr "յակուտերեն"
 
 msgid "langname_yiddish"
-msgstr "Yiddish"
+msgstr "իդիշ"
 
 msgid "metafield_account_type"
-msgstr "Account type"
+msgstr "Հաշվի տեսակ"
 
 msgid "metafield_account_type_post"
-msgstr "Account type (post-level)"
+msgstr "Հաշվի ենթատեսակ (պոստ)"
 
 msgid "metafield_age"
-msgstr "Age"
+msgstr "տարիք"
 
 msgid "metafield_annotators"
-msgstr "Annotators"
+msgstr "պիտակավորողներ"
 
 msgid "metafield_author"
-msgstr "Author"
+msgstr "հեղինակ"
 
 msgid "metafield_birth_place"
-msgstr "Place of birth"
+msgstr "ծննդավայր"
 
 msgid "metafield_birth_year"
-msgstr "Year of birth"
+msgstr "ծծնդյան տարեթիվ"
 
 msgid "metafield_birthplace"
-msgstr "Place of birth"
+msgstr "ծննդավայր"
 
 msgid "metafield_birthyear"
-msgstr "Year of birth"
+msgstr "ծծնդյան տարեթիվ"
 
 msgid "metafield_byear"
-msgstr "Year of birth"
+msgstr "ծծնդյան տարեթիվ"
 
 msgid "metafield_byear_post"
-msgstr "Birth year (post-level)"
+msgstr "ծծնդյան տարեթիվ (պոստ)"
 
 msgid "metafield_century"
-msgstr "Century"
+msgstr "դար"
 
 msgid "metafield_chronotop"
-msgstr "Chronotope"
+msgstr "գործողության վայրն ու ժամանակը"
 
 msgid "metafield_citation"
-msgstr "Citation"
+msgstr "մեջբերում"
 
 msgid "metafield_city"
-msgstr "City"
+msgstr "քաղաք"
 
 msgid "metafield_city_post"
-msgstr "Current place (post-level)"
+msgstr "բնակավայր (պոստ)"
 
 msgid "metafield_collector"
-msgstr "Collector"
+msgstr "հավաքող"
 
 msgid "metafield_country"
-msgstr "Country"
+msgstr "երկիր"
 
 msgid "metafield_date_trans"
-msgstr "Date of translation"
+msgstr "թարգմանության տարեթիվ"
 
 msgid "metafield_dialect"
-msgstr "Dialect"
+msgstr "բարբառ"
 
 msgid "metafield_gender"
-msgstr "Gender"
+msgstr "սեռ"
 
 msgid "metafield_genre"
-msgstr "Genre"
+msgstr "ժանր"
 
 msgid "metafield_genre_fi"
-msgstr "Genre of fiction"
+msgstr "գեղարվեստական ժանր"
 
 msgid "metafield_home_town"
-msgstr "Home town"
+msgstr "ծննդավայր"
 
 msgid "metafield_home_town_post"
-msgstr "Birth place (post-level)"
+msgstr "ծննդավայր (պոստ)"
 
 msgid "metafield_hometown"
-msgstr "Home town"
+msgstr "ծննդավայր (քաղաք)"
 
 msgid "metafield_issue"
-msgstr "Issue"
+msgstr "թողարկում"
 
 msgid "metafield_lang"
-msgstr "Original language"
+msgstr "բնագիր լեզու"
 
 msgid "metafield_lang_trans"
-msgstr "Language of translation"
+msgstr "թարգմանության լեզու"
 
 msgid "metafield_language"
-msgstr "Language"
+msgstr "լեզու"
 
 msgid "metafield_length"
-msgstr "Length"
+msgstr "երկարություն"
 
 msgid "metafield_line"
-msgstr "Line"
+msgstr "տող"
 
 msgid "metafield_linguist"
-msgstr "Linguist"
+msgstr "լեզվաբան"
 
 msgid "metafield_linguists"
-msgstr "Linguists"
+msgstr "լեզվաբաններ"
 
 msgid "metafield_live_place"
-msgstr "Place of living"
+msgstr "բնակավայր"
 
 msgid "metafield_liveplace"
-msgstr "Place of living"
+msgstr "բնակավայր"
 
 msgid "metafield_medium"
-msgstr "Medium"
+msgstr "լեզվակիր"
 
 msgid "metafield_occupation"
-msgstr "Occupation"
+msgstr "զբաղմունքի տեսակ"
 
 msgid "metafield_origin"
-msgstr "Place of origin"
+msgstr "ծննդավայր"
 
 msgid "metafield_orth"
-msgstr "Orthography"
+msgstr "ուղղագրություն"
 
 msgid "metafield_orthography"
-msgstr "Orthography"
+msgstr "ուղղագրություն"
 
 msgid "metafield_page"
-msgstr "Page"
+msgstr "էջ"
 
 msgid "metafield_place"
-msgstr "Place"
+msgstr "վայր"
 
 msgid "metafield_post_type"
-msgstr "Post type"
+msgstr "պոստի տեսակ"
 
 msgid "metafield_profession"
-msgstr "Profession"
+msgstr "մասնագիտություն"
 
 msgid "metafield_publication"
-msgstr "Publication"
+msgstr "հրատարակություն"
 
 msgid "metafield_published"
-msgstr "Published"
+msgstr "հրատարակված"
 
 msgid "metafield_region"
-msgstr "Region"
+msgstr "շրջան"
 
 msgid "metafield_sent_analyses"
-msgstr "Sentence analyzed"
+msgstr "նախադասության վերլուծություն"
 
 msgid "metafield_sex"
-msgstr "Sex"
+msgstr "սեռ"
 
 msgid "metafield_sex_post"
-msgstr "Sex (post-level)"
+msgstr "սեռ (պոստ)"
 
 msgid "metafield_speaker"
-msgstr "Speaker"
+msgstr "խոսող"
 
 msgid "metafield_speakers"
-msgstr "Speakers"
+msgstr "խոսողներ"
 
 msgid "metafield_sphere"
-msgstr "Sphere"
+msgstr "ոլորտ"
 
 msgid "metafield_style"
-msgstr "Style"
+msgstr "ոճ"
 
 msgid "metafield_subdialect"
-msgstr "Subdialect"
+msgstr "ենթաբարբառ"
 
 msgid "metafield_subject"
-msgstr "Subject"
+msgstr "առարկա"
 
 msgid "metafield_tagging"
-msgstr "Tagging"
+msgstr "պիտակավորում"
 
 msgid "metafield_title"
-msgstr "Title"
+msgstr "վերնագիր"
 
 msgid "metafield_title_en"
-msgstr "Title in English"
+msgstr "անգլերեն վերնագիր"
 
 msgid "metafield_title_ru"
-msgstr "Title in Russian"
+msgstr "ռուսերեն վերնագիր"
 
 msgid "metafield_topic"
-msgstr "Topic"
+msgstr "թեմա"
 
 msgid "metafield_translator"
-msgstr "Translator"
+msgstr "թարգմանիչ"
 
 msgid "metafield_type"
-msgstr "Type"
+msgstr "տեսակ"
 
 msgid "metafield_year"
-msgstr "Year"
+msgstr "տարի"
 
 msgid "metafield_year_birth"
-msgstr "Year of birth"
+msgstr "ծննդյան տարեթիվ"
 
 msgid "metafield_year_from"
-msgstr "Year: from"
+msgstr "տարի՝ -ից"
 
 msgid "metafield_year_post"
-msgstr "Year (post-level)"
+msgstr "տարի (պոստ)"
 
 msgid "metafield_year_publ"
-msgstr "Publication year"
+msgstr "հրատարակության տարեթիվ"
 
 msgid "metafield_year_to"
-msgstr "Year: to"
+msgstr "տարի՝ մինչև"
 
 msgid "metavalue_F"
-msgstr "F"
+msgstr "Ի"
 
 msgid "metavalue_M"
-msgstr "M"
+msgstr "Ա"
 
 msgid "metavalue_complete"
-msgstr "completely, but ambiguously"
+msgstr "ամբողջությամբ, բայց համանունությամբ"
 
 msgid "metavalue_dialogue"
-msgstr "dialogue"
+msgstr "երկխոսություն"
 
 msgid "metavalue_essay"
-msgstr "essay"
+msgstr "էսսե"
 
 msgid "metavalue_experiment"
-msgstr "experiment"
+msgstr "փորձ"
 
 msgid "metavalue_female"
-msgstr "female"
+msgstr "կին"
 
 msgid "metavalue_fiction"
-msgstr "fiction"
+msgstr "գեղարվեստական"
 
 msgid "metavalue_incomplete"
-msgstr "incompletely"
+msgstr "ոչ ամբողջովին"
 
 msgid "metavalue_interview"
-msgstr "interview"
+msgstr "հարցազրույց"
 
 msgid "metavalue_male"
-msgstr "male"
+msgstr "տղամարդ"
 
 msgid "metavalue_monologue"
-msgstr "monologue"
+msgstr "մենախոսություն"
 
 msgid "metavalue_movie"
-msgstr "movie"
+msgstr "ֆիլմ"
 
 msgid "metavalue_nonfiction"
-msgstr "non-fiction"
+msgstr "ոչգեղարվեստական"
 
 msgid "metavalue_novel"
-msgstr "novel"
+msgstr "վեպ"
 
 msgid "metavalue_oral"
-msgstr "oral"
+msgstr "բանավոր"
 
 msgid "metavalue_original"
-msgstr "original"
+msgstr "բնագիր"
 
 msgid "metavalue_poetry"
-msgstr "poetry"
+msgstr "բանաստեղծություն"
 
 msgid "metavalue_press"
-msgstr "press"
+msgstr "մամուլ"
 
 msgid "metavalue_prose"
-msgstr "prose"
+msgstr "արձակ"
 
 msgid "metavalue_public"
-msgstr "public"
+msgstr "հասարակական"
 
 msgid "metavalue_religion"
-msgstr "religion"
+msgstr "եկեղեցական"
 
 msgid "metavalue_science"
-msgstr "science"
+msgstr "գիտական"
 
 msgid "metavalue_song"
-msgstr "song"
+msgstr "երգ"
 
 msgid "metavalue_spontaneous"
-msgstr "spontaneous"
+msgstr "սպոնտան"
 
 msgid "metavalue_story"
-msgstr "story"
+msgstr "պատմվածք"
 
 msgid "metavalue_translated"
-msgstr "translated"
+msgstr "թարգմանված"
 
 msgid "metavalue_unique"
-msgstr "unambiguously"
+msgstr "միանշանակ"
 
 msgid "metavalue_wikipedia"
-msgstr "Wikipedia"
+msgstr "Վիկիպեդիա"
 
 msgid "metavalue_written"
-msgstr "written"
+msgstr "գրավոր"
 
 msgid "translitname_IPA"
-msgstr "IPA"
-
-msgid "translitname_UPA"
-msgstr "UPA"
+msgstr "ՄՀԱ"
 
 msgid "translitname_corpus"
-msgstr "corpus"
+msgstr "կորպուսային"
 
 msgid "translitname_cyrillic"
-msgstr "cyrillic"
+msgstr "կյուրեղագիր"
 
 msgid "translitname_dictionary"
-msgstr "dictionary"
+msgstr "բառարանային"
 
 msgid "translitname_latin"
-msgstr "latin"
+msgstr "լատինատառ"
 
 msgid "translitname_original"
-msgstr "original"
+msgstr "բնագիր"
 
 msgid "wordfield_lex2"
-msgstr "2nd lemma"
+msgstr "բառույթ 2"
 
 msgid "wordfield_logogram"
-msgstr "logogram"
+msgstr "լոգոգրամ"
 
 msgid "wordfield_segment"
-msgstr "segment"
+msgstr "հատված"
 
 msgid "wordfield_trans_de"
-msgstr "translation (DE)"
+msgstr "թարգմանություն (DE)"
 
 msgid "wordfield_trans_de2"
-msgstr "2nd transl. (DE)"
+msgstr "թարգմանություն 2 (DE)"
 
 msgid "wordfield_trans_en"
-msgstr "translation (EN)"
+msgstr "թարգմանություն (EN)"
 
 msgid "wordfield_trans_en2"
-msgstr "2nd transl. (EN)"
+msgstr "թարգմանություն 2 (EN)"
 
 msgid "wordfield_trans_fr"
-msgstr "translation (FR)"
+msgstr "թարգմանություն (FR)"
 
 msgid "wordfield_trans_fr2"
-msgstr "2nd transl. (FR)"
+msgstr "թարգմանություն 2 (FR)"
 
 msgid "wordfield_trans_ru"
-msgstr "translation (RU)"
+msgstr "թարգմանություն (RU)"
 
 msgid "wordfield_trans_ru2"
-msgstr "2nd transl. (RU)"
+msgstr "թարգմանություն 2 (RU)"
 
 msgid "wordfield_transcription"
-msgstr "transcription"
+msgstr "վերծանում"
 

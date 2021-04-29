@@ -1,0 +1,3 @@
+normal	հասարակ
+strict	ճշգրիտ
+simplified	պարզեցված

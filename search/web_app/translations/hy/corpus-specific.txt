@@ -1,0 +1,1 @@
+corpus_title	(Մուտքագրեք կորպուսի անվանումն այստեղ՝ translations/en/corpus-specific.txt)
