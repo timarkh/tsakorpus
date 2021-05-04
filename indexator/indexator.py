@@ -863,7 +863,7 @@ class Indexator:
         Drop the current database, if any, and load the entire corpus.
         """
         t1 = time.time()
-        self.compile_translations()
+        # self.compile_translations()
         indicesDeleted = self.delete_indices()
         if not indicesDeleted:
             return
