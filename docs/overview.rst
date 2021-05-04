@@ -74,6 +74,8 @@ In order to index a copus, you have to :doc:`adjust settings </configuration>` i
 
 After these preliminary steps, you have to launch ``indexator/indexator.py`` and wait until it reports that the corpus has been successfully indexed or that something went wrong. The indexator basically transfers the source JSON files to the database with minor technical additions. Besides, it calculates statistics such as word frequencies, which it also puts to the database. In the course of indexing, it stores all word types with their statistics in the memory, which can lead to huge memory consumption in the case of large corpora (>> 50 million tokens; see the subsection below).
 
+If you have lots of files and only want to test Tsakorpus on a small sample of them before putting it to production, you can set the ``sample_size`` parameter in :doc:`corpus.json </configuration>`.
+
 The indexator creates following elasticsearch indexes:
 
 - ``%corpus_name%.sentences`` -- main index: all sentences of the corpus;

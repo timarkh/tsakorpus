@@ -128,6 +128,8 @@ List of parameters
 
 - ``rtl_languages`` (list of strings) -- list of languages which use right-to-left writing direction. Defaults to empty list.
 
+- ``sample_size`` (real number between ``0`` and ``1``) -- if you only launch your corpus for testing purposes and do not want to index all source files, you can indicate the proportion of files you want to use. Files will be randomly selected at indexation time. E.g. if ``sample_size`` is set to ``0.1``, only about 10% of the source files will be indexed. Defaults to ``1``.
+
 - ``search_meta`` (dictionary) -- describes what should appear on different tabs of the "Select subcorpus" dialogue:
 
    - ``columns`` -- list with column-by-column description of what options should appear on the "Specify parameters" tab;
