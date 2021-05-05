@@ -50,7 +50,7 @@ If you have a corpus in one of several accepted formats, this is the typical pip
 
     - If you have multiple corpora, a separate Tsakorpus instance (i.e. Tsakorpus directory and apache config file) is needed for each of them.
     - You configure indexing and search by filling out a configuration page in the browser or editing ``/conf/corpus.json`` and copy the ``categories.json`` to ``/conf``.
-    - You manually adjust and/or add interface translations by editing ``messages.po`` files in language subdirectories of ``/search/web_app/translations`` (see :doc:`interface_languages`).
+    - You manually adjust and/or add interface translations by editing text files in language subdirectories of ``/search/web_app/translations`` (see :doc:`interface_languages`).
     - If you want to use custom transliteration for input or output, you have to edit the scripts in ``/search/transliterators`` and ``/search/web_app/transliteration.py`` (see :doc:`transliteration` and :doc:`input_methods`).
     - If you want to add virtual keyboard(s), you have to edit keyboard files in ``/search/web_app/static/keyboards`` (see :doc:`keyboards`).
     - If you have annotations that span over multiple words, you can define how they should be displayed with CSS styles in ``/search/web_app/static/css/span_styles.css`` (see :doc:`styles`).

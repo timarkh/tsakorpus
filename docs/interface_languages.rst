@@ -6,7 +6,8 @@ You can translate your interface into any languages you want. The user will be a
 - English (``en``);
 - Russian (``ru``);
 - Chinese (``zh``, partial);
-- Albanian (``sq``, partial).
+- Albanian (``sq``);
+- Eastern Armenian (``hy``).
 
 Configuring interface languages
 -------------------------------
