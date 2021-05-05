@@ -54,6 +54,7 @@ If you have a corpus in one of several accepted formats, this is the typical pip
     - If you want to use custom transliteration for input or output, you have to edit the scripts in ``/search/transliterators`` and ``/search/web_app/transliteration.py`` (see :doc:`transliteration` and :doc:`input_methods`).
     - If you want to add virtual keyboard(s), you have to edit keyboard files in ``/search/web_app/static/keyboards`` (see :doc:`keyboards`).
     - If you have annotations that span over multiple words, you can define how they should be displayed with CSS styles in ``/search/web_app/static/css/span_styles.css`` (see :doc:`styles`).
+    - If you want to add a header, a footer or custom css/js links to your search page, you can do that in ``/search/web_app/templates/header.html`` (the header), ``/search/web_app/templates/footer.html`` (the footer) and ``/search/web_app/templates/head_add.html`` (code that has to be added to the ``<head>`` element in ``index.html``). You can also edit ``/search/web_app/templates/index.html`` directly, but then it can be more difficult to update the platform in the future.
     - You put the JSON files to the appropriate folder inside ``/corpus``.
     - You run ``/indexator/indexator.py``.
     - If you are setting up the corpus for the first time, you set up apache/nginx/... configuration files, so that some URL resolves to your corpus, and switch it on.

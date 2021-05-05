@@ -8,6 +8,8 @@ Configuration files
 
 There are two configuration files you need before you launch your corpus: ``/conf/corpus.json`` and ``/conf/categories.json``. The latter describes tags and categories; you can find more :doc:`here </categories>`. This page describes ``corpus.json``.
 
+Note that in some cases, you may also want to change the default values of some Elasticsearch parameters (see below).
+
 Configuring your corpus
 -----------------------
 
@@ -165,3 +167,23 @@ List of parameters
 
 - ``year_sort_enabled`` (Boolean) -- whether the "sort by year" option is enabled in sentence search. Defaults to ``false``. If enabled, sentences can be sorted by the ``year_from`` field (or just ``year``, if there is no ``year_from``) of their document in the decreasing order. Only makes sense if all documents are dated.
 
+Elasticsearch configuration
+---------------------------
+
+In most cases, default settings will work just fine. However, there are several parameters that you may want to change. They deal with certain limitations set as safeguards against unexpectedly high memory use. You can add or change these parameters by creating `index templates <https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html>`_ and/or in ``elasticsearch.yml`` (``/etc/elasticsearch/elasticsearch.yml`` by default on Linux).
+
+- ``index.mapping.nested_objects.limit`` (defaults to 10000) -- the maximum number of `nested JSON objects <https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html>`_ that a single document can contain. If you have very large documents and indexation crashes because the number exceeds the limit, you can either split them into smaller parts or increase this parameter.
+
+- ``index.max_result_window`` (defaults to 10000) -- the maximum number of `hits <https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html>`_ you can retrieve. The default value means you cannot see search results pages past 1000 (which you usually don't need). If you change it, do not forget to change the ``max_hits_retrieve`` parameter in ``corpus.json`` as well.
+
+- `various search settings <https://www.elastic.co/guide/en/elasticsearch/reference/current/search-settings.html>`_ can be adjusted if you experience problems when making very complex queries.
+
+This is how you could change settings for all new indices (details may vary)::
+
+   curl -X PUT "localhost:9200/_settings?pretty" -H 'Content-Type: application/json' -d'
+   {
+       "index": {
+           "mapping.nested_objects.limit": 50000
+       }
+   }
+   '
