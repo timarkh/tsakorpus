@@ -37,18 +37,16 @@ class PrepareData:
         if 'wf_lowercase' in self.settings:
             wfLowercase = self.settings['wf_lowercase']
         self.wfAnalyzer = {
-            'analysis': {
-                'analyzer': {
-                    'wf_analyzer': {
-                        'type': 'pattern',
-                        'pattern': wfAnalyzerPatter,
-                        'lowercase': wfLowercase
-                    },
-                    'gloss_analyzer': {
-                        'type': 'pattern',
-                        'pattern': ' ',
-                        'lowercase': True
-                    }
+            'analyzer': {
+                'wf_analyzer': {
+                    'type': 'pattern',
+                    'pattern': wfAnalyzerPatter,
+                    'lowercase': wfLowercase
+                },
+                'gloss_analyzer': {
+                    'type': 'pattern',
+                    'pattern': ' ',
+                    'lowercase': True
                 }
             }
         }
@@ -163,7 +161,9 @@ class PrepareData:
             'mappings': {
                 'properties': m
             },
-            'settings': self.wfAnalyzer
+            'settings': {
+                'analysis': self.wfAnalyzer
+            }
         }
         return mapping
 
@@ -323,7 +323,14 @@ class PrepareData:
             'mappings': {
                 'properties': m
             },
-            'settings': self.wfAnalyzer
+            'settings': {
+                'analysis': self.wfAnalyzer,
+                'refresh_interval': '30s',
+                'max_regex_length': 5000,
+                'mapping': {
+                    'nested_objects.limit': 50000
+                }
+            }
         }
         return mapping
 
