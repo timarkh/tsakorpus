@@ -83,25 +83,35 @@ function assign_word_events() {
 }
 
 function expand_context(e) {
-	var n_sent = $(e.currentTarget).attr('data-nsent');
+	let n_sent = $(e.currentTarget).attr('data-nsent');
 	load_expanded_context(n_sent);
 }
 
 function copy_glossed_sentence(e) {
-	var n_sent = $(e.currentTarget).attr('data-nsent');
-	var hiddenTextArea = document.createElement("textarea");
+	let n_sent = $(e.currentTarget).attr('data-nsent');
+	let hiddenTextArea = document.createElement("textarea");
 	hiddenTextArea.id = "glossed_copy_textarea";
 	hiddenTextArea.style.boxShadow = 'none';
 	document.body.appendChild(hiddenTextArea);
 	load_glossed_sentence(n_sent);
 	$('#glossed_copy_textarea').focus();
 	$('#glossed_copy_textarea').select();
-	var successful = document.execCommand('copy');
+	let successful = document.execCommand('copy');
+	if (successful) {
+		let pos = $(e.currentTarget).position();
+		let width = $("#glossed_copy_successful").width();
+		let height = $("#glossed_copy_successful").height();
+		$("#glossed_copy_successful").css({left: pos.left - width - $(e.currentTarget).width() - 20, top: pos.top + $(e.currentTarget).height() / 2 - height / 2});
+		$('#glossed_copy_successful').fadeIn(200);
+		setTimeout(function(){
+			$('#glossed_copy_successful').fadeOut(600, function() {$(this).hide();});
+		}, 1200);
+	}
 	document.body.removeChild(hiddenTextArea);
 }
 
 function context_toggle(e) {
-	var contextDiv = $(e.currentTarget).parent().parent().parent();
+	let contextDiv = $(e.currentTarget).parent().parent().parent();
 	contextDiv.toggleClass('context_off');
 	contextID = contextDiv.attr('id').substring(7);
 	$.ajax({url: "toggle_sentence/" + contextID});

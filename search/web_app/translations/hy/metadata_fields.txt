@@ -1,0 +1,70 @@
+account_type	Հաշվի տեսակ
+account_type_post	Հաշվի ենթատեսակ (պոստ)
+age	տարիք
+annotators	պիտակավորողներ
+author	հեղինակ
+birth_place	ծննդավայր
+birth_year	ծծնդյան տարեթիվ
+birthplace	ծննդավայր
+birthyear	ծծնդյան տարեթիվ
+byear	ծծնդյան տարեթիվ
+byear_post	ծծնդյան տարեթիվ (պոստ)
+century	դար
+chronotop	գործողության վայրն ու ժամանակը
+citation	մեջբերում
+city	քաղաք
+city_post	բնակավայր (պոստ)
+collector	հավաքող
+country	երկիր
+date_trans	թարգմանության տարեթիվ
+dialect	բարբառ
+gender	սեռ
+genre	ժանր
+genre_fi	գեղարվեստական ժանր
+home_town	ծննդավայր
+home_town_post	ծննդավայր (պոստ)
+hometown	ծննդավայր (քաղաք)
+issue	թողարկում
+lang	բնագիր լեզու
+lang_trans	թարգմանության լեզու
+language	լեզու
+length	երկարություն
+line	տող
+linguist	լեզվաբան
+linguists	լեզվաբաններ
+live_place	բնակավայր
+liveplace	բնակավայր
+medium	լեզվակիր
+occupation	զբաղմունքի տեսակ
+origin	ծննդավայր
+orth	ուղղագրություն
+orthography	ուղղագրություն
+page	էջ
+place	վայր
+post_type	պոստի տեսակ
+profession	մասնագիտություն
+publication	հրատարակություն
+published	հրատարակված
+region	շրջան
+sent_analyses	նախադասության վերլուծություն
+sex	սեռ
+sex_post	սեռ (պոստ)
+speaker	խոսող
+speakers	խոսողներ
+sphere	ոլորտ
+style	ոճ
+subdialect	ենթաբարբառ
+subject	առարկա
+tagging	պիտակավորում
+title	վերնագիր
+title_en	անգլերեն վերնագիր
+title_ru	ռուսերեն վերնագիր
+topic	թեմա
+translator	թարգմանիչ
+type	տեսակ
+year	տարի
+year_birth	ծննդյան տարեթիվ
+year_from	տարի՝ -ից
+year_post	տարի (պոստ)
+year_publ	հրատարակության տարեթիվ
+year_to	տարի՝ մինչև

@@ -405,7 +405,7 @@ msgstr "Select parameters"
 
 #: templates/modals/subcorpus_selection.html:27
 msgid "lower bound"
-msgstr "lower found"
+msgstr "lower bound"
 
 #: templates/modals/subcorpus_selection.html:28
 msgid "upper bound"

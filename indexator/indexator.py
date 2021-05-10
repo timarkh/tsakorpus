@@ -830,6 +830,10 @@ class Indexator:
             return
         for fname, fsize in sorted(filenames, key=lambda p: -p[1]):
             # print(fname, fsize)
+            if 'sample_size' in self.settings and 0 < self.settings['sample_size'] < 1:
+                # Only take a random sample of the source files (for test purposes)
+                if random.random() > self.settings['sample_size']:
+                    continue
             bulk(self.es, self.iterate_sentences(fname), chunk_size=200, request_timeout=60)
             self.index_doc(fname)
         self.index_words()
@@ -859,7 +863,7 @@ class Indexator:
         Drop the current database, if any, and load the entire corpus.
         """
         t1 = time.time()
-        self.compile_translations()
+        # self.compile_translations()
         indicesDeleted = self.delete_indices()
         if not indicesDeleted:
             return

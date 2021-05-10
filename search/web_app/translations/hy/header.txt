@@ -1,0 +1,19 @@
+# Eastern Armenian translations for Tsakorpus.
+# Copyright (C) 2021 Victoria Khurshudyan
+# This file is distributed under the same license as the Tsakorpus project.
+# Victoria Khurshudyan <victoria.khurshudyan@inalco.fr>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 2.0\n"
+"Report-Msgid-Bugs-To: timarkh@gmail.com\n"
+"POT-Creation-Date: 2021-04-20 16:59+0200\n"
+"PO-Revision-Date: 2017-09-20 17:03+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: hy\n"
+"Language-Team: hy <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.0\n"

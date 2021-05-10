@@ -40,8 +40,9 @@ class CorpusSettings:
         self.ambiguous_analyses = True
         self.keep_lemma_order = False
 
-        # Search options
+        # Indexation and search options
         self.debug = False
+        self.sample_size = 1.0
         self.all_language_search_enabled = True
         self.fulltext_search_enabled = True
         self.negative_search_enabled = True

@@ -24,7 +24,7 @@ var subcorpus_bar = null;
 		$('#select_meta_lang').change(load_subcorpus_stats);
 		$(".subcorpus_autocomplete").each(function () {
 			$(this).autocomplete({
-				serviceUrl: '/autocomplete_meta/' + this.id,
+				serviceUrl: 'autocomplete_meta/' + this.id,
 				minChars: 2,
 				width: 260,
 				orientation: "auto",

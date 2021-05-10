@@ -381,7 +381,7 @@ function assign_autocomplete() {
 		let field = $(this).attr('id').replace(/[0-9]*$/g, '');
 		let curTier = $('#lang' + wordNum.toString() + ' option:selected').val();
 		$(this).autocomplete({
-			serviceUrl: '/autocomplete_word/' + curTier + '/' + field,
+			serviceUrl: 'autocomplete_word/' + curTier + '/' + field,
 			minChars: 2,
 			width: 260,
 			orientation: "auto",
