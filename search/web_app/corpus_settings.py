@@ -169,7 +169,7 @@ class CorpusSettings:
                     if 'type' in el and el['type'] in ('gramm', 'gloss'):
                         el['type'] = 'tag'
             if 'gloss_selection' in self.lang_props[lang]:
-                for el in self.lang_props[lang]['gramm_selection']:
+                for el in self.lang_props[lang]['gloss_selection']:
                     if 'type' in el and el['type'] in ('gramm', 'gloss'):
                         el['type'] = 'tag'
         for lang in self.word_fields_by_tier:
