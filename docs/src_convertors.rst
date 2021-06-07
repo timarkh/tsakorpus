@@ -185,3 +185,20 @@ Running a convertor
 -------------------
 
 When you are ready with the configuration and the source files are stored in the relevant folder, all you have to do is to run the corresponding Python file and wait until it terminates. If your corpus consists of several parts stored in different formats, you may process them one by one with different source convertors and put the resulting JSONs in one place. The resulting files will be stored in ``/src_convertors/corpus/json`` or, if you used CG3 disambiguation, in ``/src_convertors/corpus/json_disamb``.
+
+Individual convertor settings
+-----------------------------
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+   
+   parsed_wordlist_format
+   tags_vs_glosses
+   src_convertors_gloss
+   txt2json
+   eaf2json
+   xml_flex2json
+   xml_rnc2json
+   iso_tei_hamburg2json
+   exmaralda_hamburg2json

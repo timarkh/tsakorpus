@@ -1,8 +1,6 @@
-# Tsakorpus
+# Tsakorpus 2.0
 
-**WARNING:** Tsakorpus 2.0 is being developed right now. It is going to be released in May 2021.
-
-If you want to use tsakorpus, download the most recent version from this repository.
+If you want to use Tsakorpus, download the most recent version from this repository.
 
 ## Overview
 
@@ -20,7 +18,7 @@ Feel free to ask questions or discuss Tsakorpus [on the Discussions page](https:
 
 Tsakorpus was tested on Windows and Ubuntu. Its dependencies are the following:
 
-* elasticsearch 7.x (tested on 7.6, 7.7, 7.10, 7.12)
+* elasticsearch 7.x (tested on 7.6-7.12)
 * python >= 3.5
 * python modules: elasticsearch 7.x, flask, lxml, ijson, Flask-Babel, xlsxwriter (you can use requirements.txt)
 * for converting media-aligned corpora: ffmpeg

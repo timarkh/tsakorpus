@@ -23,6 +23,7 @@ class CorpusSettings:
         # General information
         self.corpus_name = ''
         self.input_format = 'json'
+        self.elastic_url = ''
 
         # Corpus type
         self.images = False

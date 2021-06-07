@@ -25,6 +25,8 @@ This page contains (almost) all possible parameters separated into rubrics. Fill
 
 Apart from ``corpus.json``, it will generate :doc:`translation files </interface_languages>` in ``/USER_CONFIG/translations``. Edit them and replace files in ``/search/web_app/translations/`` with them in your :doc:`fork </forks>`.
 
+When you are done with basic configuration and translations, you could also set up :doc:`automatic transliterations </transliteration>`, :doc:`input methods </input_methods>`, :doc:`virtual keyboards </keyboards>` and :doc:`style spans </styles>` in separate files.
+
 List of parameters
 ------------------
 
@@ -55,6 +57,8 @@ List of parameters
 - ``detect_lemma_queries`` (Boolean) -- whether the search engine should recognize word queries which only look for one particular lemma (possibly with additional constraints) and lift the cap on the number of hits displayed. (The cap is actually increased to ``InterfaceQueryParser.maxQuerySize``, see ``/search/search_engine/query_parser.py``.) Defaults to ``false``.
 
 - ``display_freq_rank`` (Boolean) -- whether the quantile / frequency rank column should be displayed for word/lemma query hits. Defaults to ``true``.
+
+- ``elastic_url`` (string) -- by default, Tsakorpus connects to the Elasticsearch running on ``localhost:9200`` without user authentication. If you want to connect to Elasticsearch running on another host or port, or if you want to supply username and password, you can put a URL to be used here, e.g. ``http://user:password@localhost:9200/``. Make sure ``corpus.json`` does not have too broad read permissions. Defaults to empty string.
 
 - ``fulltext_search_enabled`` (Boolean) -- boolean value that determines whether a text box for full-text search should be displayed. Defaults to ``true``.
 
@@ -187,3 +191,16 @@ This is how you could change settings for all new indices (details may vary)::
        }
    }
    '
+
+Further configuration
+---------------------
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+   
+   interface_languages
+   transliteration
+   input_methods
+   keyboards
+   styles
