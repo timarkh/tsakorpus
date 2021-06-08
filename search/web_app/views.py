@@ -422,7 +422,8 @@ def search_doc():
                                                corpusSize=settings.corpus_size)
     hitsProcessed['media'] = settings.media
     hitsProcessed['images'] = settings.images
-    return render_template('search_results/result_docs.html', data=hitsProcessed)
+    return render_template('search_results/result_docs.html', data=hitsProcessed,
+                           sentence_meta=settings.sentence_meta)
 
 
 @app.route('/autocomplete_meta/<metafield>')
