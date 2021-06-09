@@ -215,7 +215,8 @@ class CorpusSettings:
         # Glosses are searched in lowercase (maybe that will change in the future)
         for lang in self.lang_props:
             if 'gloss_shortcuts' in self.lang_props[lang]:
-                for k, v in self.lang_props[lang]['gloss_shortcuts'].items():
+                curGlossShortcuts = copy.deepcopy(self.lang_props[lang]['gloss_shortcuts'])
+                for k, v in curGlossShortcuts.items():
                     self.lang_props[lang]['gloss_shortcuts'][k.lower()] = v.lower()
 
     def as_dict(self):
