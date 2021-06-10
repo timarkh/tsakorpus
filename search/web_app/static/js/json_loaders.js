@@ -441,6 +441,7 @@ function add_word_inputs(e) {
 	$("div.words_search").append(word_div);
 	$(word_div).removeClass('negated');
 	$(word_div).find('.word_search_r').removeClass('negated');
+	$(word_div).find('.autocomplete-suggestions').remove();
 	$("#n_words").attr('value', new_word_num);
 	$('#search_div').removeClass('centered');
 	assign_input_events();

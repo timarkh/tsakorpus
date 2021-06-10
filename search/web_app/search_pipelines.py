@@ -159,6 +159,10 @@ def suggest_metafield(fieldName, query):
     """
     if fieldName not in settings.search_meta['stat_options']:
         return []
+    if len(query.replace('*', '')) < 2:
+        return []
+    if '*' not in query:
+        query = '*' + query + '*'
     if not fieldName.startswith('year'):
         queryFieldName = fieldName + '_kw'
     else:
@@ -167,7 +171,7 @@ def suggest_metafield(fieldName, query):
         'query': {
             'wildcard': {
                 fieldName: {
-                    'value': '*' + query + '*'
+                    'value': query
                 }
             }
         },
@@ -202,6 +206,10 @@ def suggest_word(lang, fieldName, query):
     """
     if lang not in settings.languages:
         return []
+    if len(query.replace('*', '')) < 2:
+        return []
+    if '*' not in query:
+        query += '*'
     wtype = 'word'
     if fieldName == 'lex':
         wtype = 'lemma'
@@ -220,7 +228,7 @@ def suggest_word(lang, fieldName, query):
                                 },
                                 {
                                     'wildcard': {
-                                        'wf': query + '*'
+                                        'wf': query
                                     }
                                 }
                             ]
