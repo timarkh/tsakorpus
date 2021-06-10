@@ -98,6 +98,9 @@ class Indexator:
         self.numSentsLang = [0] * len(self.languages)    # number of sentences in each language in current document
         self.totalNumWords = 0
 
+        self.filenames = []   # List of tuples (filename, filesize)
+        self.corpusSizeInBytes = 0
+
     def delete_indices(self):
         """
         If there already exist indices with the same names,
@@ -133,7 +136,8 @@ class Indexator:
         """
         self.sentWordMapping = self.pd.generate_words_mapping(wordFreqs=False)
         self.wordMapping = self.pd.generate_words_mapping(wordFreqs=True)
-        self.sentMapping = self.pd.generate_sentences_mapping(self.sentWordMapping)
+        self.sentMapping = self.pd.generate_sentences_mapping(self.sentWordMapping,
+                                                              corpusSizeInBytes=self.corpusSizeInBytes)
         self.docMapping = self.pd.generate_docs_mapping()
 
         self.es_ic.create(index=self.name + '.docs',
@@ -806,16 +810,13 @@ class Indexator:
                                                fnameOut))
         self.dID += 1
 
-    def index_dir(self):
+    def analyze_dir(self):
         """
-        Index all files from the corpus directory, sorted by their size
-        in decreasing order. Such sorting helps prevent memory errors
-        when indexing large corpora, as the default behavior is to load
-        the whole file is into memory, and there is more free memory
-        in the beginning of the process. If MemoryError occurs, the
-        iterative JSON parser is used, which works much slower.
+        Collect all filenames for subsequent indexing and calculate
+        their total size. Store them as object properties.
         """
-        filenames = []
+        self.filenames = []
+        self.corpusSizeInBytes = 0
         for root, dirs, files in os.walk(self.corpus_dir):
             for fname in files:
                 if (not ((self.settings['input_format'] == 'json'
@@ -824,11 +825,24 @@ class Indexator:
                              and fname.lower().endswith('.json.gz')))):
                     continue
                 fnameFull = os.path.join(root, fname)
-                filenames.append((fnameFull, os.path.getsize(fnameFull)))
-        if len(filenames) <= 0:
+                fileSize = os.path.getsize(fnameFull)
+                self.corpusSizeInBytes += fileSize
+                self.filenames.append((fnameFull, fileSize))
+
+    def index_dir(self):
+        """
+        Index all files from the corpus directory, sorted by their size
+        in decreasing order. Use a previously collected list of filenames
+        and filesizes. Such sorting helps prevent memory errors
+        when indexing large corpora, as the default behavior is to load
+        the whole file is into memory, and there is more free memory
+        in the beginning of the process. If MemoryError occurs, the
+        iterative JSON parser is used, which works much slower.
+        """
+        if len(self.filenames) <= 0:
             print('There are no files in this corpus.')
             return
-        for fname, fsize in sorted(filenames, key=lambda p: -p[1]):
+        for fname, fsize in sorted(self.filenames, key=lambda p: -p[1]):
             # print(fname, fsize)
             if 'sample_size' in self.settings and 0 < self.settings['sample_size'] < 1:
                 # Only take a random sample of the source files (for test purposes)
@@ -867,6 +881,7 @@ class Indexator:
         indicesDeleted = self.delete_indices()
         if not indicesDeleted:
             return
+        self.analyze_dir()
         self.create_indices()
         self.index_dir()
         t2 = time.time()

@@ -10,6 +10,7 @@ class PrepareData:
     """
     SETTINGS_DIR = '../conf'
     rxBadField = re.compile('[^a-zA-Z0-9_]|^(?:lex|gr|gloss_index|wf|[wm]type|ana|sent_ids|id)$')
+    MULTIPLE_SHARDS_THRESHOLD = 1024 * 1024 * 1024
 
     def __init__(self):
         """
@@ -206,7 +207,7 @@ class PrepareData:
         }
         return mapping
 
-    def generate_sentences_mapping(self, word_mapping):
+    def generate_sentences_mapping(self, word_mapping, corpusSizeInBytes=0):
         """
         Return Elasticsearch mapping for the type "sentence", based
         on searchable features described in the corpus settings.
@@ -217,7 +218,7 @@ class PrepareData:
             'next_id': {'type': 'integer'},
             'doc_id': {'type': 'integer'},
             'text': {'type': 'text'},
-            'lang': {'type': 'byte'},
+            'lang': {'type': 'keyword'},
             'words': {
                 'type': 'nested',
                 'properties': wordProps
@@ -319,11 +320,21 @@ class PrepareData:
                 sentMetaDict[meta + '_kw'] = {'type': 'keyword'}
         if len(sentMetaDict) > 0:
             m['meta'] = {'properties': sentMetaDict}
+
+        # Large corpora on machines with enough CPU cores
+        # are split into shards, so that searches can run in parallel
+        # on different pieces of the corpus.
+        numShards = 1
+        cpuCount = os.cpu_count()
+        if (corpusSizeInBytes > self.MULTIPLE_SHARDS_THRESHOLD
+                and cpuCount is not None and cpuCount > 2):
+            numShards = cpuCount - 1
         mapping = {
             'mappings': {
                 'properties': m
             },
             'settings': {
+                'number_of_shards': numShards,
                 'analysis': self.wfAnalyzer,
                 'refresh_interval': '30s',
                 'max_regex_length': 5000,
@@ -332,6 +343,7 @@ class PrepareData:
                 }
             }
         }
+        print(mapping)
         return mapping
 
     def generate_mappings(self):
