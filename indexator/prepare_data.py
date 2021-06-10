@@ -10,7 +10,7 @@ class PrepareData:
     """
     SETTINGS_DIR = '../conf'
     rxBadField = re.compile('[^a-zA-Z0-9_]|^(?:lex|gr|gloss_index|wf|[wm]type|ana|sent_ids|id)$')
-    MULTIPLE_SHARDS_THRESHOLD = 1024 * 1024 * 1024
+    MULTIPLE_SHARDS_THRESHOLD = 256 * 1024 * 1024
 
     def __init__(self):
         """
