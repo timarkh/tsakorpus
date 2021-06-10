@@ -37,6 +37,9 @@ class Indexator:
             self.languages = [self.name]
         self.input_format = self.settings['input_format']
         self.corpus_dir = os.path.join('../corpus', self.name)
+        self.lowerWf = False
+        if 'wf_lowercase' not in self.settings or self.settings['wf_lowercase']:
+            self.lowerWf = True
         self.iterSent = None
         if self.input_format in ['json', 'json-gzip']:
             self.iterSent = JSONDocReader(format=self.input_format,
@@ -182,11 +185,11 @@ class Indexator:
             if field in self.goodWordFields or field in self.additionalWordFields:
                 wClean[field] = w[field]
                 if field == 'wf':
-                    if 'wf_lowercase' not in self.settings or self.settings['wf_lowercase']:
+                    if self.lowerWf:
                         wClean[field] = wClean[field].lower()
                     self.wfs.add(wClean[field])
         if 'ana' in w:
-            lemma = self.get_lemma(w)
+            lemma = self.get_lemma(w, lower_lemma=self.lowerWf)
             self.lemmata.add(lemma)
             wClean['ana'] = []
             for ana in w['ana']:
@@ -542,7 +545,7 @@ class Indexator:
                     wfOrder = wfsSorted[wJson['wf']]
                 lOrder = len(lemmataSorted) + 1
                 if 'ana' in wJson:
-                    lOrder = lemmataSorted[self.get_lemma(wJson)]
+                    lOrder = lemmataSorted[self.get_lemma(wJson, lower_lemma=self.lowerWf)]
                 wJson['wf_order'] = wfOrder
                 wJson['l_order'] = lOrder
                 wJson['l_id'] = lID

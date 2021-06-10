@@ -343,7 +343,6 @@ class PrepareData:
                 }
             }
         }
-        print(mapping)
         return mapping
 
     def generate_mappings(self):
