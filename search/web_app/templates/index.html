@@ -49,13 +49,17 @@
 	<link rel="stylesheet" href="static/kioskboard-1.4.0/kioskboard-1.4.0.min.css" />
 	<script src="static/kioskboard-1.4.0/kioskboard-1.4.0.js"></script>
 	{% endif %}
+{% if not minimalistic %}
 	{% include "head_add.html" ignore missing %}
+{% endif %}
 </head>
 <body>
 	<div class="box_column">
+{% if not minimalistic %}
 		<div class="row_section_fixed">
 			{% include "header.html" ignore missing %} <!-- user-defined header, if any -->
 		</div>
+{% endif %}
 		<div class="row_section_fixed">
 			{% include "index/corpus_header.html" %} <!-- tsakorpus header: corpus name, interface langauges, help link -->
 		</div>
@@ -77,9 +81,11 @@
 			</div>
 		</div>
 {% endif %}
+{% if not minimalistic %}
 		<div class="row_section_fixed">
 			{% include "footer.html" ignore missing %} <!-- user-defined footer, if any -->
 		</div>
+{% endif %}
 	</div>
 	{% include "index/hidden_elements.html" %} <!-- modal windows, analysis tooltip etc. -->
 	{% include "modals/query_share_load.html" %}

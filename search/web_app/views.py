@@ -21,6 +21,7 @@ from .search_pipelines import *
 
 
 @app.route('/search')
+@app.route('/search_minimalistic')
 def search_page():
     """
     Return HTML of the search page (the main page of the corpus).
@@ -31,8 +32,10 @@ def search_page():
     ready4work = settings.ready_for_work
     if settings.ready_for_work:
         ready4work = sc.is_alive()
+    bMinimalistic = ('minimalistic' in request.url_rule.rule)
 
     return render_template('index.html',
+                           minimalistic=bMinimalistic,
                            ready_for_work=ready4work,
                            locale=get_locale(),
                            corpus_name=settings.corpus_name,
