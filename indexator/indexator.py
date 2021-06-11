@@ -73,8 +73,16 @@ class Indexator:
         self.characterRegexes = {}
 
         self.pd = PrepareData()
-        self.es = Elasticsearch()
+
+        # Initialize Elasticsearch connection
+        self.es = None
+        if 'elastic_url' in self.settings and len(self.settings['elastic_url']) > 0:
+            # Connect to a non-default URL or supply username and password
+            self.es = Elasticsearch([self.settings['elastic_url']])
+        else:
+            self.es = Elasticsearch()
         self.es_ic = IndicesClient(self.es)
+
         self.shuffled_ids = [i for i in range(1, 1000000)]
         random.shuffle(self.shuffled_ids)
         self.shuffled_ids.insert(0, 0)    # id=0 is special and should not change
