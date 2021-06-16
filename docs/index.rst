@@ -11,10 +11,9 @@ Introduction
 
 Tsakorpus_ is a linguistic corpus platform. You can use it to publish your corpora online, so that linguists can search in them without downloading the source files or any software. The backend of Tsakorpus is written in Python (with flask_) and uses Elasticsearch_ for storing and querying data.
 
-.. warning:: This is documentation for Tsakorpus 2.0, which was released in 2021.
 .. _Tsakorpus: https://github.com/timarkh/tsakorpus
 
-Here is a fact sheet about Tsakorpus:
+Here is a fact sheet about Tsakorpus 2.x:
 
 * It's completely free and open-source.
 * You can make complex queries through its web interface without having to learn any query language.
@@ -24,11 +23,11 @@ Here is a fact sheet about Tsakorpus:
 * Tsakorpus supports parallel corpora with any number of languages/tiers.
 * Tsakorpus supports sound- and video-aligned corpora.
 * You can have multiple interface languages in Tsakorpus.
-* Tsakorpus has been tested on corpora ranging from 0.01 to 300 million tokens. Larger corpora are probably ok if you give it more memory.
+* Tsakorpus has been tested on corpora ranging from 0.01 to 300 million tokens. Larger corpora are probably ok if you give it more memory and CPU cores (or cluster nodes).
 * Tsakorpus includes a number of source convertors that can turn raw or annotated texts in widely used formats in the JSON format it requires.
 * Tsakorpus is only suitable for publishing and searching in your corpus, but **not for annotating or managing your corpus data**.
 
-See :doc:`FAQ </faq>` for a short list of commonly asked questions, which can help you decide if Tsakorpus suits your purposes. If you want to learn how to set up Tsakorpus, please go to :doc:`overview`.
+See :doc:`FAQ </faq>` for a short list of commonly asked questions, which can help you decide if Tsakorpus suits your purposes. You can find some example instances :doc:`here </examples>`. If you want to learn how to set up Tsakorpus, please go to :doc:`overview`.
 
 If you are not sure Tsakorpus is what you need, you can compare it to other common corpus analysis software:
 
@@ -57,7 +56,7 @@ Requirements
 
 Tsakorpus was tested on Ubuntu and Windows. Its dependencies are the following:
 
-- Elasticsearch 7.x (tested on 7.6-7.12)
+- Elasticsearch 7.x (tested on 7.6-7.13)
 - Python >= 3.5
 - Python modules: ``elasticsearch 7.x``, ``flask``, ``Flask-Babel``, ``lxml``, ``ijson``, ``xlsxwriter`` (you can use ``requirements.txt``)
 - for converting media-aligned corpora: ``ffmpeg``
@@ -96,6 +95,7 @@ The software is distributed under MIT license.
    
    faq
    overview
+   examples
    forks
    src_convertors
    data_model
