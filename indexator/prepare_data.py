@@ -182,7 +182,17 @@ class PrepareData:
             for lang in self.settings['languages']:
                 m['n_words_' + lang] = {'type': 'integer'}
                 m['n_sents_' + lang] = {'type': 'integer'}
-        for meta in self.settings['viewable_meta']:
+        
+        metaFields = self.settings['viewable_meta'][:]
+        if 'search_meta' in self.settings and 'stat_options' in self.settings['search_meta']:
+            metaFields += self.settings['search_meta']['stat_options']
+        if 'title' not in metaFields:
+            metaFields.append('title')
+        if ('author_metafield' in self.settings
+                and len(self.settings['author_metafield']) > 0
+                and self.settings['author_metafield'] not in metaFields):
+            metaFields.append(self.settings['author_metafield'])
+        for meta in metaFields:
             if meta.startswith('year') or ('integer_meta_fields' in self.settings
                                            and meta in self.settings['integer_meta_fields']):
                 m[meta] = {'type': 'integer'}
