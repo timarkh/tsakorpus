@@ -38,7 +38,7 @@ List of parameters
 
 - ``ambiguous_analyses`` (Boolean) -- whether there are tokens in the corpus which have multiple (ambiguous) analyses. In this case, the user can select if they want to search only among unambiguously analyzed words.
 
-- ``author_metafield`` (string) -- name the second-important metadata field whose value will be displayed next to the title in headers of hit results. Defaults to ``author``.
+- ``author_metafield`` (string) -- name of the second-important metadata field whose value will be displayed next to the title in headers of hit results. Defaults to ``author``.
 
 - ``citation`` (string) -- an HTML string that answers the question "How to cite the corpus". If it is present, a quotation mark image will appear at the top of the page. The citation information will appear as a dialogue if the user clicks that image.
 
@@ -127,6 +127,8 @@ List of parameters
 - ``multiple_choice_fields`` (dictionary) -- describes tag selection tables for word-level fields other that *Grammar* or *Gloss* and sentence-level metadata fields. Keys are field names, values are structured in the same way as ``gramm_selection`` above.
 
 - ``negative_search_enabled`` (Boolean) -- whether the negative search button should be present in the word query form. Defaults to ``true``.
+
+- ``query_log`` (Boolean) -- whether queries should be logged. When turned on, query type, query arguments and timestamps are appended to ``query_log.txt`` after each query. No personal data (such as IP address) are saved. Defaults to ``true``.
 
 - ``query_timeout`` (integer) -- the upper bound on sentence search query execution in seconds. This bound is applied stricly for the Elasticsearch query execution and not so strictly when postprocessing results found by Elasticsearch.
 

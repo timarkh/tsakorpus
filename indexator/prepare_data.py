@@ -182,7 +182,7 @@ class PrepareData:
             for lang in self.settings['languages']:
                 m['n_words_' + lang] = {'type': 'integer'}
                 m['n_sents_' + lang] = {'type': 'integer'}
-        
+
         metaFields = self.settings['viewable_meta'][:]
         if 'search_meta' in self.settings and 'stat_options' in self.settings['search_meta']:
             metaFields += self.settings['search_meta']['stat_options']

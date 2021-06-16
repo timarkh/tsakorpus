@@ -2,6 +2,8 @@ import gzip
 from functools import wraps, update_wrapper
 import copy
 import math
+import json
+import time
 from flask import request, current_app, after_this_request, make_response
 from . import settings
 from .transliteration import *
@@ -171,3 +173,15 @@ def remove_sensitive_data(hits):
                 del hit['_source']['prev_id']
             if 'next_id' in hit['_source']:
                 del hit['_source']['next_id']
+
+
+def log_query(queryType, args, fnameLog='query_log.txt'):
+    """
+    Log the query if the settings allow that.
+    """
+    if not settings.query_log:
+        return
+    logString = time.strftime('%Y-%m-%d %H:%M') + '\t' + queryType + '\t' \
+                + json.dumps(args, indent=None, sort_keys=True, ensure_ascii=False) + '\n'
+    with open(fnameLog, 'a', encoding='utf-8') as fLog:
+        fLog.write(logString)

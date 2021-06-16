@@ -97,6 +97,7 @@ class CorpusSettings:
 
         # Server configuration
         self.session_cookie_domain = None
+        self.query_log = True
 
         # Statistics calculated at runtime
         self.corpus_size = 0

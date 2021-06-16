@@ -12,7 +12,7 @@ from flask import request
 from . import sc, sentView, settings, MIN_TOTAL_FREQ_WORD_QUERY, rxIndexAtEnd
 from .session_management import set_session_data, get_session_data, get_locale, change_display_options, cur_search_context
 from .auxiliary_functions import jsonp, gzipped, nocache, lang_sorting_key, copy_request_args,\
-    wilson_confidence_interval, distance_constraints_too_complex
+    wilson_confidence_interval, distance_constraints_too_complex, log_query
 
 
 def find_parallel_for_one_sent(sSource):
@@ -514,6 +514,7 @@ def find_sentences_json(page=0):
     """
     if request.args and page <= 0:
         query = copy_request_args()
+        log_query('sentence', query)
         page = 1
         change_display_options(query)
         sortOrder = get_session_data('sort')
@@ -637,6 +638,7 @@ def find_words_json(searchType='word', page=0):
         query = copy_request_args()
         page = 1
         change_display_options(query)
+        log_query('sentence', query)
         if get_session_data('sort') not in ('random', 'freq', 'wf', 'lemma'):
             set_session_data('sort', 'random')
         set_session_data('last_query', query)

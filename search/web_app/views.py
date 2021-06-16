@@ -16,7 +16,7 @@ from werkzeug.utils import secure_filename
 from . import app, settings, sc, sentView, MAX_PAGE_SIZE
 from .session_management import get_locale, get_session_data, change_display_options, set_session_data
 from .auxiliary_functions import jsonp, gzipped, nocache, lang_sorting_key, copy_request_args,\
-    distance_constraints_too_complex, remove_sensitive_data
+    distance_constraints_too_complex, remove_sensitive_data, log_query
 from .search_pipelines import *
 
 
@@ -224,6 +224,7 @@ def get_word_freq_stats(searchType='word'):
     """
     htmlQuery = copy_request_args()
     change_display_options(htmlQuery)
+    log_query('word_freq_stats/' + searchType, htmlQuery)
     langID = 0
     nWords = 1
     if 'n_words' in htmlQuery and int(htmlQuery['n_words']) > 1:
@@ -297,6 +298,7 @@ def get_word_stats(searchType, metaField):
         # If this URL was called from a word/lemma table, then we
         # have to be able to continue serving words/lemmata further down the list
         change_display_options(htmlQuery)
+    log_query('word_stats/' + searchType + '/' + metaField, htmlQuery)
     langID = -1
     if 'lang1' in htmlQuery and htmlQuery['lang1'] in settings.languages:
         langID = settings.languages.index(htmlQuery['lang1'])
@@ -415,6 +417,7 @@ def search_word(searchType='word', page=-1):
 @jsonp
 def search_doc():
     query = copy_request_args()
+    log_query('doc', query)
     change_display_options(query)
     query = sc.qp.subcorpus_query(query,
                                   sortOrder=get_session_data('sort'),
