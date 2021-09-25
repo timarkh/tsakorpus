@@ -15,7 +15,7 @@ FieldWorks stores texts in a sophisticated database, so first you need to export
 Configuration
 -------------
 
-Following additional configuration parameters have to be set in :doc:`conversion_settings.jon </src_convertors>`:
+Following additional configuration parameters have to be set in :doc:`conversion_settings.json </src_convertors>`:
 
 * ``language_codes`` (dictionary) -- contains correspondences between the ``lang`` attribute values used to identify languages of the original text, translations and glosses, and the language names as specified in the ``languages`` list. If verbose language codes are used in your FLEX project, only theis parts before the first hyphen should be used in this dictionary (e.g. ``os`` instead of ``os-xxx-yyy``).
 
