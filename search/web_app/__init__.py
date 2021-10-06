@@ -144,7 +144,8 @@ app.secret_key = 'kkj6hd)^js7#dFQ'
 app.config.update(dict(
     LANGUAGES=settings.interface_languages,
     BABEL_DEFAULT_LOCALE=settings.default_locale,
-    BABEL_TRANSLATION_DIRECTORIES='translations_pybabel'
+    BABEL_TRANSLATION_DIRECTORIES='translations_pybabel',
+    SESSION_COOKIE_SAMESITE='Lax'
 ))
 
 if settings.session_cookie_domain is not None and len(settings.session_cookie_domain) > 0:
