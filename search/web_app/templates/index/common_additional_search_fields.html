@@ -13,9 +13,9 @@
 		{% elif sentence_meta_values and field in sentence_meta_values %}
 		<label for="sent_meta_{{ field }}1">{{ _('metafield_' + field) | capitalize }}:</label>
 		<select class="search_input" name="sent_meta_{{ field }}1" id="sent_meta_{{ field }}1"><br>
-			<option value="" selected></option>
+			<option value="" {% if "sent_meta_" + field not in default_values %} selected {% endif %}></option>
 			{% for v in sentence_meta_values[field] %}
-			<option value="{{ v }}">{{ _('metavalue_' + v) }}</option>
+			<option value="{{ v }}" {% if "sent_meta_" + field in default_values and default_values["sent_meta_" + field] == v %} selected {% endif %}>{{ _('metavalue_' + v) }}</option>
 			{% endfor %}
 		</select><br>
 		{% else %}
