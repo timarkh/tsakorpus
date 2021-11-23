@@ -414,6 +414,8 @@ class Eaf2JSON(Txt2JSON):
             analyses = [ana for ana in self.retrieve_analyses(wordIDs[iWord], lang=lang) if len(ana) > 0]
             if len(analyses) > 0:
                 token['ana'] = analyses
+            elif self.rxLetters.search(word) is None:
+                token['wtype'] = 'punct'
             words.append(token)
         if iSentPos < len(text):
             self.add_punc(words, text[iSentPos:], text[:iSentPos], iSentPos)
