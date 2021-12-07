@@ -25,6 +25,7 @@ class SentenceViewer:
     rxHitWordNo = re.compile('(?<=^w)[0-9]+')
     rxTextSpans = re.compile('</?span.*?>|[^<>]+', flags=re.DOTALL)
     rxTabs = re.compile('^\t*$')
+    rxKW = re.compile('_kw$')
     invisibleAnaFields = {'gloss_index'}
 
     def __init__(self, settings, search_client, fullText=False):
@@ -361,8 +362,10 @@ class SentenceViewer:
     def process_sentence_header(self, sentSource, format='html'):
         """
         Retrieve the metadata of the document the sentence
-        belongs to. Return an HTML string with this data that
-        can serve as a header for the context on the output page.
+        belongs to. Return a string with this data that can
+        serve as a header for the context on the output page
+        (format=='html') or as a set of tab-delimited metadata
+        fields that accompany the sentence in a CSV file (format='csv').
         """
         docID = sentSource['doc_id']
         meta = self.sc.get_doc_by_id(docID)
@@ -372,7 +375,7 @@ class SentenceViewer:
                 or len(meta['hits']['hits']) <= 0
                 or '_source' not in meta['hits']['hits'][0]):
             if format == 'csv':
-                return ''
+                return ['']
             else:
                 return render_template('search_results/sentence_header.html',
                                        fulltext_view_enabled=False)
@@ -395,17 +398,25 @@ class SentenceViewer:
         metaHtml = html.escape(metaHtml)
 
         if format == 'csv':
-            result = ''
+            result = ['']
             if 'title' in meta:
-                result += '"' + meta['title'] + '" '
+                result[0] += '"' + meta['title'] + '" '
             else:
-                result += '"???" '
-            if self.authorMeta in meta:
-                result += '(' + meta[self.authorMeta] + ') '
+                result[0] += '"???" '
+            if self.authorMeta in meta and len(meta[self.authorMeta]) > 0:
+                result[0] += '(' + meta[self.authorMeta] + ') '
             if 'issue' in meta and len(meta['issue']) > 0:
-                result += meta['issue'] + ' '
+                result[0] += meta['issue'] + ' '
             if len(dateDisplay) > 0:
-                result += '[' + dateDisplay + ']'
+                result[0] += '[' + dateDisplay + ']'
+            meta = {self.rxKW.sub('', k): v
+                    for k, v in meta.items()
+                    if self.rxKW.sub('', k) in self.settings.viewable_meta
+                    and k not in ['filename', 'filename_kw']}
+            for k, v in sorted(meta.items()):
+                newField = '[' + k + ': ' + v.replace('\t', ' ') + ']'
+                if newField not in result:
+                    result.append(newField)
         else:
             result = render_template('search_results/sentence_header.html',
                                      fulltext_view_enabled=self.settings.fulltext_view_enabled,
@@ -599,27 +610,25 @@ class SentenceViewer:
     def view_sentence_meta(self, sSource, format):
         """
         If there is a metadata dictionary in the sentence, transform it
-        to an HTML span or a text for CSV.
+        to an HTML span or text for CSV.
         """
         if 'meta' not in sSource:
             return ''
-        meta2show = {k: sSource['meta'][k] for k in sSource['meta'] if k not in ['sent_analyses']}
+        meta2show = {self.rxKW.sub('', k): sSource['meta'][k]
+                     for k in sSource['meta'] if k not in ['sent_analyses', 'sent_analyses_kw']}
         if len(meta2show) <= 0:
             return
         metaSpan = '<span class="sentence_meta">'
         if format == 'csv':
-            metaSpan = '['
-        for k, v in meta2show.items():
-            if k.endswith('_kw'):
-                continue
+            metaSpan = ''
+        for k, v in sorted(meta2show.items()):
             if format == 'csv':
-                metaSpan += k + ': ' + str(v)
-                metaSpan += '; '
+                metaSpan += '[' + k + ': ' + str(v).replace('\t', ' ') + ']\t'
             else:
                 metaSpan += html.escape(k + ': ' + str(v))
                 metaSpan += '<br>'
         if format == 'csv':
-            metaSpan = metaSpan.strip('; ') + '] '
+            metaSpan = metaSpan.strip(' ')
         else:
             if metaSpan.endswith('<br>'):
                 metaSpan = metaSpan[:-4]
