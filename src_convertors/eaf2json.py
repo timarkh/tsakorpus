@@ -864,6 +864,7 @@ class Eaf2JSON(Txt2JSON):
         textJSON = {'meta': curMeta, 'sentences': []}
         nTokens, nWords, nAnalyzed = 0, 0, 0
         self.spanAnnoTiers = {}
+        self.alignedSpanAnnoTiers = {}
         srcTree = etree.parse(fnameSrc)
         self.tlis = self.get_tlis(srcTree)
         self.build_segment_tree(srcTree)
