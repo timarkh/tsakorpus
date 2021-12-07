@@ -79,8 +79,8 @@ class Tokenizer:
             elif (i < len(tokens) - 1 and
                   token['wtype'] == 'punct' and
                   token['wf'] not in self.settings['non_word_internal_punct'] and
-                  (token['wf'] <= 0 or all(c not in self.settings['non_word_internal_punct']
-                                           for c in token['wf'])) and
+                  (len(token['wf']) <= 0 or all(c not in self.settings['non_word_internal_punct']
+                                                for c in token['wf'])) and
                   joinedTokens[-1]['wtype'] == 'word' and
                   tokens[i+1]['wtype'] == 'word' and
                   tokens[i]['off_start'] == joinedTokens[-1]['off_end'] and
