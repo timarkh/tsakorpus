@@ -617,7 +617,7 @@ class SentenceViewer:
         meta2show = {self.rxKW.sub('', k): sSource['meta'][k]
                      for k in sSource['meta'] if k not in ['sent_analyses', 'sent_analyses_kw']}
         if len(meta2show) <= 0:
-            return
+            return ''
         metaSpan = '<span class="sentence_meta">'
         if format == 'csv':
             metaSpan = ''
