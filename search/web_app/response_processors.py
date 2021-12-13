@@ -366,6 +366,9 @@ class SentenceViewer:
         serve as a header for the context on the output page
         (format=='html') or as a set of tab-delimited metadata
         fields that accompany the sentence in a CSV file (format='csv').
+        In the latter case, the first element should contain
+        a short description string, including things such as
+        authour or title.
         """
         docID = sentSource['doc_id']
         meta = self.sc.get_doc_by_id(docID)
@@ -804,7 +807,7 @@ class SentenceViewer:
 
         header = ''
         if getHeader:
-            header = ' [' + self.process_sentence_header(s, 'csv') + ']'
+            header = ' [' + self.process_sentence_header(s, 'csv')[0] + ']'
         if 'words' not in s:
             return {s['text'] + header}
         text = self.transliterate_baseline(s['text'].strip(' \t\n').replace('\n', '\\n '),
