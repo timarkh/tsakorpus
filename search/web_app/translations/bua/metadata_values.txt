@@ -1,0 +1,30 @@
+F	Эмэ
+M	Эрэ
+complete	дууһан, тиигээд омонимиитэй
+dialogue	ярилсаан
+essay	эссе
+experiment	туршалга
+female	эмэгтэй
+fiction	уран зохёолой
+incomplete	дууһан бэшэ
+interview	интервью
+male	эрэгтэй
+monologue	монолог
+movie	фильмэ
+nonfiction	уран зохёолой бэшэ
+novel	роман
+oral	амаар
+original	оригинал
+poetry	яаруу найраг
+press	прессэ
+prose	прозо
+public	публичнэ
+religion	шажанай
+science	эрдэм ухаанай
+song	дуун
+spontaneous	зүн дэгээн
+story	рассказ
+unique	ганса удхатайгаар
+translated	оршуулга
+wikipedia	Википеди
+written	бэшэмэл

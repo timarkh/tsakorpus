@@ -1,0 +1,3 @@
+normal	юрын
+strict	зүб
+simplified	юрын болгоһон

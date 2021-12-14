@@ -1,0 +1,12 @@
+trans_ru	оршуулга (RU)
+trans_en	оршуулга (EN)
+trans_de	оршуулга (DE)
+trans_fr	оршуулга (FR)
+lex2	леммэ 2
+trans_ru2	оршуулга 2 (RU)
+trans_en2	оршуулга 2 (EN)
+trans_de2	оршуулга 2 (DE)
+trans_fr2	оршуулга 2 (FR)
+logogram	логограмма
+transcription	транскрипци
+segment	сегментэ
