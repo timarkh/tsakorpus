@@ -70,7 +70,7 @@ In most cases, it is expected that metadata for your texts (such as title, autho
 
 - ``meta_files_ext`` (Boolean) -- whether the filenames in the metadata file have extensions.
 
-- ``meta_files_dir`` (Boolean) -- whether the filenames in the metadata file have full paths rooted by ``/src_convertors/corpus/%ext%``. If it is set to ``false``, it is assumed that the names of the source files are unique regardless of where they exist within the subtree.
+- ``meta_files_dir`` (Boolean) -- whether the filenames in the metadata file have their full path relative to ``/src_convertors/corpus/%ext%`` specified (without trailing slashes). If it is set to ``false``, it is assumed that the names of the source files are unique regardless of where they exist within the subtree.
 
 - ``meta_files_case_sensitive`` (Boolean) -- whether the filenames in the metadata file should be treated as case sensitive.
 
