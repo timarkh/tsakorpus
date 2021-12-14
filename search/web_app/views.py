@@ -33,6 +33,9 @@ def search_page():
     if settings.ready_for_work:
         ready4work = sc.is_alive()
     bMinimalistic = ('minimalistic' in request.url_rule.rule)
+    locales = settings.interface_languages
+    if type(locales) == list:
+        locales = {x: x for x in locales}
 
     return render_template('index.html',
                            minimalistic=bMinimalistic,
@@ -66,7 +69,7 @@ def search_page():
                            default_view=settings.default_view,
                            max_request_time=settings.query_timeout + 1,
                            max_page_size=MAX_PAGE_SIZE,
-                           locales=settings.interface_languages,
+                           locales=locales,
                            random_seed=get_session_data('seed'),
                            query_string=queryString)
 
@@ -691,6 +694,11 @@ def get_glossed_sentence(n):
 @app.route('/set_locale/<lang>')
 @app.route('/docs/set_locale/<lang>')
 def set_locale(lang=''):
+    if type(settings.interface_languages) == dict and lang not in settings.interface_languages:
+        for il in settings.interface_languages:
+            if settings.interface_languages[il] == lang:
+                lang = il
+                break
     if lang not in settings.interface_languages:
         return
     set_session_data('locale', lang)
