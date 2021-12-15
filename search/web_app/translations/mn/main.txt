@@ -98,7 +98,7 @@ msgstr "гансал шүүлбэригүй"
 
 #: templates/index/common_additional_search_fields.html:34
 msgid "Position in sentence: "
-msgstr "Мэдyyлэл соохи hуури: "
+msgstr "Мэдүүлэл соохи hуури: "
 
 #: templates/index/corpus_header.html:9
 msgid "Corpus name"
@@ -117,12 +117,12 @@ msgstr "Үнэмшэлгэ харуулха"
 #: templates/index/greeting_en.html:5 templates/index/greeting_ru.html:5
 #: templates/index/query_area.html:70
 msgid "Search sentences"
-msgstr "Мэдyyлэлнyyдэй бэдэрэлгэ"
+msgstr "Мэдүүлэлнүүдэй бэдэрэлгэ"
 
 #: templates/index/greeting_en.html:6 templates/index/greeting_ru.html:6
 #: templates/index/query_area.html:71
 msgid "Search words"
-msgstr "Үгэнyyдэй бэдэрэлгэ"
+msgstr "Үгэнүүдэй бэдэрэлгэ"
 
 #: templates/index/greeting_en.html:6 templates/index/greeting_ru.html:6
 #: templates/index/query_area.html:72
@@ -143,7 +143,7 @@ msgstr "Толи"
 
 #: templates/index/hidden_elements.html:57
 msgid "Metadata_header"
-msgstr "Метамэдээнyyд"
+msgstr "Метамэдээнүүд"
 
 #: templates/index/progress.html:6
 msgid "Max seconds left: "
