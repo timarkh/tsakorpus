@@ -11,7 +11,7 @@
 	{% for col in glosses.columns %}
 		<div class="gloss_column">
 		{% for gl in col %}
-		{% if gl.type == "gloss" %}
+		{% if gl.type == "tag" or gl.type == "gloss" %}
 			<div class="switchable_gramm" data-cat="{{ gl.category|safe }}" data-gloss="{{ gl.value|safe }}">{{ gl.value|safe }}
 			{% if gl.tooltip %}
 				<span class="tooltip_prompt alert alert-warning">{{ _('tooltip_' + gl.tooltip)|safe }}</span>
