@@ -236,7 +236,7 @@ class Splitter:
         for i in range(len(sentences) - 1, 0, -1):
             sentenceR = sentences[i]
             sentenceL = sentences[i - 1]
-            if 'lang' not in sentenceL or 'lang' in sentenceR:
+            if 'lang' not in sentenceL or 'lang' not in sentenceR:
                 continue
             if sentenceL['lang'] not in langs2resegment:
                 continue
