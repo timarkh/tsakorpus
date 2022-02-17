@@ -105,8 +105,8 @@ class MediaCutter:
                     break
                 if seg[1] / 1000 <= splitStart:
                     continue
-                segStart = max(splitStart, seg[0] / 1000)
-                segEnd = min(splitStart + splitLength, seg[1] / 1000)
+                segStart = max(splitStart, seg[0] / 1000) - splitStart
+                segEnd = min(splitStart + splitLength, seg[1] / 1000) - splitStart
                 seg = (str(segStart), str(segEnd),
                        str(segEnd - segStart), str(len(curPrivacySegments) + 1))
                 curPrivacySegments.append(seg)
