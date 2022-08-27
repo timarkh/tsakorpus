@@ -17,7 +17,7 @@ Configuration
 
 Following additional configuration parameters have to be set in :doc:`conversion_settings.json </src_convertors>`:
 
-* ``language_codes`` (dictionary) -- contains correspondences between the ``lang`` attribute values used to identify languages of the original text, translations and glosses, and the language names as specified in the ``languages`` list. If verbose language codes are used in your FLEX project, only theis parts before the first hyphen should be used in this dictionary (e.g. ``os`` instead of ``os-xxx-yyy``).
+* ``language_codes`` (dictionary) -- contains correspondences between the ``lang`` attribute values used to identify languages of the original text, translations and glosses, and the language names as specified in the ``languages`` list. If verbose language codes are used in your FLEX project, only this parts before the first hyphen should be used in this dictionary (e.g. ``os`` instead of ``os-xxx-yyy``).
 
 * ``bad_analysis_languages`` (list of strings, optional) -- if your files have glosses in more than one language, this list can contain language codes for the gloss languages that have to be disregarded (e.g. if you only want to keep English glosses).
 

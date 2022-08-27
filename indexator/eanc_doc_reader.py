@@ -145,7 +145,7 @@ class Sentence:
 
     def form_words(self, content):
         """
-        fills the sentence with tokens. iterates thruogh lines
+        fills the sentence with tokens. iterates through lines
         and separates and builds the wordforms. 
         """
         for line in content:
@@ -165,7 +165,7 @@ class Sentence:
         """
         extracts punctuation: iterates all the wordforms 
         and if it seessome punctuation in them, 
-        craetes an object of class Punct and adds it to the list 
+        creates an object of class Punct and adds it to the list 
         """
         i = 0
         while i < len(self.words):

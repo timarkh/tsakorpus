@@ -81,7 +81,7 @@ The indexator creates following elasticsearch indexes:
 
 - ``%corpus_name%.sentences`` -- main index: all sentences of the corpus;
 - ``%corpus_name%.docs`` -- metadata for corpus documents;
-- ``%corpus_name%.words`` -- contains three types, ``lemma``, ``word`` and ``word_freq``. The instances of the first two are all lemma / word types with statistics (identical word forms with different annotations are considered different types). Each instance of the latter contains frequency statictics for each (word, document) tuple.
+- ``%corpus_name%.words`` -- contains three types, ``lemma``, ``word`` and ``word_freq``. The instances of the first two are all lemma / word types with statistics (identical word forms with different annotations are considered different types). Each instance of the latter contains frequency statistics for each (word, document) tuple.
 
 You can find out more :doc:`here </indexator>`.
 

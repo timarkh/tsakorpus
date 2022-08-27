@@ -584,7 +584,7 @@ def download_cur_results_xlsx():
 @app.route('/toggle_sentence/<int:sentNum>')
 def toggle_sentence(sentNum):
     """
-    Togle currently viewed sentence with the given number on or off.
+    Toggle currently viewed sentence with the given number on or off.
     The sentences that have been switched off are not written to the
     CSV/XLSX when the user wants to download the search results.
     """
@@ -603,7 +603,7 @@ def toggle_sentence(sentNum):
 @app.route('/toggle_doc/<int:docID>')
 def toggle_document(docID):
     """
-    Togle given docID on or off. The documents that have been switched off
+    Toggle given docID on or off. The documents that have been switched off
     are not included in the search.
     """
     excludedDocIDs = get_session_data('excluded_doc_ids')

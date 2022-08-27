@@ -3,7 +3,7 @@ Transliterations
 
 You can set up automatic transliterations in your corpus. Transliterations are functions that transform the text of words and sentences before they are sent to the user. If you use transliterations, you have to list their names in the ``transliterations`` list in :doc:`corpus.json </configuration>`. The user can choose a transliteration in the settings dialog. Although the list of transliterations is defined globally for the whole corpus, each transliteration can work differently depending on the language/tier chosen.
 
-For each language and each transliteration, you have to create a function in a python file located in ``/search/transliterators`` (feel free to add new files) with one argument, which contains the text to be transliterated. The function must return a transliterated string. Accroding to the convention used in Tsakorpus, such functions should be called ``%LANGUAGE_NAME%_translit_%TRANSLITERATION%(text)``, but that's up to you.
+For each language and each transliteration, you have to create a function in a python file located in ``/search/transliterators`` (feel free to add new files) with one argument, which contains the text to be transliterated. The function must return a transliterated string. According to the convention used in Tsakorpus, such functions should be called ``%LANGUAGE_NAME%_translit_%TRANSLITERATION%(text)``, but that's up to you.
 
 This a simple example from ``/search/transliterators/armenian.py``:
 

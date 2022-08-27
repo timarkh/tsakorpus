@@ -7,7 +7,7 @@ class TextCleaner:
     """
     Contains methods for cleaning a string from things like
     HTML entities etc.
-    It is assumed tha the cleaner can be language-dependent.
+    It is assumed that the cleaner can be language-dependent.
     """
     rxTags = re.compile('</?(?:a|img|span|div|p|body|html|head)(?: [^<>]+)?>|[\0⌐-♯]+',
                         flags=re.DOTALL)

@@ -209,7 +209,7 @@ class Txt2JSON:
     def write_output(self, fnameTarget, textJSON):
         """
         Write the JSON text to fnameTarget either as plain text
-        or as gzipped text, dependeing on the settings.
+        or as gzipped text, depending on the settings.
         """
         if self.corpusSettings['gzip']:
             fTarget = gzip.open(fnameTarget, 'wt', encoding='utf-8')

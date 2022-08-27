@@ -701,7 +701,7 @@ class Eaf2JSON(Txt2JSON):
                     # We will calculate these imaginary boundaries to compare them to the annotation
                     # boundaries and know which tokens the annotation should cover.
                     # Note that the visual alignment can be imperfect, so we have to account for that.
-                    # We use the original tokenization as represented in ELAN for calcuations,
+                    # We use the original tokenization as represented in ELAN for calculations,
                     # which might be different from what is in curSentence['words'] now (e.g. punctuation
                     # might have been absent from the original tokens).
                     tokenDuration = (curSentenceEnd - curSentenceStart) / curSentence['nTokensOrig']
