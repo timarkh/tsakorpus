@@ -956,7 +956,7 @@ class InterfaceQueryParser:
     def check_html_parameters(self, htmlQuery, page=1, query_size=10, searchOutput='sentences'):
         """
         Check if HTML query is valid. If so, calculate and return a number
-        of parameters for subseqent insertion into the ES query.
+        of parameters for subsequent insertion into the ES query.
         Return None otherwise.
         """
         if len(htmlQuery) <= 0 or 'n_words' not in htmlQuery:

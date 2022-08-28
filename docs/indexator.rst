@@ -25,7 +25,7 @@ What indexator does
 -------------------
 
 1. It creates three Elasticsearch indexes called ``%corpus_name%.sentences``, ``%corpus_name%.docs`` and ``%corpus_name%.words``. If indexes with such names already exist, the indexator will ask you for permission to proceed. Use the ``-y`` option to overwrite existing indexes without asking.
-2. It puts the contents of your JSON files to the indexes. Sentences are transfered to the database almost without changes.
+2. It puts the contents of your JSON files to the indexes. Sentences are transferred to the database almost without changes.
 3. It calculates word and lemma statistics and puts it to the indexes. The statistics is kept in memory during the indexation, so the larger your corpus, the more memory indexation will require.
 4. It generates full-text representations and dictionaries, if you chose so in the configuration.
 

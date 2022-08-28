@@ -21,7 +21,7 @@ class Tmx2JSON(Xml_Rnc2JSON):
     def process_se_node(self, se, lang):
         """
         Extract data from the <tuv> (sentence) node that contains
-        one ore more sentences in one language. The input is an
+        one or more sentences in one language. The input is an
         XML string, not an element.
         """
         bProcessXML = ('<w>' in se)

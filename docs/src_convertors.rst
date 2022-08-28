@@ -10,7 +10,7 @@ All files related to the convertors are located in ``/src_convertors``.
 
 This is how it works:
 
-1. You put your sorce files into the appropriate folder.
+1. You put your source files into the appropriate folder.
 2. You edit configuration files.
 3. You pick one of the Python scripts in ``/src_convertors``, based on your data format, and run it.
 4. You get the JSON files. If your corpus has media files, you also get cut and compressed media files.

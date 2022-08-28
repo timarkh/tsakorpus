@@ -1288,7 +1288,7 @@ class SentenceViewer:
         offsets of the words that matched the word-level query
         and offsets of the respective analyses, if any.
         Search for word offsets recursively, so that the procedure
-        does not depend excatly on the response structure.
+        does not depend exactly on the response structure.
         Return a dictionary where keys are offsets of highlighted words
         and values are sets of the pairs (ID of the words, ID of its ana)
         that were found by the search query .

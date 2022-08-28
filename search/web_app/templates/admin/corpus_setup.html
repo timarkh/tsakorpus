@@ -123,7 +123,7 @@
 			<div class="form-check option_group">
 				<input class="form-check-input" type="checkbox" value="keep_lemma_order" id="keep_lemma_order" name="keep_lemma_order" {% if settings.keep_lemma_order %}checked{% endif %}>
 				<label class="form-check-label" for="keep_lemma_order">
-				If there are amiguous analyses, keep their mutual order in each word. (Otherwise, lemmata may be sorted lexicographically.)
+				If there are ambiguous analyses, keep their mutual order in each word. (Otherwise, lemmata may be sorted lexicographically.)
 				</label>
 			</div>
 			<div class="mb-3 option_group">
@@ -691,7 +691,7 @@
 			</div>
 			<div class="mb-3 option_group">
 				<label for="lang_props.lexicographic_order" class="form-label">Lexicographic order</label>
-				<p class="explanation">By default, all characters are sorted accoring to their Unicode codepoint. This is relevant for "sort by word/lemma" options and the generated dictionary. If you want to have a different order of characters, you can list them here. All characters not on the list will be moved to the end.</p>
+				<p class="explanation">By default, all characters are sorted according to their Unicode codepoint. This is relevant for "sort by word/lemma" options and the generated dictionary. If you want to have a different order of characters, you can list them here. All characters not on the list will be moved to the end.</p>
 				<p class="explanation">Write one line per language/tier. Separate language/tier name and its character list with a colon (possibly with whitespaces). Separate characters with a comma (possibly with whitespaces).</p>
 				<textarea class="form-control" id="lang_props.lexicographic_order" name="lang_props.lexicographic_order" wrap="hard">{% for k in settings.lang_props %}{% if "lexicographic_order" in settings.lang_props[k] %}{{ k }}: {{ settings.lang_props[k].lexicographic_order|join(', ') }}
 {% endif %}{% endfor %}</textarea>
