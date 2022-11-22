@@ -87,6 +87,10 @@
   {
     "beserman":
     {
+      "gramm_shortcuts": {
+        "NV": "(N|V)",
+        "V_nderiv": "V,~(caus|detr|iter)"
+      },
       "gloss_shortcuts": {
         "case": "(nom|gen2?|acc|dat|ins|loc|ill|el|egr|term|prol|car|app|rcs|adv|dms)(\\.(sg|pl))?",
         "poss": "(p\\.[123](sg|pl)(\\.acc)?)",
