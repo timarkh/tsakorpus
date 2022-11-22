@@ -284,7 +284,7 @@ class Xml_Flex2JSON(Txt2JSON):
                         if element.text is None:
                             element.text = ' '
                         gloss = element.text
-                        glossIndex = element.text + '{' + lastPart.strip('-=:.<>') + '}-'
+                        glossIndex = element.text.strip('-=:.<>') + '{' + lastPart.strip('-=:.<>') + '}-'
                         if (morphType == 'stem'
                                 or (morphType == 'unknown' and element.text not in self.glosses))\
                                 or (morphType in ('enclitic', 'proclitic') and len(mNode) == 1):
