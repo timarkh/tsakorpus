@@ -1,6 +1,6 @@
 # Requirements file for python modules, to be used with pip (pip3 install -r requirements.txt).
 
-elasticsearch>=7.0.0
+elasticsearch>=7.0.0,<8.0.0
 Flask
 Flask-Babel
 lxml

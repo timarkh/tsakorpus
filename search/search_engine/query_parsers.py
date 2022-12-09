@@ -615,8 +615,18 @@ class InterfaceQueryParser:
                 queryDictWordsAna[k] = v
             elif k in wordFields:
                 queryDictWords[k] = v
-        if not negative and sentIndexQuery is not None and 'words.sentence_index' not in queryDictWords:
-            queryDictWords['words.sentence_index'] = sentIndexQuery
+        if not negative and sentIndexQuery is not None:
+            if 'words.sentence_index' not in queryDictWords:
+                queryDictWords['words.sentence_index'] = sentIndexQuery
+            else:
+                queryDictWords['words.sentence_index'] = {
+                    'bool': {
+                        'must': [
+                            queryDictWords['words.sentence_index'],
+                            sentIndexQuery
+                        ]
+                    }
+                }
         if (len(queryDictWords) <= 0
                 and len(queryDictWordsAna) <= 0):
             return []
@@ -686,8 +696,20 @@ class InterfaceQueryParser:
                 for iQueryWord in range(len(queryDict['words'])):
                     wordDesc, negQuery = queryDict['words'][iQueryWord]
                     curSentIndex = None
+                    print(iQueryWord, wordDesc)
                     if iQueryWord == nPivotalTerm - 1:  # nPivotalTerm is 1-based
+                        if ('words.sentence_index' in wordDesc
+                                and 'match' in wordDesc['words.sentence_index']
+                                and 'words.sentence_index' in wordDesc['words.sentence_index']['match']):
+                            # The pivotal word has a "position in sentence" constraint,
+                            # which makes life easier (no need to search for combinations
+                            # where the pivotal word is not in its prescribed place)
+                            if (pivotalTermIndex != wordDesc['words.sentence_index']['match']['words.sentence_index']
+                                    and 0 <= wordDesc['words.sentence_index']['match']['words.sentence_index'] < self.settings.max_words_in_sentence):
+                                distanceQueryTuple = []
+                                break
                         curSentIndex = self.sentence_index_query(pivotalTermIndex)
+                        print(curSentIndex)
                     elif iQueryWord + 1 in constraints:
                         for wordPair in constraints[iQueryWord + 1]:
                             if nPivotalTerm not in wordPair:
@@ -708,7 +730,8 @@ class InterfaceQueryParser:
                                                                           sentIndexQuery=curSentIndex,
                                                                           highlightedWordSubindex=pivotalTermIndex,
                                                                           searchOutput=searchOutput)
-                distanceQueryTuples.append(distanceQueryTuple)
+                if len(distanceQueryTuple) > 0:
+                    distanceQueryTuples.append(distanceQueryTuple)
             if len(distanceQueryTuples) == 1:
                 return distanceQueryTuples[0]
             else:
