@@ -363,6 +363,9 @@ def search_sent(page=-1):
                     // hitsProcessed['page_size'] + 1
     hitsProcessed['too_many_hits'] = (settings.max_hits_retrieve < hitsProcessed['n_sentences'])
 
+    if request.args and 'response_format' in request.args and request.args['response_format'] == 'json':
+        return jsonify(hitsProcessed)
+
     return render_template('search_results/result_sentences.html',
                            data=hitsProcessed,
                            max_page_number=maxPageNumber)
