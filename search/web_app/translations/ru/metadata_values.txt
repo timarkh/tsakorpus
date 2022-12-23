@@ -8,9 +8,11 @@ female	женский
 fiction	художественные
 incomplete	не полностью
 interview	интервью
+linguist	лингвист
 male	мужской
 monologue	монолог
 movie	фильм
+native	носитель
 nonfiction	нехудожественные
 novel	роман
 oral	устные

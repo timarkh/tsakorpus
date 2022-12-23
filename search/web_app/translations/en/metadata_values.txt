@@ -8,9 +8,11 @@ female	female
 fiction	fiction
 incomplete	incompletely
 interview	interview
+linguist	linguist
 male	male
 monologue	monologue
 movie	movie
+native	native
 nonfiction	non-fiction
 novel	novel
 oral	oral

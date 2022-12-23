@@ -50,6 +50,7 @@ sent_analyses	Разбор предложения
 sex	пол
 sex_post	пол (пост)
 speaker	говорящий
+speaker_type	тип говорящего
 speakers	говорящие
 sphere	сфера функционирования
 style	стиль
