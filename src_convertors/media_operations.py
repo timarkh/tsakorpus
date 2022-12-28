@@ -117,7 +117,7 @@ class MediaCutter:
             if len(beepOut) > 0:
                 beepOut = ' -filter_complex "[1]' + re.sub('\\[out[0-9]+\\]$', '', beepOut[6:]) + '" '
             if fname.lower().endswith('.mp4'):
-                splitStr += ' -vcodec copy -acodec copy'
+                splitStr += ' -vcodec copy -c:a dca -ac 2'
                 newExt = '.mp4'
             elif fname.lower().endswith(('.avi', '.mts', '.mov', '.mp4')):
                 splitStr += ' -s 400x300 -vcodec libx264 -b:v 500k -acodec aac -ab 192k' + beepOut
