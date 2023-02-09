@@ -97,6 +97,13 @@ class Tmx2JSON(Xml_Rnc2JSON):
                         nWords += 1
                         if 'ana' in word and len(word['ana']) > 0:
                             nAnalyzed += 1
+        if not ('multiple_translation_variants' in self.corpusSettings
+                and not self.corpusSettings['multiple_translation_variants']):
+            # Multiple translation variants by default, but if
+            # there is only one for each language, remove the redundant
+            # key
+            for i in range(len(textJSON['sentences'])):
+                del textJSON['sentences'][i]['transVar']
         self.tp.splitter.recalculate_offsets(textJSON['sentences'])
         self.tp.splitter.add_next_word_id(textJSON['sentences'])
         self.write_output(fnameTarget, textJSON)
