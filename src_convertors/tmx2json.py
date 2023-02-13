@@ -97,7 +97,7 @@ class Tmx2JSON(Xml_Rnc2JSON):
                         nWords += 1
                         if 'ana' in word and len(word['ana']) > 0:
                             nAnalyzed += 1
-        if not ('multiple_translation_variants' in self.corpusSettings
+        if ('multiple_translation_variants' in self.corpusSettings
                 and not self.corpusSettings['multiple_translation_variants']):
             # Multiple translation variants by default, but if
             # there is only one for each language, remove the redundant
