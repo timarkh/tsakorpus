@@ -141,7 +141,7 @@ function assign_gram_popup() {
 		$('#analysis').show();
         if ($('.sentence_meta').length > 0) {
 			var prevEl = $(this).prev();
-			while (true) {
+			while (prevEl.length > 0) {
 				if (prevEl.hasClass('sentence_meta')) {
 					break;
 				}

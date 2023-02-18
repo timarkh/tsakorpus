@@ -1,6 +1,5 @@
 import json
 import html
-import os
 import copy
 import math
 import re
@@ -9,7 +8,7 @@ from flask import render_template
 try:
     from .transliteration import *
 except ImportError:
-    # This happens when response_processots.py is imported
+    # This happens when response_processors.py is imported
     # from outside this package, but we do not need the
     # transliterations in that case
     pass
@@ -25,6 +24,7 @@ class SentenceViewer:
     rxHitWordNo = re.compile('(?<=^w)[0-9]+')
     rxTextSpans = re.compile('</?span.*?>|[^<>]+', flags=re.DOTALL)
     rxTabs = re.compile('^\t*$')
+    rxKW = re.compile('_kw$')
     invisibleAnaFields = {'gloss_index'}
 
     def __init__(self, settings, search_client, fullText=False):
@@ -194,12 +194,12 @@ class SentenceViewer:
         if not gramdic:
             try:
                 return render_template('search_results/grammar_popup.html', grAnaPart=grAnaPart).strip()
-            except AttributeError:
+            except (AttributeError, RuntimeError):
                 return self.render_jinja_html('../search/web_app/templates/search_results',
                                               'grammar_popup.html', grAnaPart=grAnaPart).strip()
         try:
             return render_template('search_results/gramdic_popup.html', grAnaPart=grAnaPart).strip()
-        except AttributeError:
+        except (AttributeError, RuntimeError):
             return self.render_jinja_html('../search/web_app/templates/search_results',
                                           'gramdic_popup.html', grAnaPart=grAnaPart).strip()
 
@@ -252,7 +252,7 @@ class SentenceViewer:
             ana4template['other_fields'].sort(key=lambda x: x['key'])
         try:
             return render_template('search_results/analysis_div.html', ana=ana4template).strip()
-        except AttributeError:
+        except (AttributeError, RuntimeError):
             return self.render_jinja_html('../search/web_app/templates/search_results',
                                           'analysis_div.html', ana=ana4template).strip()
 
@@ -275,7 +275,7 @@ class SentenceViewer:
                 data4template['analyses'].append(ana4template)
         try:
             return render_template('search_results/analyses_popup.html', data=data4template)
-        except AttributeError:
+        except (AttributeError, RuntimeError):
             return self.render_jinja_html('../search/web_app/templates/search_results',
                                           'analyses_popup.html', data=data4template)
 
@@ -361,8 +361,13 @@ class SentenceViewer:
     def process_sentence_header(self, sentSource, format='html'):
         """
         Retrieve the metadata of the document the sentence
-        belongs to. Return an HTML string with this data that
-        can serve as a header for the context on the output page.
+        belongs to. Return a string with this data that can
+        serve as a header for the context on the output page
+        (format=='html') or as a set of tab-delimited metadata
+        fields that accompany the sentence in a CSV file (format='csv').
+        In the latter case, the first element should contain
+        a short description string, including things such as
+        authour or title.
         """
         docID = sentSource['doc_id']
         meta = self.sc.get_doc_by_id(docID)
@@ -372,7 +377,7 @@ class SentenceViewer:
                 or len(meta['hits']['hits']) <= 0
                 or '_source' not in meta['hits']['hits'][0]):
             if format == 'csv':
-                return ''
+                return ['']
             else:
                 return render_template('search_results/sentence_header.html',
                                        fulltext_view_enabled=False)
@@ -395,17 +400,25 @@ class SentenceViewer:
         metaHtml = html.escape(metaHtml)
 
         if format == 'csv':
-            result = ''
+            result = ['']
             if 'title' in meta:
-                result += '"' + meta['title'] + '" '
+                result[0] += '"' + meta['title'] + '" '
             else:
-                result += '"???" '
-            if self.authorMeta in meta:
-                result += '(' + meta[self.authorMeta] + ') '
+                result[0] += '"???" '
+            if self.authorMeta in meta and len(meta[self.authorMeta]) > 0:
+                result[0] += '(' + meta[self.authorMeta] + ') '
             if 'issue' in meta and len(meta['issue']) > 0:
-                result += meta['issue'] + ' '
+                result[0] += meta['issue'] + ' '
             if len(dateDisplay) > 0:
-                result += '[' + dateDisplay + ']'
+                result[0] += '[' + dateDisplay + ']'
+            meta = {self.rxKW.sub('', k): v
+                    for k, v in meta.items()
+                    if self.rxKW.sub('', k) in self.settings.viewable_meta
+                    and k not in ['filename', 'filename_kw']}
+            for k, v in sorted(meta.items()):
+                newField = '[' + k + ': ' + v.replace('\t', ' ') + ']'
+                if newField not in result:
+                    result.append(newField)
         else:
             result = render_template('search_results/sentence_header.html',
                                      fulltext_view_enabled=self.settings.fulltext_view_enabled,
@@ -599,27 +612,25 @@ class SentenceViewer:
     def view_sentence_meta(self, sSource, format):
         """
         If there is a metadata dictionary in the sentence, transform it
-        to an HTML span or a text for CSV.
+        to an HTML span or text for CSV.
         """
         if 'meta' not in sSource:
             return ''
-        meta2show = {k: sSource['meta'][k] for k in sSource['meta'] if k not in ['sent_analyses']}
+        meta2show = {self.rxKW.sub('', k): sSource['meta'][k]
+                     for k in sSource['meta'] if k not in ['sent_analyses', 'sent_analyses_kw']}
         if len(meta2show) <= 0:
-            return
+            return ''
         metaSpan = '<span class="sentence_meta">'
         if format == 'csv':
-            metaSpan = '['
-        for k, v in meta2show.items():
-            if k.endswith('_kw'):
-                continue
+            metaSpan = ''
+        for k, v in sorted(meta2show.items()):
             if format == 'csv':
-                metaSpan += k + ': ' + str(v)
-                metaSpan += '; '
+                metaSpan += '[' + k + ': ' + str(v).replace('\t', ' ') + ']\t'
             else:
                 metaSpan += html.escape(k + ': ' + str(v))
                 metaSpan += '<br>'
         if format == 'csv':
-            metaSpan = metaSpan.strip('; ') + '] '
+            metaSpan = metaSpan.strip(' ')
         else:
             if metaSpan.endswith('<br>'):
                 metaSpan = metaSpan[:-4]
@@ -795,7 +806,7 @@ class SentenceViewer:
 
         header = ''
         if getHeader:
-            header = ' [' + self.process_sentence_header(s, 'csv') + ']'
+            header = ' [' + self.process_sentence_header(s, 'csv')[0] + ']'
         if 'words' not in s:
             return {s['text'] + header}
         text = self.transliterate_baseline(s['text'].strip(' \t\n').replace('\n', '\\n '),
@@ -1276,7 +1287,7 @@ class SentenceViewer:
         offsets of the words that matched the word-level query
         and offsets of the respective analyses, if any.
         Search for word offsets recursively, so that the procedure
-        does not depend excatly on the response structure.
+        does not depend exactly on the response structure.
         Return a dictionary where keys are offsets of highlighted words
         and values are sets of the pairs (ID of the words, ID of its ana)
         that were found by the search query .

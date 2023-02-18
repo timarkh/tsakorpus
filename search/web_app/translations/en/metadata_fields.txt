@@ -50,6 +50,7 @@ sent_analyses	Sentence analyzed
 sex	Sex
 sex_post	Sex (post-level)
 speaker	Speaker
+speaker_type	Speaker type
 speakers	Speakers
 sphere	Sphere
 style	Style

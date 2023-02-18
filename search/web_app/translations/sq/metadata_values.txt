@@ -8,8 +8,10 @@ female	femër
 fiction	tekstet letrare
 incomplete	jo plotësisht
 interview	intervistë
+linguist	gjuhëtar
 male	mashkull
 monologue	monolog
+native	amtare
 nonfiction	tekstet joletrare
 novel	roman
 oral	tekstet gojore

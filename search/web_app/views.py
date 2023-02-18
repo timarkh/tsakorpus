@@ -33,6 +33,9 @@ def search_page():
     if settings.ready_for_work:
         ready4work = sc.is_alive()
     bMinimalistic = ('minimalistic' in request.url_rule.rule)
+    locales = settings.interface_languages
+    if type(locales) == list:
+        locales = {x: x for x in locales}
 
     return render_template('index.html',
                            minimalistic=bMinimalistic,
@@ -66,7 +69,7 @@ def search_page():
                            default_view=settings.default_view,
                            max_request_time=settings.query_timeout + 1,
                            max_page_size=MAX_PAGE_SIZE,
-                           locales=settings.interface_languages,
+                           locales=locales,
                            random_seed=get_session_data('seed'),
                            query_string=queryString)
 
@@ -360,6 +363,9 @@ def search_sent(page=-1):
                     // hitsProcessed['page_size'] + 1
     hitsProcessed['too_many_hits'] = (settings.max_hits_retrieve < hitsProcessed['n_sentences'])
 
+    if request.args and 'response_format' in request.args and request.args['response_format'] == 'json':
+        return jsonify(hitsProcessed)
+
     return render_template('search_results/result_sentences.html',
                            data=hitsProcessed,
                            max_page_number=maxPageNumber)
@@ -581,7 +587,7 @@ def download_cur_results_xlsx():
 @app.route('/toggle_sentence/<int:sentNum>')
 def toggle_sentence(sentNum):
     """
-    Togle currently viewed sentence with the given number on or off.
+    Toggle currently viewed sentence with the given number on or off.
     The sentences that have been switched off are not written to the
     CSV/XLSX when the user wants to download the search results.
     """
@@ -600,7 +606,7 @@ def toggle_sentence(sentNum):
 @app.route('/toggle_doc/<int:docID>')
 def toggle_document(docID):
     """
-    Togle given docID on or off. The documents that have been switched off
+    Toggle given docID on or off. The documents that have been switched off
     are not included in the search.
     """
     excludedDocIDs = get_session_data('excluded_doc_ids')
@@ -691,6 +697,11 @@ def get_glossed_sentence(n):
 @app.route('/set_locale/<lang>')
 @app.route('/docs/set_locale/<lang>')
 def set_locale(lang=''):
+    if type(settings.interface_languages) == dict and lang not in settings.interface_languages:
+        for il in settings.interface_languages:
+            if settings.interface_languages[il] == lang:
+                lang = il
+                break
     if lang not in settings.interface_languages:
         return
     set_session_data('locale', lang)

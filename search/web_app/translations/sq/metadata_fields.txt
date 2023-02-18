@@ -47,6 +47,7 @@ sent_analyses	analiza e fjalisë
 sex	seksi
 sex_post	seksi (postim)
 speaker	folësi
+speaker_type	lloji i folësit
 speakers	folësit
 sphere	sfera e funksionimit
 style	stili

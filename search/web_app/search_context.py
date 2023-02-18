@@ -52,7 +52,7 @@ class SearchContext:
                              'doc_id': docID,
                              'times_expanded': 0,
                              'src_alignment_files': [],
-                             'header_csv': ''})
+                             'header_csv': ['']})
         langID = 0
         nextID = prevID = -1
         highlightedText = ''
@@ -61,7 +61,8 @@ class SearchContext:
                 nextID = sent['_source']['next_id']
             if 'prev_id' in sent['_source']:
                 prevID = sent['_source']['prev_id']
-            if len(sentData['header_csv']) <= 0:
+            if (len(sentData['header_csv']) <= 0
+                    or (len(sentData['header_csv']) == 1 and len(sentData['header_csv'][0]) <= 0)):
                 sentData['header_csv'] = sentView.process_sentence_header(sent['_source'],
                                                                           format='csv')
             if 'lang' in sent['_source']:
@@ -121,7 +122,7 @@ class SearchContext:
             hit = hitsProcessed['contexts'][iHit]
             sentPageDataDict = {'toggled_off': False,
                                 'highlighted_text_csv': [],
-                                'header_csv': ''}
+                                'header_csv': ['']}
             if not hit['toggled_on']:
                 sentPageDataDict['toggled_off'] = True
             for lang in settings.languages:
@@ -179,5 +180,10 @@ class SearchContext:
         for page in self.page_data:
             for sent in self.page_data[page]:
                 if not sent['toggled_off']:
-                    result.append([sent['header_csv']] + sent['highlighted_text_csv'])
+                    curLine = sent['header_csv']
+                    for s in sent['highlighted_text_csv']:
+                        for sPart in s.split('\t'):
+                            if not sPart.startswith('[') or sPart not in curLine:
+                                curLine.append(sPart)
+                    result.append(curLine)
         return result

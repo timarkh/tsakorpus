@@ -182,7 +182,7 @@ class InterfaceQueryParser:
                     and 'gramm_shortcuts' in self.settings.lang_props[lang]
                     and text in self.settings.lang_props[lang]['gramm_shortcuts']):
                 text = self.settings.lang_props[lang]['gramm_shortcuts'][text]
-                return self.make_simple_term_query(text, field, lang, keyword_query=keyword_query)
+                return self.make_bool_query(text, field, lang, keyword_query=keyword_query)
         return {'match_none': {}}
 
     def make_bool_query(self, strQuery, field, lang, start=0, end=-1, keyword_query=False):
@@ -615,8 +615,18 @@ class InterfaceQueryParser:
                 queryDictWordsAna[k] = v
             elif k in wordFields:
                 queryDictWords[k] = v
-        if not negative and sentIndexQuery is not None and 'words.sentence_index' not in queryDictWords:
-            queryDictWords['words.sentence_index'] = sentIndexQuery
+        if not negative and sentIndexQuery is not None:
+            if 'words.sentence_index' not in queryDictWords:
+                queryDictWords['words.sentence_index'] = sentIndexQuery
+            else:
+                queryDictWords['words.sentence_index'] = {
+                    'bool': {
+                        'must': [
+                            queryDictWords['words.sentence_index'],
+                            sentIndexQuery
+                        ]
+                    }
+                }
         if (len(queryDictWords) <= 0
                 and len(queryDictWordsAna) <= 0):
             return []
@@ -686,8 +696,20 @@ class InterfaceQueryParser:
                 for iQueryWord in range(len(queryDict['words'])):
                     wordDesc, negQuery = queryDict['words'][iQueryWord]
                     curSentIndex = None
+                    print(iQueryWord, wordDesc)
                     if iQueryWord == nPivotalTerm - 1:  # nPivotalTerm is 1-based
+                        if ('words.sentence_index' in wordDesc
+                                and 'match' in wordDesc['words.sentence_index']
+                                and 'words.sentence_index' in wordDesc['words.sentence_index']['match']):
+                            # The pivotal word has a "position in sentence" constraint,
+                            # which makes life easier (no need to search for combinations
+                            # where the pivotal word is not in its prescribed place)
+                            if (pivotalTermIndex != wordDesc['words.sentence_index']['match']['words.sentence_index']
+                                    and 0 <= wordDesc['words.sentence_index']['match']['words.sentence_index'] < self.settings.max_words_in_sentence):
+                                distanceQueryTuple = []
+                                break
                         curSentIndex = self.sentence_index_query(pivotalTermIndex)
+                        print(curSentIndex)
                     elif iQueryWord + 1 in constraints:
                         for wordPair in constraints[iQueryWord + 1]:
                             if nPivotalTerm not in wordPair:
@@ -708,7 +730,8 @@ class InterfaceQueryParser:
                                                                           sentIndexQuery=curSentIndex,
                                                                           highlightedWordSubindex=pivotalTermIndex,
                                                                           searchOutput=searchOutput)
-                distanceQueryTuples.append(distanceQueryTuple)
+                if len(distanceQueryTuple) > 0:
+                    distanceQueryTuples.append(distanceQueryTuple)
             if len(distanceQueryTuples) == 1:
                 return distanceQueryTuples[0]
             else:
@@ -956,7 +979,7 @@ class InterfaceQueryParser:
     def check_html_parameters(self, htmlQuery, page=1, query_size=10, searchOutput='sentences'):
         """
         Check if HTML query is valid. If so, calculate and return a number
-        of parameters for subseqent insertion into the ES query.
+        of parameters for subsequent insertion into the ES query.
         Return None otherwise.
         """
         if len(htmlQuery) <= 0 or 'n_words' not in htmlQuery:

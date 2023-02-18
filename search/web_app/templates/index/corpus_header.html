@@ -11,7 +11,7 @@
 	{% if locales|length > 1 %}
 		&nbsp;&nbsp;
 		{% for l_code in locales %}
-			<a class="locale {% if locale == l_code %}locale-selected{% endif %}" title="{{ locales[l_code] }}">{{ l_code|upper }}</a>&nbsp;
+			<a class="locale {% if locale == l_code %}locale-selected{% endif %}" title="{{ locales[l_code] }}">{{ locales[l_code]|upper }}</a>&nbsp;
 			{% if not last %}
 				|&nbsp;
 			{% else %}

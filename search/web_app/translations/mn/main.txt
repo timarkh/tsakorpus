@@ -1,0 +1,737 @@
+#: templates/index.html:4
+msgid "Corpus search page"
+msgstr "Корпусто бэдэрэлгэ"
+
+#: templates/index.html:19 templates/index/query_area.html:54
+msgid "more_fields"
+msgstr "бүхы тала харуулха"
+
+#: templates/index.html:20
+msgid "fewer_fields"
+msgstr "талануудые нюуха"
+
+#: templates/index.html:21
+msgid "add_distance"
+msgstr "нэмэхэ&nbsp;зай"
+
+#: templates/index.html:22
+msgid "remove_word"
+msgstr "хуряаха&nbsp;үгэ"
+
+#: templates/index.html:23
+msgid "Distance to word #"
+msgstr "№ үгэ хүрэтэр зай"
+
+#: templates/index.html:24
+msgid "from "
+msgstr "эндэhээ"
+
+#: templates/index.html:25
+msgid "to "
+msgstr "хүрэтэр"
+
+#: templates/index.html:26
+msgid "Select combinations of tags"
+msgstr "Грамматикын тэмдэгүүдые шэлэхэ"
+
+#: templates/index.html:27
+msgid "Select glosses"
+msgstr "Глосс шэлэхэ"
+
+#: templates/index.html:28
+msgid "the query"
+msgstr "эрилтэ"
+
+#: templates/index.html:29 templates/modals/subcorpus_selection.html:90
+#: templates/modals/word_stats.html:55
+msgid "Nothing found."
+msgstr "Юуншье олдоогүй."
+
+#: templates/index.html:30
+msgid "Query word"
+msgstr "Эрилтын үгэ"
+
+#: templates/index.html:67
+msgid "Sorry, the server is experiencing technical issues. Please try again later."
+msgstr "Хүлисэгты, сервер дээрэ саг зуурын техническэ эбдэрэл. Хожомынь туршахадатнай болохо."
+
+#: templates/index.html:68 templates/index/hidden_elements.html:12
+#: templates/index/hidden_elements.html:30
+#: templates/index/hidden_elements.html:44
+#: templates/index/hidden_elements.html:58
+#: templates/index/hidden_elements.html:73
+#: templates/index/hidden_elements.html:87 templates/index/query_area.html:100
+#: templates/index/results_area.html:11
+#: templates/modals/display_settings.html:6
+#: templates/modals/query_history.html:6
+#: templates/modals/query_share_load.html:6
+#: templates/modals/query_share_load.html:20
+#: templates/modals/subcorpus_selection.html:6
+#: templates/modals/word_stats.html:6
+msgid "Close"
+msgstr "Хааха"
+
+#: templates/index/common_additional_search_fields.html:23
+msgid "Analyses: "
+msgstr "Шүүлбэри: "
+
+#: templates/index/common_additional_search_fields.html:24
+msgid "any number of analyses"
+msgstr "ямаршье тоо"
+
+#: templates/index/common_additional_search_fields.html:26
+msgid "only ambiguous"
+msgstr "гансал омонимитой"
+
+#: templates/index/common_additional_search_fields.html:27
+msgid "only non-ambiguous"
+msgstr "гансал нэгэ удхатай"
+
+#: templates/index/common_additional_search_fields.html:28
+#: templates/index/common_additional_search_fields.html:30
+msgid "only with analysis"
+msgstr "гансал шүүлбэритэй"
+
+#: templates/index/common_additional_search_fields.html:32
+msgid "only without analysis"
+msgstr "гансал шүүлбэригүй"
+
+#: templates/index/common_additional_search_fields.html:34
+msgid "Position in sentence: "
+msgstr "Мэдүүлэл соохи hуури: "
+
+#: templates/index/corpus_header.html:9
+msgid "Corpus name"
+msgstr "Корпусой нэрэ"
+
+#: templates/index/corpus_header.html:25
+#: templates/index/hidden_elements.html:72
+msgid "How to cite"
+msgstr "Яажа корпус цитировалха бэ"
+
+#: templates/index/corpus_header.html:28 templates/index/greeting_en.html:9
+#: templates/index/greeting_ru.html:9
+msgid "Show help"
+msgstr "Үнэмшэлгэ харуулха"
+
+#: templates/index/greeting_en.html:5 templates/index/greeting_ru.html:5
+#: templates/index/query_area.html:70
+msgid "Search sentences"
+msgstr "Мэдүүлэлнүүдэй бэдэрэлгэ"
+
+#: templates/index/greeting_en.html:6 templates/index/greeting_ru.html:6
+#: templates/index/query_area.html:71
+msgid "Search words"
+msgstr "Үгэнүүдэй бэдэрэлгэ"
+
+#: templates/index/greeting_en.html:6 templates/index/greeting_ru.html:6
+#: templates/index/query_area.html:72
+msgid "Search lemmata"
+msgstr "/ лексемэ"
+
+#: templates/index/hidden_elements.html:19
+msgid "Cancel"
+msgstr "Болюулга"
+
+#: templates/index/hidden_elements.html:29
+msgid "Help"
+msgstr "Үнэмшэлгэ"
+
+#: templates/index/hidden_elements.html:43
+msgid "Dictionary_header"
+msgstr "Толи"
+
+#: templates/index/hidden_elements.html:57
+msgid "Metadata_header"
+msgstr "Метамэдээнүүд"
+
+#: templates/index/progress.html:6
+msgid "Max seconds left: "
+msgstr "Секундэ yлөө (максимум): "
+
+#: templates/index/query_area.html:8
+msgid "Options"
+msgstr "Настройко"
+
+#: templates/index/query_area.html:9 templates/modals/query_history.html:5
+msgid "Query history"
+msgstr "Бэдэрэлгын тyyхэ"
+
+#: templates/index/query_area.html:11
+msgid "Show dictionary"
+msgstr "Толи харуулха"
+
+#: templates/index/query_area.html:19
+msgid "Word_header"
+msgstr "Үгэ"
+
+#: templates/index/query_area.html:19
+msgid "Number_sign"
+msgstr "№"
+
+#: templates/index/query_area.html:20
+msgid "Word:"
+msgstr "Үгэ:"
+
+#: templates/index/query_area.html:21
+msgid "Lemma:"
+msgstr "Леммэ:"
+
+#: templates/index/query_area.html:22
+msgid "Grammar:"
+msgstr "Грамматика:"
+
+#: templates/index/query_area.html:26
+msgid "Gloss:"
+msgstr "Глоссонууд:"
+
+#: templates/index/query_area.html:31
+#: templates/modals/subcorpus_selection.html:56
+msgid "Language/tier:"
+msgstr "Хэлэн/үе:"
+
+#: templates/index/query_area.html:36
+#: templates/modals/subcorpus_selection.html:58
+msgid "langname_all"
+msgstr "ямаршье"
+
+#: templates/index/query_area.html:49
+msgid "negative_query"
+msgstr "буруушааhан&nbsp;эрилтэ"
+
+#: templates/index/query_area.html:51
+msgid "add_word"
+msgstr "үгэ нэмэхэ"
+
+#: templates/index/query_area.html:61
+msgid "Full-text search:"
+msgstr "Бүхэли текстын бэдэрэлгэ:"
+
+#: templates/index/query_area.html:63
+msgid "Precise match"
+msgstr "тон зүб таарамжа"
+
+#: templates/index/query_area.html:73
+msgid "Words statistics"
+msgstr "Словоформын дахилта"
+
+#: templates/index/query_area.html:75
+#: templates/modals/subcorpus_selection.html:5
+msgid "Select subcorpus"
+msgstr "Подкорпусой шэлэлгэ"
+
+#: templates/index/query_area.html:77
+msgid "Share this query"
+msgstr "Дам саашань эльгээхэ"
+
+#: templates/index/query_area.html:78
+msgid "Load external query"
+msgstr "Гадаадын эрилтэ хэрэглэхэ"
+
+#: templates/index/query_area.html:97
+msgid "Back to search"
+msgstr "Бэдэрэлгэдэ тэхэрихэ"
+
+#: templates/index/results_area.html:10
+msgid "Click on an example to see video."
+msgstr "Али нэгэн жэшээ шагнахын түлөө, тэрэниие дарагты."
+
+#: templates/index/results_area.html:10
+msgid "Click on an example to listen."
+msgstr "Али нэгэн жэшээ шагнахын түлөө, тэрэниие дарагты."
+
+#: templates/modals/display_settings.html:5
+msgid "Additional search and display options"
+msgstr "Бэдэрэлгын ба зураглан харуулалгын нэмэри настройконууд"
+
+#: templates/modals/display_settings.html:12
+msgid "Results per page:"
+msgstr "Нюур дээрэхи контекстууд:"
+
+#: templates/modals/display_settings.html:16
+msgid "Sorting:"
+msgstr "Илгалга"
+
+#: templates/modals/display_settings.html:18
+msgid "random"
+msgstr "гэнтын"
+
+#: templates/modals/display_settings.html:19
+msgid "by word (word queries)"
+msgstr "үгын хэбээр (үгэнүүдые бэдэрэхэ)"
+
+#: templates/modals/display_settings.html:20
+msgid "by lemma (word queries)"
+msgstr "леммээр (үгэнүүдые бэдэрхэ)"
+
+#: templates/modals/display_settings.html:21
+msgid "by frequency"
+msgstr "дахилтаар"
+
+#: templates/modals/display_settings.html:23
+msgid "by year (decreasing; sentence queries)"
+msgstr "жэлээр (мэдүүлэлнүүдые бэдэрхэ; уридахи жэлнүүдээр)"
+
+#: templates/modals/display_settings.html:26
+msgid "no sorting"
+msgstr "илгалгагүй"
+
+#: templates/modals/display_settings.html:32
+msgid "Word distance requirements are strict"
+msgstr "Үгэнүүдэй хорондохи зай эрилтын ёһоор"
+
+#: templates/modals/display_settings.html:37
+msgid "Viewing mode:"
+msgstr "Үгэлгэ:"
+
+#: templates/modals/display_settings.html:39
+msgid "view_standard"
+msgstr "юрын"
+
+#: templates/modals/display_settings.html:40
+msgid "view_glossed"
+msgstr "глоссированна"
+
+#: templates/modals/display_settings.html:45
+msgid "Transliteration: "
+msgstr "Транслитераци: "
+
+#: templates/modals/display_settings.html:55
+msgid "Character input method: "
+msgstr "Тэмдэгүүдэй оруулалгын арга: "
+
+#: templates/modals/display_settings.html:65
+msgid "Annotation layers in glossed mode:"
+msgstr "Глоссированна үгэлгэ соохи разметкын үенүүд:"
+
+#: templates/modals/display_settings.html:68
+#: templates/modals/query_history.html:18
+msgid "Lemma"
+msgstr "Леммэ"
+
+#: templates/modals/display_settings.html:72
+#: templates/modals/query_history.html:19
+msgid "Grammar"
+msgstr "Грамматика"
+
+#: templates/modals/display_settings.html:77
+msgid "Gloss"
+msgstr "Глоссонууд"
+
+#: templates/modals/display_settings.html:82
+msgid "Additional fields"
+msgstr "Нэмэри таланууд"
+
+#: templates/modals/query_history.html:10
+msgid "Click on"
+msgstr "Дарагты"
+
+#: templates/modals/query_history.html:10
+#: templates/modals/query_history.html:23
+msgid "Repeat query"
+msgstr "Эрилтэ дабтаха"
+
+#: templates/modals/query_history.html:10
+msgid "to repeat a query."
+msgstr ", эрилтэ дабтахын түлөө."
+
+#: templates/modals/query_history.html:13
+msgid "You have not made any queries yet."
+msgstr "Та мүнөөдөө юушье бэдэрээгүйта."
+
+#: templates/modals/query_history.html:17
+msgid "Word"
+msgstr "үгын хэб"
+
+#: templates/modals/query_history.html:20
+msgid "Subcorpus"
+msgstr "Подкорпус"
+
+#: templates/modals/query_history.html:21
+msgid "Search type"
+msgstr "Бэдэрэлгын түхэл"
+
+#: templates/modals/query_history.html:22
+msgid "Time"
+msgstr "Саг"
+
+#: templates/modals/query_share_load.html:5
+msgid "Share query"
+msgstr "Эрилтэ дам саашань эльгээхэ"
+
+#: templates/modals/query_share_load.html:9
+msgid "If you want to share your query with someone, send them the text you see below. The person who loads this query will see the same results in the same order, unless the corpus has been re-indexed."
+msgstr ""Хэһэн эрилтэеэ, хүндэ эльгээхын түлөө, буулгажа абаад дорохи текст эльгээгты. Энэ эрилтэ татажа абаһан хүн, тэрэл үрэ дүн тэрэл ёһоор хараха, хэрбээ корпус тэрэ сагһаа хойшо шэнээр индексировалагдаагүйһаань."
+
+#: templates/modals/query_share_load.html:19
+msgid "Load query"
+msgstr "Эрилтэ хэрэглэхэ"
+
+#: templates/modals/query_share_load.html:23
+msgid "Here you can load a corpus query someone sent you. Please enter the query below:"
+msgstr "Эндэ корпусто танда хүнэй эльгээһэн эрилтэ хэрэглэхэдэ болохо. Дорохи талада эрилтэ оруулагты::"
+
+#: templates/modals/select_gloss.html:5
+msgid "word boundary"
+msgstr "үгын хилэ"
+
+#: templates/modals/select_gloss.html:6
+msgid "any number of morphs"
+msgstr "хэдышье морфемэнүүдые"
+
+#: templates/modals/select_gloss.html:7
+msgid "any positive number of morphs"
+msgstr "хэдышье морфемын ноль бэшэ тоо"
+
+#: templates/modals/select_gloss.html:8
+msgid "any morph"
+msgstr "ямаршье морфемэ"
+
+#: templates/modals/subcorpus_selection.html:10
+msgid "Specify parameters"
+msgstr "хараа хэмжээнэй шэлэлгэ"
+
+#: templates/modals/subcorpus_selection.html:11
+msgid "Choose from a list"
+msgstr "Дансаһаа шэлэлгэ"
+
+#: templates/modals/subcorpus_selection.html:12
+msgid "Subcorpus statistics"
+msgstr "Подкорпусой статистика"
+
+#: templates/modals/subcorpus_selection.html:16
+msgid "Select parameters"
+msgstr "Хараа хэмжээнүүдые шэлэгты"
+
+#: templates/modals/subcorpus_selection.html:27
+msgid "lower bound"
+msgstr "дорохи хилэ"
+
+#: templates/modals/subcorpus_selection.html:28
+msgid "upper bound"
+msgstr "дээрэхи хилэ"
+
+#: templates/modals/subcorpus_selection.html:42
+msgid "Select documents"
+msgstr "Текстнүүдые шэлэгты"
+
+#: templates/modals/subcorpus_selection.html:43
+msgid "(please wait for the document list to load)"
+msgstr "(бага зэргэ хүлеэгты, текстнүүдэй данса нэбтэрүүлэгдэжэ байна)"
+
+#: templates/modals/subcorpus_selection.html:46
+msgid "Selected subcorpus composition"
+msgstr "Шэлэгдэһэн подкорпусой бүрилдэл"
+
+#: templates/modals/subcorpus_selection.html:47
+#: templates/modals/word_stats.html:16
+msgid "Parameter: "
+msgstr "Хараа хэмжээн: "
+
+#: templates/modals/subcorpus_selection.html:71
+#: templates/modals/word_stats.html:28
+msgid "A maximum of 25 metadata values can be displayed, sorted by the number of words in the relevant texts."
+msgstr "Ехэдээл һаа 25 удханууд харуулагдажа шадаха, хэрэглэгдэһэн текстнүүдһээ үгэнүүдэй тоогоор илгалгагдаһан."
+
+#: templates/modals/subcorpus_selection.html:73
+#: templates/modals/word_stats.html:81
+msgid "(please wait for the plot to load)"
+msgstr "(зааха хүлеэгты, график нэбтэрүүлэгдэнэ)"
+
+#: templates/modals/subcorpus_selection.html:77
+msgid "Value"
+msgstr "Удха"
+
+#: templates/modals/subcorpus_selection.html:78
+msgid "Size in words"
+msgstr "Үгын тоогоор хэмжээн"
+
+#: templates/modals/subcorpus_selection.html:79
+msgid "Number of documents"
+msgstr "Текстнүүдэй тоо"
+
+#: templates/modals/subcorpus_selection.html:87
+#: templates/modals/word_stats.html:52
+msgid "please wait for the plot to load"
+msgstr "зааха хүлеэгты, график нэбтэрүүлэгдэнэ"
+
+#: templates/modals/subcorpus_selection.html:97
+msgid "Clear subcorpus"
+msgstr "Подкорпус арилгаха"
+
+#: templates/modals/word_stats.html:5
+msgid "Word statistics header"
+msgstr "Үгын хэбүүдэй статистика"
+
+#: templates/modals/word_stats.html:10
+msgid "By metadata values"
+msgstr "Метамэдээнэй удхаар"
+
+#: templates/modals/word_stats.html:11
+msgid "By frequency"
+msgstr "Дахилтаар"
+
+#: templates/modals/word_stats.html:15
+msgid "Word statistics for "
+msgstr " статистика"
+
+#: templates/modals/word_stats.html:22
+msgid "Query type: "
+msgstr "Эрилтын түхэл: "
+
+#: templates/modals/word_stats.html:24
+msgid "search the whole query"
+msgstr "эрилтэ бүхэлеэрнь бэдэрхэ"
+
+#: templates/modals/word_stats.html:25
+msgid "compare words in the query"
+msgstr "эрилтын үгэнүүдые зэргэсүүлхэ"
+
+#: templates/modals/word_stats.html:35
+msgid "Query word "
+msgstr "Эрилтын үгэ "
+
+#: templates/modals/word_stats.html:40
+msgid "value"
+msgstr "удха"
+
+#: templates/modals/word_stats.html:43
+msgid "frequency (ipm)"
+msgstr "дахилта (саяын үгэ)"
+
+#: templates/modals/word_stats.html:44
+#, python-format
+msgid "90%% conf. int. "
+msgstr "90%%-дахи найдалгатай зай"
+
+#: templates/modals/word_stats.html:59
+msgid "Distribution by frequency rank"
+msgstr "Үгэнүүдэй дахилтын зэргээр хубаарил"
+
+#: templates/modals/word_stats.html:60
+msgid "Explanation for frequency distributions"
+msgstr "<p>График ниже устроен следующим образом. На оси <i>x</i> расположены частотные ранги, т. е. номера позиций в полном списке словоформ/лемм, упорядоченных по убыванию частотности. Если у нескольких словоформ/лемм частотность одинакова, им всем приписывается одинаковый ранг, равный среднему арифметическому номеров их позиций. Для каждого ранга <i>r</i> <strong>по оси <i>y</i> откладывается доля словоформ/лемм, удовлетворяющих поисковому запросу, среди всех словоформ/лемм, частотный ранг которых не превосходит <i>r</i>.</strong> В частности, самая правая точка на графике показывает долю таких словоформ/лемм во всём корпусе. В случае поиска лемм учитываются все леммы, имеющие хотя бы одну словоформу, удовлетворяющую запросу.</p><p>При построении этого графика не учитываются выбор подкорпуса и все слова в запросе, кроме первого.</p>"
+
+#: templates/modals/word_stats.html:62
+msgid "words"
+msgstr "үгын хэбүүд"
+
+#: templates/modals/word_stats.html:63
+msgid "lemmata"
+msgstr "леммэнүүд"
+
+#: templates/modals/word_stats.html:65
+msgid "Scale of the x axis: "
+msgstr "X шугамаар: "
+
+#: templates/modals/word_stats.html:67
+msgid "linear"
+msgstr "линейнэ"
+
+#: templates/modals/word_stats.html:68
+msgid "logarithmic"
+msgstr "логарифмическа"
+
+#: templates/modals/word_stats.html:70
+msgid "Max y: "
+msgstr "Макс. y"
+
+#: templates/modals/word_stats.html:72
+msgid "as in data"
+msgstr "мэдээнүүдтэ байһантай адли"
+
+#: templates/modals/word_stats.html:73
+#, python-format
+msgid "100%%"
+msgstr "100%%"
+
+#: templates/modals/word_stats.html:74
+#, python-format
+msgid "50%%"
+msgstr "50%%"
+
+#: templates/modals/word_stats.html:75
+#, python-format
+msgid "25%%"
+msgstr "25%%"
+
+#: templates/modals/word_stats.html:76
+#, python-format
+msgid "10%%"
+msgstr "10%%"
+
+#: templates/modals/word_stats.html:77
+#, python-format
+msgid "5%%"
+msgstr "5%%"
+
+#: templates/modals/word_stats.html:78
+#, python-format
+msgid "1%%"
+msgstr "1%%"
+
+#: templates/modals/word_stats.html:79
+#, python-format
+msgid "0.1%%"
+msgstr "0,1%%"
+
+#: templates/search_results/lemma_table_row.html:16
+#: templates/search_results/word_table_row.html:20
+msgid "Search in corpus"
+msgstr "Корпусто бэдэрэлгэ"
+
+#: templates/search_results/lemma_table_row.html:17
+#: templates/search_results/word_table_row.html:21
+msgid "Show statistics"
+msgstr "Статистика харуулха"
+
+#: templates/search_results/result_docs.html:1
+msgid "Filter result:"
+msgstr "Шэлэлтын дүнгүүд:"
+
+#: templates/search_results/result_docs.html:2
+msgid "document with"
+msgid_plural "documents with"
+msgstr[0] "-тай данса"
+msgstr[1] "-тай дансанууд"
+
+#: templates/search_results/result_docs.html:3
+msgid "word found,"
+msgid_plural "words found,"
+msgstr[0] "үгөөр,"
+msgstr[1] "үгэнүүдээр,"
+
+#: templates/search_results/result_docs.html:4
+msgid "of the entire corpus."
+msgstr "бүхы корпусһоо."
+
+#: templates/search_results/result_sentences.html:2
+#: templates/search_results/result_words.html:3
+msgid "Бэдэрэлгын дүн:"
+msgid_plural "Search result:"
+msgstr[0] "Бэдэрэлгын дүн: олдобо"
+msgstr[1] "Бэдэрэлгын дүн: олдобо" 
+
+#: templates/search_results/result_sentences.html:3
+msgid "occurrence"
+msgid_plural "occurrences"
+msgstr[0] "үгын хэб"
+msgstr[1] "үгын хэб"
+
+#: templates/search_results/result_sentences.html:4
+msgid "sentence found in approximately"
+msgid_plural "sentences found in approximately"
+msgstr[0] "соо тухай мэдүүлэл" 
+msgstr[1] "соо тухай мэдүүлэлнүүд" 
+
+#: templates/search_results/result_sentences.html:5
+msgid "in_document"
+msgid_plural "in_documents"
+msgstr[0] "дансада"
+msgstr[1] "дансада"
+
+#: templates/search_results/result_sentences.html:9
+#: templates/search_results/result_words.html:18
+msgid "The search was not finished due to the query timeout. You only see partial results."
+msgstr "Хүлеэлгын саг дүүрээд бэдэрэлгэ хүсэлдэбэгүй. Бэдэрэлгын бүхы дүнгүүд харуулагдабагүй."
+
+#: templates/search_results/result_sentences.html:19
+msgid "Number of results found exceeds the maximum number of pages you can view."
+msgstr "Дүнгүүдэй тоо үзэжэ болохо нюурнуудай тоо үлүүдэбэ." 
+
+#: templates/search_results/result_sentences.html:24
+#: templates/search_results/result_words.html:28
+msgid "You are searching in a subcorpus."
+msgstr "Та подкорпус соо бэдэрнэт."
+
+#: templates/search_results/result_sentences.html:45
+msgid "Copy example to clipboard"
+msgstr "Жэшээ хуулаха"
+
+#: templates/search_results/result_sentences.html:46
+msgid "Expand context"
+msgstr "Контекст үргэдхэхэ"
+
+#: templates/search_results/result_sentences.html:60
+msgid "download as CSV"
+msgstr "CSV мэтээр нэбтэрүүлхэ"
+
+#: templates/search_results/result_sentences.html:61
+msgid "download as XLSX"
+msgstr "XLSX мэтээр нэбтэрүүлхэ"
+
+#: templates/search_results/result_words.html:5
+msgid "unique word"
+msgid_plural "different words"
+msgstr[0] "үгын онсо хэб"
+msgstr[1] "үгын онсо хэбүүд"
+
+#: templates/search_results/result_words.html:7
+msgid "unique lemma"
+msgid_plural "different lemmata"
+msgstr[0] "онсо леммэ"
+msgstr[1] "элдэб леммэ"
+
+#: templates/search_results/result_words.html:9
+msgid "in approximately"
+msgstr "жэшээнь"
+
+#: templates/search_results/result_words.html:9
+msgid "document found,"
+msgid_plural "documents found,"
+msgstr[0] "дансада,"
+msgstr[1] "дансанудта,"
+
+#: templates/search_results/result_words.html:11
+msgid "total frequency:"
+msgstr "сүм дахилта:"
+
+#: templates/search_results/result_words.html:13
+msgid "total frequency of found word forms:"
+msgstr "үгын хэбэй сүм дахилта:"
+
+#: templates/search_results/result_words.html:34
+msgid "word_th_word"
+msgstr "үгэ"
+
+#: templates/search_results/result_words.html:34
+msgid "word_th_lemma"
+msgstr "леммэ"
+
+#: templates/search_results/result_words.html:36
+msgid "word_th_gr"
+msgstr "грамм."
+
+#: templates/search_results/result_words.html:41
+msgid "word_th_frequency"
+msgstr "дахилта"
+
+#: templates/search_results/result_words.html:43
+msgid "word_th_freq. rank / quantile"
+msgstr "дахилтын зэргэ /<br>квантиль"
+
+#: templates/search_results/result_words.html:46
+msgid "word_th_# forms"
+msgstr "түхэлнүүдэй тоо"
+
+#: templates/search_results/result_words.html:48
+msgid "word_th_# sentences"
+msgstr "мэд-дэй тоо"
+
+#: templates/search_results/result_words.html:49
+msgid "word_th_# documents"
+msgstr "данс-дай тоо"
+
+#: templates/search_results/result_words.html:50
+msgid "word_th_search in corpus"
+msgstr "бэдэрхэ"
+
+#: templates/search_results/result_words.html:51
+msgid "word_th_word stats"
+msgstr "тоо бүридхэл"
+
+#: templates/search_results/sentence_header.html:20
+msgid "Full text (opens in a new tab)"
+msgstr "Дүүрэн текст (шэнэ нюурта нээгдэхэ)"
+
+

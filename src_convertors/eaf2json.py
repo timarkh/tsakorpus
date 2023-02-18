@@ -41,6 +41,7 @@ class Eaf2JSON(Txt2JSON):
         self.segmentChildren = {}  # (aID, child tier type) -> [child aID]
         self.spanAnnoTiers = {}  # span annotation tier type -> {tier ID -> [(tli1, tli2, contents)}
         self.alignedSpanAnnoTiers = {}  # aID of a segment -> {span annotation tier ID -> contents}
+        self.spanAnnoTLIs = {}   # time-aligned span annotation ID -> {(tli1, tli2)}
         self.additionalWordFields = []  # names of additional word-level fields associated with some analysis tiers
         self.privacySegments = {}  # segments (start_ms, end_ms) that should be beeped out, one list per source file
         self.rxIgnoreTokens = None
@@ -307,7 +308,9 @@ class Eaf2JSON(Txt2JSON):
                         ana[tierType] = contents
                     analysisTiers[-1].append(ana)
             analysisTiers[-1] = [ana for ana in analysisTiers[-1] if len(ana) > 0]
-        if len(analysisTiers) <= 0:
+            if len(analysisTiers[-1]) <= 0:
+                analysisTiers[-1] = [{}]
+        if len(analysisTiers) <= 0 or (len(analysisTiers) == 1 and len(analysisTiers[0]) <= 0):
             return [{}]
         for combination in itertools.product(*analysisTiers):
             ana = {}
@@ -336,7 +339,7 @@ class Eaf2JSON(Txt2JSON):
                                 elif type(totalAna[k]) == list and ana[k] not in totalAna[k]:
                                     totalAna[k].append(ana[k])
                         else:
-                            if len(totalAna[k]) > 0 and k not in ['parts']:
+                            if len(totalAna[k]) > 0 and k not in ['parts', 'gloss']:
                                 totalAna[k] += '-'
                             if k not in ana:
                                 totalAna[k] += '∅'
@@ -414,12 +417,19 @@ class Eaf2JSON(Txt2JSON):
             analyses = [ana for ana in self.retrieve_analyses(wordIDs[iWord], lang=lang) if len(ana) > 0]
             if len(analyses) > 0:
                 token['ana'] = analyses
+            elif self.rxLetters.search(word) is None:
+                token['wtype'] = 'punct'
+            for rx in self.tp.tokenizer.specialTokenRegexes:
+                if rx['regex'].match(word):
+                    for k, v in rx['token'].items():
+                        token[k] = v
+                    break
             words.append(token)
         if iSentPos < len(text):
             self.add_punc(words, text[iSentPos:], text[:iSentPos], iSentPos)
         return words, text
 
-    def process_span_annotation_tier(self, tierNode):
+    def process_span_annotation_tier(self, tierNode, alignedTier=False):
         """
         If the tier in tierNode is a span annotation tier, extract its data.
         If the tier is time-aligned, save the data to self.spanAnnoTiers[annoTierID]
@@ -436,16 +446,24 @@ class Eaf2JSON(Txt2JSON):
         if annoTierID not in self.spanAnnoTiers[annoTierType]:
             self.spanAnnoTiers[annoTierType][annoTierID] = []
 
-        segments = tierNode.xpath('ANNOTATION/ALIGNABLE_ANNOTATION')
+        segments = tierNode.xpath('ANNOTATION/REF_ANNOTATION | ANNOTATION/ALIGNABLE_ANNOTATION')
         for segNode in segments:
             if ('ANNOTATION_ID' not in segNode.attrib
                     or segNode.attrib['ANNOTATION_ID'] not in self.segmentTree):
                 continue
             segData = self.segmentTree[segNode.attrib['ANNOTATION_ID']]
-            if segData[2] is None or segData[3] is None:
+            if not alignedTier:
+                if segData[2] is None or segData[3] is None:
+                    continue
+                tli1 = segData[2]
+                tli2 = segData[3]
+                self.spanAnnoTLIs[segNode.attrib['ANNOTATION_ID']] = (tli1, tli2)
+            elif segData[1] is not None:
+                aID = segData[1]
+                tli1, tli2 = self.spanAnnoTLIs[aID]
+                self.spanAnnoTLIs[segNode.attrib['ANNOTATION_ID']] = self.spanAnnoTLIs[aID]
+            else:
                 continue
-            tli1 = segData[2]
-            tli2 = segData[3]
             text = segData[0]
             self.spanAnnoTiers[annoTierType][annoTierID].append((tli1, tli2, text))
         self.spanAnnoTiers[annoTierType][annoTierID].sort(
@@ -529,8 +547,8 @@ class Eaf2JSON(Txt2JSON):
                     continue
         if len(lang) <= 0 or lang not in self.corpusSettings['languages']:
             # A tier can also contain span annotations, let's check it:
-            if len(lang) <= 0 and not alignedTier:
-                self.process_span_annotation_tier(tierNode)
+            if len(lang) <= 0:
+                self.process_span_annotation_tier(tierNode, alignedTier)
             # Otherwise, we do not want a tier with no language association
             return
         langID = self.corpusSettings['languages'].index(lang)
@@ -683,7 +701,7 @@ class Eaf2JSON(Txt2JSON):
                     # We will calculate these imaginary boundaries to compare them to the annotation
                     # boundaries and know which tokens the annotation should cover.
                     # Note that the visual alignment can be imperfect, so we have to account for that.
-                    # We use the original tokenization as represented in ELAN for calcuations,
+                    # We use the original tokenization as represented in ELAN for calculations,
                     # which might be different from what is in curSentence['words'] now (e.g. punctuation
                     # might have been absent from the original tokens).
                     tokenDuration = (curSentenceEnd - curSentenceStart) / curSentence['nTokensOrig']
@@ -857,6 +875,8 @@ class Eaf2JSON(Txt2JSON):
         textJSON = {'meta': curMeta, 'sentences': []}
         nTokens, nWords, nAnalyzed = 0, 0, 0
         self.spanAnnoTiers = {}
+        self.alignedSpanAnnoTiers = {}
+        self.spanAnnoTLIs = {}
         srcTree = etree.parse(fnameSrc)
         self.tlis = self.get_tlis(srcTree)
         self.build_segment_tree(srcTree)

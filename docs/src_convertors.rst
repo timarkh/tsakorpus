@@ -10,7 +10,7 @@ All files related to the convertors are located in ``/src_convertors``.
 
 This is how it works:
 
-1. You put your sorce files into the appropriate folder.
+1. You put your source files into the appropriate folder.
 2. You edit configuration files.
 3. You pick one of the Python scripts in ``/src_convertors``, based on your data format, and run it.
 4. You get the JSON files. If your corpus has media files, you also get cut and compressed media files.
@@ -70,7 +70,7 @@ In most cases, it is expected that metadata for your texts (such as title, autho
 
 - ``meta_files_ext`` (Boolean) -- whether the filenames in the metadata file have extensions.
 
-- ``meta_files_dir`` (Boolean) -- whether the filenames in the metadata file have full paths rooted by ``/src_convertors/corpus/%ext%``. If it is set to ``false``, it is assumed that the names of the source files are unique regardless of where they exist within the subtree.
+- ``meta_files_dir`` (Boolean) -- whether the filenames in the metadata file have their full path relative to ``/src_convertors/corpus/%ext%`` specified (without trailing slashes). If it is set to ``false``, it is assumed that the names of the source files are unique regardless of where they exist within the subtree.
 
 - ``meta_files_case_sensitive`` (Boolean) -- whether the filenames in the metadata file should be treated as case sensitive.
 

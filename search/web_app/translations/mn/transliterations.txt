@@ -1,0 +1,7 @@
+IPA	МФА
+UPA	УФА
+corpus	корпусно
+cyrillic	кирилл
+dictionary	толиин
+latin	лата
+original	эхинэй

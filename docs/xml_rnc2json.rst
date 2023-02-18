@@ -1,7 +1,7 @@
 RNC XML convertor
 =================
 
-This document explains how to convert RNC XML docuemnts to Tsakorpus JSON. See general information about source convertors and their configuration files :doc:`here </src_convertors>`.
+This document explains how to convert RNC XML documents to Tsakorpus JSON. See general information about source convertors and their configuration files :doc:`here </src_convertors>`.
 
 Convertor: ``/src_convertors/xml_rnc2json.py``.
 
@@ -15,7 +15,7 @@ Format description
 
 All data is contained in an ``<html>`` node, which has ``<head>`` and ``<body>`` daughters. ``<head>`` may contain metadata, which alternatively can be stored in a separate metadata file. Each metadata field is stored as ``<meta name="..." content="..."/>``.
 
-In the case of simple annotated files, ``<body>`` contains paragraphs (``<p>``, possibly with a class attribute), which, in turn, contain sentences (``<se>``). Sentences contain words (``<w>``, see :doc:`parsed_wordlist_format` for details), while punctuation is placed between the word nodes as plain text. If there are newlines between the words, they are ignored. It is allowed to have spans marking italics (``<i>``) or boldface (``<b>``) inside ``<se>``; they will be transofrmed into :doc:`style spans </styles>`.
+In the case of simple annotated files, ``<body>`` contains paragraphs (``<p>``, possibly with a class attribute), which, in turn, contain sentences (``<se>``). Sentences contain words (``<w>``, see :doc:`parsed_wordlist_format` for details), while punctuation is placed between the word nodes as plain text. If there are newlines between the words, they are ignored. It is allowed to have spans marking italics (``<i>``) or boldface (``<b>``) inside ``<se>``; they will be transformed into :doc:`style spans </styles>`.
 
 In parallel corpora, ``<body>`` contains translation units (``<para>``), which contain aligned sentences. Each sentence has to have a ``lang`` attribute. The sentences are structured in the same way as in the case of simple texts. There may also be a ``<p>`` layer between ``<body>`` and ``<para>``.
 

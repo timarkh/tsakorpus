@@ -114,7 +114,7 @@ class Xml_Rnc2JSON(Txt2JSON):
     def process_se_node(self, se, lang, p_class=None):
         """
         Extract data from the <se> (sentence) node that contains
-        one ore more sentences in one language. The input is an
+        one or more sentences in one language. The input is an
         XML string, not an element.
         """
         bProcessXML = (('analyze_text' in self.corpusSettings and not self.corpusSettings['analyze_text'])

@@ -26,7 +26,7 @@ Glosses and grammatical tags generally represent the same kind of information, i
 
 - Tags constitute an unordered set, while glosses tell you how the exponents of certain values are positioned relative to one another inside one word.
 - With tags, you do not know which category is expressed by which morpheme.
-- Each tag ideally expresses one particular value of one particular category, while there is generally no one-to-one correspondence between categories and morphemes. One category can be experessed by several different morphemes, or several categories can be expressed by one morpheme.
+- Each tag ideally expresses one particular value of one particular category, while there is generally no one-to-one correspondence between categories and morphemes. One category can be expressed by several different morphemes, or several categories can be expressed by one morpheme.
 
 It may seem that, putting aside lexical class glosses such *inanim* above, tags would be redundant compared to glosses. However, this is not always the case. If only glosses are present in the annotation, it may negatively affect the search functionality of the corpus. Consider, for example, Udmurt (Uralic > Permic) word **bi̮dtiśkemmi̮**. Here is how it could be glossed:
 

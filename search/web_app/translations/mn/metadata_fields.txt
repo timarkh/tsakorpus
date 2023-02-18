@@ -1,0 +1,70 @@
+account_type	аккаунтын түхэл
+account_type_post	аккаунтын дүрэ (пост)
+age	наһан 
+annotators	разметчикууд
+author	зохёогшо
+birth_place	түрэһэн нютаг
+birth_year	түрэһэн он
+birthplace	түрэһэн нютаг
+birthyear	түрэһэн он
+byear	түрэһэн он
+byear_post	түрэһэн он (пост)
+century	зуун жэл
+chronotop	үйлын саг ба газар
+citation	ссылкэ
+city	хото
+city_post	ажаhуулгын газар (пост)
+collector	суглуулагша
+country	гүрэн
+date_trans	оршуулгын hара он
+dialect	диалектэ
+gender	бэлгэ
+genre	жанр
+genre_fi	уран зохёлой жанр
+home_town	түрэһэн газар
+home_town_post	түрэһэн газар (пост)
+hometown	түрэһэн газар
+issue	гаргалга
+lang	оригиналай хэлэн
+lang_trans	оршуулгын хэлэн
+language	хэлэн
+length	алибаа юумэнэй ута
+line	мүр
+linguist	хэлэ шэнжэлэгшэ
+linguists	хэлэ шэнжэлэгшэд
+live_place	ажаhуулгын газар
+liveplace	ажаhуулгын газар
+medium	эзэлэн багтаагшын түхэл
+occupation	ажалай янза
+origin	түрэһэн газар
+orth	орфографи
+orthography	орфографи
+page	хуудаһан
+place	газар
+post_type	постын түхэл 
+profession	мэргэжэл
+publication	хэблэл
+published	хэблэгдэhэн 
+region	регион
+sent_analyses	мэдүүлэлэй шүүлбэри
+sex	бэлгэ
+sex_post	бэлгэ (пост)
+speaker	хэлэгшэ
+speakers	хэлэгшэд
+sphere	хүдэлэлгын сферэ
+style	стиль
+subdialect	нютагай хэлэн
+subject	алибаа юумэн
+tagging	разметкэ
+title	нэрэ
+title_en	нэрэ (англи)
+title_ru	нэрэ (ород)
+topic	сэдэб
+translator	оршуулагша
+type	түхэл
+year	он
+year_birth	зохёолшын түрэһэн он
+year_from	он: онhоо
+year_post	он (пост)
+year_publ	толилолгын он
+year_to	он: хүрэтэр

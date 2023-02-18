@@ -130,9 +130,9 @@ List of parameters
 
 - ``query_log`` (Boolean) -- whether queries should be logged. When turned on, query type, query arguments and timestamps are appended to ``search/query_log.txt`` after each query. No personal data (such as IP address) are saved. Defaults to ``true``.
 
-- ``query_timeout`` (integer) -- the upper bound on sentence search query execution in seconds. This bound is applied stricly for the Elasticsearch query execution and not so strictly when postprocessing results found by Elasticsearch.
+- ``query_timeout`` (integer) -- the upper bound on sentence search query execution in seconds. This bound is applied strictly for the Elasticsearch query execution and not so strictly when postprocessing results found by Elasticsearch.
 
-- ``regex_simple_search`` (string) -- regex which is applied to all strings of a query to determine how they should be dealt with. By default, a text query is treated as containing wildcards if it only contains regular characters and a star, as a regex if it contains any special regex characters other than a star, and as simple text otherwise. If ``regex_simple_search`` matches the query, it will be processed as simple text. You would want to change this parameter if you have tokens with stars, dots, parentheses etc. that you need to search.
+- ``regex_simple_search`` (string) -- regex which is applied to all strings of a query to determine how they should be dealt with. By default, a text query is treated as containing wildcards and Boolean operators if it only contains regular characters and either a star or Boolean operators; as a regex if it contains any special regex characters other than a star; and as simple text otherwise. If ``regex_simple_search`` matches the query, it will be processed as simple text. You would want to change this parameter if you have tokens with stars, dots, parentheses etc. that you need to search. Defaults to ``^[^\[\]()*\\{}^$.?+~|,&]*$``.
 
 - ``rtl_languages`` (list of strings) -- list of languages which use right-to-left writing direction. Defaults to empty list.
 

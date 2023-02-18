@@ -284,7 +284,7 @@ class Xml_Flex2JSON(Txt2JSON):
                         if element.text is None:
                             element.text = ' '
                         gloss = element.text
-                        glossIndex = element.text + '{' + lastPart.strip('-=:.<>') + '}-'
+                        glossIndex = element.text.strip('-=:.<>') + '{' + lastPart.strip('-=:.<>') + '}-'
                         if (morphType == 'stem'
                                 or (morphType == 'unknown' and element.text not in self.glosses))\
                                 or (morphType in ('enclitic', 'proclitic') and len(mNode) == 1):
@@ -411,7 +411,7 @@ class Xml_Flex2JSON(Txt2JSON):
             yield {'lang': langID, 'words': words, 'text': transText, 'para_alignment': [paraAlignment]}
 
     def convert_file(self, fnameSrc, fnameTarget):
-        nTokens, nWords, nAnalyze = 0, 0, 0
+        nTokens, nWords, nAnalyzed = 0, 0, 0
         srcTree = etree.parse(fnameSrc)
         interlinears = srcTree.xpath('/document/interlinear-text')
         nDoc = 0
@@ -434,10 +434,23 @@ class Xml_Flex2JSON(Txt2JSON):
             for i in range(len(textJSON['sentences']) - 1):
                 if textJSON['sentences'][i]['lang'] != textJSON['sentences'][i + 1]['lang']:
                     textJSON['sentences'][i]['last'] = True
+
+            # Count words and tokens
+            for i in range(len(textJSON['sentences']) - 1):
+                if textJSON['sentences'][i]['lang'] != textJSON['sentences'][i + 1]['lang']:
+                    textJSON['sentences'][i]['last'] = True
+                for word in textJSON['sentences'][i]['words']:
+                    nTokens += 1
+                    if word['wtype'] == 'word':
+                        nWords += 1
+                    if 'ana' in word and len(word['ana']) > 0:
+                        nAnalyzed += 1
+
+            # Clean up and write the output
             self.tp.splitter.recalculate_offsets(textJSON['sentences'])
             self.tp.splitter.add_next_word_id(textJSON['sentences'])
             self.write_output(curFnameTarget, textJSON)
-        return nTokens, nWords, nAnalyze
+        return nTokens, nWords, nAnalyzed
 
 
 if __name__ == '__main__':
