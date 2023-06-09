@@ -98,6 +98,7 @@ class CorpusSettings:
         # Server configuration
         self.session_cookie_domain = None
         self.query_log = True
+        self.try_restart_elastic = True     # Try restarting elasticsearch.service if it is down
 
         # Statistics calculated at runtime
         self.corpus_size = 0

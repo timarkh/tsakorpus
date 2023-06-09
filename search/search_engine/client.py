@@ -1,6 +1,6 @@
 from elasticsearch import Elasticsearch, helpers
 from elasticsearch.client import IndicesClient
-import json
+import subprocess
 import os
 import time
 from .query_parsers import InterfaceQueryParser
@@ -179,6 +179,13 @@ class SearchClient:
         hits = self.es.search(index=self.name + '.words',
                               body=esQuery)
         return hits
+
+    def start_elastic_service(self):
+        """
+        Try to restart the system's Elasticsearch server.
+        """
+        subprocess.Popen(os.path.abspath('restart_elasticsearch.sh'), shell=True,
+                         stdout=subprocess.PIPE)
 
     def is_alive(self):
         """

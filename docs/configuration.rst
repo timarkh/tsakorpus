@@ -155,6 +155,12 @@ List of parameters
 
 - ``transliterations`` (list of strings) -- list of supported transliterations. For each transliteration, there should be a function in ``/search/web_app/transliteration.py`` named ``trans_%TRANSLITERATION_NAME%_baseline`` that takes the text and the name of the language as input and returns transliterated text.
 
+- ``try_restart_elastic`` (Boolean) -- if local Elasticsearch is used and it seems to be down (no connection can be established when a client opens the search page), try starting it by running ``search/restart_elasticsearch.sh`` (only in Linux). Defaults to ``true``. Note that starting a service requires sudo privileges. In order for this to work without you manually entering your sudo password, the user who runs the app has to be allowed to use sudo without a password in this case. This can be achieved by running ``sudo visudo`` and adding the following line::
+
+    your_username   ALL=NOPASSWD:/usr/bin/systemctl start elasticsearch.service
+
+If you edit ``search/restart_elasticsearch.sh`` to use a different way of starting Elasticsearch service, you have to modify this line accordingly.
+
 - ``video`` (Boolean) -- whether the corpus has aligned video files. Defaults to ``false``. If it does, do not forget to set ``media`` to ``true``.
 
 - ``viewable_meta`` (list of strings) -- names of the document-level metadata fields that should be shown in search results.

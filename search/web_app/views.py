@@ -30,8 +30,14 @@ def search_page():
     if request.query_string is not None:
         queryString = request.query_string.decode('utf-8')
     ready4work = settings.ready_for_work
+    sc.start_elastic_service()
     if settings.ready_for_work:
         ready4work = sc.is_alive()
+        if (not ready4work
+                and settings.try_restart_elastic
+                and (settings.elastic_url is None or len(settings.elastic_url) <= 0)):
+            # The local Elasticsearch server is down, try to restart it
+            sc.start_elastic_service()
     bMinimalistic = ('minimalistic' in request.url_rule.rule)
     locales = settings.interface_languages
     if type(locales) == list:
