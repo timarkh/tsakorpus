@@ -1466,6 +1466,7 @@ class SentenceViewer:
                 # found items comes from word[wtype=word_freq] objects and
                 # therefore is stored in a subaggregation.
                 # If not, it will be taken from the item itself by process_word_buckets.
+                # print(response['aggregations']['agg_group_by_word'])
                 wordFreq = response['aggregations']['agg_group_by_word']['buckets'][iHit]['subagg_freq']['value']
             except KeyError:
                 wordFreq = None

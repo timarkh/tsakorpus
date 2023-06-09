@@ -345,6 +345,8 @@ class InterfaceQueryParser:
                 elif sortOrder == 'freq':
                     order = {'freq': {'order': 'desc'}}
             elif groupBy == 'lemma':
+                subAggregations = {'subagg_freq': {'sum': {'field': 'freq'}},
+                                   'subagg_nforms': {'cardinality': {'field': 'w_id'}}}
                 if sortOrder in ('wf', 'lemma'):
                     order = {'l_order': {'terms': {'field': 'l_order'}}}
                 elif sortOrder == 'freq':
@@ -414,6 +416,8 @@ class InterfaceQueryParser:
                 esQuery['size'] = 0
                 esQuery['aggs']['agg_noccurrences'] = {'cardinality': {'field': 'l_id'}}
                 esQuery['aggs']['agg_group_by_word'] = self.composite_agg_word(query_size, order, groupBy, after_key)
+                if subAggregations is not None:
+                    esQuery['aggs']['agg_group_by_word']['aggs'] = subAggregations
             elif groupBy == 'word' and order is not None:
                 esQuery['sort'] = order
         else:
@@ -696,7 +700,7 @@ class InterfaceQueryParser:
                 for iQueryWord in range(len(queryDict['words'])):
                     wordDesc, negQuery = queryDict['words'][iQueryWord]
                     curSentIndex = None
-                    print(iQueryWord, wordDesc)
+                    # print(iQueryWord, wordDesc)
                     if iQueryWord == nPivotalTerm - 1:  # nPivotalTerm is 1-based
                         if ('words.sentence_index' in wordDesc
                                 and 'match' in wordDesc['words.sentence_index']
@@ -709,7 +713,7 @@ class InterfaceQueryParser:
                                 distanceQueryTuple = []
                                 break
                         curSentIndex = self.sentence_index_query(pivotalTermIndex)
-                        print(curSentIndex)
+                        # print(curSentIndex)
                     elif iQueryWord + 1 in constraints:
                         for wordPair in constraints[iQueryWord + 1]:
                             if nPivotalTerm not in wordPair:
@@ -1102,9 +1106,11 @@ class InterfaceQueryParser:
             if len(curPrelimQuery) > 0:
                 prelimQuery['words'].append((curPrelimQuery, negQuery))
             for k, v in htmlQuery.items():
-                if k.startswith('sent_meta_') and (type(v) != str or self.rxStars.search(v) is None):
-                    mFieldNum = self.rxFieldNum.search(k)
-                    if mFieldNum is not None:
+                mFieldNum = self.rxFieldNum.search(k)
+                if mFieldNum is not None:
+                    fieldName = mFieldNum.group(1)
+                    if (fieldName.startswith('sent_meta_')
+                            and type(v) != str or self.rxStars.search(v) is None):
                         prelimQuery[mFieldNum.group(1)] = v
         if searchIndex == 'sentences' and 'txt' in htmlQuery and len(htmlQuery['txt']) > 0:
             if 'precise' in htmlQuery and htmlQuery['precise'] == 'on':
