@@ -217,3 +217,5 @@ function html_decode(input){
   e.innerHTML = input;
   return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
 }
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));

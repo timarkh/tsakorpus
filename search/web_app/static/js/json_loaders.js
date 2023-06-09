@@ -604,9 +604,9 @@ function search_if_enter(e) {
     }
 }
 
-function search_if_query() {
+async function search_if_query() {
 	if ($('#query_to_load').val().length > 1) {
-		$('#query_load_ok').click();
+		await load_query();
 		$('#search_sent').click();
 	}
 }
