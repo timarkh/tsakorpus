@@ -39,7 +39,7 @@ From the developer's perspective
 | **A**: No.
 
 | **Q**: *Is it possible to offer web interface in several languages?*
-| **A**: Yes. English and Russian are in the box, but you may add other languages. There are a lot of strings to translate though.
+| **A**: Yes. English, French, Russian and a couple of other translations are in the box, but you may add other languages. There are a lot of strings to translate though.
 
 | **Q**: *Can I have several transliteration options?*
 | **A**: Yes. Some are in the box; if you want to create your own, you will have to implement it as a Python function.

@@ -733,3 +733,6 @@ msgstr "statistics"
 #: templates/search_results/sentence_header.html:20
 msgid "Full text (opens in a new tab)"
 msgstr "Full text (opens in a new tab)"
+
+msgid "Virtual keyboard"
+msgstr "Virtual keyboard"

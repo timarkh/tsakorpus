@@ -1,0 +1,31 @@
+F	F
+M	M
+complete	entièrement, mais avec homonymie
+dialogue	dialogue
+essay	essai
+experiment	expérience
+female	féminin
+fiction	fiction
+incomplete	de manière incomplète
+interview	entretien
+male	masculin
+monologue	monologue
+movie	film
+nonfiction	non-fiction
+novel	roman
+oral	oraux
+original	original
+poetry	poésie
+press	presse
+prose	prose
+public	publics
+religion	religieux
+science	scientifiques
+song	chanson
+spontaneous	spontanés
+story	récit
+translated	traduction
+unique	sans ambiguïté
+wikipedia	Wikipedia
+written	écrits
+

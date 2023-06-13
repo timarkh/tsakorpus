@@ -76,7 +76,7 @@ List of parameters
 
 - ``integer_meta_fields`` (list of strings) -- names of the sentence-level metadata fields that have integer values and therefore should be represented by ranges rather than by single text boxes in the query interface.
 
-- ``interface_languages`` (list of strings) -- list with codes of all available web interface languages.
+- ``interface_languages`` (list of strings) -- list with codes of all available :doc:`web interface languages </interface_languages>`.
 
 - ``keep_lemma_order`` (Boolean) -- whether the order of multiple analyses should be kept when a string with the lemmata is concatenated for displaying. Defaults to ``false``. For example, if a word has 3 analyses with the lemmara *B*, *A* and *B*, ``false`` means that the output string of lemmata will look like *A/B*, and ``true``, *B/A/B*. The latter may be needed if multiple analyses actually refer to different parts of a graphic word, e.g. host and clitics if they are represented as a single token.
 

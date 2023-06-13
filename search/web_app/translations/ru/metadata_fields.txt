@@ -16,8 +16,10 @@ city	город
 city_post	место проживания (пост)
 collector	собиратель
 country	страна
+date_of_recording	дата записи
 date_trans	дата перевода
 dialect	диалект
+filename	имя файла
 gender	пол
 genre	жанр
 genre_fi	жанр худ. литературы
@@ -41,6 +43,7 @@ orth	орфография
 orthography	орфография
 page	страница
 place	место
+place_of_recording	место записи
 post_type	тип поста
 profession	профессия
 publication	издание
@@ -50,7 +53,10 @@ sent_analyses	Разбор предложения
 sex	пол
 sex_post	пол (пост)
 speaker	говорящий
+speaker_ID	ID говорящего
+speaker_gender	пол говорящего
 speaker_type	тип говорящего
+speaker_year_of_birth	год рождения говорящего
 speakers	говорящие
 sphere	сфера функционирования
 style	стиль

@@ -1,0 +1,80 @@
+all toutes les langues
+undefined	indéfinie
+comments	commentaires
+note	commentaires
+notes	commentaires
+positive	positifs
+negative	negatifs
+ref	ID
+id	ID
+
+abaza	Abaza
+acrhi	Artchi
+adyghe	Adyguéen
+albanian	Albanais
+armenian	Arménien
+armenian_translit	Arménien (translit.)
+bangime	Bangime
+bashkir	Bachkir
+belarusian	Biélorusse
+beserman	Beserman
+bulgarian	Bulgare
+buryat	Bouriate
+chinese	Chinois
+chuvash	Tchouvache
+chuvash_cyr	Tchouvache (cyrillique)
+dargwa	Dargwa
+dogon	Dogon
+english	Anglais
+english_note	Anglais (commentaires)
+erzya	Erzya
+estonian	Estonien
+finnish	Finlandais
+french	Français
+german	Allemand
+ginyanga	Ginyanga
+gizey	Gizey
+greek	Grec
+guro	Guro
+hill_mari	Mari des montagnes
+hungarian	Hongrois
+italian	Italien
+joola	Bandial
+kafire	Kafire
+kalmyk	Kalmouk
+kamas	Kamas
+kazakh	Kazakh
+komi	Komi
+komi-zyrian	Komi-zyriène
+komi_permyak	Komi-permiak
+komi_zyrian	Komi-zyriène
+latvian	Letton
+limba	Limba
+lithuanian	Lituanien
+macedonian  Macédonien
+meadow_mari	Mari des prairies
+moksha	Mokcha
+mundabli	Mundabli
+mwan	Monan
+nganasan	Nganassane
+ossetic	Ossète
+ossetic_digor	Digor
+ossetic_iron	Iron
+polish	Polonais
+romani	Romani
+russian	Russe
+san	San
+selkup	Selkoupe
+senufo	Sénoufo
+spanish	Espagnol
+swedish	Suédois
+tatar	Tatar
+tsakhur	Tsakhour
+tsakonian	Tsakonien
+udihe	Oudihé
+udmurt	Oudmourte
+ukrainian	Ukrainien
+ut_main	ut-Ma'in
+wan	Wan
+yakut	Iakoute
+yiddish	Yiddish

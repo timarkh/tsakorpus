@@ -1,0 +1,76 @@
+account_type	Type de compte
+account_type_post	Type de compte (post)
+age	Âge
+annotators	Annotateurs
+author	Auteur
+birth_place	Lieu de naissance
+birth_year	Année de naissance
+birthplace	Lieu de naissance
+birthyear	Année de naissance
+byear	Année de naissance
+byear_post	Année de naissance (post)
+century	Siècle
+chronotop	Chronotope (relation espace-temps)
+citation	Référence biblio
+city	Ville
+city_post	Lieu de résidence (post)
+collector	Linguiste descripteur
+country Pays
+date_of_recording	Date d'enregistrement 
+date_trans	Date de traduction
+dialect	Dialecte
+filename	Nom du fichier 
+gender	Sexe
+genre	Genre
+genre_fi	Genre de fiction
+home_town	Lieu de naissance
+home_town_post	Lieu de naissance (post)
+hometown	Lieu de naissance
+issue	Numéro
+lang	Langue originale
+lang_trans	Langue de traduction
+language	Langue
+length	Longueur
+line	Ligne
+linguist	Linguiste
+linguists	Linguistes
+live_place	Lieu de résidence
+liveplace	Lieu de résidence
+medium	Support
+occupation	Profession
+origin	Lieu de naissance
+orth	Orthographe
+orthography	Orthographe
+page	Page
+place	Lieu
+place_of_recording	Lieu d'enregistrement 
+post_type	Type de post
+profession	Profession
+publication	Édition
+published	Publié
+region	Région
+sent_analyses	Analyse de l'énoncé
+sex	Sexe
+sex_post	Sexe (post)
+speaker	Énonciateur 
+speaker_ID	ID de l'énonciateur 
+speaker_gender	Sexe de l'énonciateur 
+speaker_year_of_birth	Année de naissance de l'énonciateur 
+speakers	Énonciateurs
+sphere	Domaine
+style	Style
+subdialect	Parler
+subject	Sujet
+tagging	Étiquetage
+title	Titre
+title_en	Titre en anglais
+title_ru	Titre en russe
+topic	Thème
+translator	Traducteur
+type	Type
+year	Année
+year_birth	Année de naissance de l'auteur
+year_from	Année : de
+year_post	Année (post)
+year_publ	Année de parution
+year_to	Année : à

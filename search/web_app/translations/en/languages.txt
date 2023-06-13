@@ -14,6 +14,7 @@ adyghe	Adyghe
 albanian	Albanian
 armenian	Armenian
 armenian_translit	Armenian (translit.)
+bangime	Bangime
 bashkir	Bashkir
 belarusian	Belarusian
 beserman	Beserman
@@ -21,18 +22,25 @@ bulgarian	Bulgarian
 buryat	Buryat
 chinese	Chinese
 chuvash	Chuvash
+chuvash_cyr	Chuvash (cyrillic)
 dargwa	Dargwa
+dogon	Dogon
 english	English
 english_note	English (note)
 erzya	Erzya
 estonian	Estonian
 finnish	Finnish
 french	French
-hungarian	Hungarian
 german	German
+ginyanga	Ginyanga
+gizey	Gizey
 greek	Greek
+guro	Guro
 hill_mari	Hill Mari
+hungarian	Hungarian
 italian	Italian
+joola	Joola (Bandial)
+kafire	Kafire
 kalmyk	Kalmyk
 kamas	Kamas
 kazakh	Kazakh
@@ -41,9 +49,13 @@ komi-zyrian	Komi-Zyrian
 komi_permyak	Komi-Permyak
 komi_zyrian	Komi-Zyrian
 latvian	Latvian
+limba	Limba
 lithuanian	Lithuanian
+macedonian  Macedonian
 meadow_mari	Meadow Mari
 moksha	Moksha
+mundabli	Mundabli
+mwan	Mwan
 nganasan	Nganasan
 ossetic	Ossetic
 ossetic_digor	Digor Ossetic
@@ -51,13 +63,18 @@ ossetic_iron	Iron Ossetic
 polish	Polish
 romani	Romani
 russian	Russian
+san	San
 selkup	Selkup
+senufo	Senufo
 spanish	Spanish
 swedish	Swedish
 tatar	Tatar
 tsakhur	Tsakhur
 tsakonian	Tsakonian
+udihe	Udihe
 udmurt	Udmurt
 ukrainian	Ukrainian
+ut_main	u̠t-Ma'in
+wan	Wan
 yakut	Yakut
 yiddish	Yiddish

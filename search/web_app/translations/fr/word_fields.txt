@@ -1,0 +1,14 @@
+lex2	2ème lemme
+logogram	logogramme
+par	Participant (par)  
+segment	segment
+trans_de	traduction (DE)
+trans_de2	2ème traduction (DE)
+trans_en	traduction (EN)  
+trans_en2	2ème traduction (EN)
+trans_fr	traduction (FR)
+trans_fr2	2ème traduction (FR)
+trans_ru	traduction (RU)
+trans_ru2	2ème traduction (RU)
+transcription	transcription
+

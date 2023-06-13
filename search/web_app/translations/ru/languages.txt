@@ -14,6 +14,7 @@ adyghe	адыгейский
 albanian	албанский
 armenian	армянский
 armenian_translit	армянский (транслит.)
+bangime	бангери
 bashkir	башкирский
 belarusian	белорусский
 beserman	бесермянский
@@ -21,7 +22,9 @@ bulgarian	болгарский
 buryat	бурятский
 chinese	китайский
 chuvash	чувашский
+chuvash_cyr	чувашский (кириллица)
 dargwa	даргинский
+dogon	догон
 english	английский
 english_note	английский (комментарии)
 erzya	эрзянский
@@ -29,19 +32,30 @@ estonian	эстонский
 finnish	финский
 french	французский
 german	немецкий
+ginyanga	гиньянга
+gizey	гизей
 greek	греческий
+guro	гуро
 hill_mari	горномарийский
+hungarian	венгерский
 italian	итальянский
+joola	бандиал
+kafire	кафире
 kalmyk	калмыцкий
 kamas	камасинский
+kazakh	казахский
 komi	коми
 komi-zyrian	коми-зырянский
 komi_permyak	коми-пермяцкий
 komi_zyrian	коми-зырянский
 latvian	латышский
+limba	лимба
 lithuanian	литовский
 meadow_mari	луговой марийский
+macedonian  македонский
 moksha	мокшанский
+mundabli	мундабли
+mwan	муан
 nganasan	нганасанский
 ossetic	осетинский
 ossetic_digor	дигорский
@@ -49,13 +63,18 @@ ossetic_iron	иронский
 polish	польский
 romani	цыганский
 russian	русский
+san	сан
 selkup	селькупский
+senufo	сенуфо
 spanish	испанский
 swedish	шведский
 tatar	татарский
 tsakhur	цахурский
 tsakonian	цаконский
+udihe	улэгейский
 udmurt	удмуртский
 ukrainian	украинский
+ut_main	ут-маин
+wan	уан
 yakut	якутский
 yiddish	идиш

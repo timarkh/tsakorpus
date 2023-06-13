@@ -4,6 +4,7 @@ Interface languages
 You can translate your interface into any languages you want. The user will be able to choose a language by clicking a language code link at the top of the search page. Basic interface translations into several languages are already built in:
 
 - English (``en``);
+- French (``fr``);
 - Russian (``ru``);
 - Chinese (``zh``, partial);
 - Albanian (``sq``);

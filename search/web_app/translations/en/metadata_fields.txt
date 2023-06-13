@@ -16,8 +16,10 @@ city	City
 city_post	Current place (post-level)
 collector	Collector
 country	Country
+date_of_recording	Date of recording
 date_trans	Date of translation
 dialect	Dialect
+filename	File name
 gender	Gender
 genre	Genre
 genre_fi	Genre of fiction
@@ -41,6 +43,7 @@ orth	Orthography
 orthography	Orthography
 page	Page
 place	Place
+place_of_recording	Place of recording
 post_type	Post type
 profession	Profession
 publication	Publication
@@ -50,7 +53,10 @@ sent_analyses	Sentence analyzed
 sex	Sex
 sex_post	Sex (post-level)
 speaker	Speaker
+speaker_ID	Speaker ID
+speaker_gender	Gender of the speaker
 speaker_type	Speaker type
+speaker_year_of_birth	Birth year of the speaker
 speakers	Speakers
 sphere	Sphere
 style	Style

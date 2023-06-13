@@ -1,59 +1,59 @@
 #: templates/index.html:4
 msgid "Corpus search page"
-msgstr "Поиск в корпусе"
+msgstr "Page de recherche"
 
 #: templates/index.html:19 templates/index/query_area.html:54
 msgid "more_fields"
-msgstr "показать все поля"
+msgstr "afficher plus de champs"
 
 #: templates/index.html:20
 msgid "fewer_fields"
-msgstr "скрыть поля"
+msgstr "masquer les champs"
 
 #: templates/index.html:21
 msgid "add_distance"
-msgstr "добавить&nbsp;расстояние"
+msgstr "ajouter&nbsp;une distance"
 
 #: templates/index.html:22
 msgid "remove_word"
-msgstr "убрать&nbsp;слово"
+msgstr "supprimer&nbsp;le mot"
 
 #: templates/index.html:23
 msgid "Distance to word #"
-msgstr "Расстояние до слова №"
+msgstr "Distance&nbsp;par&nbsp;rapport&nbsp;au&nbsp;mot №"
 
 #: templates/index.html:24
 msgid "from "
-msgstr "от "
+msgstr "de "
 
 #: templates/index.html:25
 msgid "to "
-msgstr "до "
+msgstr "à "
 
 #: templates/index.html:26
 msgid "Select combinations of tags"
-msgstr "Выбор грамматических тэгов"
+msgstr "Sélectionnez une étiquette ou une combinaison d'étiquettes"
 
 #: templates/index.html:27
 msgid "Select glosses"
-msgstr "Выбор глосс"
+msgstr "Sélectionnez les gloses"
 
 #: templates/index.html:28
 msgid "the query"
-msgstr "запроса"
+msgstr "la requête"
 
 #: templates/index.html:29 templates/modals/subcorpus_selection.html:90
 #: templates/modals/word_stats.html:55
 msgid "Nothing found."
-msgstr "Ничего не найдено."
+msgstr "Aucun résultat n'a été trouvé."
 
 #: templates/index.html:30
 msgid "Query word"
-msgstr "Слово запроса"
+msgstr "Mot recherché"
 
 #: templates/index.html:67
 msgid "Sorry, the server is experiencing technical issues. Please try again later."
-msgstr "Извините, на сервере временные технические неполадки. Пожалуйста, попробуйте зайти позже."
+msgstr "Désolé, le serveur rencontre des problèmes techniques. Veuillez réessayer plus tard."
 
 #: templates/index.html:68 templates/index/hidden_elements.html:12
 #: templates/index/hidden_elements.html:30
@@ -69,101 +69,101 @@ msgstr "Извините, на сервере временные техниче�
 #: templates/modals/subcorpus_selection.html:6
 #: templates/modals/word_stats.html:6
 msgid "Close"
-msgstr "Закрыть"
+msgstr "Fermer"
 
 #: templates/index/common_additional_search_fields.html:23
 msgid "Analyses: "
-msgstr "Разборы: "
+msgstr "Analyses : "
 
 #: templates/index/common_additional_search_fields.html:24
 msgid "any number of analyses"
-msgstr "любое количество"
+msgstr "n'importe quel nombre"
 
 #: templates/index/common_additional_search_fields.html:26
 msgid "only ambiguous"
-msgstr "только с омонимией"
+msgstr "seulement avec homonymie"
 
 #: templates/index/common_additional_search_fields.html:27
 msgid "only non-ambiguous"
-msgstr "только однозначные"
+msgstr "sans ambiguïté"
 
 #: templates/index/common_additional_search_fields.html:28
 #: templates/index/common_additional_search_fields.html:30
 msgid "only with analysis"
-msgstr "только с разбором"
+msgstr "avec analyses"
 
 #: templates/index/common_additional_search_fields.html:32
 msgid "only without analysis"
-msgstr "только без разбора"
+msgstr "sans analyse"
 
 #: templates/index/common_additional_search_fields.html:34
 msgid "Position in sentence: "
-msgstr "Позиция в предложении: "
+msgstr "Position dans l'énoncé : "
 
 #: templates/index/corpus_header.html:9
 msgid "Corpus name"
-msgstr "Название корпуса"
+msgstr "Nom du corpus"
 
 #: templates/index/corpus_header.html:25
 #: templates/index/hidden_elements.html:72
 msgid "How to cite"
-msgstr "Как цитировать корпус"
+msgstr "Comment citer le corpus"
 
 #: templates/index/corpus_header.html:28 templates/index/greeting_en.html:9
 #: templates/index/greeting_ru.html:9
 msgid "Show help"
-msgstr "Показать справку"
+msgstr "Aide"
 
 #: templates/index/greeting_en.html:5 templates/index/greeting_ru.html:5
 #: templates/index/query_area.html:70
 msgid "Search sentences"
-msgstr "Поиск предложений"
+msgstr "Recherche d'énoncés"
 
 #: templates/index/greeting_en.html:6 templates/index/greeting_ru.html:6
 #: templates/index/query_area.html:71
 msgid "Search words"
-msgstr "Поиск слов"
+msgstr "Recherche de mots"
 
 #: templates/index/greeting_en.html:6 templates/index/greeting_ru.html:6
 #: templates/index/query_area.html:72
 msgid "Search lemmata"
-msgstr "/ лексем"
+msgstr "/ de lemmes"
 
 #: templates/index/hidden_elements.html:19
 msgid "Cancel"
-msgstr "Отмена"
+msgstr "Annuler"
 
 #: templates/index/hidden_elements.html:29
 msgid "Help"
-msgstr "Справка"
+msgstr "Aide"
 
 #: templates/index/hidden_elements.html:43
 msgid "Dictionary_header"
-msgstr "Словарь"
+msgstr "Dictionnaire"
 
 #: templates/index/hidden_elements.html:57
 msgid "Metadata_header"
-msgstr "Метаданные"
+msgstr "Métadonnées"
 
 #: templates/index/progress.html:6
 msgid "Max seconds left: "
-msgstr "Осталось секунд (максимум): "
+msgstr "Nombre maximal de secondes restantes : "
 
 #: templates/index/query_area.html:8
 msgid "Options"
-msgstr "Настройки"
+msgstr "Paramètres"
 
 #: templates/index/query_area.html:9 templates/modals/query_history.html:5
 msgid "Query history"
-msgstr "История поиска"
+msgstr "Historique de requêtes"
 
 #: templates/index/query_area.html:11
 msgid "Show dictionary"
-msgstr "Показать словарь"
+msgstr "Afficher le dictionnaire"
 
 #: templates/index/query_area.html:19
 msgid "Word_header"
-msgstr "Слово"
+msgstr "Mot"
 
 #: templates/index/query_area.html:19
 msgid "Number_sign"
@@ -171,374 +171,374 @@ msgstr "№"
 
 #: templates/index/query_area.html:20
 msgid "Word:"
-msgstr "Слово:"
+msgstr "Mot :"
 
 #: templates/index/query_area.html:21
 msgid "Lemma:"
-msgstr "Лемма:"
+msgstr "Lemme :"
 
 #: templates/index/query_area.html:22
 msgid "Grammar:"
-msgstr "Грамматика:"
+msgstr "Grammaire :"
 
 #: templates/index/query_area.html:26
 msgid "Gloss:"
-msgstr "Глоссы:"
+msgstr "Gloses :"
 
 #: templates/index/query_area.html:31
 #: templates/modals/subcorpus_selection.html:56
 msgid "Language/tier:"
-msgstr "Язык/слой:"
+msgstr "Langue/tire :"
 
 #: templates/index/query_area.html:36
 #: templates/modals/subcorpus_selection.html:58
 msgid "langname_all"
-msgstr "любой"
+msgstr "toutes les langues"
 
 #: templates/index/query_area.html:49
 msgid "negative_query"
-msgstr "отрицательный&nbsp;запрос"
+msgstr "requête&nbsp;négative"
 
 #: templates/index/query_area.html:51
 msgid "add_word"
-msgstr "добавить слово"
+msgstr "ajouter un mot"
 
 #: templates/index/query_area.html:61
 msgid "Full-text search:"
-msgstr "Полнотекстовый поиск:"
+msgstr "Recherche de texte intégral :"
 
 #: templates/index/query_area.html:63
 msgid "Precise match"
-msgstr "точное соответствие"
+msgstr "correspondance exacte"
 
 #: templates/index/query_area.html:73
 msgid "Words statistics"
-msgstr "Статистика по словоформам"
+msgstr "Statistiques sur les mots"
 
 #: templates/index/query_area.html:75
 #: templates/modals/subcorpus_selection.html:5
 msgid "Select subcorpus"
-msgstr "Выбор подкорпуса"
+msgstr "Sélectionner un sous-corpus"
 
 #: templates/index/query_area.html:77
 msgid "Share this query"
-msgstr "Переслать этот запрос"
+msgstr "Partager cette requête"
 
 #: templates/index/query_area.html:78
 msgid "Load external query"
-msgstr "Загрузить внешний запрос"
+msgstr "Charger une requête externe"
 
 #: templates/index/query_area.html:97
 msgid "Back to search"
-msgstr "Вернуться к поиску"
+msgstr "Retour à la recherche"
 
 #: templates/index/results_area.html:10
 msgid "Click on an example to see video."
-msgstr "Чтобы прослушать какой-нибудь пример, нажмите на него."
+msgstr "Cliquez sur un exemple pour écouter ou voir la vidéo."
 
 #: templates/index/results_area.html:10
 msgid "Click on an example to listen."
-msgstr "Чтобы прослушать какой-нибудь пример, нажмите на него."
+msgstr "Cliquez sur un exemple pour écouter ou voir la vidéo."
 
 #: templates/modals/display_settings.html:5
 msgid "Additional search and display options"
-msgstr "Дополнительные настройки поиска и отображения"
+msgstr "Options supplémentaires de recherche et d'affichage"
 
 #: templates/modals/display_settings.html:12
 msgid "Results per page:"
-msgstr "Контекстов на странице:"
+msgstr "Résultats par page :"
 
 #: templates/modals/display_settings.html:16
 msgid "Sorting:"
-msgstr "Сортировка"
+msgstr "Tri :"
 
 #: templates/modals/display_settings.html:18
 msgid "random"
-msgstr "случайная"
+msgstr "aléatoire"
 
 #: templates/modals/display_settings.html:19
 msgid "by word (word queries)"
-msgstr "по словоформе (поиск слов)"
+msgstr "par mot (recherche de mots)"
 
 #: templates/modals/display_settings.html:20
 msgid "by lemma (word queries)"
-msgstr "по лемме (поиск слов)"
+msgstr "par lemme (recherche de mots)"
 
 #: templates/modals/display_settings.html:21
 msgid "by frequency"
-msgstr "по частотности"
+msgstr "par fréquence"
 
 #: templates/modals/display_settings.html:23
 msgid "by year (decreasing; sentence queries)"
-msgstr "по году (по убыванию; поиск предложений)"
+msgstr "par année (décroissant ; recherche d'énoncés)"
 
 #: templates/modals/display_settings.html:26
 msgid "no sorting"
-msgstr "без сортировки"
+msgstr "sans tri"
 
 #: templates/modals/display_settings.html:32
 msgid "Word distance requirements are strict"
-msgstr "Расстояния между словами только как в запросе"
+msgstr "Distance entre les mots exactement comme dans la requête"
 
 #: templates/modals/display_settings.html:37
 msgid "Viewing mode:"
-msgstr "Выдача:"
+msgstr "Mode d'affichage :"
 
 #: templates/modals/display_settings.html:39
 msgid "view_standard"
-msgstr "обычная"
+msgstr "standard"
 
 #: templates/modals/display_settings.html:40
 msgid "view_glossed"
-msgstr "глоссированная"
+msgstr "glosé"
 
 #: templates/modals/display_settings.html:45
 msgid "Transliteration: "
-msgstr "Транслитерация: "
+msgstr "Translittération : "
 
 #: templates/modals/display_settings.html:55
 msgid "Character input method: "
-msgstr "Способ ввода символов: "
+msgstr "Méthode de saisie de caractères : "
 
 #: templates/modals/display_settings.html:65
 msgid "Annotation layers in glossed mode:"
-msgstr "Слои разметки в глоссированной выдаче:"
+msgstr "Niveaux d'annotation en mode d'affichage glosé :"
 
 #: templates/modals/display_settings.html:68
 #: templates/modals/query_history.html:18
 msgid "Lemma"
-msgstr "Лемма"
+msgstr "Lemme"
 
 #: templates/modals/display_settings.html:72
 #: templates/modals/query_history.html:19
 msgid "Grammar"
-msgstr "Грамматика"
+msgstr "Grammaire"
 
 #: templates/modals/display_settings.html:77
 msgid "Gloss"
-msgstr "Глоссы"
+msgstr "Gloses"
 
 #: templates/modals/display_settings.html:82
 msgid "Additional fields"
-msgstr "Дополнительные поля"
+msgstr "Champs supplémentaires"
 
 #: templates/modals/query_history.html:10
 msgid "Click on"
-msgstr "Нажмите"
+msgstr "Cliquez sur"
 
 #: templates/modals/query_history.html:10
 #: templates/modals/query_history.html:23
 msgid "Repeat query"
-msgstr "Повторить запрос"
+msgstr "Répéter une requête"
 
 #: templates/modals/query_history.html:10
 msgid "to repeat a query."
-msgstr ", чтобы повторить запрос."
+msgstr "pour répéter une requête."
 
 #: templates/modals/query_history.html:13
 msgid "You have not made any queries yet."
-msgstr "Вы пока ничего не искали."
+msgstr "Vous n'avez encore effectué aucune requête."
 
 #: templates/modals/query_history.html:17
 msgid "Word"
-msgstr "Словоформа"
+msgstr "Mot"
 
 #: templates/modals/query_history.html:20
 msgid "Subcorpus"
-msgstr "Подкорпус"
+msgstr "Sous-corpus"
 
 #: templates/modals/query_history.html:21
 msgid "Search type"
-msgstr "Тип поиска"
+msgstr "Type de recherche"
 
 #: templates/modals/query_history.html:22
 msgid "Time"
-msgstr "Время"
+msgstr "Temps"
 
 #: templates/modals/query_share_load.html:5
 msgid "Share query"
-msgstr "Переслать запрос"
+msgstr "Partager la requête"
 
 #: templates/modals/query_share_load.html:9
 msgid "If you want to share your query with someone, send them the text you see below. The person who loads this query will see the same results in the same order, unless the corpus has been re-indexed."
-msgstr "Чтобы послать кому-то запрос, который Вы сделали, скопируйте и пошлите текст ниже. Любой, кто загрузит такой запрос, увидит те же результаты в том же порядке, если только не окажется, что корпус с тех пор индексировали заново."
+msgstr "Si vous souhaitez partager votre requête avec quelqu'un, envoyez-lui le texte ci-dessous. La personne qui chargera cette requête verra les mêmes résultats dans le même ordre, à moins que le corpus n'ait été réindexé."
 
 #: templates/modals/query_share_load.html:19
 msgid "Load query"
-msgstr "Загрузить запрос"
+msgstr "Charger une requête"
 
 #: templates/modals/query_share_load.html:23
 msgid "Here you can load a corpus query someone sent you. Please enter the query below:"
-msgstr "Здесь можно загрузить запрос к корпусу, который кто-то Вам прислал. Вставьте запрос в поле ниже:"
+msgstr "Ici vous pouvez charger la requête que quelqu'un vous a envoyée. Veuillez saisir la requête ci-dessous :"
 
 #: templates/modals/select_gloss.html:5
 msgid "word boundary"
-msgstr "граница слова"
+msgstr "frontière de mot"
 
 #: templates/modals/select_gloss.html:6
 msgid "any number of morphs"
-msgstr "любое число морфем"
+msgstr "n'importe quel nombre de morphèmes"
 
 #: templates/modals/select_gloss.html:7
 msgid "any positive number of morphs"
-msgstr "любое ненулевое число морфем"
+msgstr "tout nombre de morphèmes différent de zéro"
 
 #: templates/modals/select_gloss.html:8
 msgid "any morph"
-msgstr "любая морфема"
+msgstr "n'importe quel morphème"
 
 #: templates/modals/subcorpus_selection.html:10
 msgid "Specify parameters"
-msgstr "Выбор параметров"
+msgstr "Spécifiez les paramètres"
 
 #: templates/modals/subcorpus_selection.html:11
 msgid "Choose from a list"
-msgstr "Выбор из списка"
+msgstr "Choisissez dans la liste"
 
 #: templates/modals/subcorpus_selection.html:12
 msgid "Subcorpus statistics"
-msgstr "Статистика подкорпуса"
+msgstr "Statistiques sur le sous-corpus"
 
 #: templates/modals/subcorpus_selection.html:16
 msgid "Select parameters"
-msgstr "Выберите параметры"
+msgstr "Sélectionnez les paramètres"
 
 #: templates/modals/subcorpus_selection.html:27
 msgid "lower bound"
-msgstr "нижняя граница"
+msgstr "borne inférieure"
 
 #: templates/modals/subcorpus_selection.html:28
 msgid "upper bound"
-msgstr "верхняя граница"
+msgstr "borne supérieure"
 
 #: templates/modals/subcorpus_selection.html:42
 msgid "Select documents"
-msgstr "Выберите тексты"
+msgstr "Sélectionnez les textes"
 
 #: templates/modals/subcorpus_selection.html:43
 msgid "(please wait for the document list to load)"
-msgstr "(подождите немного, список текстов загружается)"
+msgstr "(veuillez attendre le chargement de la liste des textes)"
 
 #: templates/modals/subcorpus_selection.html:46
 msgid "Selected subcorpus composition"
-msgstr "Состав выбранного подкорпуса"
+msgstr "Contenu du sous-corpus sélectionné"
 
 #: templates/modals/subcorpus_selection.html:47
 #: templates/modals/word_stats.html:16
 msgid "Parameter: "
-msgstr "Параметр: "
+msgstr "Paramètre : "
 
 #: templates/modals/subcorpus_selection.html:71
 #: templates/modals/word_stats.html:28
 msgid "A maximum of 25 metadata values can be displayed, sorted by the number of words in the relevant texts."
-msgstr "Может быть показано максимум 25 значений, отсортированных по количеству слов в соответствующих текстах."
+msgstr "Un maximum de 25 valeurs peuvent être affichées, triées en fonction du nombre de mots dans les textes concernés."
 
 #: templates/modals/subcorpus_selection.html:73
 #: templates/modals/word_stats.html:81
 msgid "(please wait for the plot to load)"
-msgstr "(подождите немного, график загружается)"
+msgstr "(veuillez patienter pendant le chargement du graphique)"
 
 #: templates/modals/subcorpus_selection.html:77
 msgid "Value"
-msgstr "Значение"
+msgstr "Valeur"
 
 #: templates/modals/subcorpus_selection.html:78
 msgid "Size in words"
-msgstr "Объём в словах"
+msgstr "Taille en mots"
 
 #: templates/modals/subcorpus_selection.html:79
 msgid "Number of documents"
-msgstr "Число текстов"
+msgstr "Nombre de textes"
 
 #: templates/modals/subcorpus_selection.html:87
 #: templates/modals/word_stats.html:52
 msgid "please wait for the plot to load"
-msgstr "подождите немного, график загружается"
+msgstr "veuillez patienter pendant le chargement du graphique"
 
 #: templates/modals/subcorpus_selection.html:97
 msgid "Clear subcorpus"
-msgstr "Очистить подкорпус"
+msgstr "Nettoyer le sous-corpus"
 
 #: templates/modals/word_stats.html:5
 msgid "Word statistics header"
-msgstr "Статистика по словоформам"
+msgstr "Statistiques sur les mots"
 
 #: templates/modals/word_stats.html:10
 msgid "By metadata values"
-msgstr "По значениям метаданных"
+msgstr "Par métadonnées"
 
 #: templates/modals/word_stats.html:11
 msgid "By frequency"
-msgstr "По частотности"
+msgstr "Par fréquence"
 
 #: templates/modals/word_stats.html:15
 msgid "Word statistics for "
-msgstr "Статистика для "
+msgstr "Statistiques pour "
 
 #: templates/modals/word_stats.html:22
 msgid "Query type: "
-msgstr "Тип запроса: "
+msgstr "Type de requête : "
 
 #: templates/modals/word_stats.html:24
 msgid "search the whole query"
-msgstr "искать запрос целиком"
+msgstr "obtenir l'ensemble de la requête"
 
 #: templates/modals/word_stats.html:25
 msgid "compare words in the query"
-msgstr "сравнить слова в запросе"
+msgstr "comparer les mots de la requête"
 
 #: templates/modals/word_stats.html:35
 msgid "Query word "
-msgstr "Слово запроса "
+msgstr "Mot de requête "
 
 #: templates/modals/word_stats.html:40
 msgid "value"
-msgstr "значение"
+msgstr "valeur"
 
 #: templates/modals/word_stats.html:43
 msgid "frequency (ipm)"
-msgstr "частотность (слов на миллион)"
+msgstr "fréquence (occurrences par million de mots)"
 
 #: templates/modals/word_stats.html:44
 #, python-format
 msgid "90%% conf. int. "
-msgstr "90%%-й довер. интервал"
+msgstr "intervalle de confiance à 90%% "
 
 #: templates/modals/word_stats.html:59
 msgid "Distribution by frequency rank"
-msgstr "Распределение слов по частотным рангам"
+msgstr "Répartition par rang de fréquence"
 
 #: templates/modals/word_stats.html:60
 msgid "Explanation for frequency distributions"
-msgstr "<p>График ниже устроен следующим образом. На оси <i>x</i> расположены частотные ранги, т. е. номера позиций в полном списке словоформ/лемм, упорядоченных по убыванию частотности. Если у нескольких словоформ/лемм частотность одинакова, им всем приписывается одинаковый ранг, равный среднему арифметическому номеров их позиций. Для каждого ранга <i>r</i> <strong>по оси <i>y</i> откладывается доля словоформ/лемм, удовлетворяющих поисковому запросу, среди всех словоформ/лемм, частотный ранг которых не превосходит <i>r</i>.</strong> В частности, самая правая точка на графике показывает долю таких словоформ/лемм во всём корпусе. В случае поиска лемм учитываются все леммы, имеющие хотя бы одну словоформу, удовлетворяющую запросу.</p><p>При построении этого графика не учитываются выбор подкорпуса и все слова в запросе, кроме первого.</p>"
+msgstr "<p>Le graphique ci-dessous est organisé de la manière suivante. L'axe des <i>x</i> contient les rangs de fréquence, c'est-à-dire les numéros de position dans la liste complète des mots/lemmes classés par ordre décroissant de fréquence. Si plusieurs mots/lemmes ont la même fréquence, ils auront tous le même rang égal à la moyenne arithmétique de leurs numéros de position. Pour chaque rang <i>r</i>, <strong>sur l'axe des <i>y</i> est représentée la proportion des mots/lemmes qui répondent à la requête de recherche, parmi tous les mots/lemmes dont le rang de fréquence ne dépasse pas <i>r</i>.</strong> Le point le plus à droite du graphique indique la proportion de ces mots/lemmes dans l'ensemble du corpus. Dans le cas d'une recherche de lemmes, tous les lemmes ayant au moins une forme de mot répondant à la requête sont pris en compte.</p><p>Ce graphique ne tient pas compte du choix de sous-corpus et de tous les mots de la requête à l'exception du premier.</p>"
 
 #: templates/modals/word_stats.html:62
 msgid "words"
-msgstr "словоформы"
+msgstr "mots"
 
 #: templates/modals/word_stats.html:63
 msgid "lemmata"
-msgstr "леммы"
+msgstr "lemmes"
 
 #: templates/modals/word_stats.html:65
 msgid "Scale of the x axis: "
-msgstr "Шкала по оси x: "
+msgstr "Échelle de l'axe des x : "
 
 #: templates/modals/word_stats.html:67
 msgid "linear"
-msgstr "линейная"
+msgstr "linéaire"
 
 #: templates/modals/word_stats.html:68
 msgid "logarithmic"
-msgstr "логарифмическая"
+msgstr "logarithmique"
 
 #: templates/modals/word_stats.html:70
 msgid "Max y: "
-msgstr "Макс. y"
+msgstr "Y max : "
 
 #: templates/modals/word_stats.html:72
 msgid "as in data"
-msgstr "как в данных"
+msgstr "comme dans les données"
 
 #: templates/modals/word_stats.html:73
 #, python-format
@@ -573,175 +573,166 @@ msgstr "1%%"
 #: templates/modals/word_stats.html:79
 #, python-format
 msgid "0.1%%"
-msgstr "0,1%%"
+msgstr "0.1%%"
 
 #: templates/search_results/lemma_table_row.html:16
 #: templates/search_results/word_table_row.html:20
 msgid "Search in corpus"
-msgstr "Поиск в корпусе"
+msgstr "Recherche dans le corpus"
 
 #: templates/search_results/lemma_table_row.html:17
 #: templates/search_results/word_table_row.html:21
 msgid "Show statistics"
-msgstr "Показать статистику"
+msgstr "Afficher les statistiques"
 
 #: templates/search_results/result_docs.html:1
 msgid "Filter result:"
-msgstr "Результаты отбора:"
+msgstr "Résultat du tri :"
 
 #: templates/search_results/result_docs.html:2
 msgid "document with"
 msgid_plural "documents with"
-msgstr[0] "документ с"
-msgstr[1] "документа с"
-msgstr[2] "документов с"
+msgstr[0] "document avec"
+msgstr[1] "documents avec"
 
 #: templates/search_results/result_docs.html:3
 msgid "word found,"
 msgid_plural "words found,"
-msgstr[0] "словом,"
-msgstr[1] "словами,"
-msgstr[2] "словами,"
+msgstr[0] "mot trouvé,"
+msgstr[1] "mots trouvés,"
 
 #: templates/search_results/result_docs.html:4
 msgid "of the entire corpus."
-msgstr "от всего корпуса."
+msgstr "de l'ensemble du corpus."
 
 #: templates/search_results/result_sentences.html:2
 #: templates/search_results/result_words.html:3
 msgid "Search result:"
 msgid_plural "Search result:"
-msgstr[0] "Результат поиска: найдена"
-msgstr[1] "Результат поиска: найдены"
-msgstr[2] "Результат поиска: найдено"
+msgstr[0] "Résultat de la recherche :"
+msgstr[1] "Résultat de la recherche :"
 
 #: templates/search_results/result_sentences.html:3
 msgid "occurrence"
 msgid_plural "occurrences"
-msgstr[0] "словоформа"
-msgstr[1] "словоформы"
-msgstr[2] "словоформ"
+msgstr[0] "occurrence"
+msgstr[1] "occurrences"
 
 #: templates/search_results/result_sentences.html:4
 msgid "sentence found in approximately"
 msgid_plural "sentences found in approximately"
-msgstr[0] "предложение примерно в"
-msgstr[1] "предложения примерно в"
-msgstr[2] "предложений примерно в"
+msgstr[0] "énoncé trouvé dans environ"
+msgstr[1] "énoncés trouvés dans environ"
 
 #: templates/search_results/result_sentences.html:5
 msgid "in_document"
 msgid_plural "in_documents"
-msgstr[0] "документе"
-msgstr[1] "документах"
-msgstr[2] "документах"
+msgstr[0] "document"
+msgstr[1] "documents"
 
 #: templates/search_results/result_sentences.html:9
 #: templates/search_results/result_words.html:18
 msgid "The search was not finished due to the query timeout. You only see partial results."
-msgstr "Поиск не был завершён, потому что истекло время ожидания. Показаны не все результаты."
+msgstr "La recherche a expiré en raison du délai d'attente de la requête. Vous ne voyez que des résultats partiels."
 
 #: templates/search_results/result_sentences.html:19
 msgid "Number of results found exceeds the maximum number of pages you can view."
-msgstr "Число результатов превышает максимальное количество страниц, которые можно просмотреть."
+msgstr "Le nombre de résultats trouvés dépasse le nombre maximum de pages que vous pouvez afficher."
 
 #: templates/search_results/result_sentences.html:24
 #: templates/search_results/result_words.html:28
 msgid "You are searching in a subcorpus."
-msgstr "Вы ищете в подкорпусе."
+msgstr "Vous cherchez dans un sous-corpus."
 
 #: templates/search_results/result_sentences.html:45
 msgid "Copy example to clipboard"
-msgstr "Скопировать пример"
+msgstr "Copier l'exemple dans le presse-papiers"
 
 #: templates/search_results/result_sentences.html:46
 msgid "Expand context"
-msgstr "Расширить контекст"
+msgstr "Élargir le contexte"
 
 #: templates/search_results/result_sentences.html:60
 msgid "download as CSV"
-msgstr "Загрузить как CSV"
+msgstr "télécharger au format CSV"
 
 #: templates/search_results/result_sentences.html:61
 msgid "download as XLSX"
-msgstr "Загрузить как XLSX"
+msgstr "télécharger au format XLSX"
 
 #: templates/search_results/result_words.html:5
 msgid "unique word"
 msgid_plural "different words"
-msgstr[0] "уникальная словоформа"
-msgstr[1] "разных словоформы"
-msgstr[2] "разных словоформ"
+msgstr[0] "mot"
+msgstr[1] "mots différents"
 
 #: templates/search_results/result_words.html:7
 msgid "unique lemma"
 msgid_plural "different lemmata"
-msgstr[0] "уникальная лемма"
-msgstr[1] "разных леммы"
-msgstr[2] "разных лемм"
+msgstr[0] "lemme"
+msgstr[1] "lemmes différents"
 
 #: templates/search_results/result_words.html:9
 msgid "in approximately"
-msgstr "примерно в"
+msgstr "dans environ"
 
 #: templates/search_results/result_words.html:9
 msgid "document found,"
 msgid_plural "documents found,"
-msgstr[0] "документе,"
-msgstr[1] "документах,"
-msgstr[2] "документах,"
+msgstr[0] "document trouvé,"
+msgstr[1] "documents trouvés,"
 
 #: templates/search_results/result_words.html:11
 msgid "total frequency:"
-msgstr "суммарная частотность:"
+msgstr "fréquence cumulée :"
 
 #: templates/search_results/result_words.html:13
 msgid "total frequency of found word forms:"
-msgstr "суммарная частотность их словоформ:"
+msgstr "fréquence cumulée des formes de mots trouvées :"
 
 #: templates/search_results/result_words.html:34
 msgid "word_th_word"
-msgstr "слово"
+msgstr "mot"
 
 #: templates/search_results/result_words.html:34
 msgid "word_th_lemma"
-msgstr "лемма"
+msgstr "lemme"
 
 #: templates/search_results/result_words.html:36
 msgid "word_th_gr"
-msgstr "грамм."
+msgstr "grammaire"
 
 #: templates/search_results/result_words.html:41
 msgid "word_th_frequency"
-msgstr "частотность"
+msgstr "fréquence"
 
 #: templates/search_results/result_words.html:43
 msgid "word_th_freq. rank / quantile"
-msgstr "част. ранг /<br>квантиль"
+msgstr "rang de fréquence/quantile"
 
 #: templates/search_results/result_words.html:46
 msgid "word_th_# forms"
-msgstr "кол-во форм"
+msgstr "nombre de formes de mot"
 
 #: templates/search_results/result_words.html:48
 msgid "word_th_# sentences"
-msgstr "кол-во предл."
+msgstr "nombre d'énoncés"
 
 #: templates/search_results/result_words.html:49
 msgid "word_th_# documents"
-msgstr "кол-во док."
+msgstr "nombre de documents"
 
 #: templates/search_results/result_words.html:50
 msgid "word_th_search in corpus"
-msgstr "искать"
+msgstr "chercher"
 
 #: templates/search_results/result_words.html:51
 msgid "word_th_word stats"
-msgstr "статистика"
+msgstr "statistiques"
 
 #: templates/search_results/sentence_header.html:20
 msgid "Full text (opens in a new tab)"
-msgstr "Полный текст (откроется в новой вкладке)"
+msgstr "Texte intégral (s'ouvre dans un nouvel onglet)"
 
 msgid "Virtual keyboard"
-msgstr "Виртуальная клавиатура"
+msgstr "Clavier virtuel"
