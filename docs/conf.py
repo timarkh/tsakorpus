@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'tsakorpus'
-copyright = '2021, Timofey Arkhangelskiy'
+copyright = '2021-2023, Timofey Arkhangelskiy'
 author = 'Timofey Arkhangelskiy'
 
 # The full version, including alpha/beta/rc tags

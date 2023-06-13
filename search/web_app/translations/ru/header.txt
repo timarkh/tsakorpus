@@ -1,5 +1,5 @@
 # Russian translations for Tsakorpus.
-# Copyright (C) 2017-2021 Timofey Arkhangelskiy
+# Copyright (C) 2017-2023 Timofey Arkhangelskiy
 # This file is distributed under the same license as the Tsakorpus project.
 # Timofey Arkhangelskiy <timarkh@gmail.com>, 2017-2021.
 #
