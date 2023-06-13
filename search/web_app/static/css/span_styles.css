@@ -1,3 +1,9 @@
+/* Trigger parent's click event if clicked */
+
+.style_span {
+	pointer-events: none;
+}
+
 /* Predefined styles for certain tiers 
 (add styles for your languages/tiers if
 different languages should be displayed
