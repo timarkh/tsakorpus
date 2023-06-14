@@ -8,12 +8,13 @@ because it can be quite large and cookies have size limits.
 This means that Tsakorpus API is not as RESTful as you might
 have imagined.
 """
-
-
+import re
 from . import sentView, settings
 
 
 class SearchContext:
+    rxCSVMeta = re.compile('^\\[.*:.*\\]$')
+
     def __init__(self):
         """
         Whenever someone clicks one of the Search buttons, a new
@@ -186,7 +187,7 @@ class SearchContext:
                     curLine = sent['header_csv']
                     for s in sent['highlighted_text_csv']:
                         for sPart in s.split('\t'):
-                            if len(sPart) > 0 and (not sPart.startswith('[') or sPart not in curLine):
+                            if len(sPart) > 0 and (self.rxCSVMeta.search(sPart) is None or sPart not in curLine):
                                 curLine.append(sPart)
                     if settings.gloss_search_enabled and 'glossed' in sent:
                         curLine.append(sent['glossed'])

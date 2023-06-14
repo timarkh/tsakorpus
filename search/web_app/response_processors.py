@@ -415,8 +415,16 @@ class SentenceViewer:
                     for k, v in meta.items()
                     if self.rxKW.sub('', k) in self.settings.viewable_meta
                     and k not in ['filename', 'filename_kw']}
-            for k, v in sorted(meta.items()):
-                newField = '[' + k + ': ' + v.replace('\t', ' ') + ']'
+            sortedMetaFields = []
+            for f in self.settings.viewable_meta:
+                # Sort in the same order as listed in conf/corpus.json
+                if f not in ['filename', 'filename_kw'] and f not in self.settings.sentence_meta:
+                    sortedMetaFields.append(f)
+            for f in sortedMetaFields:
+                v = ''
+                if f in meta:
+                    v = str(meta[f]).replace('\t', ' ')
+                newField = '[' + f + ': ' + v + ']'
                 if newField not in result:
                     result.append(newField)
         else:
@@ -623,11 +631,18 @@ class SentenceViewer:
         metaSpan = '<span class="sentence_meta">'
         if format == 'csv':
             metaSpan = ''
-        for k, v in sorted(meta2show.items()):
+        sortedMetaFields = []
+        for f in self.settings.sentence_meta:
+            if f not in ['filename', 'filename_kw', 'sent_analyses', 'sent_analyses_kw']:
+                sortedMetaFields.append(f)
+        for f in sortedMetaFields:
+            v = ''
+            if f in meta2show:
+                v = str(meta2show[f]).replace('\t', ' ')
             if format == 'csv':
-                metaSpan += '[' + k + ': ' + str(v).replace('\t', ' ') + ']\t'
-            else:
-                metaSpan += html.escape(k + ': ' + str(v))
+                metaSpan += '[' + f + ': ' + v + ']\t'
+            elif len(v) > 0:
+                metaSpan += html.escape(f + ': ' + v)
                 metaSpan += '<br>'
         if format == 'csv':
             metaSpan = metaSpan.strip(' ')
