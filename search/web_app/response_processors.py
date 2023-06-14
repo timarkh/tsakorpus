@@ -774,7 +774,7 @@ class SentenceViewer:
                 'toggled_on': relationsSatisfied,
                 'src_alignment': fragmentInfo}
 
-    def get_glossed_sentence(self, s, getHeader=True, lang='', translit=None):
+    def get_glossed_sentence(self, s, getHeader=True, lang='', glossOnly=False, translit=None):
         """
         Process one sentence taken from response['hits']['hits'].
         If getHeader is True, retrieve the metadata from the database.
@@ -831,22 +831,28 @@ class SentenceViewer:
                 analyses = []
                 if 'ana' in w:
                     analyses = self.simplify_ana(w['ana'], [])[0]
-                setParts = set(ana['parts'] for ana in analyses if 'parts' in ana)
-                setGloss = set(ana['gloss'] for ana in analyses if 'gloss' in ana)
-                setLemmata = set(ana['lex'] for ana in analyses if 'lex' in ana)
+                setParts = set(str(ana['parts']) for ana in analyses
+                               if 'parts' in ana and type(ana['parts']) in (str, list))
+                setGloss = set(str(ana['gloss']) for ana in analyses
+                               if 'gloss' in ana and type(ana['gloss']) in (str, list))
+                setLemmata = set(str(ana['lex']) for ana in analyses
+                                 if 'lex' in ana and type(ana['lex']) in (str, list))
                 if len(setParts) > 1:
-                    parts += ' || '.join(ana['parts'] for ana in analyses if 'parts' in ana)
+                    parts += ' || '.join(str(ana['parts']) for ana in analyses
+                                         if 'parts' in ana and type(ana['parts']) in (str, list))
                 elif len(setParts) == 1:
                     parts += setParts.pop()
                 else:
                     parts += w['wf']
                 if len(setGloss) != 1:
-                    gloss += ' || '.join(ana['gloss'] for ana in analyses if 'gloss' in ana)
+                    gloss += ' || '.join(str(ana['gloss']) for ana in analyses
+                                         if 'gloss' in ana and type(ana['gloss']) in (str, list))
                 else:
                     gloss += setGloss.pop()
                 gramm += ' || '.join(get_ana_gramm(ana) for ana in analyses)
                 if len(setLemmata) != 1:
-                    lemmata += ' || '.join(ana['lex'] for ana in analyses if 'lex' in ana)
+                    lemmata += ' || '.join(str(ana['lex']) for ana in analyses
+                                           if 'lex' in ana and type(ana['lex']) in (str, list))
                 else:
                     lemmata += setLemmata.pop()
         if self.rxTabs.search(parts) is not None:
@@ -857,9 +863,12 @@ class SentenceViewer:
             gramm = ''
         if self.rxTabs.search(lemmata) is not None:
             lemmata = ''
-        if len(parts) > 0:
-            return text + parts + '\n' + gloss + '\n' + lemmata + '\n' + gramm + '\n'
-        return text + tokens + '\n' + parts + '\n' + gloss + '\n' + lemmata + '\n' + gramm + '\n'
+        if not glossOnly:
+            if len(parts) > 0:
+                return text + parts + '\n' + gloss + '\n' + lemmata + '\n' + gramm + '\n'
+            return text + tokens + '\n' + parts + '\n' + gloss + '\n' + lemmata + '\n' + gramm + '\n'
+        # glossOnly == True means that we don't need anything other than the glossed example
+        return parts.replace('\t', ' ') + '\t' + gloss.replace('\t', ' ')
 
     def count_word_subcorpus_stats(self, w, docIDs):
         """

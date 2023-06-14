@@ -158,7 +158,10 @@ class MediaCutter:
         """
         if privacySegments is not None:
             self.privacySegments = privacySegments
-        outDir = os.path.abspath(os.path.join(self.settings['corpus_dir'], 'media'))
+        if 'output_media_dir' in self.settings and len(self.settings['output_media_dir']) > 0:
+            outDir = os.path.abspath(self.settings['output_media_dir'])
+        else:
+            outDir = os.path.abspath(os.path.join(self.settings['corpus_dir'], 'media'))
         if not os.path.exists(outDir):
             os.makedirs(outDir)
         fileLen = self.settings['media_length']

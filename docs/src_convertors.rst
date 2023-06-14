@@ -37,7 +37,7 @@ Source files
 
 All source files have to have the same format and extension. If you want to include different types of files in the corpus, you have to create a separate corpus folder for each type, see Option 2 above.
 
-The source files should be placed in ``/src_convertors/corpus/%ext%``, where ``%ext%`` is their extension. If the extension is ``json``, you have to name this directory ``json_input`` to avoid name collision with the target directory. This directory can have any number of subdirectories of arbitrary depth. After the files have been converted, the resulting JSON files will be located in ``/src_convertors/corpus/json``. If you run CG3 disambiguation after that, the disambiguated JSON files will be located in ``src_convertors/corpus/json_disamb``. If you have a media-aligned corpus, the source media files have to be located next to the corresponding ELAN/EXMARaLDA/TEI files (and referenced there). The resulting media files (compressed and split into pieces) will appear in ``/src_convertors/corpus/media``.
+The source files should be placed in ``/src_convertors/corpus/%ext%``, where ``%ext%`` is their extension. If the extension is ``json``, you have to name this directory ``json_input`` to avoid name collision with the target directory. This directory can have any number of subdirectories of arbitrary depth. After the files have been converted, the resulting JSON files will be located in ``/src_convertors/corpus/json``. If you run CG3 disambiguation after that, the disambiguated JSON files will be located in ``src_convertors/corpus/json_disamb``. If you have a media-aligned corpus, the source media files have to be located next to the corresponding ELAN/EXMARaLDA/TEI files (and referenced there). The resulting media files (compressed and split into pieces) will appear in the directory that you set through the ``output_media_dir`` parameter. If this parameter is not set, they will appear in ``/src_convertors/corpus/media``.
 
 Configuration files
 -------------------
@@ -153,6 +153,10 @@ If your texts are aligned with sound or video files, the following parameters ar
 - ``media_length`` (integer) -- the length of one media file piece in seconds. All media files will be split into overlapping pieces of that length, so that the user does not have to download the entire file to listen for one sentence.
 
 - ``media_dir`` (string, optional) -- path to the media files to be cut, if they are located in a different folder than the ELAN files.
+
+- ``output_media_dir`` (string, optional) -- path to the directory where cut media files will be stored, if different from the default (``/src_convertors/corpus/media``).
+
+If not absolute, the directory paths are relative to ``src_convertors``.
 
 The convertors
 --------------

@@ -131,6 +131,9 @@ class SearchContext:
                 else:
                     sentPageDataDict['highlighted_text_csv'].append(
                         self.sentence_data[iHit]['languages'][lang]['highlighted_text'])
+                    glossed = sentView.get_glossed_sentence(self.sentence_data[iHit]['languages'][lang]['source'], lang=lang, glossOnly=True)
+                    if settings.gloss_search_enabled and '{{' in self.sentence_data[iHit]['languages'][lang]['highlighted_text']:
+                        sentPageDataDict['glossed'] = glossed
                 if 'header_csv' in self.sentence_data[iHit]:
                     sentPageDataDict['header_csv'] = self.sentence_data[iHit]['header_csv']
             result.append(sentPageDataDict)
@@ -183,7 +186,9 @@ class SearchContext:
                     curLine = sent['header_csv']
                     for s in sent['highlighted_text_csv']:
                         for sPart in s.split('\t'):
-                            if not sPart.startswith('[') or sPart not in curLine:
+                            if len(sPart) > 0 and (not sPart.startswith('[') or sPart not in curLine):
                                 curLine.append(sPart)
+                    if settings.gloss_search_enabled and 'glossed' in sent:
+                        curLine.append(sent['glossed'])
                     result.append(curLine)
         return result

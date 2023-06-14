@@ -78,9 +78,9 @@ class Indexator:
         self.es = None
         if 'elastic_url' in self.settings and len(self.settings['elastic_url']) > 0:
             # Connect to a non-default URL or supply username and password
-            self.es = Elasticsearch([self.settings['elastic_url']])
+            self.es = Elasticsearch([self.settings['elastic_url']], timeout=60)
         else:
-            self.es = Elasticsearch()
+            self.es = Elasticsearch(timeout=60)
         self.es_ic = IndicesClient(self.es)
 
         self.shuffled_ids = [i for i in range(1, 1000000)]
