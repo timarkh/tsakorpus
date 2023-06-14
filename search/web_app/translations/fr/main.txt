@@ -90,7 +90,7 @@ msgstr "sans ambiguïté"
 #: templates/index/common_additional_search_fields.html:28
 #: templates/index/common_additional_search_fields.html:30
 msgid "only with analysis"
-msgstr "avec analyses"
+msgstr "avec analyse"
 
 #: templates/index/common_additional_search_fields.html:32
 msgid "only without analysis"
@@ -188,7 +188,7 @@ msgstr "Gloses :"
 #: templates/index/query_area.html:31
 #: templates/modals/subcorpus_selection.html:56
 msgid "Language/tier:"
-msgstr "Langue/tire :"
+msgstr "Langue/couche :"
 
 #: templates/index/query_area.html:36
 #: templates/modals/subcorpus_selection.html:58
@@ -393,7 +393,7 @@ msgstr "Spécifiez les paramètres"
 
 #: templates/modals/subcorpus_selection.html:11
 msgid "Choose from a list"
-msgstr "Choisissez dans la liste"
+msgstr "Choisissez dans une liste"
 
 #: templates/modals/subcorpus_selection.html:12
 msgid "Subcorpus statistics"
@@ -510,7 +510,7 @@ msgstr "Répartition par rang de fréquence"
 
 #: templates/modals/word_stats.html:60
 msgid "Explanation for frequency distributions"
-msgstr "<p>Le graphique ci-dessous est organisé de la manière suivante. L'axe des <i>x</i> contient les rangs de fréquence, c'est-à-dire les numéros de position dans la liste complète des mots/lemmes classés par ordre décroissant de fréquence. Si plusieurs mots/lemmes ont la même fréquence, ils auront tous le même rang égal à la moyenne arithmétique de leurs numéros de position. Pour chaque rang <i>r</i>, <strong>sur l'axe des <i>y</i> est représentée la proportion des mots/lemmes qui répondent à la requête de recherche, parmi tous les mots/lemmes dont le rang de fréquence ne dépasse pas <i>r</i>.</strong> Le point le plus à droite du graphique indique la proportion de ces mots/lemmes dans l'ensemble du corpus. Dans le cas d'une recherche de lemmes, tous les lemmes ayant au moins une forme de mot répondant à la requête sont pris en compte.</p><p>Ce graphique ne tient pas compte du choix de sous-corpus et de tous les mots de la requête à l'exception du premier.</p>"
+msgstr "<p>Le graphique ci-dessous est organisé de la manière suivante. L'axe des <i>x</i> contient les rangs de fréquence, c'est-à-dire les numéros de position dans la liste complète des mots/lemmes classés par ordre décroissant de fréquence. Si plusieurs mots/lemmes ont la même fréquence, ils auront tous le même rang égal à la moyenne arithmétique de leurs numéros de position. Pour chaque rang <i>r</i>, <strong>sur l'axe des <i>y</i> est représentée la proportion des mots/lemmes qui répondent à la requête de recherche, parmi tous les mots/lemmes dont le rang de fréquence ne dépasse pas <i>r</i>.</strong> Le point le plus à droite du graphique indique la proportion de ces mots/lemmes dans l'ensemble du corpus. Dans le cas de la recherche de lemmes, tous les lemmes ayant au moins une forme de mot répondant à la requête sont pris en compte.</p><p>Ce graphique ne tient pas compte du choix du sous-corpus et de tous les mots de la requête à l'exception du premier.</p>"
 
 #: templates/modals/word_stats.html:62
 msgid "words"
@@ -633,7 +633,7 @@ msgstr[1] "documents"
 #: templates/search_results/result_sentences.html:9
 #: templates/search_results/result_words.html:18
 msgid "The search was not finished due to the query timeout. You only see partial results."
-msgstr "La recherche a expiré en raison du délai d'attente de la requête. Vous ne voyez que des résultats partiels."
+msgstr "La recherche n'a pas été terminée en raison du délai d'attente de la requête. Vous ne voyez que des résultats partiels."
 
 #: templates/search_results/result_sentences.html:19
 msgid "Number of results found exceeds the maximum number of pages you can view."
@@ -708,7 +708,7 @@ msgstr "fréquence"
 
 #: templates/search_results/result_words.html:43
 msgid "word_th_freq. rank / quantile"
-msgstr "rang de fréquence/quantile"
+msgstr "rang de fréquence /<br>quantile"
 
 #: templates/search_results/result_words.html:46
 msgid "word_th_# forms"
