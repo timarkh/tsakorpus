@@ -39,7 +39,7 @@ guro	Guro
 hill_mari	Hill Mari
 hungarian	Hungarian
 italian	Italian
-joola	Joola (Bandial)
+joola	Jо́ola (Eegimaa)
 kafire	Kafire
 kalmyk	Kalmyk
 kamas	Kamas
@@ -51,7 +51,8 @@ komi_zyrian	Komi-Zyrian
 latvian	Latvian
 limba	Limba
 lithuanian	Lithuanian
-macedonian  Macedonian
+macedonian	Macedonian
+macedonian_cyr	Macedonian (cyrillic)
 meadow_mari	Meadow Mari
 moksha	Moksha
 mundabli	Mundabli
@@ -74,7 +75,7 @@ tsakonian	Tsakonian
 udihe	Udihe
 udmurt	Udmurt
 ukrainian	Ukrainian
-ut_main	u̠t-Ma'in
+ut-main	u̠t-Ma'in
 wan	Wan
 yakut	Yakut
 yiddish	Yiddish

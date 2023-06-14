@@ -52,7 +52,8 @@ latvian	латышский
 limba	лимба
 lithuanian	литовский
 meadow_mari	луговой марийский
-macedonian  македонский
+macedonian	македонский
+macedonian_cyr	македонский (кириллица)
 moksha	мокшанский
 mundabli	мундабли
 mwan	муан
@@ -74,7 +75,7 @@ tsakonian	цаконский
 udihe	улэгейский
 udmurt	удмуртский
 ukrainian	украинский
-ut_main	ут-маин
+ut-main	ут-маин
 wan	уан
 yakut	якутский
 yiddish	идиш

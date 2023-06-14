@@ -1,4 +1,4 @@
-all toutes les langues
+all	toutes les langues
 undefined	indéfinie
 comments	commentaires
 note	commentaires
@@ -8,73 +8,74 @@ negative	negatifs
 ref	ID
 id	ID
 
-abaza	Abaza
-acrhi	Artchi
-adyghe	Adyguéen
-albanian	Albanais
-armenian	Arménien
-armenian_translit	Arménien (translit.)
-bangime	Bangime
-bashkir	Bachkir
-belarusian	Biélorusse
-beserman	Beserman
-bulgarian	Bulgare
-buryat	Bouriate
-chinese	Chinois
-chuvash	Tchouvache
-chuvash_cyr	Tchouvache (cyrillique)
-dargwa	Dargwa
-dogon	Dogon
-english	Anglais
-english_note	Anglais (commentaires)
-erzya	Erzya
-estonian	Estonien
-finnish	Finlandais
-french	Français
-german	Allemand
-ginyanga	Ginyanga
-gizey	Gizey
-greek	Grec
-guro	Guro
-hill_mari	Mari des montagnes
-hungarian	Hongrois
-italian	Italien
-joola	Bandial
-kafire	Kafire
-kalmyk	Kalmouk
-kamas	Kamas
-kazakh	Kazakh
-komi	Komi
-komi-zyrian	Komi-zyriène
-komi_permyak	Komi-permiak
-komi_zyrian	Komi-zyriène
-latvian	Letton
-limba	Limba
-lithuanian	Lituanien
-macedonian  Macédonien
-meadow_mari	Mari des prairies
-moksha	Mokcha
-mundabli	Mundabli
-mwan	Monan
-nganasan	Nganassane
-ossetic	Ossète
-ossetic_digor	Digor
-ossetic_iron	Iron
-polish	Polonais
-romani	Romani
-russian	Russe
-san	San
-selkup	Selkoupe
-senufo	Sénoufo
-spanish	Espagnol
-swedish	Suédois
-tatar	Tatar
-tsakhur	Tsakhour
-tsakonian	Tsakonien
-udihe	Oudihé
-udmurt	Oudmourte
-ukrainian	Ukrainien
-ut_main	ut-Ma'in
-wan	Wan
-yakut	Iakoute
-yiddish	Yiddish
+abaza	abaza
+acrhi	artchi
+adyghe	adyguéen
+albanian	albanais
+armenian	arménien
+armenian_translit	arménien (translit.)
+bangime	bangime
+bashkir	bachkir
+belarusian	biélorusse
+beserman	beserman
+bulgarian	bulgare
+buryat	bouriate
+chinese	chinois
+chuvash	tchouvache
+chuvash_cyr	tchouvache (cyrillique)
+dargwa	dargwa
+dogon	dogon
+english	anglais
+english_note	anglais (commentaires)
+erzya	erzya
+estonian	estonien
+finnish	finlandais
+french	français
+german	allemand
+ginyanga	ginyanga
+gizey	gizey
+greek	grec
+guro	guro
+hill_mari	mari des montagnes
+hungarian	hongrois
+italian	italien
+joola	joola
+kafire	kafire
+kalmyk	kalmouk
+kamas	kamas
+kazakh	kazakh
+komi	komi
+komi-zyrian	komi-zyriène
+komi_permyak	komi-permiak
+komi_zyrian	komi-zyriène
+latvian	letton
+limba	limba
+lithuanian	lituanien
+macedonian	macédonien
+macedonian_cyr	macédonien (cyrillique)
+meadow_mari	mari des prairies
+moksha	mokcha
+mundabli	mundabli
+mwan	mwan
+nganasan	nganassane
+ossetic	ossète
+ossetic_digor	ossète (digor)
+ossetic_iron	ossète (iron)
+polish	polonais
+romani	romani
+russian	russe
+san	san
+selkup	selkoupe
+senufo	sénoufo
+spanish	espagnol
+swedish	suédois
+tatar	tatar
+tsakhur	tsakhour
+tsakonian	tsakonien
+udihe	oudihé
+udmurt	oudmourte
+ukrainian	ukrainien
+ut-main	ut-ma'in
+wan	wan
+yakut	iakoute
+yiddish	yiddish
