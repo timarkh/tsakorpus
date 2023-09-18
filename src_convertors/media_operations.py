@@ -117,10 +117,10 @@ class MediaCutter:
             if len(beepOut) > 0:
                 beepOut = ' -filter_complex "[1]' + re.sub('\\[out[0-9]+\\]$', '', beepOut[6:]) + '" '
             if fname.lower().endswith('.mp4'):
-                splitStr += ' -c:v libx264 -b:v 700k -c:a aac -b:a 192k' + beepOut
+                splitStr += ' -c:v libx264 -b:v 700k -c:a aac -b:a 192k -ac 2' + beepOut
                 newExt = '.mp4'
             elif fname.lower().endswith(('.avi', '.mts', '.mov', '.mp4')):
-                splitStr += ' -s 400x300 -c:v libx264 -b:v 500k -c:a aac -b:a 192k' + beepOut
+                splitStr += ' -s 400x300 -c:v libx264 -b:v 500k -c:a aac -b:a 192k -ac 2' + beepOut
                 newExt = '.mp4'
             elif fname.lower().endswith(('.wav', '.wma', '.mp3')):
                 # splitStr += " -ab 196k"
@@ -129,7 +129,7 @@ class MediaCutter:
                            ' -ss ' + str(splitStart) + \
                            ' -i "' + fname + '" -t ' + str(splitLength) +\
                            ' -vcodec libx264 -tune stillimage -acodec aac' + \
-                           ' -ab 192k -pix_fmt yuv420p -shortest ' + beepOut
+                           ' -ab 192k -ac 2 -pix_fmt yuv420p -shortest ' + beepOut
                 newExt = '.mp4'
             else:
                 print('Unknown file type: ' + fname)
