@@ -261,7 +261,7 @@ class Xml_Rnc2JSON(Txt2JSON):
                 if len(curSentences) > 0:
                     # Add a newline to the end of each paragraph
                     curSentences[-1]['text'] += '\n'
-                    curSentences[-1]['words'].append({'wtype': 'punc',
+                    curSentences[-1]['words'].append({'wtype': 'punct',
                                                       'wf': '\n',
                                                       'off_start': len(curSentences[-1]['text']) - 1,
                                                       'off_end': len(curSentences[-1]['text'])})

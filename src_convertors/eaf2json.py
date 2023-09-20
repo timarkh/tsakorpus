@@ -911,6 +911,8 @@ class Eaf2JSON(Txt2JSON):
                     nAnalyzed += 1
         self.tp.splitter.recalculate_offsets(textJSON['sentences'])
         self.tp.splitter.add_next_word_id(textJSON['sentences'])
+        if 'add_contextual_flags' in self.corpusSettings and self.corpusSettings['add_contextual_flags']:
+            self.tp.splitter.add_contextual_flags(textJSON['sentences'])
         self.add_speaker_marks(textJSON['sentences'])
         self.add_sentence_meta(textJSON['sentences'], curMeta)
         self.clean_up_sentences(textJSON['sentences'])

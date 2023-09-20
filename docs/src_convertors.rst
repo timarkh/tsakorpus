@@ -128,6 +128,8 @@ These parameters are taken into account in scenarios where Tsakorpus performs to
 
 - ``char_replacements`` (dictionary, optional) -- describes characters that should be replaced. Keys are characters to be replaced, values are strings they should be replaced with. Can be used e.g. for replacing lookalike special characters.
 
+- ``add_contextual_flags`` (Boolean, optional) -- whether punctuation-related ``flags`` field should be added automatically to each word. There is a pre-defined set of punctuation-related flags, e.g. ``comma``, ``quest_mark`` or ``quote`` (see ``src_convertors/simple_convertors/sentence_splitter.py`` for details). For example, if a word is preceded by a comma and followed by a question mark, it will get ``a:comma`` and ``b:quest_mark`` strings in the ``flags`` field. This way, the users can take punctuation into account when searching. This option only works in some of the convertors for now. 
+
 Morphological analysis
 ~~~~~~~~~~~~~~~~~~~~~~
 
