@@ -69,6 +69,8 @@ def search_page():
                                                           ensure_ascii=False, indent=-1),
                            auto_switch_tiers=json.dumps(settings.auto_switch_tiers,
                                                         ensure_ascii=False, indent=-1),
+                           int_meta_fields=json.dumps(settings.integer_meta_fields,
+                                                      ensure_ascii=False, indent=-1),
                            generate_dictionary=settings.generate_dictionary,
                            citation=settings.citation,
                            start_page_url=settings.start_page_url,

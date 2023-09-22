@@ -530,7 +530,7 @@ $(function() {
 		svg = d3.create("svg");
       	plotObj.append(svg);
       	plotObj.find('svg').addClass('word_meta_plot').attr("viewBox", "0 0 600 350");
-		if (metaField.startsWith('year')) {
+		if (intMetaFields.includes(metaField)) {
 			show_line_plot(results, maxHeight, 1, ' ipm');
 		}
 		else
