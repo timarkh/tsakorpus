@@ -95,7 +95,7 @@ def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=
     innerQuery = {'match_all': {}}
     if docIDs is not None:
         innerQuery = {'ids': {'values': list(docIDs)}}
-    if not fieldName.startswith('year'):
+    if not (fieldName.startswith('year') or fieldName in settings.integer_meta_fields):
         queryFieldName = fieldName + '_kw'
     else:
         queryFieldName = fieldName
@@ -138,11 +138,11 @@ def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=
                           'n_docs': bucket['doc_count'],
                           'n_words': bucket['subagg_n_words']['value']}
         buckets.append(bucketListItem)
-    if not fieldName.startswith(('year', 'byear', 'birth_year')):
+    if not (fieldName.startswith('year') or fieldName in settings.integer_meta_fields):
         buckets.sort(key=lambda b: (-b['n_words'], -b['n_docs'], b['name']))
     else:
         buckets.sort(key=lambda b: b['name'])
-    if len(buckets) > 25 and not fieldName.startswith('year'):
+    if len(buckets) > 25 and not (fieldName.startswith('year') or fieldName in settings.integer_meta_fields):
         bucketsFirst = buckets[:25]
         lastBucket = {'name': '>>', 'n_docs': 0, 'n_words': 0}
         for i in range(25, len(buckets)):
@@ -164,7 +164,7 @@ def suggest_metafield(fieldName, query):
         return []
     if '*' not in query:
         query = '*' + query + '*'
-    if not fieldName.startswith('year'):
+    if not (fieldName.startswith('year') or fieldName in settings.integer_meta_fields):
         queryFieldName = fieldName + '_kw'
     else:
         queryFieldName = fieldName
@@ -299,7 +299,8 @@ def get_buckets_for_sent_metafield(fieldName, langID=-1, docIDs=None, maxBuckets
         queryFieldName = 'meta.' + fieldName
     else:
         queryFieldName = fieldName
-    if not queryFieldName.startswith('meta.year'):
+    if not (queryFieldName.startswith('meta.year') or (queryFieldName.startswith('meta.')
+                                                       and fieldName[5:] in settings.integer_meta_fields)):
         queryFieldName += '_kw'
     esQuery = {
         'query': innerQuery,
@@ -331,11 +332,11 @@ def get_buckets_for_sent_metafield(fieldName, langID=-1, docIDs=None, maxBuckets
             'n_words': bucket['subagg_n_words']['value']
         }
         buckets.append(bucketListItem)
-    if not fieldName.startswith(('year', 'byear', 'birth_year')):
+    if not (fieldName.startswith('year') or fieldName in settings.integer_meta_fields):
         buckets.sort(key=lambda b: (-b['n_words'], -b['n_sents'], b['name']))
     else:
         buckets.sort(key=lambda b: b['name'])
-    if len(buckets) > 25 and not fieldName.startswith('year'):
+    if len(buckets) > 25 and not (fieldName.startswith('year') or fieldName in settings.integer_meta_fields):
         bucketsFirst = buckets[:25]
         lastBucket = {'name': '>>', 'n_sents': 0, 'n_words': 0}
         for i in range(25, len(buckets)):
