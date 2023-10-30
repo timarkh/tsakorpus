@@ -53,7 +53,7 @@ Format
     }
   }
 
-If a language does not appear in this dictionary, its tags will not be searchable. If you have extra languages (i.e. languages that you do not have in your corpus), nothing bad will happen.
+If a language does not appear in this dictionary, its tags will not be searchable. If you have extra languages (i.e. languages that you do not have in your corpus), nothing bad will happen. If you have multiple languages, enabled the "search in all languages" option and want some tags to be searchable under this option, you have to create a language named ``all`` with its own tag-to-category dictionary.
 
 Making your life easier
 -----------------------
