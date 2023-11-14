@@ -124,7 +124,7 @@ List of parameters
 
 - ``media`` (Boolean) -- whether the corpus contains any aligned media (sound or video) files and, therefore, whether the media player should appear next to the search results. Defaults to ``false``. See also the ``video`` option.
 
-- ``multiple_choice_fields`` (dictionary) -- describes tag selection tables for word-level fields other that *Grammar* or *Gloss* and sentence-level metadata fields. Keys are field names, values are structured in the same way as ``gramm_selection`` above.
+- ``multiple_choice_fields`` (dictionary) -- describes tag selection tables for sentence-level metadata fields or word-level fields (other that *Grammar* or *Gloss*). Keys are field names, values are structured in the same way as ``gramm_selection`` above.
 
 - ``negative_search_enabled`` (Boolean) -- whether the negative search button should be present in the word query form. Defaults to ``true``.
 
