@@ -108,6 +108,7 @@ class Indexator:
         self.numWordsLang = [0] * len(self.languages)    # number of words in each language in current document
         self.numSentsLang = [0] * len(self.languages)    # number of sentences in each language in current document
         self.totalNumWords = 0
+        self.sentID = 0
 
         self.filenames = []   # List of tuples (filename, filesize)
         self.corpusSizeInBytes = 0
@@ -721,6 +722,9 @@ class Indexator:
                 langID = 0
                 s['lang'] = langID
             s['n_words'] = 0
+            if self.settings['sent_id_sort_enabled']:
+                s['sent_id'] = self.sentID
+                self.sentID += 1
             if 'words' in s:
                 sentAnaMeta = self.process_sentence_words(s['words'], langID)
                 s['n_words'] = sum(1 for w in s['words'] if 'wtype' in w and w['wtype'] == 'word')

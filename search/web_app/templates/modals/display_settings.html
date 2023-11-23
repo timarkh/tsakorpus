@@ -22,6 +22,9 @@
 								{% if year_sort_enabled %}
 								<option value="year">{{ _('by year (decreasing; sentence queries)') }}</option>
 								{% endif %}
+								{% if sent_id_sort_enabled %}
+								<option value="sent_id">{{ _('by sentence ID (sentence queries)') }}</option>
+								{% endif %}
 								{% if debug %}
 								<option value="">{{ _('no sorting') }}</option>
 								{% endif %}

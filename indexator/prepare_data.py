@@ -227,6 +227,7 @@ class PrepareData:
             'prev_id': {'type': 'integer'},
             'next_id': {'type': 'integer'},
             'doc_id': {'type': 'integer'},
+            'sent_id': {'type': 'long'},
             'text': {'type': 'text'},
             'lang': {'type': 'keyword'},
             'words': {

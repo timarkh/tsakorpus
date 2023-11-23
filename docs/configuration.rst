@@ -145,6 +145,8 @@ List of parameters
 
 - ``search_remove_whitespaces`` (Boolean) -- whether all whitespaces should be deleted from the search textbox before making a non-keyword query, such as word or lemma query. Defaults to ``true``. The whitespaces are trimmed at the ends of the textboxes regardless of this parameter.
 
+- ``sent_id_sort_enabled`` (Boolean) -- whether the "sort by sentence ID" option is enabled in sentence search. Defaults to ``false``. If enabled, hits will be sorted in by document, and inside one document, in the order of their appearance there. Re-indexing needed if switching from ``false`` to ``true``. **ATTENTION!** If enabled, this option will allow to view sentences of the entire corpus in the correct sequence. Do not enable it if your texts are copyright-protected.
+
 - ``sentence_meta_values`` (dictionary) -- dictionary where keys are names of sentence-level metadata fields and values are lists of their respective values. You should use this dictionary for metadata fields that have short lists of allowed values. Instead of text boxes, such metadata fields will be represented by selectors where all values will be listed in the order specified in the lists.
 
 - ``sentence_meta`` (list of strings) -- list with names of the sentence-level metadata fields that should be available in word-level search queries.

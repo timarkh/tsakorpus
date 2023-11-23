@@ -62,6 +62,7 @@ def search_page():
                            negative_search_enabled=settings.negative_search_enabled,
                            fulltext_search_enabled=settings.fulltext_search_enabled,
                            year_sort_enabled=settings.year_sort_enabled,
+                           sent_id_sort_enabled=settings.sent_id_sort_enabled,
                            debug=settings.debug,
                            subcorpus_selection=settings.search_meta,
                            sentence_meta=settings.sentence_meta,

@@ -272,6 +272,9 @@ msgstr "par fréquence"
 msgid "by year (decreasing; sentence queries)"
 msgstr "par année (décroissant ; recherche d'énoncés)"
 
+msgid "by sentence ID (sentence queries)"
+msgstr "par ID de l'énoncé (recherche d'énoncés)"
+
 #: templates/modals/display_settings.html:26
 msgid "no sorting"
 msgstr "sans tri"

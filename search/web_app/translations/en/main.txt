@@ -272,6 +272,9 @@ msgstr "by frequency"
 msgid "by year (decreasing; sentence queries)"
 msgstr "by year (decreasing; sentence queries)"
 
+msgid "by sentence ID (sentence queries)"
+msgstr "by sentence ID (sentence queries)"
+
 #: templates/modals/display_settings.html:26
 msgid "no sorting"
 msgstr "no sorting"

@@ -520,8 +520,9 @@ def find_sentences_json(page=0):
         page = 1
         change_display_options(query)
         sortOrder = get_session_data('sort')
-        if (sortOrder not in ('random', 'freq', 'year')
+        if (sortOrder not in ('random', 'freq', 'year', 'sent_id')
                 or sortOrder == 'year' and not settings.year_sort_enabled
+                or sortOrder == 'sent_id' and not settings.sent_id_sort_enabled
                 or sortOrder == '' and not settings.debug):
             set_session_data('sort', 'random')
         elif sortOrder == '':

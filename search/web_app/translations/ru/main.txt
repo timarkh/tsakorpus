@@ -272,6 +272,9 @@ msgstr "по частотности"
 msgid "by year (decreasing; sentence queries)"
 msgstr "по году (по убыванию; поиск предложений)"
 
+msgid "by sentence ID (sentence queries)"
+msgstr "по ID предложения (поиск предложений)"
+
 #: templates/modals/display_settings.html:26
 msgid "no sorting"
 msgstr "без сортировки"

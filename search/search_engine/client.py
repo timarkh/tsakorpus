@@ -2,6 +2,7 @@ from elasticsearch import Elasticsearch, helpers
 from elasticsearch.client import IndicesClient
 import subprocess
 import os
+import json
 import time
 from .query_parsers import InterfaceQueryParser
 
@@ -98,6 +99,7 @@ class SearchClient:
 
     @log_if_needed
     def get_sentences(self, esQuery):
+        print(json.dumps(esQuery, ensure_ascii=False, indent=1))
         if self.settings.query_timeout > 0:
             hits = self.es.search(index=self.name + '.sentences',
                                   body=esQuery, request_timeout=self.settings.query_timeout)

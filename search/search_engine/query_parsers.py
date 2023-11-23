@@ -803,7 +803,7 @@ class InterfaceQueryParser:
 
         if sortOrder in ('random', 'year'):
             query = self.make_random(query, randomSeed)
-        elif sortOrder != 'no':
+        elif sortOrder not in ('sent_id', 'no'):
             query = self.make_half_random(query, randomSeed)
 
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
@@ -812,6 +812,15 @@ class InterfaceQueryParser:
                 {
                     'meta.year': {
                         "order": "desc"
+                    }
+                },
+                '_score'
+            ]
+        if sortOrder == 'sent_id':
+            esQuery['sort'] = [
+                {
+                    'sent_id': {
+                        "order": "asc"
                     }
                 },
                 '_score'
