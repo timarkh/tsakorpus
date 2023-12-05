@@ -722,7 +722,7 @@ class Indexator:
                 langID = 0
                 s['lang'] = langID
             s['n_words'] = 0
-            if 'sent_id_sort_enabled' and self.settings['sent_id_sort_enabled']:
+            if 'sent_id_sort_enabled' in self.settings and self.settings['sent_id_sort_enabled']:
                 s['sent_id'] = self.sentID
                 self.sentID += 1
             if 'words' in s:
