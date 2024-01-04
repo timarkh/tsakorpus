@@ -155,6 +155,10 @@ List of parameters
 
 - ``start_page_url`` (string) -- a string with the URL of the start page of the corpus, if there is one. It is used to link the header of the search page to the start page.
 
+- ``text_fields_analyzer_pattern`` (string) -- regex to be used by the Elasticsearch analyzer to split the contents of non-keyword word-level analysis fields, such as word translations, into simple tokens for storage and search purposes. By default, it equals ``[.\n()\\[\\]/,:;?!" ]``. It is used in indexation only. The idea is that if e.g. a translation of a lemma contains a whitespace or a comma, it should be possible to find it by searching for either part, the one before the whitespace/comma and the one after it.
+
+- ``text_fields_lowercase`` (Boolean) -- whether all non-keyword word-level analysis fields should be stored in lowercase. Defaults to ``true``. It is used in indexation only. If set to false, the word-level search will be case sensitive.
+
 - ``transliterations`` (list of strings) -- list of supported transliterations. For each transliteration, there should be a function in ``/search/web_app/transliteration.py`` named ``trans_%TRANSLITERATION_NAME%_baseline`` that takes the text and the name of the language as input and returns transliterated text.
 
 - ``try_restart_elastic`` (Boolean) -- if local Elasticsearch is used and it seems to be down (no connection can be established when a client opens the search page), try starting it by running ``search/restart_elasticsearch.sh`` (only in Linux). Defaults to ``true``. Note that starting a service requires sudo privileges. In order for this to work without you manually entering your sudo password, the user who runs the app has to be allowed to use sudo without a password in this case. This can be achieved by running ``sudo visudo`` and adding the following line::

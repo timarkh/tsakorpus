@@ -37,6 +37,12 @@ class PrepareData:
         wfLowercase = True
         if 'wf_lowercase' in self.settings:
             wfLowercase = self.settings['wf_lowercase']
+        textFieldsAnalyzerPatter = '[.\n()\\[\\]/,:;?!" ]'
+        if 'text_fields_analyzer_pattern' in self.settings and self.settings['text_fields_analyzer_pattern'] is not None:
+            textFieldsAnalyzerPatter = self.settings['text_fields_analyzer_pattern']
+        textFieldsLowercase = True
+        if 'text_fields_lowercase' in self.settings:
+            textFieldsLowercase = self.settings['text_fields_lowercase']
         self.wfAnalyzer = {
             'analyzer': {
                 'wf_analyzer': {
@@ -48,6 +54,11 @@ class PrepareData:
                     'type': 'pattern',
                     'pattern': ' ',
                     'lowercase': True
+                },
+                'text_fields_analyzer': {
+                    'type': 'pattern',
+                    'pattern': textFieldsAnalyzerPatter,
+                    'lowercase': textFieldsLowercase
                 }
             }
         }
@@ -131,7 +142,10 @@ class PrepareData:
         for field in self.wordFields:
             # additional word-level fields such as translation
             if self.rxBadField.search(field) is None and field not in self.kwFields:
-                m['ana']['properties'][field] = {'type': 'text'}
+                m['ana']['properties'][field] = {
+                    'type': 'text',
+                    'analyzer': 'text_fields_analyzer'
+                }
         for field in self.kwFields:
             # additional word-level fields with no full-text search
             if self.rxBadField.search(field) is None:

@@ -92,6 +92,8 @@ class CorpusSettings:
         # Regexes etc.
         self.wf_analyzer_pattern = None
         self.wf_lowercase = True
+        self.text_fields_analyzer_pattern = None
+        self.text_fields_lowercase = True
         self.regex_simple_search = None
         self.search_remove_whitespaces = True
         self.detect_lemma_queries = False

@@ -608,7 +608,6 @@ msgstr "来自所有语料库."
 msgid "Search result:"
 msgid_plural "Search result:"
 msgstr[0] "搜索结果: 已找到"
-msgstr[1] ""
 
 #: templates/search_results/result_sentences.html:3
 #, fuzzy
