@@ -21,6 +21,9 @@ class DumbMorphParser:
     rxBracketGloss = re.compile('[.-]?\\[.*?\\]')
     rxRuleSimpleAndCurlyParts = re.compile('\\{[^{}]+\\}|[^{}]+')
     rxGrammRuleCurlyBrackets = re.compile('\\{ *([\\w-]+) *= *([^{}\r\n=]*?) *\\}')
+    rxStartsEndsWithW = re.compile('^\\w$|^\\w.*\\w$')
+    rxStartsWithW = re.compile('^\\w.*[^\\w]$')
+    rxEndsWithW = re.compile('^[^\\w]*\\w$')
 
     def __init__(self, settings, categories, errorLog=''):
         self.settings = copy.deepcopy(settings)
@@ -102,7 +105,7 @@ class DumbMorphParser:
         rule = ''
         for i in range(len(ruleParts)):
             if i % 2 == 0:
-                rulePartsSimpleAndCurly = DumbMorphParser.rxRuleSimpleAndCurlyParts.findall(ruleParts)
+                rulePartsSimpleAndCurly = DumbMorphParser.rxRuleSimpleAndCurlyParts.findall(ruleParts[i])
                 for subpart in rulePartsSimpleAndCurly:
                     m = DumbMorphParser.rxGrammRuleCurlyBrackets.search(subpart)
                     if m is not None:
@@ -227,9 +230,20 @@ class DumbMorphParser:
             if lang not in self.categories:
                 self.categories[lang] = {}
             if 'glosses' in self.settings and lang in self.settings['glosses']:
-                sRegex = '|'.join(re.escape(g) for g in sorted(self.settings['glosses'][lang],
-                                                               key=lambda x: -len(x)))
-                sRegex = '\\b(' + sRegex + ')\\b'
+                sRegex = ''
+                for g in sorted(self.settings['glosses'][lang],
+                                key=lambda x: -len(x)):
+                    g = re.escape(g)
+                    if self.rxStartsEndsWithW.search(g):
+                        g = '\\b' + g + '\\b'
+                    elif self.rxStartsWithW.search(g):
+                        g = '\\b' + g + '(?!\\w)'
+                    elif self.rxEndsWithW.search(g):
+                        g = '(?<!\\w)' + g + '\\b'
+                    else:
+                        g = '(?<!\\w)' + g + '(?!\\w)'
+                    sRegex += g + '|'
+                sRegex = '(' + sRegex.strip('|') + ')'
                 regexes[lang] = re.compile(sRegex)
             else:
                 sRegex = '|'.join(re.escape(g) for g in sorted(self.categories[lang],
