@@ -20,9 +20,7 @@ class Xml_Flex2JSON(Txt2JSON):
         self.srcExt = 'xml'
         self.pID = 0        # id of last aligned segment
         self.glosses = []
-        self.grammRules = []
-        self.posRules = {}
-        self.load_rules()
+        self.load_glosses(os.path.join(self.settingsDir, 'glossList.txt'))
         self.POSTags = set()    # All POS tags encountered in the XML
         self.rxStemGlosses = re.compile('^$')
         self.mainGlossLang = 'en'
@@ -31,16 +29,7 @@ class Xml_Flex2JSON(Txt2JSON):
             self.mainGlossLang = self.corpusSettings['main_gloss_language']
         if 'bad_analysis_languages' in self.corpusSettings:
             self.badAnalysisLangs = self.corpusSettings['bad_analysis_languages']
-    
-    def load_rules(self):
-        """
-        Load rules for converting the glosses into bags of grammatical
-        tags.
-        """
-        self.load_glosses(os.path.join(self.settingsDir, 'glossList.txt'))
-        self.load_gramm_rules(os.path.join(self.settingsDir, 'gramRules.txt'))
-        self.load_pos_rules(os.path.join(self.settingsDir, 'posRules.txt'))
-    
+
     def load_glosses(self, fname):
         """
         Load gloss list.
@@ -59,76 +48,14 @@ class Xml_Flex2JSON(Txt2JSON):
         self.rxStemGlosses = re.compile('\\b' + '|'.join(re.escape(gl) for gl in glosses) + '\\b')
         self.glosses = glosses
 
-    @staticmethod
-    def prepare_rule(rule):
-        """
-        Make a compiled regex out of a rule represented as a string.
-        """
-        def replReg(s):
-            if "'" in s:
-                return ''
-            return ' re.search(\'' + s +\
-                   '\', ana[\'parts\']) is not None or ' +\
-                   're.search(\'' + s +\
-                   '\', ana[\'gloss\']) is not None '
-        ruleParts = rule.split('"')
-        rule = ''
-        for i in range(len(ruleParts)):
-            if i % 2 == 0:
-                rule += re.sub('([^\\[\\]~|& \t\']+)', ' \'\\1\' in tagsAndGlosses ',
-                               ruleParts[i]).replace('|', ' or ').replace('&', ' and ')\
-                                            .replace('~', ' not ').replace('[', '(').replace(']', ')')
-            else:
-                rule += replReg(ruleParts[i])
-        return rule
-
-    def load_gramm_rules(self, fname):
-        """
-        Load main set of rules for converting the glosses into bags
-        of grammatical tags.
-        """
-        if len(fname) <= 0 or not os.path.isfile(fname):
-            return
-        rules = []
-        f = open(fname, 'r', encoding='utf-8-sig')
-        for line in f:
-            line = line.strip()
-            if len(line) > 0:
-                rule = [i.strip() for i in line.split('->')]
-                if len(rule) != 2:
-                    continue
-                rule[1] = set(rule[1].split(','))
-                rule[0] = self.prepare_rule(rule[0])
-                rules.append(rule)
-        f.close()
-        self.grammRules = rules
-
-    def load_pos_rules(self, fname):
-        """
-        Load mapping of the FLEX POS tags to your corpus POS tags.
-        """
-        if len(fname) <= 0 or not os.path.isfile(fname):
-            return
-        rules = {}
-        f = open(fname, 'r', encoding='utf-8-sig')
-        for line in f:
-            line = line.strip('\r\n')
-            if len(line) > 0:
-                rule = [i.strip() for i in line.split('\t')]
-                if len(rule) != 2:
-                    continue
-                rules[rule[0]] = rule[1]
-        f.close()
-        self.posRules = rules
-
     def add_pos_ana(self, ana, pos):
         """
         Add the part of speech tag to single JSON analysis, taking into
         account the correspondences between FLEX tags and the target
         corpus tags. Change the analysis, do not return anything.
         """
-        if pos in self.posRules:
-            pos = self.posRules[pos]
+        if pos in self.tp.parser.posRules:
+            pos = self.tp.parser.posRules[pos]
         if 'gr.pos' not in ana:
             ana['gr.pos'] = pos
         elif type(ana['gr.pos']) == str and ana['gr.pos'] != pos:
@@ -170,8 +97,8 @@ class Xml_Flex2JSON(Txt2JSON):
                         tagsAndGlosses |= set(ana[field])
             if 'gloss' in ana:
                 tagsAndGlosses |= set(gl.strip('-=:.<>') for gl in self.rxSplitParts.findall(ana['gloss']))
-            if len(self.grammRules) > 0:
-                for rule in self.grammRules:
+            if len(self.tp.parser.grammRules) > 0:
+                for rule in self.tp.parser.grammRules:
                     if eval(rule[0]):
                         addedGrammTags |= rule[1]
             elif 'gloss' in ana:

@@ -19,6 +19,8 @@ class DumbMorphParser:
     rxGlossParts = re.compile('\\.\\[[^\\[\\]]+\\]|[^ \\-=<>\\[\\]]*[^ \\-=<>\\[\\].]')
     rxGlossIndexPart = re.compile('^(.*)\\{(.*?)\\}')
     rxBracketGloss = re.compile('[.-]?\\[.*?\\]')
+    rxRuleSimpleAndCurlyParts = re.compile('\\{[^{}]+\\}|[^{}]+')
+    rxGrammRuleCurlyBrackets = re.compile('\\{ *([\\w-]+) *= *([^{}\r\n=]*?) *\\}')
 
     def __init__(self, settings, categories, errorLog=''):
         self.settings = copy.deepcopy(settings)
@@ -45,12 +47,14 @@ class DumbMorphParser:
                     self.load_analyses(os.path.join(self.settings['corpus_dir'],
                                                     self.settings['parsed_wordlist_filename'][language]),
                                        language)
+        self.grammRules = []
+        self.posRules = {}
         self.load_rules()
 
     def load_rules(self):
         """
         Load rules for converting the glosses into bags of grammatical
-        tags.
+        tags and for changing POS values.
         """
         self.grammRules = []
         if os.path.exists(os.path.join(self.settings['corpus_dir'], 'conf_conversion')):
@@ -62,6 +66,10 @@ class DumbMorphParser:
                                                'conf_conversion/grammRules.csv'), separator='\t')
             self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
                                                'conf_conversion/gramRules.csv'), separator='\t')  # Backward compatibility
+            self.load_pos_rules(os.path.join(self.settings['corpus_dir'],
+                                             'conf_conversion/posRules.txt'))
+            self.load_pos_rules(os.path.join(self.settings['corpus_dir'],
+                                             'conf_conversion/posRules.csv'), separator='\t')
         else:  # Backward compatibility
             self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
                                                'conf/grammRules.txt'))
@@ -71,30 +79,47 @@ class DumbMorphParser:
                                                'conf/grammRules.csv'), separator='\t')
             self.load_gramm_rules(os.path.join(self.settings['corpus_dir'],
                                                'conf/gramRules.csv'), separator='\t')  # Backward compatibility
+            self.load_pos_rules(os.path.join(self.settings['corpus_dir'],
+                                             'conf/posRules.txt'))
+            self.load_pos_rules(os.path.join(self.settings['corpus_dir'],
+                                             'conf/posRules.csv'), separator='\t')
+
+    @staticmethod
+    def repl_regex_rule(s):
+        if "'" in s:
+            return ''
+        return ' re.search(\'' + s + \
+               '\', ana[\'parts\']) is not None or ' + \
+               're.search(\'' + s + \
+               '\', ana[\'gloss\']) is not None '
 
     @staticmethod
     def prepare_rule(rule):
         """
         Make a compiled regex out of a rule represented as a string.
         """
-
-        def replReg(s):
-            if "'" in s:
-                return ''
-            return ' re.search(\'' + s + \
-                   '\', ana[\'parts\']) is not None or ' + \
-                   're.search(\'' + s + \
-                   '\', ana[\'gloss\']) is not None '
-
         ruleParts = rule.split('"')
         rule = ''
         for i in range(len(ruleParts)):
             if i % 2 == 0:
-                rule += re.sub('([^\\[\\]~|& \t\']+)', ' \'\\1\' in tagsAndGlosses ',
-                               ruleParts[i]).replace('|', ' or ').replace('&', ' and ') \
-                    .replace('~', ' not ').replace('[', '(').replace(']', ')')
+                rulePartsSimpleAndCurly = DumbMorphParser.rxRuleSimpleAndCurlyParts.findall(ruleParts)
+                for subpart in rulePartsSimpleAndCurly:
+                    m = DumbMorphParser.rxGrammRuleCurlyBrackets.search(subpart)
+                    if m is not None:
+                        value = m.group(2).replace('\'', '\\\'')
+                        field = m.group(1).replace('\'', '\\\'')
+                        if field == 'lemma':
+                            field = 'lex'
+                        rule += ' re.fullmatch(\'' + value + '\', ana[\'' + field + '\']) is not None '
+                        continue
+                    # If we are here, this is a "simple" part without curly brackets
+                    # (or a broken bracketed one). It contains conditions connected
+                    # to the glosses.
+                    rule += re.sub('([^\\[\\]~|& \t\']+)', ' \'\\1\' in tagsAndGlosses ',
+                                   ruleParts[i]).replace('|', ' or ').replace('&', ' and ') \
+                        .replace('~', ' not ').replace('[', '(').replace(']', ')')
             else:
-                rule += replReg(ruleParts[i])
+                rule += DumbMorphParser.repl_regex_rule(ruleParts[i])
         return rule
 
     def load_gramm_rules(self, fname, separator='->'):
@@ -105,18 +130,34 @@ class DumbMorphParser:
         if len(fname) <= 0 or not os.path.isfile(fname):
             return
         rules = []
-        f = open(fname, 'r', encoding='utf-8-sig')
-        for line in f:
-            line = re.sub('#.*', '', line).strip()
-            if len(line) > 0:
-                rule = [i.strip() for i in line.split(separator)]
-                if len(rule) != 2:
-                    continue
-                rule[1] = set(rule[1].split(','))
-                rule[0] = self.prepare_rule(rule[0])
-                rules.append(rule)
-        f.close()
+        with open(fname, 'r', encoding='utf-8-sig') as fIn:
+            for line in fIn:
+                line = re.sub('#.*', '', line).strip()
+                if len(line) > 0:
+                    rule = [i.strip() for i in line.split(separator)]
+                    if len(rule) != 2:
+                        continue
+                    rule[1] = set(rule[1].split(','))
+                    rule[0] = DumbMorphParser.prepare_rule(rule[0])
+                    rules.append(rule)
         self.grammRules += rules
+
+    def load_pos_rules(self, fname, separator='\t'):
+        """
+        Load mapping of the FLEX POS tags to your corpus POS tags.
+        """
+        if len(fname) <= 0 or not os.path.isfile(fname):
+            return
+        rules = {}
+        with open(fname, 'r', encoding='utf-8-sig') as fIn:
+            for line in fIn:
+                line = line.strip('\r\n')
+                if len(line) > 0:
+                    rule = [i.strip() for i in line.split(separator)]
+                    if len(rule) != 2:
+                        continue
+                    rules[rule[0]] = rule[1]
+        self.posRules = rules
 
     def log_message(self, message):
         """

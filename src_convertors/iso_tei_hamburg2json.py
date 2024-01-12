@@ -41,26 +41,6 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         self.wordIDseq = []  # sequence of word/punctuation/incident IDs
                              # (needed to understand ranges such as "w13 to inc2")
         self.glosses = set()
-        self.posRules = {}
-        self.load_pos_rules(os.path.join(self.settingsDir, 'posRules.txt'))
-
-    def load_pos_rules(self, fname):
-        """
-        Load mapping of the POS tags used in the source files to your corpus POS tags.
-        """
-        if len(fname) <= 0 or not os.path.isfile(fname):
-            return
-        rules = {}
-        f = open(fname, 'r', encoding='utf-8-sig')
-        for line in f:
-            line = line.strip('\r\n')
-            if len(line) > 0:
-                rule = [i.strip() for i in line.split('\t')]
-                if len(rule) != 2:
-                    continue
-                rules[rule[0]] = rule[1]
-        f.close()
-        self.posRules = rules
 
     def load_speaker_meta(self, srcTree):
         speakerMeta = {}
@@ -130,8 +110,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         account the correspondences between source file tags and the target
         corpus tags. Change the analysis, do not return anything.
         """
-        if pos in self.posRules:
-            pos = self.posRules[pos]
+        if pos in self.tp.parser.posRules:
+            pos = self.tp.parser.posRules[pos]
         if 'gr.pos' not in ana:
             ana['gr.pos'] = pos
         elif type(ana['gr.pos']) == str and ana['gr.pos'] != pos:
