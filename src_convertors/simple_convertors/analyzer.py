@@ -24,6 +24,7 @@ class DumbMorphParser:
     rxStartsEndsWithW = re.compile('^\\w$|^\\w.*\\w$')
     rxStartsWithW = re.compile('^\\w.*[^\\w]$')
     rxEndsWithW = re.compile('^[^\\w]*\\w$')
+    rxBadChars = re.compile('[{}.*+^$|()]+')
 
     def __init__(self, settings, categories, errorLog=''):
         self.settings = copy.deepcopy(settings)
@@ -305,7 +306,19 @@ class DumbMorphParser:
         """
         Return all glosses that are not in the categories list, and
         therefore are the glosses for the stem.
+        There ay be multiple strings in glossIndex, e.g. "surface"
+        and "deep" representations of morphemes.
         """
+        if type(glossIndex) == list:
+            stemsList = []
+            newIndexGlossList = []
+            for glossIndexVariant in glossIndex:
+                stems, newIndexGloss = self.find_stems(glossIndexVariant, lang)
+                stemsList.append(stems)
+                newIndexGlossList.append(newIndexGloss)
+            return stemsList, newIndexGlossList
+
+        # If we are here, then glossIndex is a string
         stems = []
         newIndexGloss = ''
         for glossPart in glossIndex.split('-'):
@@ -323,12 +336,16 @@ class DumbMorphParser:
                 newIndexGloss += glossPart + '-'
         return stems, newIndexGloss
 
-    def process_gloss_in_ana(self, ana, gloss_lang=''):
+    def process_gloss_in_ana(self, ana, gloss_lang='',
+                             partsAttr='parts', partPfx='', overwrite=True):
         """
-        If there are fields 'gloss' and 'parts' in the JSON
+        If there are fields 'gloss' and partsAttr in the JSON
         analysis, add field 'gloss_index' that contains the
         glossed word in such a form that it could be queried
-        with the gloss query language.
+        with the gloss query language. By default, partsAttr == 'parts',
+        but this function may be used to generate additional
+        gloss strings for searching e.g. in the "deep representations"
+        of morphemes.
         If gloss_lang is not empty, look in fields "gloss_%gloss_lang%"
         etc. instead of just "gloss". This may be needed if
         there are glosses in more than one metalanguage.
@@ -336,20 +353,34 @@ class DumbMorphParser:
         """
         if len(gloss_lang) > 0:
             gloss_lang = '_' + gloss_lang
-        if 'gloss' + gloss_lang not in ana or 'parts' not in ana:
+        if 'gloss' + gloss_lang not in ana or partsAttr not in ana:
             return
-        wordParts = self.rxGlossParts.findall(ana['parts'].replace('{', '(').replace('{', ')').replace(' ', '.'))
+        partPfx = self.rxBadChars.sub('', partPfx)
+        wordParts = self.rxGlossParts.findall(ana[partsAttr].replace('{', '(').replace('{', ')').replace(' ', '.'))
         glosses = self.rxGlossParts.findall(ana['gloss' + gloss_lang])
         glossesOvert = [g for g in glosses if self.rxBracketGloss.search(g) is None]
         glossesCovert = [g.strip('[].') for g in glosses if self.rxBracketGloss.search(g) is not None]
         if len(wordParts) <= 0 or len(glosses) == 0 or len(wordParts) != len(glossesOvert):
-            self.log_message('Wrong gloss or partitioning: ' + ana['parts'] + ' != ' + ana['gloss' + gloss_lang])
+            self.log_message('Wrong gloss or partitioning: ' + ana[partsAttr] + ' != ' + ana['gloss' + gloss_lang])
             return
-        glossIndex = '-'.join(p[1] + '{' + p[0] + '}'
+        glossIndex = '-'.join(p[1] + '{' + partPfx + p[0] + '}'
                               for p in zip(wordParts, glossesOvert)) + '-'
-        ana['gloss_index' + gloss_lang] = glossIndex
+
+        glossKey = 'gloss_index' + gloss_lang
+        glossKeyCovert = 'glosses_covert' + gloss_lang
+        if overwrite or glossKey not in ana:
+            ana[glossKey] = glossIndex
+        else:
+            if type(ana[glossKey]) == str:
+                ana[glossKey] = [ana[glossKey]]
+            ana[glossKey].append(glossIndex)
         if len(glossesCovert) > 0:
-            ana['glosses_covert' + gloss_lang] = glossesCovert
+            if overwrite or glossKeyCovert not in ana:
+                ana[glossKeyCovert] = glossesCovert
+            else:
+                if type(ana[glossKeyCovert]) == str:
+                    ana[glossKeyCovert] = [ana[glossKeyCovert]]
+                ana[glossKeyCovert].append(glossesCovert)
 
     def transform_ana_rnc(self, ana, lang=''):
         """

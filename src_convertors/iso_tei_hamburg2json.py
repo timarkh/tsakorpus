@@ -280,13 +280,19 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 self.glosses |= set(g for g in ana['gloss'].split('-') if g.upper() == g)
             if 'mp' in curWordAnno:
                 # mp contains normalized versions of morphemes. If this tier exists,
-                # take normalized stem from it and make it a lemma. Then forget mp
-                # and write glosses based on the mb tier, if it exists.
-                ana['parts'] = curWordAnno['mp']
+                # take normalized stem from it and make it a lemma.
+                # Write glosses (gloss_index) based on the mb tier, if it exists, but also
+                # store the "deep form" from mp in ana['parts_deep'] and add this data
+                # to ana['gloss_index'] as well, prefixing each deep morpheme representation
+                # with '_'.
+                ana['parts'] = curWordAnno['mp']    # Will be overwritten by mb, if any
+                ana['parts_deep'] = curWordAnno['mp']
                 self.tp.parser.process_gloss_in_ana(ana)
                 if 'gloss_index' in ana:
                     stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index'],
                                                                      self.corpusSettings['languages'][0])
+                    if len(stems) > 0 and type(stems[0]) == list:
+                        stems = stems[0]
                     ana['lex'] = ' '.join(s[1] for s in stems)
             if 'mb' in curWordAnno:
                 ana['parts'] = curWordAnno['mb']
@@ -298,10 +304,13 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 self.tp.parser.process_gloss_in_ana(ana, 'de')
             if 'ps' in curWordAnno:
                 self.add_pos_ana(ana, curWordAnno['ps'])
-            self.tp.parser.process_gloss_in_ana(ana)
+
+            self.tp.parser.process_gloss_in_ana(ana)    # "Surface" representations (mb)
             if 'gloss_index' in ana:
                 stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index'],
                                                                  self.corpusSettings['languages'][0])
+                if len(stems) > 0 and type(stems[0]) == list:
+                    stems = stems[0]
                 if 'lex' not in ana:
                     ana['lex'] = ' '.join(s[1] for s in stems)
                 ana['trans_en'] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
@@ -318,6 +327,15 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                     del ana['gloss_' + glossLang]
                     if 'glosses_covert_' + glossLang in ana:
                         del ana['glosses_covert_' + glossLang]
+
+            self.tp.parser.process_gloss_in_ana(ana, partsAttr='parts_deep',
+                                                partPfx='_', overwrite=False)    # Add "Deep" representations (mp)
+            if 'gloss_index' in ana and type(ana['gloss_index']) == list:
+                stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index'],
+                                                                 self.corpusSettings['languages'][0])
+                for i in range(len(ana['gloss_index'])):
+                    ana['gloss_index'][i] = self.rxBracketGloss.sub('', newIndexGloss[i])
+
             if ('replace_bracketed_glosses' in self.corpusSettings
                     and self.corpusSettings['replace_bracketed_glosses']
                     and 'gloss' in ana):
@@ -720,5 +738,5 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
 
 if __name__ == '__main__':
     x2j = ISO_TEI_Hamburg2JSON()
-    x2j.process_corpus(cutMedia=False)
+    x2j.process_corpus(cutMedia=True)
 
