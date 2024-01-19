@@ -41,6 +41,8 @@ class InterfaceQueryParser:
                         if not f.startswith('year')
                         and f not in self.settings.integer_meta_fields]
         self.docMetaFields += kwMetaFields
+        self.rxWordIndexQueryFields = re.compile('^(?:sent_meta_.+|' + '|'.join(
+            re.escape(awf) + '.*' for awf in settings.accidental_word_fields) + ')$')
         self.rp = rp    # ResponseProcessor instance
         # for g in self.gramDict:
         #     self.gramDict[g] = 'ana.gr.' + self.gramDict[g]
@@ -1018,6 +1020,10 @@ class InterfaceQueryParser:
                  and len(htmlQuery[k]) > 0 and htmlQuery[k] not in ('*', '.*')
                  for k in htmlQuery):
             searchIndex = 'sentences'
+        elif any(self.rxWordIndexQueryFields.search(k) is not None
+                 and len(htmlQuery[k]) > 0 and htmlQuery[k] not in ('*', '.*', '^.*$')
+                 for k in htmlQuery):
+            searchIndex = 'sentences'
         else:
             searchIndex = searchOutput
         # searchIndex is the name of the ES index where the search is performed.
@@ -1050,9 +1056,9 @@ class InterfaceQueryParser:
         else:
             pathPfx = ''
 
-        if 'doc_ids' in htmlQuery:
+        if 'doc_ids' in htmlQuery and htmlQuery['doc_ids'] is not None:
             prelimQuery['doc_ids'] = [int(did) for did in htmlQuery['doc_ids']]
-        if searchIndex == 'sentences' and 'para_ids' in htmlQuery:
+        if searchIndex == 'sentences' and 'para_ids' in htmlQuery and htmlQuery['para_ids'] is not None:
             prelimQuery['para_ids'] = htmlQuery['para_ids']
 
         if self.settings.detect_lemma_queries:

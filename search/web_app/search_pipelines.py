@@ -668,8 +668,6 @@ def find_words_json(searchType='word', page=0):
     for iQueryWord in range(1, nWords + 1):
         if 'negq' + str(iQueryWord) in query and query['negq' + str(iQueryWord)] == 'on':
             negWords.append(iQueryWord)
-    rxWordIndexQueryFields = re.compile('^(?:sent_meta_.+|' + '|'.join(
-        re.escape(f) + '.*' for f in settings.accidental_word_fields) + ')$')
     if nWords > 1:
         # Multi-word search: instead of looking in the words index,
         # first find all occurrences in the sentences and then
@@ -684,7 +682,7 @@ def find_words_json(searchType='word', page=0):
             if distance_constraints_too_complex(wordConstraints):
                 constraintsTooComplex = True
     elif ('sentence_index1' in query and len(query['sentence_index1']) > 0
-          or any(rxWordIndexQueryFields.search(k) is not None
+          or any(sc.qp.rxWordIndexQueryFields.search(k) is not None
                  and len(query[k]) > 0 and query[k] not in ('*', '.*', '^.*$')
                  for k in query)):
         # Sentence-level-meta query or query involving position in sentence
