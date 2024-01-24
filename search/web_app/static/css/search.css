@@ -1164,6 +1164,12 @@ hr.separator {
 	padding-left: 15px;
 }
 
+.saved_words_table {
+	margin: 15px 2px 10px 2px;
+	display: inline-block;
+	width: 100%;
+}
+
 @media screen and (min-width: 790px) {
     white-space: nowrap;
 }

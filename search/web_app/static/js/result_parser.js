@@ -145,6 +145,10 @@ function search_word_from_list(e) {
 	if (wID == "") return;
 	clear_search_form();
 	$('#w_id1').val(wID);
+	$('.words_list_table').detach().appendTo('#saved_words_table');
+	$('#td_load_more_words').toggle(false);
+	$('#saved_words_table').toggle(true);
+	$(e.currentTarget).css('color', 'blueviolet');
 	$("#search_sent").click();
 }
 
@@ -153,6 +157,10 @@ function search_lemma_from_list(e) {
 	if (lID == "") return;
 	clear_search_form();
 	$('#l_id1').val(lID);
+	$('.words_list_table').detach().appendTo('#saved_words_table');
+	$('#td_load_more_words').toggle(false);
+	$('#saved_words_table').toggle(true);
+	$(e.currentTarget).css('color', 'blueviolet');
 	$("#search_sent").click();
 }
 

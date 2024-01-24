@@ -3,6 +3,7 @@ $(function() {
 	
 	$("#search_sent_json").click(function() {
 		//$("#corpus_header").html( $("#search_main").serialize() );
+		clear_saved_words_table();
 		$.ajax({
 			url: "search_sent_json",
 			data: $("#search_main").serialize(),
@@ -20,6 +21,7 @@ $(function() {
 	
 	$("#search_sent_query").click(function() {
 		//$("#corpus_header").html( $("#search_main").serialize() );
+		clear_saved_words_table();
 		$.ajax({
 			url: "search_sent_query",
 			data: $("#search_main").serialize(),
@@ -38,6 +40,7 @@ $(function() {
 	$("#search_word").click(function() {
 		//$("#query").html( $("#search_main").serialize() );
 		remember_query('word');
+		clear_saved_words_table();
 		$.ajax({
 			url: "search_word",
 			data: $("#search_main").serialize(),
@@ -55,6 +58,7 @@ $(function() {
 	$("#search_lemma").click(function() {
 		//$("#query").html( $("#search_main").serialize() );
 		remember_query('lemma');
+		clear_saved_words_table();
 		$.ajax({
 			url: "search_lemma",
 			data: $("#search_main").serialize(),
@@ -295,6 +299,7 @@ function get_sentences() {
 }
 
 function get_sentences_page(page) {
+	clear_saved_words_table();
 	if (page < 0) {
 		remember_query('sentence');
 		$.ajax({
