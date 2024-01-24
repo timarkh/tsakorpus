@@ -35,9 +35,15 @@
 			{% if word_search_display_gr %}
 			<th>{{ _('word_th_gr') }}</th>
 			{% endif %}
+			{% if search_type == "word" %}
 			{% for item in word_table_fields %}
 			<th>{{ _('word_th_' + item) }}</th>
 			{% endfor %}
+			{% elif search_type == "lemma" %}
+			{% for item in lemma_table_fields %}
+			<th>{{ _('word_th_' + item) }}</th>
+			{% endfor %}
+			{% endif %}
 			<th>{{ _('word_th_frequency') }}</th>
 			{% if display_freq_rank %}
 			<th><i class="bi bi-list-ol" data-tooltip="tooltip" data-placement="top" title="{{ _('word_th_freq. rank / quantile') }}"></i></th>

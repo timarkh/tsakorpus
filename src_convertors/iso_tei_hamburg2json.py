@@ -273,6 +273,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         for wordID in wordAnno:
             ana = {}
             curWordAnno = wordAnno[wordID]
+            self.add_ana_fields(ana, curWordAnno)
             # mp: morph breaks with empty morphemes (corresponds to the mc tier: POS and morph categories)
             # mb: morph breaks without empty morphemes (corresponds to the gr/ge tiers: actual glosses)
             if 'ge' in curWordAnno:
@@ -314,7 +315,6 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 if 'lex' not in ana:
                     ana['lex'] = ' '.join(s[1] for s in stems)
                 ana['trans_en'] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
-                self.add_ana_fields(ana, curWordAnno)
                 self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0],
                                         useGlossList=useGlossList)
                 ana['gloss_index'] = self.rxBracketGloss.sub('', newIndexGloss)

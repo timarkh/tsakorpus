@@ -71,6 +71,7 @@ class CorpusSettings:
         self.multiple_choice_fields = {}
         self.integer_meta_fields = []
         self.word_table_fields = []
+        self.lemma_table_fields = []
         self.default_values = {}
         self.sentence_meta_values = {}
         self.display_freq_rank = True
@@ -126,6 +127,7 @@ class CorpusSettings:
             'line_plot_meta',
             'integer_meta_fields',
             'word_table_fields',
+            'lemma_table_fields',
             'accidental_word_fields',
             'languages',
             'rtl_languages',

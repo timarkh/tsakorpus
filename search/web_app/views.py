@@ -421,6 +421,7 @@ def search_word(searchType='word', page=-1):
     return render_template('search_results/result_words.html',
                            data=hitsProcessed,
                            word_table_fields=settings.word_table_fields,
+                           lemma_table_fields=settings.lemma_table_fields,
                            word_search_display_gr=settings.word_search_display_gr,
                            display_freq_rank=settings.display_freq_rank,
                            search_type=searchType,
