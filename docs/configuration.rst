@@ -60,6 +60,8 @@ List of parameters
 
 - ``elastic_url`` (string) -- by default, Tsakorpus connects to the Elasticsearch running on ``localhost:9200`` without user authentication. If you want to connect to Elasticsearch running on another host or port, or if you want to supply username and password, you can put a URL to be used here, e.g. ``http://user:password@localhost:9200/``. Make sure ``corpus.json`` does not have too broad read permissions. Defaults to empty string.
 
+- ``exclude_from_dict`` (dictionary) -- if ``generate_dictionary`` is set to ``True``, this dictionary specifies which words should not be taken into account when generating a dictionary. For example, you may want to omit words annotated as hesitation or code switching. Keys are analysis fields (with the ``gr.`` prefix for grammatical categories, e.g. ``gr.pos``). Values are regexes. Words that have at liest one analysis field at least one value of which matches the corresponding regex will be excluded from the dictionary.
+
 - ``fulltext_search_enabled`` (Boolean) -- boolean value that determines whether a text box for full-text search should be displayed. Defaults to ``true``.
 
 - ``fulltext_view_enabled`` (Boolean) -- whether it is allowed to view entire annotated texts. If turned on, HTML rendering is generated for texts at indexation time (which can slow down the process significantly). Full texts are only generated for those JSON files that have ``fulltext_id`` metadata field filled in. The name of the resulting file is its value. Defaults to ``false``.

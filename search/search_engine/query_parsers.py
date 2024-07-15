@@ -145,7 +145,7 @@ class InterfaceQueryParser:
                          for part in parts if len(part) > 0)
         return qStart + result + qEnd
 
-    def make_simple_term_query(self, text, field, lang, keyword_query=False):
+    def make_simple_term_query(self, text, field, lang, keyword_query=False, rewrite=True):
         """
         Make a term query that will become one of the inner parts
         of the compound bool query. Recognize simple wildcards and regexps.
@@ -176,28 +176,33 @@ class InterfaceQueryParser:
                 if text.endswith('$'):
                     text = text[:-1]
                 return {'regexp': {field: text}}
-        try:
-            field += '.' + self.gramDict[lang][text]
-            return {'match': {field: text}}
-        except KeyError:
-            if (lang in self.settings.lang_props
-                    and 'gramm_shortcuts' in self.settings.lang_props[lang]
-                    and text in self.settings.lang_props[lang]['gramm_shortcuts']):
-                text = self.settings.lang_props[lang]['gramm_shortcuts'][text]
-                return self.make_bool_query(text, field, lang, keyword_query=keyword_query)
+        if (rewrite
+                and lang in self.settings.lang_props
+                and 'gramm_shortcuts' in self.settings.lang_props[lang]
+                and text in self.settings.lang_props[lang]['gramm_shortcuts']):
+            text = self.settings.lang_props[lang]['gramm_shortcuts'][text]
+            return self.make_bool_query(text, field, lang, keyword_query=keyword_query, rewrite=False)
+        else:
+            try:
+                field += '.' + self.gramDict[lang][text]
+                return {'match': {field: text}}
+            except KeyError:
+                pass
         return {'match_none': {}}
 
-    def make_bool_query(self, strQuery, field, lang, start=0, end=-1, keyword_query=False):
+    def make_bool_query(self, strQuery, field, lang, start=0, end=-1, keyword_query=False, rewrite=True):
         """
         Make a bool elasticsearch query from a string like (XXX|Y*Z),~ABC.
         If the field is "ana.gr", find categories for every gramtag. If no
         category is available for some tag, return empty query.
         The function is recursive and only looks at the part of the string
         delimited by start and end parameters.
+        Do not use gramm_shortcuts dictionary if rewrite == True.
         """
         if end == -1:
             if type(strQuery) == int:
-                return self.make_simple_term_query(strQuery, field, lang, keyword_query=True)
+                return self.make_simple_term_query(strQuery, field, lang,
+                                                   keyword_query=True, rewrite=rewrite)
             if not keyword_query:
                 if self.settings.search_remove_whitespaces:
                     strQuery = strQuery.replace(' ', '')
@@ -205,12 +210,13 @@ class InterfaceQueryParser:
                 strQuery = strQuery.strip()
                 if '|' not in strQuery and '~' not in strQuery:
                     # Metadata query: metafields can contain commas and parentheses
-                    return self.make_simple_term_query(strQuery, field, lang, keyword_query=keyword_query)
+                    return self.make_simple_term_query(strQuery, field, lang,
+                                                       keyword_query=keyword_query, rewrite=rewrite)
             end = len(strQuery)
             if end == 0:
                 return {'match_none': {}}
             if not (field == 'ana.gr' or field.endswith('.ana.gr')) and self.rxSimpleText.search(strQuery) is not None:
-                return self.make_simple_term_query(strQuery, field, lang)
+                return self.make_simple_term_query(strQuery, field, lang, rewrite=rewrite)
             if strQuery.count('(') != strQuery.count(')'):
                 return {'match_none': {}}
         if len(strQuery) <= 0 or start >= end:
@@ -219,23 +225,23 @@ class InterfaceQueryParser:
         iOpPos, strOp = self.find_operator(strQuery, start, end, glossField)
         if iOpPos == -1:
             if strQuery[start] == '(' and strQuery[end - 1] == ')':
-                return self.make_bool_query(strQuery, field, lang, start=start + 1, end=end - 1)
+                return self.make_bool_query(strQuery, field, lang, start=start + 1, end=end - 1, rewrite=rewrite)
             else:
-                return self.make_simple_term_query(strQuery[start:end], field, lang)
+                return self.make_simple_term_query(strQuery[start:end], field, lang, rewrite=rewrite)
         if strOp in ',|&':
-            resultLeft = self.make_bool_query(strQuery, field, lang, start=start, end=iOpPos)
-            resultRight = self.make_bool_query(strQuery, field, lang, start=iOpPos + 1, end=end)
+            resultLeft = self.make_bool_query(strQuery, field, lang, start=start, end=iOpPos, rewrite=rewrite)
+            resultRight = self.make_bool_query(strQuery, field, lang, start=iOpPos + 1, end=end, rewrite=rewrite)
             if len(resultLeft) <= 0 or len(resultRight) <= 0:
                 return {}
             return {'bool': {self.dictOperators[strOp]: [resultLeft, resultRight]}}
         elif strOp == '~':
             rest = strQuery[start + 1:end]
             if InterfaceQueryParser.rxParentheses.search(rest) is None:
-                mustNotClause = [self.make_simple_term_query(t, field, lang)
+                mustNotClause = [self.make_simple_term_query(t, field, lang, rewrite=rewrite)
                                  for t in rest.split('|')]
             else:
                 mustNotClause = self.make_bool_query(strQuery, field, lang,
-                                                     start=start+1, end=end)
+                                                     start=start+1, end=end, rewrite=rewrite)
             return {
                 'bool': {
                     'must_not': mustNotClause

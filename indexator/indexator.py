@@ -57,12 +57,15 @@ class Indexator:
             'n_ana'         # number of analyses
         ]
         self.additionalWordFields = set()
+        self.excludeFromDict = {}
         if 'word_fields' in self.settings:
             self.additionalWordFields |= set(self.settings['word_fields'])
         if 'word_table_fields' in self.settings:
             self.additionalWordFields |= set(self.settings['word_table_fields'])
         if 'accidental_word_fields' in self.settings:
             self.additionalWordFields -= set(self.settings['accidental_word_fields'])
+        if 'exclude_from_dict' in self.settings:
+            self.excludeFromDict = {k: re.compile(v) for k, v in self.settings['exclude_from_dict'].items()}
         f = open(os.path.join(self.SETTINGS_DIR, 'categories.json'),
                  'r', encoding='utf-8')
         categories = json.loads(f.read())
@@ -637,6 +640,10 @@ class Indexator:
                 iWord += 1
                 wJson = json.loads(w)
                 if 'ana' not in wJson or len(wJson['ana']) <= 0:
+                    continue
+                if any(k in wJson and ((type(wJson[k]) == str and v.search(wJson[k]) is not None)
+                                       or (type(wJson[k]) == list and any(vp.search(wJson[k]) is not None for vp in v)))
+                       for k, v in self.excludeFromDict.items()):
                     continue
                 lemma = self.get_lemma(wJson, lower_lemma=False)
                 grdic, translations = self.get_grdic(wJson, self.languages[langID])
