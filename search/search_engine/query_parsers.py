@@ -796,11 +796,11 @@ class InterfaceQueryParser:
                     if k.endswith('_kw'):
                         boolQuery = self.make_bool_query(v, k, lang=lang, keyword_query=True)
                     elif (k.endswith('__to')
-                          and k[5:len(k)-3] in self.settings.integer_meta_fields):
-                        boolQuery = self.make_range_query([None, v], k[:-3])
+                          and k[5:len(k)-4] in self.settings.integer_meta_fields):
+                        boolQuery = self.make_range_query([None, v], k[:-4])
                     elif (k.endswith('__from')
-                          and k[5:len(k)-3] in self.settings.integer_meta_fields):
-                        boolQuery = self.make_range_query([v, None], k[:-3])
+                          and k[5:len(k)-6] in self.settings.integer_meta_fields):
+                        boolQuery = self.make_range_query([v, None], k[:-6])
                     else:
                         boolQuery = self.make_bool_query(v, k, lang=lang)
                     if 'match_none' not in boolQuery:
