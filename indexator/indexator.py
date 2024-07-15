@@ -646,7 +646,7 @@ class Indexator:
                     if any(k in ana and ((type(ana[k]) == str and v.search(ana[k]) is not None)
                                            or (type(ana[k]) == list and any(vp.search(ana[k]) is not None for vp in v)))
                            for k, v in self.excludeFromDict.items()):
-                        excludeWord = true
+                        excludeWord = True
                         break
                 if excludeWord:
                     continue
