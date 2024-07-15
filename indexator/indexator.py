@@ -641,9 +641,14 @@ class Indexator:
                 wJson = json.loads(w)
                 if 'ana' not in wJson or len(wJson['ana']) <= 0:
                     continue
-                if any(k in wJson and ((type(wJson[k]) == str and v.search(wJson[k]) is not None)
-                                       or (type(wJson[k]) == list and any(vp.search(wJson[k]) is not None for vp in v)))
-                       for k, v in self.excludeFromDict.items()):
+                excludeWord = False
+                for ana in wJson['ana']:
+                    if any(k in ana and ((type(ana[k]) == str and v.search(ana[k]) is not None)
+                                           or (type(ana[k]) == list and any(vp.search(ana[k]) is not None for vp in v)))
+                           for k, v in self.excludeFromDict.items()):
+                        excludeWord = true
+                        break
+                if excludeWord:
                     continue
                 lemma = self.get_lemma(wJson, lower_lemma=False)
                 grdic, translations = self.get_grdic(wJson, self.languages[langID])
