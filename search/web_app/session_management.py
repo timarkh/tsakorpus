@@ -26,7 +26,7 @@ def initialize_session():
                                           'sort': '',
                                           'distance_strict': False,
                                           'last_query': {},
-                                          'seed': random.randint(1, 1e6),
+                                          'seed': random.randint(1, 1000000),
                                           'excluded_doc_ids': set(),
                                           'progress': 100,
                                           'search_context': SearchContext()}
