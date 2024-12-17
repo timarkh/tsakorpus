@@ -130,6 +130,8 @@ List of parameters
 
 - ``negative_search_enabled`` (Boolean) -- whether the negative search button should be present in the word query form. Defaults to ``true``.
 
+- ``primary_languages`` (list of strings) -- names of the languages that are considered primary. Only words in primary languages are counted when calculating subcorpus sizes. Defaults to empty list, which is understood as "all languages listed in the ``languages`` list".
+
 - ``query_log`` (Boolean) -- whether queries should be logged. When turned on, query type, query arguments and timestamps are appended to ``search/query_log.txt`` after each query. No personal data (such as IP address) are saved. Defaults to ``true``.
 
 - ``query_timeout`` (integer) -- the upper bound on sentence search query execution in seconds. This bound is applied strictly for the Elasticsearch query execution and not so strictly when postprocessing results found by Elasticsearch.

@@ -140,24 +140,37 @@ class SearchClient:
                               body=esQuery)
         return hits
 
-    def get_n_words(self):
+    def get_n_words(self, primaryLanguages=None):
         """
         Return total number of words in the primary language in the corpus.
         """
         aggNWords = {'agg_nwords': {'sum': {'field': 'n_words'}}}
+        if primaryLanguages is not None and len(primaryLanguages) > 0:
+            for lang in primaryLanguages:
+                aggNWords['agg_nwords_' + lang] = {'sum': {'field': 'n_words_' + lang}}
         esQuery = {'query': {'match_all': {}}, 'from': 0, 'size': 0,
                    'aggs': aggNWords}
         hits = self.es.search(index=self.name + '.docs',
                               body=esQuery)
+        if primaryLanguages is not None and len(primaryLanguages) > 0:
+            nWords = 0
+            for lang in primaryLanguages:
+                nWords += hits['aggregations']['agg_nwords_' + lang]['value']
+            return nWords
         return hits['aggregations']['agg_nwords']['value']
 
-    def get_n_words_in_document(self, docId):
+    def get_n_words_in_document(self, docId, primaryLanguages=None):
         """
         Return number of words in the primary language in given document.
         """
         response = self.get_doc_by_id(docId=docId)
         if response['hits']['total']['value'] <= 0:
             return 0
+        if primaryLanguages is not None and len(primaryLanguages) > 0:
+            nWords = 0
+            for lang in primaryLanguages:
+                nWords += response['hits']['hits'][0]['_source']['n_words_' + lang]
+            return nWords
         return response['hits']['hits'][0]['_source']['n_words']
 
     def get_word_freq_by_rank(self, lang):

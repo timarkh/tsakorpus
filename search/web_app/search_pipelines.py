@@ -452,7 +452,8 @@ def subcorpus_ids(htmlQuery):
     fields in htmlQuery.
     """
     subcorpusQuery = sc.qp.subcorpus_query(htmlQuery, sortOrder='',
-                                           exclude=get_session_data('excluded_doc_ids'))
+                                           exclude=get_session_data('excluded_doc_ids'),
+                                           primaryLanguages=settings.primary_languages)
     if subcorpusQuery is None or ('query' in subcorpusQuery and subcorpusQuery['query'] == {'match_all': {}}):
         return None
     iterator = sc.get_all_docs(subcorpusQuery)

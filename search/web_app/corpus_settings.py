@@ -84,6 +84,7 @@ class CorpusSettings:
 
         # Languages and their properties
         self.languages = []
+        self.primary_languages = []
         self.rtl_languages = []
         self.context_header_rtl = False
         self.categories = {}
@@ -130,6 +131,7 @@ class CorpusSettings:
             'lemma_table_fields',
             'accidental_word_fields',
             'languages',
+            'primary_languages',
             'rtl_languages',
             'search_meta.stat_options'
         }
@@ -225,6 +227,14 @@ class CorpusSettings:
                 curGlossShortcuts = copy.deepcopy(self.lang_props[lang]['gloss_shortcuts'])
                 for k, v in curGlossShortcuts.items():
                     self.lang_props[lang]['gloss_shortcuts'][k.lower()] = v.lower()
+
+        # Only count words in "primary" languages/tiers when calculating subcorpus size,
+        # if these are set
+        # Check if all primary languages are contained in the languages list
+        self.primary_languages = [lang for lang in self.primary_languages
+                                  if lang in self.languages]
+        if len(self.primary_languages) == len(self.languages):
+            self.primary_languages = []     # Trivial coincidence
 
     def as_dict(self):
         """

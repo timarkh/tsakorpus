@@ -437,11 +437,13 @@ def search_doc():
     change_display_options(query)
     query = sc.qp.subcorpus_query(query,
                                   sortOrder=get_session_data('sort'),
-                                  query_size=settings.max_docs_retrieve)
+                                  query_size=settings.max_docs_retrieve,
+                                  primaryLanguages=settings.primary_languages)
     hits = sc.get_docs(query)
     hitsProcessed = sentView.process_docs_json(hits,
                                                exclude=get_session_data('excluded_doc_ids'),
-                                               corpusSize=settings.corpus_size)
+                                               corpusSize=settings.corpus_size,
+                                               primaryLanguages=settings.primary_languages)
     hitsProcessed['media'] = settings.media
     hitsProcessed['images'] = settings.images
     return render_template('search_results/result_docs.html', data=hitsProcessed,
@@ -620,7 +622,8 @@ def toggle_document(docID):
     are not included in the search.
     """
     excludedDocIDs = get_session_data('excluded_doc_ids')
-    nWords = sc.get_n_words_in_document(docId=docID)
+    nWords = sc.get_n_words_in_document(docId=docID,
+                                        primaryLanguages=settings.primary_languages)
     sizePercent = round(nWords * 100 / settings.corpus_size, 3)
     if docID in excludedDocIDs:
         excludedDocIDs.remove(docID)

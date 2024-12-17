@@ -872,7 +872,7 @@ class InterfaceQueryParser:
 
     def subcorpus_query(self, htmlQuery, query_from=0, query_size=10,
                         sortOrder='random', randomSeed=None,
-                        exclude=None):
+                        exclude=None, primaryLanguages=None):
         """
         Make an ES query to the docs index based on subcorpus selection
         fields in htmlQuery.
@@ -929,6 +929,9 @@ class InterfaceQueryParser:
             query = {'match_all': {}}
 
         aggNWords = {'agg_nwords': {'sum': {'field': 'n_words'}}}
+        if primaryLanguages is not None and len(primaryLanguages) > 0:
+            for lang in primaryLanguages:
+                aggNWords['agg_nwords_' + lang] = {'sum': {'field': 'n_words_' + lang}}
         esQuery = {'query': query, 'from': query_from, 'size': query_size,
                    '_source': {'excludes': ['filename']},
                    'aggs': aggNWords}

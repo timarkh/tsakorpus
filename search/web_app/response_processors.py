@@ -1505,7 +1505,7 @@ class SentenceViewer:
                                                              translit=translit))
         return result
 
-    def process_docs_json(self, response, exclude=None, corpusSize=1):
+    def process_docs_json(self, response, exclude=None, corpusSize=1, primaryLanguages=None):
         result = {'n_words': 0, 'n_sentences': 0, 'n_docs': 0,
                   'size_percent': 0.0,
                   'message': 'Nothing found.',
@@ -1519,13 +1519,21 @@ class SentenceViewer:
         result['message'] = ''
         result['n_docs'] = response['hits']['total']['value']
         result['n_words'] = int(round(response['aggregations']['agg_nwords']['value'], 0))
+        if primaryLanguages is not None and len(primaryLanguages) > 0:
+            result['n_words'] = 0
+            for lang in primaryLanguages:
+                result['n_words'] = int(round(response['aggregations']['agg_nwords_' + lang]['value'], 0))
         result['docs'] = []
         for iHit in range(len(response['hits']['hits'])):
             if exclude is not None and int(response['hits']['hits'][iHit]['_id']) in exclude:
                 result['n_docs'] -= 1
-                result['n_words'] -= response['hits']['hits'][iHit]['_source']['n_words']
+                if primaryLanguages is not None and len(primaryLanguages) > 0:
+                    for lang in primaryLanguages:
+                        result['n_words'] -= int(round(response['hits']['hits'][iHit]['_source']['n_words_' + lang], 0))
+                else:
+                    result['n_words'] -= int(round(response['hits']['hits'][iHit]['_source']['n_words'], 0))
             result['docs'].append(self.process_doc(response['hits']['hits'][iHit], exclude))
-        result['size_percent'] = round(result['n_words'] * 100 / corpusSize, 3)
+        result['size_percent'] = min(100, max(0, round(result['n_words'] * 100 / corpusSize, 3)))
         return result
 
     def extract_cumulative_freq_by_rank(self, hits):

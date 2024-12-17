@@ -121,7 +121,7 @@ sc.qp.rp = sentView
 sc.qp.wr.rp = sentView
 
 try:
-    settings.corpus_size = sc.get_n_words()  # size of the corpus in words
+    settings.corpus_size = sc.get_n_words(primaryLanguages=settings.primary_languages)  # size of the corpus in words
     for lang in settings.languages:
         # number of word types for each frequency rank
         settings.word_freq_by_rank.append(sentView.extract_cumulative_freq_by_rank(sc.get_word_freq_by_rank(lang)))
