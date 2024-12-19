@@ -25,6 +25,7 @@ class SentenceViewer:
     rxTextSpans = re.compile('</?span.*?>|[^<>]+', flags=re.DOTALL)
     rxTabs = re.compile('^\t*$')
     rxKW = re.compile('_kw$')
+    rxStartSpacesNewlines = re.compile('^[\r\n\t ]+', flags=re.DOTALL)
     invisibleAnaFields = {'gloss_index'}
 
     def __init__(self, settings, search_client, fullText=False):
@@ -680,6 +681,10 @@ class SentenceViewer:
                     highlightedText = highlightedText[0]
                 else:
                     highlightedText = sSource['text']
+            if (self.rxStartSpacesNewlines.search(sSource['text']) is not None
+                    and self.rxStartSpacesNewlines.search(highlightedText) is None):
+                # For some reason, the highlighted text is trimmed
+                highlightedText = self.rxStartSpacesNewlines.search(sSource['text']).group(0) + highlightedText
         else:
             highlightedText = sSource['text']
         if 'words' not in sSource:
