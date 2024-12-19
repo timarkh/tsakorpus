@@ -71,7 +71,6 @@
   "fulltext_view_enabled": true,
   "use_nonpersistent_fulltext_id": true,
   "languages": ["beserman", "russian"],
-  "primary_languages": ["beserman"],
   "transliterations": ["original", "cyrillic", "UPA"],
   "input_methods": ["normal"],
   "interface_languages": [
