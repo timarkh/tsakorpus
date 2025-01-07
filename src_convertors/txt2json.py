@@ -144,10 +144,25 @@ class Txt2JSON:
             return
         if re.search('\\b[Dd]ate +of +recording\\b', el.attrib['Name']) is not None:
             # Ad-hoc for the date of creation
-            m = re.search('^([0-9]{4})', el.text)
-            if m is not None:
-                dictMeta['year_from'] = m.group(1)
-                dictMeta['year_to'] = m.group(1)
+            # Ignore dates in round brackets
+            truncatedText = el.text
+            if "(" in el.text:
+                truncatedText = el.text[0:el.text.find("(")]
+            # For approximate recoring dates (e.g., '1979 to 1983', '1979-1983'), use both
+            # Dates such as '1880s to 1890s' are also handled
+            m = re.findall(r'(?:^|\s|-)([0-9]{4}s{0,1})', truncatedText)
+            if len(m) > 0:
+                dictMeta['year_from'] = m[0][:-1] if m[0].endswith("s") else m[0]
+                if len(m) == 1:
+                    dictMeta['year_to'] = m[0][:-1] if m[0].endswith("s") else m[0]
+                else:
+                    if int(m[1].rstrip('s')) >= int(m[0].rstrip('s')):
+                        dictMeta['year_to'] = f'{m[1][:-2]}9' if m[1].endswith("s") else m[1]
+                    else:
+                        # Inverted order of dates ('2000s or 1990s')
+                        dictMeta['year_from'] = m[1][:-1] if m[1].endswith("s") else m[1]
+                        dictMeta['year_to'] = f'{m[0][:-2]}9' if m[0].endswith("s") else m[0]
+
         elif el.attrib['Name'] in self.corpusSettings['coma_meta_conversion']:
             dictMeta[self.corpusSettings['coma_meta_conversion'][el.attrib['Name']]] = el.text.strip()
 
