@@ -690,6 +690,8 @@ def get_glossed_sentence(n):
     if sentData is None or n >= len(sentData) or 'languages' not in sentData[n]:
         return ''
     curSentData = sentData[n]
+    result = {}     # langID -> text; for language with the smallest langID, tab-delimited text with the glosses
+    curLangs = []
     for langView in curSentData['languages']:
         lang = langView
         try:
@@ -698,13 +700,24 @@ def get_glossed_sentence(n):
             # Language + number of the translation version: chop off the number
             langID = settings.languages.index(re.sub('_[0-9]+$', '', langView))
             lang = settings.languages[langID]
-        if langID != 0:
-            continue  # for now
-        result = sentView.get_glossed_sentence(curSentData['languages'][langView]['source'], lang=lang)
-        if type(result) == str:
-            return result
-        return ''
-    return ''
+        result[langID] = ''
+        curLangs.append((langID, lang, langView))
+    bInterlinearAdded = False
+    for langID, lang, langView in sorted(curLangs):
+        if not bInterlinearAdded:
+            result[langID] = sentView.get_glossed_sentence(curSentData['languages'][langView]['source'], lang=lang)
+            bInterlinearAdded = True
+        else:
+            s = curSentData['languages'][langView]['source']
+            if 'text' in s and len(s['text']) > 0:
+                result[langID] = s['text'].strip()
+    resultStr = ''
+    for langID, lang, langView in sorted(curLangs):
+        if type(result[langID]) == str:
+            if len(resultStr) > 0 and not resultStr.endswith('\n'):
+                resultStr += '\n'
+            resultStr += result[langID]
+    return resultStr
 
 
 @app.route('/set_locale/<lang>')
