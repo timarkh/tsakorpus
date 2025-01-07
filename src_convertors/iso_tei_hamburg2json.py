@@ -593,8 +593,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 continue
             if 'who' in anno.attrib and anno.attrib['who'] in self.participants:
                 sentMeta = self.participants[anno.attrib['who']]
-            curAnchor = prevAnchor = anno.attrib['start']
-            endAnchor = anno.attrib['end']
+            curAnchor = prevAnchor = annoStart = anno.attrib['start']
+            endAnchor = annoEnd = anno.attrib['end']
             curSent = None
             for u in anno.xpath('tei:u', namespaces=self.namespaces):
                 for seg_anchor in u:
@@ -625,7 +625,10 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 if curSent is not None:
                     curSentences.append(curSent)
             if curSent is not None:
-                self.add_src_alignment(curSent, [curAnchor, endAnchor], srcFile)
+                if 'src_alignment' not in curSent or len(curSent['src_alignment']) <= 0:
+                    self.add_src_alignment(curSent, [annoStart, annoEnd], srcFile)
+                elif endAnchor != curAnchor:
+                    self.add_src_alignment(curSent, [curAnchor, endAnchor], srcFile)
             self.process_words(anno)
             self.add_full_text(anno, curSentences)
             self.add_para_offsets(curSentences)

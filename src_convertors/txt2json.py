@@ -201,6 +201,7 @@ class Txt2JSON:
                                  self.corpusSettings['meta_filename'])
         if not os.path.exists(fnameMeta):
             print('Metadata file not found.')
+            return
         if self.corpusSettings['meta_filename'].lower().endswith('.coma'):
             self.load_meta_coma(fnameMeta)
         else:
