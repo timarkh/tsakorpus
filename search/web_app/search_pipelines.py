@@ -25,7 +25,10 @@ def find_parallel_for_one_sent(sSource):
     for pa in sSource['para_alignment']:
         sids |= set(pa['sent_ids'])
     sids = list(sid for sid in sorted(sids))
-    query = {'query': {'ids': {'values': sids}}}
+    query = {
+        'query': {'ids': {'values': sids}},
+        'size': len(settings.languages)
+    }
     paraSentHits = sc.get_sentences(query)
     if 'hits' in paraSentHits and 'hits' in paraSentHits['hits']:
         return paraSentHits['hits']['hits']
