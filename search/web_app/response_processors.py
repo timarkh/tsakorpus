@@ -947,6 +947,7 @@ class SentenceViewer:
             if 'grdic' in wSource:
                 gr = wSource['grdic']   # lexeme-level grammatical tags as a string
             nForms = str(wSource['n_forms'])
+
         if 'w_id' in w:
             wID = w['w_id']  # word or lemma found in the sentences index
         else:
@@ -1011,12 +1012,21 @@ class SentenceViewer:
             nSents = str(wSource['n_sents'])
 
         if searchType == 'word':
+            wf = self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit)
+            wfDisplay = ''
+            if 'wf_display' in wSource:
+                wfDisplay = self.transliterate_baseline(wSource['wf_display'], lang=lang, translit=translit)
+            lemma = self.get_lemma(wSource)
+            gr = self.get_gramm(wSource, lang)
+            otherFields = self.get_word_table_fields(wSource)
             return render_template('search_results/word_table_row.html',
                                    ana_popup=html.escape(self.build_ana_popup(wSource, lang, translit=translit)),
                                    wf=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
-                                   lemma=self.get_lemma(wSource),
-                                   gr=self.get_gramm(wSource, lang),
+                                   wfDisplay=wfDisplay,
+                                   lemma=lemma,
+                                   gr=gr,
                                    word_search_display_gr=self.settings.word_search_display_gr,
+                                   other_fields=otherFields,
                                    freq=freq,
                                    display_freq_rank=self.settings.display_freq_rank,
                                    rank=rank,
@@ -1024,19 +1034,28 @@ class SentenceViewer:
                                    nDocs=nDocs,
                                    wID=w['_id'],
                                    wfSearch=wSource['wf'])
-        return render_template('search_results/lemma_table_row.html',
-                               ana_popup=html.escape(self.build_ana_popup(wSource, lang, translit=translit)),
-                               lemma=self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit),
-                               gr=self.get_gramm(wSource, lang),
-                               word_search_display_gr=self.settings.word_search_display_gr,
-                               freq=freq,
-                               display_freq_rank=self.settings.display_freq_rank,
-                               rank=rank,
-                               nSents=nSents,
-                               nDocs=nDocs,
-                               nForms=nForms,
-                               lID=w['_id'],
-                               wfSearch=wSource['wf'])
+        else:
+            otherFields = self.get_lemma_table_fields(wSource)
+            lemma = self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit)
+            gr = ''
+            if 'grdic' in wSource:
+                gr = wSource['grdic']  # lexeme-level grammatical tags as a string
+            return render_template('search_results/lemma_table_row.html',
+                                   wf='',
+                                   wfDisplay='',
+                                   ana_popup=html.escape(self.build_ana_popup(wSource, lang, translit=translit)),
+                                   lemma=lemma,
+                                   gr=gr,
+                                   word_search_display_gr=self.settings.word_search_display_gr,
+                                   other_fields=otherFields,
+                                   freq=freq,
+                                   display_freq_rank=self.settings.display_freq_rank,
+                                   rank=rank,
+                                   nSents=nSents,
+                                   nDocs=nDocs,
+                                   nForms=nForms,
+                                   lID=w['_id'],
+                                   wfSearch=wSource['wf'])
 
     def filter_multi_word_highlight_iter(self, hit, nWords=1, negWords=None, keepOnlyFirst=False):
         """
@@ -1279,8 +1298,9 @@ class SentenceViewer:
             wordSource = self.sc.get_word_by_id(word['w_id'])['hits']['hits'][0]['_source']
             wordSource.update(word['_source'])
             word['_source'] = wordSource
-            processedWords.append(self.process_word(word, lang=self.settings.languages[word['_source']['lang']],
-                                                    searchType=searchType))
+            if 'lang' in word['_source']:
+                processedWords.append(self.process_word(word, lang=self.settings.languages[word['_source']['lang']],
+                                                        searchType=searchType))
         hitsProcessed = copy.deepcopy(hitsProcessedAll)
         hitsProcessed['words'] = processedWords
         return hitsProcessed

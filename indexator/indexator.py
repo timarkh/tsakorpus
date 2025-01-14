@@ -712,7 +712,7 @@ class Indexator:
                         fOut.write('<td>' + html.escape(additionalFieldsJson[field]) + '</td>')
                     else:
                         fOut.write('<td></td>')
-                    fOut.write('<td>' + str(lexFreqs[(lemma, grdic, additionalFields)]) + '</td></tr>\n')
+                fOut.write('<td>' + str(lexFreqs[(lemma, grdic, additionalFields)]) + '</td></tr>\n')
             if prevLetter != '':
                 fOut.write('</tbody>\n</table>\n')
             fOut.close()
