@@ -110,6 +110,8 @@ List of parameters
 
 - ``languages`` (list of strings) -- names of the languages used in the corpus. The order of the languages determines how they are encoded in the index (the code of the language is its index in this list) and, in the case of parallel corpora, in which order they are displayed within one parallel context.
 
+- ``lemma_table_fields`` (list of strings) -- names of the word-level analysis fields that should be displayed in the table with Lemma search results, along with the lemma, which appears automatically, and the dictionary categories, which appear if ``word_search_display_gr`` is set. Defaults to empty list. For each language, columns corresponding to the fields that are not on the ``lang_props[LANGNAME].lexical_fields`` list will be left empty. See also ``word_table_fields``.
+
 - ``line_plot_meta`` (list of strings) -- names of the metadata fields whose values are numerical and should be represented in statistics by a line plot rather than by a histogram. Defaults to ``["year"]``.
 
 - ``max_context_expand`` (integer) -- how many times the user may expand a context from search results. This can be important if there are copyright restrictions on the texts. Negative values mean unlimited expanding.
@@ -183,9 +185,9 @@ If you edit ``search/restart_elasticsearch.sh`` to use a different way of starti
 
 - ``word_fields`` (list of strings) -- names of the word-level analysis fields that should be available in word-level search queries. These include all fields that can occur inside the ``ana`` nested objects, except ``lex``, ``parts``, ``gloss`` and the grammatical fields that start with ``gr.``.
 
-- ``word_search_display_gr`` (Boolean) -- whether the grammar column should be displayed for word/lemma query hits. Defaults to ``true``.
+- ``word_search_display_gr`` (Boolean) -- whether the grammar column should be displayed for word/lemma query hits. Defaults to ``true``. In lemma search, only ``pos`` and the categories whose name is on the ``lang_props[LANG_NAME].dictionary_categores`` list will appear.
 
-- ``word_table_fields`` (list of strings) -- names of the word-level analysis fields that should be displayed in the table with Word search results, along with the wordform and lemma, which appear automatically. Defaults to empty list.
+- ``word_table_fields`` (list of strings) -- names of the word-level analysis fields that should be displayed in the table with Word search results, along with the wordform and lemma, which appear automatically. Defaults to empty list.  No categories that are on the ``accidental_word_fields`` will appear. See also ``lemma_table_fields``.
 
 - ``year_sort_enabled`` (Boolean) -- whether the "sort by year" option is enabled in sentence search. Defaults to ``false``. If enabled, sentences can be sorted by the ``year_from`` field (or just ``year``, if there is no ``year_from``) of their document in the decreasing order. Only makes sense if all documents are dated.
 

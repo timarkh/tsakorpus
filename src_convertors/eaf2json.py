@@ -19,7 +19,7 @@ class Eaf2JSON(Txt2JSON):
 
     mediaExtensions = {'.wav', '.mp3', '.mp4', '.avi', '.mov', '.mts'}
     rxSpaces = re.compile('[ \t]+')
-    rxLetters = re.compile('\w+')
+    rxLetters = re.compile('\\w+')
     bracketPairs = {
         ']': re.compile('\\[[^ \\]]*$'),
         ')': re.compile('\\([^ \\)]*$'),

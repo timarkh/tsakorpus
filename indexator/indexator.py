@@ -1,3 +1,5 @@
+import html
+
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
 from elasticsearch.helpers import bulk
@@ -57,13 +59,17 @@ class Indexator:
             'n_ana'         # number of analyses
         ]
         self.additionalWordFields = set()
+        self.additionalLemmaFields = set()
         self.excludeFromDict = {}
         if 'word_fields' in self.settings:
             self.additionalWordFields |= set(self.settings['word_fields'])
         if 'word_table_fields' in self.settings:
             self.additionalWordFields |= set(self.settings['word_table_fields'])
+        if 'lemma_table_fields' in self.settings:
+            self.additionalLemmaFields = set(self.settings['lemma_table_fields'])
         if 'accidental_word_fields' in self.settings:
             self.additionalWordFields -= set(self.settings['accidental_word_fields'])
+            self.additionalLemmaFields -= set(self.settings['accidental_word_fields'])
         if 'exclude_from_dict' in self.settings:
             self.excludeFromDict = {k: re.compile(v) for k, v in self.settings['exclude_from_dict'].items()}
         f = open(os.path.join(self.SETTINGS_DIR, 'categories.json'),
@@ -191,8 +197,9 @@ class Indexator:
         things if needed, etc. Return the cleaned object and the lemma.
         Add word form and lemma to the global lists.
         """
+        lang = self.settings['languages'][langID]
         wClean = {'lang': langID}
-        lemma = ''
+        lClean = {'lang': langID, 'wf': ''}
         for field in w:
             if field in self.goodWordFields or field in self.additionalWordFields:
                 wClean[field] = w[field]
@@ -201,8 +208,8 @@ class Indexator:
                         wClean[field] = wClean[field].lower()
                     self.wfs.add(wClean[field])
         if 'ana' in w:
-            lemma = self.get_lemma(w, lower_lemma=self.lowerWf)
-            self.lemmata.add(lemma)
+            lClean['wf'] = self.get_lemma(w, lower_lemma=self.lowerWf)
+            self.lemmata.add(lClean['wf'])
             wClean['ana'] = []
             for ana in w['ana']:
                 cleanAna = {}
@@ -210,7 +217,10 @@ class Indexator:
                     if anaField in self.goodWordFields or anaField in self.additionalWordFields:
                         cleanAna[anaField] = ana[anaField]
                 wClean['ana'].append(cleanAna)
-        return wClean, lemma
+            grdic, additionalFields = self.get_grdic(wClean, lang)
+            lClean['grdic'] = grdic
+            lClean.update(additionalFields)
+        return wClean, lClean
 
     def process_sentence_words(self, words, langID):
         """
@@ -236,7 +246,7 @@ class Indexator:
             elif len(w['ana']) > 1:
                 bUniquelyAnalyzed = False
 
-            wClean, lemma = self.clean_word(w, langID)
+            wClean, lClean = self.clean_word(w, langID)
             wCleanTxt = json.dumps(wClean, ensure_ascii=False, sort_keys=True)
             if wCleanTxt in self.tmpWordIDs[langID]:
                 wID = self.tmpWordIDs[langID][wCleanTxt]
@@ -246,13 +256,14 @@ class Indexator:
             wID = 'w' + str(wID)
             w['w_id'] = wID
             lID = 'l0'   # Default: no analysis
-            if len(lemma) > 0:
+            if len(lClean['wf']) > 0:
+                lCleanTxt = json.dumps(lClean, ensure_ascii=False, sort_keys=True)
                 try:
-                    lID = self.tmpLemmaIDs[langID][lemma]
+                    lID = self.tmpLemmaIDs[langID][lCleanTxt]
                 except KeyError:
                     lID = sum(len(self.tmpLemmaIDs[i])
                               for i in range(len(self.languages))) + 1
-                    self.tmpLemmaIDs[langID][lemma] = lID
+                    self.tmpLemmaIDs[langID][lCleanTxt] = lID
                 lID = 'l' + str(lID)
                 self.word2lemma[langID][wID] = lID
             w['l_id'] = lID
@@ -433,7 +444,7 @@ class Indexator:
         if 'ana' not in word:
             return ''
         curGramm = set()
-        translations = set()
+        additionalValues = {}
         for ana in word['ana']:
             grTags = ''
             if 'gr.pos' in ana:
@@ -453,11 +464,17 @@ class Indexator:
                     if len(grTags) > 0:
                         grTags += ', '
                     grTags += value
-                elif field.startswith('trans_'):
-                    translations.add(value)
+                elif field in self.additionalLemmaFields:
+                    if field in additionalValues:
+                        additionalValues[field].add(value)
+                    else:
+                        additionalValues[field] = {value}
             if len(grTags) > 0:
                 curGramm.add(grTags)
-        return ' | '.join(grdic for grdic in sorted(curGramm)), ' | '.join(tr for tr in sorted(translations))
+        grdic = ' | '.join(grdic for grdic in sorted(curGramm))
+        for field in additionalValues:
+            additionalValues[field] = ' | '.join(av for av in additionalValues[field] if len(av) > 0)
+        return grdic, additionalValues
 
     def iterate_lemmata(self, langID, lemmataSorted):
         """
@@ -474,11 +491,10 @@ class Indexator:
             lID = 'l' + str(lID)
             if iLemma % 250 == 0:
                 print('indexing lemma', iLemma)
-            lOrder = lemmataSorted[l]
-            lemmaJson = {
-                'wf': l,
+            lemmaJson = json.loads(l)
+            lOrder = lemmataSorted[lemmaJson['wf']]
+            lemmaJson.update({
                 'wtype': 'lemma',
-                'lang': langID,
                 'l_order': lOrder,
                 'freq': self.wordFreqs[langID][lID],
                 'lemma_freq': self.wordFreqs[langID][lID],
@@ -489,7 +505,7 @@ class Indexator:
                 'n_sents': self.wordSFreqs[langID][lID],
                 'n_docs': len(self.wordDIDs[langID][lID]),
                 'freq_join': 'word'
-            }
+            })
             curAction = {
                 '_index': self.name + '.words',
                 '_id': lID,
@@ -651,9 +667,9 @@ class Indexator:
                 if excludeWord:
                     continue
                 lemma = self.get_lemma(wJson, lower_lemma=False)
-                grdic, translations = self.get_grdic(wJson, self.languages[langID])
+                grdic, additionalFields = self.get_grdic(wJson, self.languages[langID])
                 wordFreq = self.wordFreqs[langID][wID]
-                lexTuple = (lemma, grdic, translations)
+                lexTuple = (lemma, grdic, json.dumps(additionalFields, indent=0, ensure_ascii=False, sort_keys=True))
                 if lexTuple not in lexFreqs:
                     lexFreqs[lexTuple] = wordFreq
                 else:
@@ -669,9 +685,10 @@ class Indexator:
                        '({{ _(\'langname_' + self.languages[langID] + '\') }})</h1>\n')
             prevLetter = ''
             sortingFunction = self.make_sorting_function(self.settings['languages'][langID])
-            for lemma, grdic, trans in sorted(lexFreqs, key=lambda x: (sortingFunction(x[0].lower()), -lexFreqs[x])):
+            for lemma, grdic, additionalFields in sorted(lexFreqs, key=lambda x: (sortingFunction(x[0].lower()), -lexFreqs[x])):
                 if len(lemma) <= 0:
                     continue
+                additionalFieldsJson = json.loads(additionalFields)
                 mChar = self.character_regex(self.languages[langID]).search(lemma.lower())
                 if mChar is None:
                     curLetter = '*'
@@ -683,14 +700,19 @@ class Indexator:
                     fOut.write('<h2 class="dictionary_letter">' + curLetter.upper() + '</h2>\n')
                     fOut.write('<table class="dictionary_table">\n<thead>\n'
                                '<th>{{ _(\'word_th_lemma\') }}</th>'
-                               '<th>{{ _(\'word_th_gr\') }}</th>'
-                               '<th>{{ _(\'word_th_trans_en\') }}</th>'
-                               '<th>{{ _(\'word_th_frequency\') }}</th>'
+                               '<th>{{ _(\'word_th_gr\') }}</th>')
+                    for field in sorted(self.additionalLemmaFields):
+                        fOut.write('<th>{{ _(\'word_th_' + html.escape(field) + '\') }}</th>')
+                    fOut.write('<th>{{ _(\'word_th_frequency\') }}</th>'
                                '</thead>\n<tbody>\n')
                     prevLetter = curLetter
-                fOut.write('<tr>\n<td class="dictionary_lemma">' + lemma + '</td><td>' + grdic + '</td>'
-                           '<td>' + trans + '</td><td>'
-                           + str(lexFreqs[(lemma, grdic, trans)]) + '</td></tr>\n')
+                fOut.write('<tr>\n<td class="dictionary_lemma">' + lemma + '</td><td>' + grdic + '</td>')
+                for field in sorted(self.additionalLemmaFields):
+                    if field in additionalFieldsJson:
+                        fOut.write('<td>' + html.escape(additionalFieldsJson[field]) + '</td>')
+                    else:
+                        fOut.write('<td></td>')
+                    fOut.write('<td>' + str(lexFreqs[(lemma, grdic, additionalFields)]) + '</td></tr>\n')
             if prevLetter != '':
                 fOut.write('</tbody>\n</table>\n')
             fOut.close()

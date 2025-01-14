@@ -941,9 +941,11 @@ class SentenceViewer:
             if 'n_sents' in wSource:
                 nSents = str(wSource['n_sents'])
             wf = wfDisplay = ''
-            otherFields = []
+            otherFields = self.get_lemma_table_fields(wSource)
             lemma = self.transliterate_baseline(wSource['wf'], lang=lang, translit=translit)
             gr = ''
+            if 'grdic' in wSource:
+                gr = wSource['grdic']   # lexeme-level grammatical tags as a string
             nForms = str(wSource['n_forms'])
         if 'w_id' in w:
             wID = w['w_id']  # word or lemma found in the sentences index
@@ -1218,6 +1220,26 @@ class SentenceViewer:
                                 curValues.add(v)
             wordTableValues.append('/'.join(v for v in sorted(curValues)))
         return wordTableValues
+
+    def get_lemma_table_fields(self, lemma):
+        """
+        Return a list with values of fields that have to be displayed
+        in a lemma search hits table, along with the lemma.
+        """
+        lemmaTableValues = []
+        for field in self.settings.lemma_table_fields:
+            if field in ['lex', 'wf']:
+                continue
+            curValues = set()
+            for k, v in lemma.items():
+                if k == field:
+                    if type(v) == list:
+                        for value in v:
+                            curValues.add(value)
+                    elif type(v) == str:
+                        curValues.add(v)
+            lemmaTableValues.append('/'.join(v for v in sorted(curValues)))
+        return lemmaTableValues
 
     def process_words_collected_from_sentences(self, hitsProcessedAll,
                                                sortOrder='freq', searchType='word',

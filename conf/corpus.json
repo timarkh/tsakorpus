@@ -59,6 +59,14 @@
   [
     "trans_ru"
   ],
+  "word_table_fields":
+  [
+    "trans_ru"
+  ],
+  "lemma_table_fields":
+  [
+    "trans_ru"
+  ],
   "default_values": {"sent_meta_speaker_type": "native"},
   "sentence_meta_values": {
     "speaker_type": ["native", "linguist"]
@@ -102,7 +110,9 @@
         "deriv": "(detr|iter|caus)",
         "pers": "[123](sg|pl)?"
       },
-      "gr_fields_order": ["nType", "adjType", "proType", "stemType", "num_deriv", "v_form", "attributivizer", "tense", "person", "number", "case", "poss"],
+      "gr_fields_order": ["nType", "adjType", "proType", "conjtype", "additional", "stemType", "num_deriv", "v_form", "attributivizer", "tense", "person", "number", "case", "poss"],
+      "dictionary_categories": ["nType", "adjType", "proType", "conjtype", "additional"],
+      "lexical_fields": ["trans_ru"],
       "gloss_selection": {
         "columns": [
           [
