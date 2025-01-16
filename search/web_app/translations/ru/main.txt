@@ -748,3 +748,6 @@ msgstr "Полный текст (откроется в новой вкладке
 
 msgid "Virtual keyboard"
 msgstr "Виртуальная клавиатура"
+
+msgid "Other corpora"
+msgstr "Другие корпуса"

@@ -504,7 +504,8 @@ label {
 }
 
 #corpus_header {
-	height: 3em;
+	min-height: 3em;
+	max-height: 4em;
 	margin-bottom: 5px;
 	padding: 5px;
 	line-height: 1.5;
@@ -597,6 +598,18 @@ label {
 	vertical-align: top;
 	cursor: pointer;
 	line-height: 1;
+}
+
+#part_of_collection:hover {
+	background-color: #2664c9;
+    color: white!important;
+}
+
+#part_of_collection {
+    padding: 6px!important;
+	margin-top: -4px;
+    border-radius: 5px;
+	display: inline-block;
 }
 
 #corpus_header a.bi:hover {

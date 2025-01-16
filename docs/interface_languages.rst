@@ -26,6 +26,7 @@ There are a number of files that have to be translated. All messages and short c
 - ``Flask-Babel`` messages in multiple files in ``/search/web_app/translations/%LANG_CODE%`` (see below).
 - Help page: ``search/web_app/templates/modals/help_dialogue_%LANG_CODE%.html``.
 - Greeting popup: ``search/web_app/templates/index/greeting_%LANG_CODE%.html``.
+- If you have a project with many corpora and want to provide the list of all of your corpora in a popup, then you will have to create popups for each interface language: ``search/web_app/templates/index/other_corpora_dialogue_%LANG_CODE%.html``. (Do not forget to set the ``part_of_collection`` parameter to ``true`` in ``corpus.json`` as well.)
 
 .. _Flask-Babel: https://flask-babel.tkte.ch/
 

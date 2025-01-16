@@ -739,3 +739,6 @@ msgstr "Full text (opens in a new tab)"
 
 msgid "Virtual keyboard"
 msgstr "Virtual keyboard"
+
+msgid "Other corpora"
+msgstr "Other corpora"

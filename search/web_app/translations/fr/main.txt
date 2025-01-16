@@ -739,3 +739,6 @@ msgstr "Texte intégral (s'ouvre dans un nouvel onglet)"
 
 msgid "Virtual keyboard"
 msgstr "Clavier virtuel"
+
+msgid "Other corpora"
+msgstr "Autres corpus"

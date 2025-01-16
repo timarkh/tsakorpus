@@ -1,4 +1,7 @@
 <header id="corpus_header">
+	{% if part_of_collection %}
+		<a id="part_of_collection" class="bi bi-three-dots-vertical" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Other corpora') }}"></a>
+	{% endif %}
 	<h1 id="corpus_title">
 		{% if start_page_url %}
 			<a href="{{ start_page_url }}">{{ _('corpus_title') }}</a>

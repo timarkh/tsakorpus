@@ -39,6 +39,22 @@
 	</div>
 </div>
 
+{% if part_of_collection %}
+<div class="modal fade modal-dialog-scrollable" id="other_corpora_dialogue" tabindex="-1" role="dialog" aria-labelledby="other_corpora_dialogue_header" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="other_corpora_dialogue_header">{{ _('Other corpora') }}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+			</div>
+			<div class="modal-body" id="other_corpora_dialogue_body">
+			<p>The list of other corpora in the collection should be loaded here.</p>
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
+
 <div class="modal fade" id="dictionary_dialogue" tabindex="-1" role="dialog" aria-labelledby="dictionary_dialogue_header" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">

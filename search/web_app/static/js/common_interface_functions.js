@@ -43,6 +43,20 @@ function show_help(e) {
 		});
 }
 
+function show_other_corpora(e) {
+	$.ajax({
+			url: "other_corpora_dialogue",
+			type: "GET",
+			success: function(result) {
+				$('#other_corpora_dialogue_body').html(result);
+				$('#other_corpora_dialogue').modal('show');
+			},
+			error: function(errorThrown) {
+				alert( JSON.stringify(errorThrown) );
+			}
+		});
+}
+
 function show_dictionary(e) {
 	var lang = $('#lang1 option:selected').val();
 	$.ajax({

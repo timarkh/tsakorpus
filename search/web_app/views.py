@@ -75,6 +75,7 @@ def search_page():
                            generate_dictionary=settings.generate_dictionary,
                            citation=settings.citation,
                            start_page_url=settings.start_page_url,
+                           part_of_collection=settings.part_of_collection,
                            default_view=settings.default_view,
                            max_request_time=settings.query_timeout + 1,
                            max_page_size=MAX_PAGE_SIZE,
@@ -742,6 +743,18 @@ def help_dialogue():
                            media=settings.media,
                            video=settings.video,
                            gloss_search_enabled=settings.gloss_search_enabled)
+
+
+@app.route('/other_corpora_dialogue')
+@app.route('/docs/other_corpora_dialogue')
+def other_corpora_dialogue():
+    if not settings.part_of_collection:
+        return ''
+    l = get_locale()
+    try:
+        return render_template('modals/other_corpora_dialogue_' + l + '.html')
+    except:
+        return ''
 
 
 @app.route('/docs/dictionary/<lang>')

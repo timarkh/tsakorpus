@@ -78,6 +78,7 @@ class CorpusSettings:
         self.word_search_display_gr = True
         self.citation = None
         self.start_page_url = None
+        self.part_of_collection = False
         self.fulltext_page_size = 100     # Size of one page of the full-text representation in sentences
         self.accidental_word_fields = []
         self.default_view = 'standard'

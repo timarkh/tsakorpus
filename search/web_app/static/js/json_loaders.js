@@ -336,6 +336,7 @@ function assign_input_events() {
 	//$("neg_query_checkbox").unbind('change');
 	$(".neg_query").unbind('click');
 	$("#show_help").unbind('click');
+	$("#part_of_collection").unbind('click');
 	$("#show_dictionary").unbind('click');
 	$("#enable_virtual_keyboard").unbind('click');
 	$("#show_settings").unbind('click');
@@ -360,6 +361,7 @@ function assign_input_events() {
 	//$("neg_query_checkbox").change(negative_query);
 	$(".neg_query").click(negative_query_span);
 	$("#show_help").click(show_help);
+	$("#part_of_collection").click(show_other_corpora);
 	$("#show_dictionary").click(show_dictionary);
 	$("#enable_virtual_keyboard").click(toggle_keyboards);
 	$("#show_settings").click(show_settings);
