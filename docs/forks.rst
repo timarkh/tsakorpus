@@ -38,9 +38,9 @@ Updating the fork
 If the Tsakorpus repository (which is called an *upstream* repository with respect to your fork) has been updated, you can fetch the changes by running the following commands in the repository folder::
 
     git fetch upstream
-    git rebase upstream/master -Xtheirs
+    git merge -Xours upstream/master
     git push -f origin master
 
-You can also use ``merge`` instead of ``rebase``. Make sure to `resolve all conflicts <https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line>`_ before you proceed.
+You can also use ``rebase`` instead of ``merge``. Make sure to `resolve all conflicts <https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line>`_ before you proceed.
 
 After this operation, you will have to pull changes to the server where your corpus is stored and reload apache (or whatever you use as the web server). Major changes might also require reindexing the corpus first.
