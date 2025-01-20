@@ -214,6 +214,8 @@ def suggest_word(lang, fieldName, query):
         return []
     if '*' not in query:
         query += '*'
+    if fieldName == 'wf' and settings.wf_lowercase:
+        query = query.lower()
     wtype = 'word'
     if fieldName == 'lex':
         wtype = 'lemma'
