@@ -37,9 +37,9 @@ class PrepareData:
         wfLowercase = True
         if 'wf_lowercase' in self.settings:
             wfLowercase = self.settings['wf_lowercase']
-        textFieldsAnalyzerPatter = '[.\n()\\[\\]/,:;?!" ]'
+        textFieldsAnalyzerPattern = '[.\n()\\[\\]/,:;?!" ]'
         if 'text_fields_analyzer_pattern' in self.settings and self.settings['text_fields_analyzer_pattern'] is not None:
-            textFieldsAnalyzerPatter = self.settings['text_fields_analyzer_pattern']
+            textFieldsAnalyzerPattern = self.settings['text_fields_analyzer_pattern']
         textFieldsLowercase = True
         if 'text_fields_lowercase' in self.settings:
             textFieldsLowercase = self.settings['text_fields_lowercase']
@@ -57,7 +57,7 @@ class PrepareData:
                 },
                 'text_fields_analyzer': {
                     'type': 'pattern',
-                    'pattern': textFieldsAnalyzerPatter,
+                    'pattern': textFieldsAnalyzerPattern,
                     'lowercase': textFieldsLowercase
                 }
             }
@@ -75,10 +75,27 @@ class PrepareData:
                         'type': 'pattern',
                         'pattern': '[|]',
                         'lowercase': True
+                    },
+                    'keepcase_normalizer_notokenize': {
+                        'type': 'pattern',
+                        'pattern': '[|]',
+                        'lowercase': False
                     }
                 }
             }
         }
+        metaFieldsWithPatterns = [m for m in sorted(self.settings['meta_analyzer_patterns'])]
+        for i in range(len(metaFieldsWithPatterns)):
+            self.docNormalizer['analysis']['analyzer']['lowercase_normalizer_meta_' + str(i)] = {
+                'type': 'pattern',
+                'pattern': self.settings['meta_analyzer_patterns'][metaFieldsWithPatterns[i]],
+                'lowercase': True
+            }
+            self.docNormalizer['analysis']['analyzer']['keepcase_normalizer_meta_' + str(i)] = {
+                'type': 'pattern',
+                'pattern': self.settings['meta_analyzer_patterns'][metaFieldsWithPatterns[i]],
+                'lowercase': False
+            }
 
     def generate_words_mapping(self, wordFreqs=True):
         """
@@ -212,10 +229,32 @@ class PrepareData:
                 m[meta] = {'type': 'integer'}
             elif meta == 'title' or ('notokenize_meta_fields' in self.settings
                                      and meta in self.settings['notokenize_meta_fields']):
-                m[meta] = {
-                    'type': 'text',
-                    'analyzer': 'lowercase_normalizer_notokenize'
-                }
+                if ('case_sensitive_meta_fields' in self.settings
+                        and meta in self.settings['case_sensitive_meta_fields']):
+                    m[meta] = {
+                        'type': 'text',
+                        'analyzer': 'keepcase_normalizer_notokenize'
+                    }
+                else:
+                    m[meta] = {
+                        'type': 'text',
+                        'analyzer': 'lowercase_normalizer_notokenize'
+                    }
+                m[meta + '_kw'] = {'type': 'keyword'}
+            elif ('meta_analyzer_patterns' in self.settings
+                  and meta in self.settings['meta_analyzer_patterns']):
+                patternID = [m for m in sorted(self.settings['meta_analyzer_patterns'])].index(meta)
+                if ('case_sensitive_meta_fields' in self.settings
+                        and meta in self.settings['case_sensitive_meta_fields']):
+                    m[meta] = {
+                        'type': 'text',
+                        'analyzer': 'keepcase_normalizer_meta_' + str(patternID)
+                    }
+                else:
+                    m[meta] = {
+                        'type': 'text',
+                        'analyzer': 'lowercase_normalizer_meta_' + str(patternID)
+                    }
                 m[meta + '_kw'] = {'type': 'keyword'}
             else:
                 m[meta] = {

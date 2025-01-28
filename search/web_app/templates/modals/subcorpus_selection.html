@@ -19,13 +19,13 @@
 							{% for option in col %}
 								{% if option.type == "input_text" %}
 									<div class="autocomplete_input_div">
-									<input type="text" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input subcorpus_autocomplete" form="search_main" placeholder="{{ _('metafield_' + option.name) | capitalize }}" title="{{ _('metafield_' + option.name) | capitalize }}">
+									<input type="text" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input subcorpus_autocomplete" form="search_main" placeholder="{{ _('metafield_' + option.name) }}" title="{{ _('metafield_' + option.name) }}">
 									</div>
 								{% elif option.type == "input_number" %}
-									<input type="number" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) | capitalize }}" title="{{ _('metafield_' + option.name) | capitalize }}">
+									<input type="number" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) }}" title="{{ _('metafield_' + option.name) }}">
 								{% elif option.type == "input_range" %}
-									<input type="number" name="{{ option.name|safe }}__from" id="{{ option.name|safe }}__from" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) | capitalize }}" title="{{ _('metafield_' + option.name) | capitalize }}: {{ _('lower bound') }}">&ndash;
-									<input type="number" name="{{ option.name|safe }}__to" id="{{ option.name|safe }}__to" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) | capitalize }}" title="{{ _('metafield_' + option.name) | capitalize }}: {{ _('upper bound') }}">
+									<input type="number" name="{{ option.name|safe }}__from" id="{{ option.name|safe }}__from" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) }}" title="{{ _('metafield_' + option.name) }}: {{ _('lower bound') }}">&ndash;
+									<input type="number" name="{{ option.name|safe }}__to" id="{{ option.name|safe }}__to" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) }}" title="{{ _('metafield_' + option.name) }}: {{ _('upper bound') }}">
 								{% elif option.type == "option" %}
 									<div class="switchable_subcorpus_option" data-name="{{ option.name|safe }}" data-value="{{ option.value|safe }}">{{ _(option.text)|safe }}
 									</div>

@@ -95,6 +95,8 @@ class CorpusSettings:
         # Regexes etc.
         self.wf_analyzer_pattern = None
         self.wf_lowercase = True
+        self.meta_analyzer_patterns = {}
+        self.case_sensitive_meta_fields = []
         self.text_fields_analyzer_pattern = None
         self.text_fields_lowercase = True
         self.regex_simple_search = None
@@ -122,6 +124,7 @@ class CorpusSettings:
         self.lsFields = {
             'sentence_meta',
             'viewable_meta',
+            'case_sensitive_meta_fields',
             'word_fields',
             'interface_languages',
             'transliterations',
@@ -159,7 +162,8 @@ class CorpusSettings:
         # including elements of lang_props.
         self.dict_dFields = {
             'lang_props.gramm_shortcuts',
-            'lang_props.gloss_shortcuts'
+            'lang_props.gloss_shortcuts',
+            'meta_analyzer_patterns'
         }
 
         # Fields that should never be saved to corpus.json.

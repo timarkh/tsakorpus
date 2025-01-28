@@ -40,6 +40,8 @@ List of parameters
 
 - ``author_metafield`` (string) -- name of the second-important metadata field whose value will be displayed next to the title in headers of hit results. Defaults to ``author``.
 
+- ``case_sensitive_meta_fields`` (list of strings) -- names of the document-level metadata fields that should be treated as case-sensitive when searching (e.g. when selecting a subcorpus). Defaults to an empty list.
+
 - ``citation`` (string) -- an HTML string that answers the question "How to cite the corpus". If it is present, a quotation mark image will appear at the top of the page. The citation information will appear as a dialogue if the user clicks that image.
 
 - ``context_header_rtl`` (Boolean) -- whether context headers for search hits, which contain metadata such as author and title, should be displayed in right-to-left direction. Defaults to ``false``.
@@ -127,6 +129,8 @@ List of parameters
 - ``media_youtube`` (Boolean) -- if ``media`` is true, determines whether the media files are stored on Youtube. Since plain audio/video files and Youtube videos require different player settings, all your media files have to be either uploaded to Youtube, or stored as media files on the server.
 
 - ``media`` (Boolean) -- whether the corpus contains any aligned media (sound or video) files and, therefore, whether the media player should appear next to the search results. Defaults to ``false``. See also the ``video`` option.
+
+- ``meta_analyzer_patterns`` (dictionary) -- regexes to be used by the Elasticsearch analyzer to split the values of non-keyword document-level metadata fields, such as author or genre, into simple tokens for storage and search purposes. By default, a pattern for each of such fields equals ``[.\n()\\[\\]/,:;?!" ]``. If you want to specify other patterns for specific metadata fields, add ``"metadata_field": "regex_pattern"`` key-value pair to this dictionary. It is used in indexation only. The idea is that if e.g. a document has multiple genres that are separated by a whitespace or a comma, it should be possible to find it by searching for either part, the one before the whitespace/comma and the one after it. This is what the default analyzer pattern does. However other metadata fields might require other patterns.
 
 - ``multiple_choice_fields`` (dictionary) -- describes tag selection tables for sentence-level metadata fields or word-level fields (other that *Grammar* or *Gloss*). Keys are field names, values are structured in the same way as ``gramm_selection`` above.
 
