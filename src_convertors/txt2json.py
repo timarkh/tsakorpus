@@ -17,6 +17,8 @@ class Txt2JSON:
 
     rxStripDir = re.compile('^.*[/\\\\]')
     rxStripExt = re.compile('\\.[^.]*$')
+    rxGoodTag = re.compile('^\\w[\\w_-]*$')
+    rxEmptyValueComa = re.compile('^[ \t.?()]*$')
 
     def __init__(self, settingsDir='conf_conversion'):
         """
@@ -58,6 +60,7 @@ class Txt2JSON:
         self.categories = json.loads(fCategories.read())
         fCategories.close()
         self.meta = {}
+        self.speakerMeta = {}
         self.tp = TextProcessor(settings=self.corpusSettings,
                                 categories=self.categories,
                                 errorLog=self.errorLog)
@@ -162,9 +165,73 @@ class Txt2JSON:
                         # Inverted order of dates ('2000s or 1990s')
                         dictMeta['year_from'] = m[1][:-1] if m[1].endswith("s") else m[1]
                         dictMeta['year_to'] = f'{m[0][:-2]}9' if m[0].endswith("s") else m[0]
+            else:
+                # e.g., 197X
+                m = re.search('^([12][0-9])([0-9X])X\\b', truncatedText)
+                if m is not None:
+                    if m.group(2) in ('X', 'x', 'Х', 'х'):
+                        dictMeta['year_from'] = int(m.group(1)) * 100
+                        dictMeta['year_to'] = dictMeta['year_from'] + 99
+                    else:
+                        dictMeta['year_from'] = int(m.group(1)) * 100 + int(m.group(2)) * 10
+                        dictMeta['year_to'] = dictMeta['year_from'] + 9
+                    dictMeta['year_from'] = str(dictMeta['year_from'])
+                    dictMeta['year_to'] = str(dictMeta['year_to'])
 
         elif el.attrib['Name'] in self.corpusSettings['coma_meta_conversion']:
             dictMeta[self.corpusSettings['coma_meta_conversion'][el.attrib['Name']]] = el.text.strip()
+
+    def extract_value_coma(self, node, xpathValue):
+        els = node.xpath(xpathValue)
+        result = []
+        for el in els:
+            if (el.text is not None
+                    and self.rxEmptyValueComa.search(el.text) is None):
+                result.append(el.text.strip())
+        if len(result) <= 0:
+            return ''
+        elif len(result) == 1:
+            return result[0]
+        return result
+
+    def load_speaker_meta_coma(self, srcTree):
+        """
+        Load speakers' data from Coma.
+        """
+        speakerMeta = {}     # code -> speaker metadata as a dictionary
+        speakerNodes = srcTree.xpath('//Corpus/CorpusData/Speaker')
+        for s in speakerNodes:
+            sJson = {}
+            if 'Id' not in s.attrib:
+                continue
+            # sJson['id'] = s.attrib['Id']
+            code = self.extract_value_coma(s, 'Sigle')
+            speakerMeta[code] = sJson
+            metaMapping = {}
+            if 'coma_meta_speaker_conversion' in self.corpusSettings:
+                metaMapping = self.corpusSettings['coma_meta_speaker_conversion']
+            for metaKeyComa, metaKeyTsakorpus in metaMapping.items():
+                if self.rxGoodTag.search(metaKeyComa) is not None:
+                    metaKeyComa = metaKeyComa + '|Location/Description/Key[@Name=\'' + metaKeyComa + "']"
+                else:
+                    metaKeyComa = 'Location/Description/Key[@Name=\'' + metaKeyComa + "']"
+                value = self.extract_value_coma(s, metaKeyComa)
+                if len(value) > 0:
+                    sJson[metaKeyTsakorpus] = value
+            if 'coma_meta_speaker_lang_conversion' in self.corpusSettings:
+                for l in s.xpath('Language'):
+                    for metaKeyComa, metaKeyTsakorpus in self.corpusSettings['coma_meta_speaker_lang_conversion'].items():
+                        metaKeyComa = 'Description/Key[@Name=\'' + metaKeyComa + "']"
+                        value = self.extract_value_coma(l, metaKeyComa)
+                        if len(value) > 0:
+                            if metaKeyTsakorpus in sJson:
+                                if type(sJson[metaKeyTsakorpus]) == str:
+                                    sJson[metaKeyTsakorpus] = [sJson[metaKeyTsakorpus]]
+                                if type(value) == str:
+                                    value = [value]
+                                sJson[metaKeyTsakorpus] += value
+                            sJson[metaKeyTsakorpus] = value
+        return speakerMeta
 
     def load_meta_coma(self, fnameMeta):
         """
@@ -172,10 +239,13 @@ class Txt2JSON:
         from a Coma XML file whose name is indicated in the settings.
         """
         srcTree = etree.parse(fnameMeta)
+        self.speakerMeta = self.load_speaker_meta_coma(srcTree)
         communications = srcTree.xpath('//Corpus/CorpusData/Communication')
         for c in communications:
+            if 'Name' not in c.attrib:
+                continue
+            title = c.attrib['Name'].strip()
             fname = ''
-            title = ''
             curMetaDict = {}
             exbTranscrs = c.xpath('Transcription')
             exbDescrs = c.xpath('Description|'
@@ -189,7 +259,7 @@ class Txt2JSON:
                     if not self.corpusSettings['meta_files_ext']:
                         fname = re.sub('\\.[^.]*$', '', fname)
                 elTitle = exbTranscr.xpath('Filename')
-                if len(elTitle) > 0 and elTitle[0].text is not None:
+                if len(title) <= 0 and len(elTitle) > 0 and elTitle[0].text is not None:
                     title = elTitle[0].text
             for exbDescr in exbDescrs:
                 for descrKey in exbDescr:
@@ -203,6 +273,8 @@ class Txt2JSON:
                     else:
                         curMetaDict['title'] = fname
                 self.meta[fname] = curMetaDict
+                if title != fname and title not in self.meta:
+                    self.meta[title] = curMetaDict
 
     def load_meta(self):
         """

@@ -43,6 +43,10 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         self.glosses = set()
 
     def load_speaker_meta(self, srcTree):
+        """
+        Speakers' metadata (code -> dictionary) must have been
+        loaded from Coma.
+        """
         speakerMeta = {}
         if 'speaker_meta_filename' in self.corpusSettings:
             try:
@@ -64,17 +68,21 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 else:
                     speakerCode = speakerID
                 speakerMeta[speakerID] = {'speaker': speakerCode}
-                if 'sex' in speaker.attrib:
-                    if speaker.attrib['sex'] in ['1', 'M']:
-                        speakerMeta[speakerID]['gender'] = 'M'
-                    elif speaker.attrib['sex'] in ['2', 'F']:
-                        speakerMeta[speakerID]['gender'] = 'F'
-                    else:
-                        speakerMeta[speakerID]['gender'] = speaker.attrib['sex']
-                if 'age' in speaker.attrib:
-                    speakerMeta[speakerID]['age'] = speaker.attrib['age']
-                if 'role' in speaker.attrib:
-                    speakerMeta[speakerID]['role'] = speaker.attrib['role']
+                if speakerCode in self.speakerMeta:
+                    speakerMeta[speakerID].update(self.speakerMeta[speakerCode])
+                else:
+                    print('Speaker with ID ' + speakerCode + ' not referenced in Coma.')
+                    if 'sex' in speaker.attrib:
+                        if speaker.attrib['sex'] in ['1', 'M']:
+                            speakerMeta[speakerID]['sex'] = 'M'
+                        elif speaker.attrib['sex'] in ['2', 'F']:
+                            speakerMeta[speakerID]['sex'] = 'F'
+                        else:
+                            speakerMeta[speakerID]['sex'] = speaker.attrib['sex']
+                    if 'age' in speaker.attrib:
+                        speakerMeta[speakerID]['age'] = speaker.attrib['age']
+                    if 'role' in speaker.attrib:
+                        speakerMeta[speakerID]['role'] = speaker.attrib['role']
         return speakerMeta
 
     def get_tlis(self, srcTree):
@@ -730,7 +738,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             # Process video files first
             files = [fname for fname in files if fname.lower().endswith(('.avi', '.mts', '.mov'))] + \
                     [fname for fname in files if fname.lower().endswith('.mp4')] + \
-                    [fname for fname in files if not fname.lower().endswith(('.avi', '.mts', '.mov', '.mp4'))]
+                    [fname for fname in files if not fname.lower().endswith(('.avi', '.mts', '.mov', '.mp4', 'mpeg'))]
             for fname in files:
                 fileExt = os.path.splitext(fname.lower())[1]
                 if fileExt in self.mediaExtensions:

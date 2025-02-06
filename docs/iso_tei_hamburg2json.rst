@@ -16,4 +16,12 @@ TEI_ is a format for annotating texts. *ISO/TEI for spoken language* is a subset
 Configuration
 -------------
 
-There are no parameters specific for this particular convertor. Please see documentation on :doc:`general parameters </src_convertors>` and :doc:`glosses-to-tags conversion </src_convertors_gloss>`.
+The additional parameters concern extraction of document-level and speaker-level metadata from CoMa files.
+
+- ``coma_meta_conversion`` -- dictionary that establishes a mapping from key names used in CoMa communication metadata to tsakorpus document-level metadata fields.
+
+- ``coma_meta_speaker_conversion`` -- dictionary that establishes a mapping from key names used in CoMa speaker metadata to tsakorpus metadata fields.
+
+- ``coma_meta_speaker_lang_conversion`` -- dictionary that establishes a mapping from key names used in the *Languages* section of CoMa speaker metadata to tsakorpus metadata fields.
+
+See also documentation on :doc:`general parameters </src_convertors>` and :doc:`glosses-to-tags conversion </src_convertors_gloss>`.
