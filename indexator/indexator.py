@@ -9,6 +9,7 @@ import ijson
 import os
 import re
 import time
+from datetime import datetime
 import math
 import random
 import sys
@@ -28,6 +29,7 @@ class Indexator:
     rxBadFileName = re.compile('[^\\w_.-]*', flags=re.DOTALL)
 
     def __init__(self, overwrite=False):
+        random.seed(datetime.now().timestamp())
         self.overwrite = overwrite  # whether to overwrite an existing index without asking
         with open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
                   'r', encoding='utf-8') as fSettings:
@@ -118,6 +120,10 @@ class Indexator:
         self.numSentsLang = [0] * len(self.languages)    # number of sentences in each language in current document
         self.totalNumWords = 0
         self.sentID = 0
+        self.wordsByPartition = {}
+        if 'partitions' in self.settings and self.settings['partitions'] > 0:
+            self.wordsByPartition = {l: {p: 0 for p in range(1, int(self.settings['partitions']) + 1)}
+                                     for l in range(len(self.languages))}
 
         self.filenames = []   # List of tuples (filename, filesize)
         self.corpusSizeInBytes = 0
@@ -750,6 +756,7 @@ class Indexator:
         sentences = []
         paraIDs = [{} for i in range(len(self.languages))]
         for s, bLast in self.iterSent.get_sentences(fname):
+            sRandomID = self.randomize_id(self.sID)
             if 'lang' in s:
                 langID = s['lang']
             else:
@@ -777,11 +784,16 @@ class Indexator:
             if 'meta' in s:
                 for metaField in [mf for mf in s['meta'].keys() if not (mf.startswith('year') or mf.endswith('_kw'))]:
                     s['meta'][metaField + '_kw'] = s['meta'][metaField]
-            # self.es.index(index=self.name + '.sentences',
-            #               id=self.sID,
-            #               body=s)
+
+            iPart = 0       # split a large corpus into partitions for faster (and less precise) queries
+            if 'partitions' in self.settings and self.settings['partitions'] > 1:
+                smallPartitions = [p for p in sorted(self.wordsByPartition[langID],
+                                                     key=lambda x: self.wordsByPartition[langID][x])][:2]
+                iPart = random.choice(smallPartitions)
+                self.wordsByPartition[langID][iPart] += s['n_words']
+            s['partition'] = iPart
             curAction = {'_index': self.name + '.sentences',
-                         '_id': self.randomize_id(self.sID),
+                         '_id': sRandomID,
                          '_source': s}
             if len(self.languages) <= 1:
                 yield curAction

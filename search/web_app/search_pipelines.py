@@ -9,8 +9,11 @@ import copy
 import math
 import re
 import time
+import random
 from flask import request
-from . import sc, sentView, settings, MIN_TOTAL_FREQ_WORD_QUERY, rxIndexAtEnd
+from sympy import false
+
+from . import sc, sentView, settings, MIN_TOTAL_FREQ_WORD_QUERY, MIN_HITS_PARTITION, rxIndexAtEnd
 from .session_management import set_session_data, get_session_data, get_locale, change_display_options, cur_search_context
 from .auxiliary_functions import jsonp, gzipped, nocache, lang_sorting_key, copy_request_args,\
     wilson_confidence_interval, distance_constraints_too_complex, log_query
@@ -501,12 +504,13 @@ def para_ids(htmlQuery):
     return langQueryParts[0], list(paraIDs)
 
 
-def count_occurrences(query, distances=None):
+def count_occurrences(query, distances=None, partition=0):
     esQuery = sc.qp.html2es(query,
                             searchOutput='sentences',
                             sortOrder='no',
-                            query_size=1,
-                            distances=distances)
+                            query_size=0,
+                            distances=distances,
+                            partition=partition)
     hits = sc.get_sentences(esQuery)
     # print(hits)
     if ('aggregations' in hits
@@ -514,6 +518,10 @@ def count_occurrences(query, distances=None):
             and hits['aggregations']['agg_nwords']['sum'] is not None):
         return int(math.floor(hits['aggregations']['agg_nwords']['sum']))
     return 0
+
+
+def extrapolate_word_count(nWords, partition):
+    return math.floor(nWords / settings.partition_sizes_words[partition - 1] * settings.corpus_size_total)
 
 
 def find_sentences_json(page=0):
@@ -541,6 +549,10 @@ def find_sentences_json(page=0):
         wordConstraints = get_session_data('word_constraints')
     set_session_data('page', page)
 
+    partition = 0   # do not use partitions (default)
+    if settings.partitions > 1 and get_session_data('sort') == 'random':
+        partition = random.randint(1, int(settings.partitions))
+
     nWords = 1
     negWords = []
     if 'n_words' in query:
@@ -555,10 +567,12 @@ def find_sentences_json(page=0):
         docIDs = subcorpus_ids(query)
         if docIDs is not None:
             query['doc_ids'] = docIDs
+            partition = 0
 
     if 'para_ids' not in query:
         query, paraIDs = para_ids(query)
         if paraIDs is not None:
+            partition = 0
             query['para_ids'] = paraIDs
             nWords = query['n_words']
             for iQueryWord in range(2, nWords + 1):
@@ -573,8 +587,20 @@ def find_sentences_json(page=0):
         esQuery = sc.qp.html2es(query,
                                 searchOutput='sentences',
                                 query_size=1,
-                                distances=wordConstraints)
+                                distances=wordConstraints,
+                                partition=partition)
         hits = sc.get_sentences(esQuery)
+        if (partition > 0 and 'hits' in hits
+                and 'total' in hits['hits']
+                and hits['hits']['total']['value'] < MIN_HITS_PARTITION):
+            partition = 0
+            esQuery = sc.qp.html2es(query,
+                                    searchOutput='sentences',
+                                    query_size=1,
+                                    distances=wordConstraints,
+                                    partitions=0)
+            hits = sc.get_sentences(esQuery)
+
         if ('hits' not in hits
                 or 'total' not in hits['hits']
                 or hits['hits']['total']['value'] > settings.max_distance_filter):
@@ -582,7 +608,8 @@ def find_sentences_json(page=0):
         else:
             esQuery = sc.qp.html2es(query,
                                     searchOutput='sentences',
-                                    distances=wordConstraints)
+                                    distances=wordConstraints,
+                                    partition=partition)
             if '_source' not in esQuery:
                 esQuery['_source'] = {}
             # esQuery['_source']['excludes'] = ['words.ana', 'words.wf']
@@ -602,7 +629,18 @@ def find_sentences_json(page=0):
             and (nWords == 1
                  or len(wordConstraints) <= 0
                  or not distance_constraints_too_complex(wordConstraints))):
-        nOccurrences = count_occurrences(query, distances=queryWordConstraints)
+        nOccurrences = count_occurrences(query, distances=queryWordConstraints, partition=partition)
+        if partition > 0:
+            ci = wilson_confidence_interval(nOccurrences / settings.partition_sizes_words[partition - 1],
+                                            nOccurrences,
+                                            settings.partition_sizes_words[partition - 1])
+            print(partition, nOccurrences)
+            print((ci[1] - ci[0]) / nOccurrences)
+            if nOccurrences < MIN_HITS_PARTITION:
+                partition = 0
+                nOccurrences = count_occurrences(query, distances=queryWordConstraints, partition=partition)
+            else:
+                nOccurrences = extrapolate_word_count(nOccurrences, partition)
 
     esQuery = sc.qp.html2es(query,
                             searchOutput='sentences',
@@ -610,7 +648,8 @@ def find_sentences_json(page=0):
                             randomSeed=get_session_data('seed'),
                             query_size=get_session_data('page_size'),
                             page=get_session_data('page'),
-                            distances=queryWordConstraints)
+                            distances=queryWordConstraints,
+                            partition=partition)
 
     # return esQuery
     hits = sc.get_sentences(esQuery)
@@ -620,11 +659,18 @@ def find_sentences_json(page=0):
     if 'aggregations' in hits and 'agg_nwords' in hits['aggregations']:
         if nOccurrences > 0:
             hits['aggregations']['agg_nwords']['sum'] = nOccurrences
+            if partition > 0 and 'count' in hits['aggregations']['agg_nwords']:
+                hits['aggregations']['agg_nwords']['count'] = extrapolate_word_count(hits['aggregations']['agg_nwords']['count'], partition)
             # hits['aggregations']['agg_nwords']['count'] = 0
-        elif ('n_words' in query and query['n_words'] == 1
+        elif ('n_words' in query and query['n_words'] != '' and int(query['n_words']) > 1
               and 'sum' in hits['aggregations']['agg_nwords']):
             # only count number of occurrences for one-word queries
             hits['aggregations']['agg_nwords']['sum'] = 0
+        if (partition > 0 and 'hits' in hits
+                and 'total' in hits['hits']):
+            hits['hits']['total']['value'] = extrapolate_word_count(hits['hits']['total']['value'], partition)
+            if 'agg_ndocs' in hits['aggregations']:
+                hits['aggregations']['agg_ndocs']['approximate'] = True
     if (len(wordConstraints) > 0
             and (not get_session_data('distance_strict')
                  or distance_constraints_too_complex(wordConstraints))

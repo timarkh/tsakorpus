@@ -84,7 +84,10 @@ class PrepareData:
                 }
             }
         }
-        metaFieldsWithPatterns = [m for m in sorted(self.settings['meta_analyzer_patterns'])]
+        if 'meta_analyzer_patterns' in self.settings:
+            metaFieldsWithPatterns = [m for m in sorted(self.settings['meta_analyzer_patterns'])]
+        else:
+            metaFieldsWithPatterns = []
         for i in range(len(metaFieldsWithPatterns)):
             self.docNormalizer['analysis']['analyzer']['lowercase_normalizer_meta_' + str(i)] = {
                 'type': 'pattern',
@@ -281,6 +284,7 @@ class PrepareData:
             'next_id': {'type': 'integer'},
             'doc_id': {'type': 'integer'},
             'sent_id': {'type': 'long'},
+            'partition': {'type': 'short'},
             'text': {'type': 'text'},
             'lang': {'type': 'keyword'},
             'words': {

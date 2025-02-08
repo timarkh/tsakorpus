@@ -35,7 +35,7 @@ rxExtraSoft = re.compile('([дзлнст])ь\\1(?=[ьяеёию])')
 rxCyrExtraSoft = re.compile('([džlnšt])\\1(?=ʼ)')
 rxCyrW = re.compile('(\\b|[кр])у(?=[аоэи])')
 
-rxCyrillic = re.compile('^[а-яёӟӥӧўөА-ЯЁӞӤӦЎӨ.,;:!?\-()\\[\\]{}<>]*$')
+rxCyrillic = re.compile('^[а-яёӟӥӧўөА-ЯЁӞӤӦЎӨ.,;:!?\\-()\\[\\]{}<>]*$')
 
 cyrReplacements = {}
 srcReplacements = {}

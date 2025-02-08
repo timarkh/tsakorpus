@@ -44,6 +44,7 @@ class CorpusSettings:
         # Indexation and search options
         self.debug = False
         self.sample_size = 1.0
+        self.partitions = 0
         self.all_language_search_enabled = True
         self.fulltext_search_enabled = True
         self.negative_search_enabled = True
@@ -109,9 +110,11 @@ class CorpusSettings:
         self.try_restart_elastic = True     # Try restarting elasticsearch.service if it is down
 
         # Statistics calculated at runtime
-        self.corpus_size = 0
+        self.corpus_size = 0             # corpus size in words, only counting primary language(s)
+        self.corpus_size_total = 0       # total corpus size in words
         self.word_freq_by_rank = []      # number of word types for each frequency rank
         self.lemma_freq_by_rank = []     # number of lemmata for each frequency rank
+        self.partition_sizes_words = []  # size of partitions in words (if any)
         self.ready_for_work = False      # turns True when all initialization queries have been made
 
         # Parameters restructured for convenience

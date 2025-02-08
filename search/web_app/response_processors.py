@@ -1433,7 +1433,8 @@ class SentenceViewer:
             'message': 'Nothing found.',
             'contexts': [],
             'languages': [],
-            'too_many_hits': False
+            'too_many_hits': False,
+            'approximate': False
         }
         result['context_header_rtl'] = self.settings.context_header_rtl
         if ('hits' not in response or 'total' not in response['hits']
@@ -1447,6 +1448,9 @@ class SentenceViewer:
         if 'aggregations' in response:
             if 'agg_ndocs' in response['aggregations']:
                 result['n_docs'] = int(response['aggregations']['agg_ndocs']['value'])
+                if ('approximate' in response['aggregations']['agg_ndocs']
+                        and response['aggregations']['agg_ndocs']['approximate']):
+                    result['approximate'] = True
             if result['n_docs'] > 0 and 'agg_nwords' in response['aggregations']:
                 result['n_occurrences'] = int(math.floor(response['aggregations']['agg_nwords']['sum']))
                 result['n_sentences'] = int(math.floor(response['aggregations']['agg_nwords']['count']))

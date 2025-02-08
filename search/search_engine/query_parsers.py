@@ -751,7 +751,7 @@ class InterfaceQueryParser:
 
     def full_sentence_query(self, queryDict, query_from=0, query_size=10,
                             sortOrder='random', randomSeed=None, lang=0,
-                            searchOutput='sentences', distances=None,
+                            partition=0, searchOutput='sentences', distances=None,
                             includeNextWordField=False,
                             highlight=True):
         """
@@ -776,6 +776,8 @@ class InterfaceQueryParser:
                 queryFilter = [{'term': {'lang': {'value': lang}}}]
             else:
                 queryFilter = []
+            if partition > 0 and self.settings.partitions > 1:
+                queryFilter.append({'term': {'partition': {'value': partition}}})
 
             # Add all word requirements to the query:
             query += self.multiple_words_sentence_query(queryDict, sortOrder=sortOrder, distances=distances,
@@ -1042,7 +1044,7 @@ class InterfaceQueryParser:
 
     def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
                 randomSeed=None, searchOutput='sentences', groupBy='word',
-                distances=None, includeNextWordField=False,
+                partition=0, distances=None, includeNextWordField=False,
                 after_key=None, highlight=True):
         """
         Make and return a ES query out of the HTML form data.
@@ -1146,6 +1148,7 @@ class InterfaceQueryParser:
                                                  query_size, sortOrder,
                                                  randomSeed,
                                                  lang=langID,
+                                                 partition=partition,
                                                  searchOutput=searchOutput,
                                                  distances=distances,
                                                  includeNextWordField=includeNextWordField,

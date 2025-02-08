@@ -140,9 +140,9 @@ class SearchClient:
                               body=esQuery)
         return hits
 
-    def get_n_words(self, primaryLanguages=None):
+    def get_n_words(self, primaryLanguages=None, partition=0):
         """
-        Return total number of words in the primary language in the corpus.
+        Return total number of words in the primary language(s) in the corpus.
         """
         aggNWords = {'agg_nwords': {'sum': {'field': 'n_words'}}}
         if primaryLanguages is not None and len(primaryLanguages) > 0:
@@ -150,7 +150,16 @@ class SearchClient:
                 aggNWords['agg_nwords_' + lang] = {'sum': {'field': 'n_words_' + lang}}
         esQuery = {'query': {'match_all': {}}, 'from': 0, 'size': 0,
                    'aggs': aggNWords}
-        hits = self.es.search(index=self.name + '.docs',
+        index = self.name + '.docs'
+        if partition > 0:
+            esQueryFilter = [
+                {'term': {'partition': {'value': partition}}}
+            ]
+            esQuery = {'query': {'bool': {'must': esQueryFilter}},
+                       'from': 0, 'size': 0,
+                       'aggs': aggNWords}
+            index = self.name + '.sentences'
+        hits = self.es.search(index=index,
                               body=esQuery)
         if primaryLanguages is not None and len(primaryLanguages) > 0:
             nWords = 0
