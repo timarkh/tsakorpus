@@ -113,6 +113,10 @@ class PrepareData:
             'wf': {
                 'type': 'text',
                 'fielddata': True,
+                'index_prefixes': {
+                    'min_chars': 3,
+                    'max_chars': 10
+                },
                 'analyzer': 'wf_analyzer'
             },
             'wf_display': {
@@ -136,6 +140,10 @@ class PrepareData:
                     'lex': {
                         'type': 'text',
                         'fielddata': True,
+                        'index_prefixes': {
+                            'min_chars': 3,
+                            'max_chars': 10
+                        },
                         'analyzer': 'wf_analyzer'
                     },
                     'gloss_index': {
@@ -154,6 +162,7 @@ class PrepareData:
             'rank_true': {'type': 'integer'},
             'n_sents': {'type': 'integer'},
             'n_docs': {'type': 'integer'},
+            'id': {'type': 'keyword'},         # for aggregations / sorting
             'w_id': {'type': 'keyword'},       # word ID
             'l_id': {'type': 'keyword'},       # lemma ID
             'wf_order': {'type': 'integer'},   # position of the word form in sorted list of word forms
@@ -210,7 +219,8 @@ class PrepareData:
         """
         m = {
             'n_words': {'type': 'integer'},
-            'n_sents': {'type': 'integer'}
+            'n_sents': {'type': 'integer'},
+            'doc_id': {'type': 'keyword'}
         }
         if len(self.settings['languages']) > 1:
             for lang in self.settings['languages']:
@@ -280,11 +290,11 @@ class PrepareData:
         """
         wordProps = word_mapping['mappings']['properties']
         m = {
-            'prev_id': {'type': 'integer'},
-            'next_id': {'type': 'integer'},
-            'doc_id': {'type': 'integer'},
+            'prev_id': {'type': 'keyword'},
+            'next_id': {'type': 'keyword'},
+            'doc_id': {'type': 'keyword'},
             'sent_id': {'type': 'long'},
-            'partition': {'type': 'short'},
+            'partition': {'type': 'keyword'},
             'text': {'type': 'text'},
             'lang': {'type': 'keyword'},
             'words': {

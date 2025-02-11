@@ -408,7 +408,7 @@ class InterfaceQueryParser:
 
         if not subcorpus:
             if sortOrder == 'random':
-                innerQuery = self.make_random(innerQuery, randomSeed=randomSeed)
+                innerQuery = self.make_random(innerQuery, randomSeed=randomSeed, randomField='id')
             esQuery = {
                 'query': innerQuery,
                 'size': query_size,
@@ -418,7 +418,7 @@ class InterfaceQueryParser:
             esQuery['aggs'] = {
                 'agg_ndocs': {'cardinality': {'field': 'dids'}},
                 'agg_freq': {'sum': {'field': 'freq'}},
-                'agg_noccurrences': {'value_count': {'field': '_id'}}
+                'agg_noccurrences': {'value_count': {'field': 'id'}}
             }
             if groupBy == 'lemma':
                 esQuery['size'] = 0
@@ -442,7 +442,7 @@ class InterfaceQueryParser:
                 }
             }
             if sortOrder == 'random':
-                innerWordFreqQuery = self.make_random(innerWordFreqQuery, randomSeed=randomSeed)
+                innerWordFreqQuery = self.make_random(innerWordFreqQuery, randomSeed=randomSeed, randomField='id')
             mainAgg = {'agg_freq': {'sum': {'field': 'freq'}},
                        'agg_ndocs': {'cardinality': {'field': 'd_id'}}}
             if groupBy == 'word':
@@ -751,7 +751,7 @@ class InterfaceQueryParser:
 
     def full_sentence_query(self, queryDict, query_from=0, query_size=10,
                             sortOrder='random', randomSeed=None, lang=0,
-                            partition=0, searchOutput='sentences', distances=None,
+                            searchOutput='sentences', distances=None,
                             includeNextWordField=False,
                             highlight=True):
         """
@@ -776,8 +776,6 @@ class InterfaceQueryParser:
                 queryFilter = [{'term': {'lang': {'value': lang}}}]
             else:
                 queryFilter = []
-            if partition > 0 and self.settings.partitions > 1:
-                queryFilter.append({'term': {'partition': {'value': partition}}})
 
             # Add all word requirements to the query:
             query += self.multiple_words_sentence_query(queryDict, sortOrder=sortOrder, distances=distances,
@@ -812,9 +810,9 @@ class InterfaceQueryParser:
             query = {'bool': {'must': query, 'filter': queryFilter}}
 
         if sortOrder in ('random', 'year'):
-            query = self.make_random(query, randomSeed)
+            query = self.make_random(query, randomSeed, randomField='prev_id')
         elif sortOrder not in ('sent_id', 'no'):
-            query = self.make_half_random(query, randomSeed)
+            query = self.make_half_random(query, randomSeed, randomField='prev_id')
 
         esQuery = {'query': query, 'size': query_size, 'from': query_from}
         if sortOrder == 'year':
@@ -848,7 +846,7 @@ class InterfaceQueryParser:
         # if sortOrder in self.sortOrders:
         return esQuery
 
-    def make_random(self, query, randomSeed=None):
+    def make_random(self, query, randomSeed=None, randomField='prev_id'):
         """
         Add random ordering to the ES query.
         """
@@ -858,9 +856,10 @@ class InterfaceQueryParser:
 
         if randomSeed is not None:
             query['function_score']['random_score']['seed'] = str(randomSeed)
+            query['function_score']['random_score']['field'] = randomField
         return query
 
-    def make_half_random(self, query, randomSeed=None):
+    def make_half_random(self, query, randomSeed=None, randomField='prev_id'):
         """
         Add random ordering to the ES query while preserving the ordering
         by number of terms found.
@@ -870,6 +869,7 @@ class InterfaceQueryParser:
                                     'random_score': {}}}
         if randomSeed is not None:
             query['function_score']['random_score']['seed'] = str(randomSeed)
+            query['function_score']['random_score']['field'] = randomField
         return query
 
     def subcorpus_query(self, htmlQuery, query_from=0, query_size=10,
@@ -926,7 +926,7 @@ class InterfaceQueryParser:
         if len(queryParts) > 0:
             query = {'bool': {'must': queryParts}}
             if sortOrder == 'random':
-                query = self.make_random(query, randomSeed)
+                query = self.make_random(query, randomSeed, 'doc_id')
         else:
             query = {'match_all': {}}
 
@@ -1044,7 +1044,7 @@ class InterfaceQueryParser:
 
     def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
                 randomSeed=None, searchOutput='sentences', groupBy='word',
-                partition=0, distances=None, includeNextWordField=False,
+                distances=None, includeNextWordField=False,
                 after_key=None, highlight=True):
         """
         Make and return a ES query out of the HTML form data.
@@ -1148,7 +1148,6 @@ class InterfaceQueryParser:
                                                  query_size, sortOrder,
                                                  randomSeed,
                                                  lang=langID,
-                                                 partition=partition,
                                                  searchOutput=searchOutput,
                                                  distances=distances,
                                                  includeNextWordField=includeNextWordField,

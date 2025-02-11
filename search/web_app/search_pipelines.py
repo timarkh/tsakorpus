@@ -509,9 +509,8 @@ def count_occurrences(query, distances=None, partition=0):
                             searchOutput='sentences',
                             sortOrder='no',
                             query_size=0,
-                            distances=distances,
-                            partition=partition)
-    hits = sc.get_sentences(esQuery)
+                            distances=distances)
+    hits = sc.get_sentences(esQuery, partition=partition)
     # print(hits)
     if ('aggregations' in hits
             and 'agg_nwords' in hits['aggregations']
@@ -587,9 +586,8 @@ def find_sentences_json(page=0):
         esQuery = sc.qp.html2es(query,
                                 searchOutput='sentences',
                                 query_size=1,
-                                distances=wordConstraints,
-                                partition=partition)
-        hits = sc.get_sentences(esQuery)
+                                distances=wordConstraints)
+        hits = sc.get_sentences(esQuery, partition=partition)
         if (partition > 0 and 'hits' in hits
                 and 'total' in hits['hits']
                 and hits['hits']['total']['value'] < MIN_HITS_PARTITION):
@@ -597,9 +595,8 @@ def find_sentences_json(page=0):
             esQuery = sc.qp.html2es(query,
                                     searchOutput='sentences',
                                     query_size=1,
-                                    distances=wordConstraints,
-                                    partitions=0)
-            hits = sc.get_sentences(esQuery)
+                                    distances=wordConstraints)
+            hits = sc.get_sentences(esQuery, partition=partition)
 
         if ('hits' not in hits
                 or 'total' not in hits['hits']
@@ -608,14 +605,13 @@ def find_sentences_json(page=0):
         else:
             esQuery = sc.qp.html2es(query,
                                     searchOutput='sentences',
-                                    distances=wordConstraints,
-                                    partition=partition)
+                                    distances=wordConstraints)
             if '_source' not in esQuery:
                 esQuery['_source'] = {}
             # esQuery['_source']['excludes'] = ['words.ana', 'words.wf']
             esQuery['_source'] = ['words.next_word', 'words.wtype']
             # TODO: separate threshold for this?
-            iterator = sc.get_all_sentences(esQuery)
+            iterator = sc.get_all_sentences(esQuery, partition=partition)
             query['sent_ids'] = sc.qp.filter_sentences(iterator, wordConstraints, nWords=nWords)
             set_session_data('last_query', query)
 
@@ -648,11 +644,10 @@ def find_sentences_json(page=0):
                             randomSeed=get_session_data('seed'),
                             query_size=get_session_data('page_size'),
                             page=get_session_data('page'),
-                            distances=queryWordConstraints,
-                            partition=partition)
+                            distances=queryWordConstraints)
 
     # return esQuery
-    hits = sc.get_sentences(esQuery)
+    hits = sc.get_sentences(esQuery, partition=partition)
     if nWords > 1 and 'hits' in hits and 'hits' in hits['hits']:
         for hit in hits['hits']['hits']:
             sentView.filter_multi_word_highlight(hit, nWords=nWords, negWords=negWords)

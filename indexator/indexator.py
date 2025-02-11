@@ -122,7 +122,7 @@ class Indexator:
         self.sentID = 0
         self.wordsByPartition = {}
         if 'partitions' in self.settings and self.settings['partitions'] > 0:
-            self.wordsByPartition = {l: {p: 0 for p in range(1, int(self.settings['partitions']) + 1)}
+            self.wordsByPartition = {l: {p: 0 for p in range(int(self.settings['partitions']))}
                                      for l in range(len(self.languages))}
 
         self.filenames = []   # List of tuples (filename, filesize)
@@ -149,8 +149,8 @@ class Indexator:
             self.es_ic.delete(index=self.name + '.docs')
         if self.es_ic.exists(index=self.name + '.words'):
             self.es_ic.delete(index=self.name + '.words')
-        if self.es_ic.exists(index=self.name + '.sentences'):
-            self.es_ic.delete(index=self.name + '.sentences')
+        if self.es_ic.exists(index=self.name + '.sentences*'):
+            self.es_ic.delete(index=self.name + '.sentences*')
         # Obsolete index word_freq can be present in pre-2019 corpora
         if self.es_ic.exists(index=self.name + '.word_freqs'):
             self.es_ic.delete(index=self.name + '.word_freqs')
@@ -171,8 +171,13 @@ class Indexator:
                           body=self.docMapping)
         self.es_ic.create(index=self.name + '.words',
                           body=self.wordMapping)
-        self.es_ic.create(index=self.name + '.sentences',
-                          body=self.sentMapping)
+        if 'partitions' in self.settings and self.settings['partitions'] > 1:
+            for i in range(int(self.settings['partitions'])):
+                self.es_ic.create(index=self.name + '.sentences.' + str(i),
+                                  body=self.sentMapping)
+        else:
+            self.es_ic.create(index=self.name + '.sentences',
+                              body=self.sentMapping)
 
     def randomize_id(self, realID):
         """
@@ -574,6 +579,7 @@ class Indexator:
                 except KeyError:
                     lID = 'l0'
                 wJson = json.loads(w)
+                wJson['id'] = wID
                 wfOrder = len(wfsSorted) + 1
                 if 'wf' in wJson:
                     wfOrder = wfsSorted[wJson['wf']]
@@ -785,14 +791,15 @@ class Indexator:
                 for metaField in [mf for mf in s['meta'].keys() if not (mf.startswith('year') or mf.endswith('_kw'))]:
                     s['meta'][metaField + '_kw'] = s['meta'][metaField]
 
+            indexName = self.name + '.sentences'
             iPart = 0       # split a large corpus into partitions for faster (and less precise) queries
             if 'partitions' in self.settings and self.settings['partitions'] > 1:
                 smallPartitions = [p for p in sorted(self.wordsByPartition[langID],
                                                      key=lambda x: self.wordsByPartition[langID][x])][:2]
                 iPart = random.choice(smallPartitions)
                 self.wordsByPartition[langID][iPart] += s['n_words']
-            s['partition'] = iPart
-            curAction = {'_index': self.name + '.sentences',
+                indexName += '.' + str(iPart)
+            curAction = {'_index': indexName,
                          '_id': sRandomID,
                          '_source': s}
             if len(self.languages) <= 1:
@@ -838,6 +845,7 @@ class Indexator:
         self.add_meta_keywords(meta)
         meta['n_words'] = self.numWords
         meta['n_sents'] = self.numSents
+        meta['doc_id'] = self.dID
         if len(self.settings['languages']) > 1:
             for i in range(len(self.languages)):
                 meta['n_words_' + self.languages[i]] = self.numWordsLang[i]
