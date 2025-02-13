@@ -405,7 +405,8 @@ class PrepareData:
         numShards = 1
         cpuCount = os.cpu_count()
         if (corpusSizeInBytes > self.MULTIPLE_SHARDS_THRESHOLD
-                and cpuCount is not None and cpuCount > 2):
+                and cpuCount is not None and cpuCount > 2
+                and ('partitions' not in self.settings or int(self.settings['partitions']) < 2)):
             numShards = cpuCount - 1
         mapping = {
             'mappings': {

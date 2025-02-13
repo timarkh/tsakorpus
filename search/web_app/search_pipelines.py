@@ -13,7 +13,7 @@ import random
 from flask import request
 from sympy import false
 
-from . import sc, sentView, settings, MIN_TOTAL_FREQ_WORD_QUERY, MIN_HITS_PARTITION, rxIndexAtEnd
+from . import sc, sentView, settings, MIN_TOTAL_FREQ_WORD_QUERY, MIN_HITS_PARTITION, MAX_CI_PARTITION, rxIndexAtEnd
 from .session_management import set_session_data, get_session_data, get_locale, change_display_options, cur_search_context
 from .auxiliary_functions import jsonp, gzipped, nocache, lang_sorting_key, copy_request_args,\
     wilson_confidence_interval, distance_constraints_too_complex, log_query
@@ -628,11 +628,10 @@ def find_sentences_json(page=0):
         nOccurrences = count_occurrences(query, distances=queryWordConstraints, partition=partition)
         if partition > 0:
             ci = wilson_confidence_interval(nOccurrences / settings.partition_sizes_words[partition - 1],
-                                            nOccurrences,
+                                            settings.partition_sizes_words[partition - 1],
                                             settings.partition_sizes_words[partition - 1])
-            print(partition, nOccurrences)
-            print((ci[1] - ci[0]) / nOccurrences)
-            if nOccurrences < MIN_HITS_PARTITION:
+            ciWidth = (ci[1] - ci[0]) / max(nOccurrences, 1)
+            if nOccurrences < MIN_HITS_PARTITION or ciWidth > MAX_CI_PARTITION:
                 partition = 0
                 nOccurrences = count_occurrences(query, distances=queryWordConstraints, partition=partition)
             else:
@@ -647,6 +646,11 @@ def find_sentences_json(page=0):
                             distances=queryWordConstraints)
 
     # return esQuery
+    if partition > 0:
+        partition = 1 + get_session_data('seed') % int(settings.partitions)
+        # We need partition to be the same for each query with the same random seed,
+        # but we want it to be truly random at the step where the number of occurrences
+        # is calculated.
     hits = sc.get_sentences(esQuery, partition=partition)
     if nWords > 1 and 'hits' in hits and 'hits' in hits['hits']:
         for hit in hits['hits']['hits']:

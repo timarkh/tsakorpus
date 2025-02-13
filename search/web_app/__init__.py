@@ -94,6 +94,8 @@ MIN_HITS_PARTITION = 100    # minimal number of hits in a partition for the resu
                             # a partition query to be extrapolated to the entire corpus
                             # (for large corpora that are split into partitions for
                             # faster processing)
+MAX_CI_PARTITION = 0.05     # maximal relative width of the confidence interval
+                            # for partition queries
 sessionData = {}        # session key -> dictionary with the data for current session
 random.seed()
 
