@@ -610,6 +610,7 @@ label {
 	margin-top: -4px;
     border-radius: 5px;
 	display: inline-block;
+	vertical-align: middle!important;
 }
 
 #corpus_header a.bi:hover {
