@@ -150,7 +150,16 @@ class Indexator:
         if self.es_ic.exists(index=self.name + '.words'):
             self.es_ic.delete(index=self.name + '.words')
         if self.es_ic.exists(index=self.name + '.sentences*'):
-            self.es_ic.delete(index=self.name + '.sentences*')
+            if self.es_ic.exists(index=self.name + '.sentences'):
+                self.es_ic.delete(index=self.name + '.sentences')
+            nPartitions = 100
+            if 'partitions' in self.settings and int(self.settings['partitions']) > 1:
+                nPartitions = int(self.settings['partitions'])
+            for i in range(nPartitions):
+                if self.es_ic.exists(index=self.name + '.sentences.' + str(i)):
+                    self.es_ic.delete(index=self.name + '.sentences.' + str(i))
+                else:
+                    break
         # Obsolete index word_freq can be present in pre-2019 corpora
         if self.es_ic.exists(index=self.name + '.word_freqs'):
             self.es_ic.delete(index=self.name + '.word_freqs')
