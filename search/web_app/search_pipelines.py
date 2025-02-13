@@ -11,7 +11,6 @@ import re
 import time
 import random
 from flask import request
-from sympy import false
 
 from . import sc, sentView, settings, MIN_TOTAL_FREQ_WORD_QUERY, MIN_HITS_PARTITION, MAX_CI_PARTITION, rxIndexAtEnd
 from .session_management import set_session_data, get_session_data, get_locale, change_display_options, cur_search_context
