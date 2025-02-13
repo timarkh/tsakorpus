@@ -245,11 +245,13 @@ function enable_datatables(tableName) {
 			header: true
 		},
 		layout: {
-			topEnd: {
+			topStart: {
 				search: {
 					text: filterCaption + ': _INPUT_'
 				}
-			}
+			},
+			bottomStart: 'paging',
+			topEnd: 'info'
 		},
 		paging: paging,
 		pageLength: 50,
