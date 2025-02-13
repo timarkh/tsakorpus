@@ -743,7 +743,7 @@ class Indexator:
         Index all words that have been collected at the previous stage
         in self.words (while the sentences were being indexed).
         """
-        bulk(self.es, self.iterate_words(), chunk_size=300, request_timeout=60)
+        bulk(self.es, self.iterate_words(), chunk_size=1000, request_timeout=120)
         if 'generate_dictionary' in self.settings and self.settings['generate_dictionary']:
             self.generate_dictionary()
 
@@ -835,6 +835,12 @@ class Indexator:
             for s in sentences:
                 yield s
 
+    def index_sentences(self, fname):
+        """
+        Index all sentences in a text.
+        """
+        bulk(self.es, self.iterate_sentences(fname), chunk_size=1000, request_timeout=120)
+
     @staticmethod
     def add_meta_keywords(meta):
         """
@@ -863,21 +869,7 @@ class Indexator:
         self.numSents = 0
         self.numWordsLang = [0] * len(self.languages)
         self.numSentsLang = [0] * len(self.languages)
-        try:
-            self.es.index(index=self.name + '.docs',
-                          id=self.dID,
-                          body=meta)
-        except RequestError as err:
-            print('Metadata error: {0}'.format(err))
-            shortMeta = {}
-            if 'filename' in meta:
-                shortMeta['filename'] = meta['filename']
-            if 'title' in meta:
-                shortMeta['title'] = meta['title']
-                shortMeta['title_kw'] = meta['title']
-                self.es.index(index=self.name + '.docs',
-                              id=self.dID,
-                              body=shortMeta)
+
         if ('fulltext_view_enabled' in self.settings
                 and self.settings['fulltext_view_enabled']
                 and 'fulltext_id' in meta):
@@ -886,7 +878,36 @@ class Indexator:
                                   os.path.join('../search/corpus_html',
                                                self.name,
                                                fnameOut))
+        curAction = {'_index': self.name + '.docs',
+                     '_id': self.dID,
+                     '_source': meta}
+        # try:
+        #     self.es.index(index=self.name + '.docs',
+        #                   id=self.dID,
+        #                   body=meta)
+        # except RequestError as err:
+        #     print('Metadata error: {0}'.format(err))
+        #     shortMeta = {}
+        #     if 'filename' in meta:
+        #         shortMeta['filename'] = meta['filename']
+        #     if 'title' in meta:
+        #         shortMeta['title'] = meta['title']
+        #         shortMeta['title_kw'] = meta['title']
+        #         self.es.index(index=self.name + '.docs',
+        #                       id=self.dID,
+        #                       body=shortMeta)
         self.dID += 1
+        return curAction
+
+    def iterate_docs(self):
+        for fname, fsize in sorted(self.filenames, key=lambda p: -p[1]):
+            # print(fname, fsize)
+            if 'sample_size' in self.settings and 0 < self.settings['sample_size'] < 1:
+                # Only take a random sample of the source files (for test purposes)
+                if random.random() > self.settings['sample_size']:
+                    continue
+            self.index_sentences(fname)
+            yield self.index_doc(fname)
 
     def analyze_dir(self):
         """
@@ -920,14 +941,7 @@ class Indexator:
         if len(self.filenames) <= 0:
             print('There are no files in this corpus.')
             return
-        for fname, fsize in sorted(self.filenames, key=lambda p: -p[1]):
-            # print(fname, fsize)
-            if 'sample_size' in self.settings and 0 < self.settings['sample_size'] < 1:
-                # Only take a random sample of the source files (for test purposes)
-                if random.random() > self.settings['sample_size']:
-                    continue
-            bulk(self.es, self.iterate_sentences(fname), chunk_size=200, request_timeout=60)
-            self.index_doc(fname)
+        bulk(self.es, self.iterate_docs(), chunk_size=200, request_timeout=60)
         self.index_words()
 
     def compile_translations(self):
