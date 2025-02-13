@@ -893,6 +893,34 @@ hr.separator {
 	padding-bottom: 20px;
 }
 
+.documents_list_table td:nth-child(1) {
+	position: sticky;
+	z-index: 1;
+	left: 0;
+	width: 30px;
+}
+
+.documents_list_table td:nth-child(2) {
+	position: sticky;
+	z-index: 2;
+	left: 30px;
+	border-right: 1px dotted;
+}
+
+.documents_list_table th:nth-child(1) {
+	position: sticky!important;
+	z-index: 1;
+	left: 0;
+	width: 30px;
+}
+
+.documents_list_table th:nth-child(2) {
+	position: sticky!important;
+	z-index: 2;
+	left: 30px;
+	border-right: 1px dotted;
+}
+
 .modal {
 	z-index: 9999999;  /* Dirty trick for dealing with wide third-party headers */
 }
@@ -911,6 +939,7 @@ hr.separator {
 
 .documents_list_table {
 	border: solid 1px gray;
+	border-collapse: separate;
 	border-radius: 4px;
 	margin: auto;
 }
@@ -918,15 +947,26 @@ hr.separator {
 .documents_list_table tr:nth-child(odd) {
 	background-color: #fff9b2; 
 }
+.documents_list_table tr:nth-child(odd) td {
+	background-color: #fff9b2; 
+}
 
 .documents_list_table tr:nth-child(even) {
 	background-color: #f7f0a0;
+}
+.documents_list_table tr:nth-child(even) td {
+	background-color: #f7f0a0;
+}
+
+.documents_list_table thead tr {
+	color: #443d35!important;
+	background-color: #e2d076!important;
 }
 
 .documents_list_table th {
 	padding: 3px 5px;
 	color: #443d35;
-	min-width: 35px;
+	min-width: 30px;
 	background-color: #e2d076;
 	cursor: pointer;
 }
