@@ -80,6 +80,7 @@ If you have lots of files and only want to test Tsakorpus on a small sample of t
 The indexator creates following elasticsearch indexes:
 
 - ``%corpus_name%.sentences`` -- main index: all sentences of the corpus;
+- alternatively, if the configuration parameter ``partitions`` is set to a value greater than ``1``, then the sentences are split between several indexes, each named ``%corpus_name%.sentences.%N%``;
 - ``%corpus_name%.docs`` -- metadata for corpus documents;
 - ``%corpus_name%.words`` -- contains three types, ``lemma``, ``word`` and ``word_freq``. The instances of the first two are all lemma / word types with statistics (identical word forms with different annotations are considered different types). Each instance of the latter contains frequency statistics for each (word, document) tuple.
 
@@ -88,7 +89,7 @@ You can find out more :doc:`here </indexator>`.
 Memory and disk space consumption
 ---------------------------------
 
-(If your corpus contains less than 1 million tokens or 100,000 sentences, you may safely skip this subsection.)
+(If your corpus contains fewer than 1 million tokens or 100,000 sentences, you may safely skip this subsection.)
 
 During the indexation phase, there are following primary causes of memory consumption:
 
@@ -98,9 +99,9 @@ During the indexation phase, there are following primary causes of memory consum
 
 Loading a source JSON document may require significantly more memory than it takes to store it on a hard drive. Consequently, loading large documents (> 100 Mb, which can happen in the case of e.g. long novels with heavy annotation) may lead to memory errors. If a memory error occurs, the file will still be indexed, but with a much slower iterative JSON parser (``ijson``).
 
-Memory consumed by Elasticsearch does not depend on the size of the corpus. Under default settings, it occupies 2 Gb of memory. You have to increase that amount in the Elasticsearch settings (``jvm.options`` file, the parameters are called ``Xms`` and ``Xmx``) if you have a large corpus (e.g. at least 4 Gb for 20 million tokens or 8 Gb for 200 million tokens).
+Memory consumed by Elasticsearch does not depend on the size of the corpus. Under default settings, it occupies a fixed fraction of the available memory. You may want to have Elasticsearch use at least 2 Gb of memory (preferably more).
 
-Memory consumed by the indexator itself non-linearly depends on several parameters (number of tokens, number of sentences and number of documents), but for the sake of simplicity it can be thought of as depending on the number of tokens more or less linearly. The constant depends, of course, on the amount of annotation you have. In case of full morphological annotation, a ratio of 60-80 Mb per million tokens (for corpora containing 10-50 million tokens) can be expected.
+Memory consumed by the indexator itself non-linearly depends on several parameters (number of tokens, number of sentences and number of documents), but for the sake of simplicity it can be thought of as depending on the number of tokens more or less linearly. The constant depends, of course, on the amount of annotation you have. In case of full morphological annotation, a ratio of 70-100 Mb per million tokens (for corpora containing 10-100 million tokens) can be expected.
 
 The disk space required by the index depends primarily on the size of the corpus. Again, in case of full morphological annotation, you can expect 1 million tokens to take 0.5-0.7 Gb of disk space.
 
