@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, url_for
 from elasticsearch.exceptions import ConnectionError, NotFoundError
 import sys
 import subprocess

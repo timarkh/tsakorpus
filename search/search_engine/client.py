@@ -227,8 +227,9 @@ class SearchClient:
         """
         Try to restart the system's Elasticsearch server.
         """
-        subprocess.Popen(os.path.abspath('restart_elasticsearch.sh'), shell=True,
-                         stdout=subprocess.PIPE)
+        if os.name != 'nt':
+            subprocess.Popen(os.path.abspath('restart_elasticsearch.sh'), shell=True,
+                             stdout=subprocess.PIPE)
 
     def is_alive(self):
         """

@@ -2,15 +2,21 @@
 <html lang="{{ locale }}">
 <head>
 	<title>{{ _('corpus_title') }} - {{ _('Corpus search page') }}</title>
+	<link rel="apple-touch-icon" sizes="180x180" href="static/favicons/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="static/favicons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="static/favicons/favicon-16x16.png">
+	<link rel="manifest" href="static/favicons/site.webmanifest">
 	<link rel="stylesheet" type="text/css" href="static/bootstrap-5.0.0-beta1-dist/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="static/css/search.css">
 	<link rel="stylesheet" type="text/css" href="static/css/span_styles.css">
 	<link rel="stylesheet" type="text/css" href="static/css/gramm_gloss_selection.css">
+	<link rel="stylesheet" type="text/css" href="static/datatables-2.2.1/dataTables.min.css">
 	<!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> -->
 	<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"> -->
 	<link rel="stylesheet" type="text/css" href="static/icons-1.4.1/font/bootstrap-icons.css">
 	<script src="static/jquery-3.5.1-dist/jquery-3.5.1.min.js"></script>
 	<script src="static/autocomplete_devbridge/jquery.autocomplete.min.js"></script>
+	<script type='text/javascript' src='static/datatables-2.2.1/dataTables.min.js'></script>
 	<script type='text/javascript' src='static/bootstrap-5.0.0-beta1-dist/js/bootstrap.bundle.min.js'></script>
 	<script type='text/javascript' src='static/js/common_interface_functions.js'></script>
 	<script type='text/javascript' src='static/js/virtual_keyboards.js'></script>
@@ -31,6 +37,7 @@
 	var forTheQueryCaption = "{{ _('the query') }}";
 	var nothingFoundCaption = "{{ _('Nothing found.') }}";
 	var queryWordCaption = "{{ _('Query word') }}";
+	var filterCaption = "{{ _('Filter') }}";
 	var autoSwitchTiers = {{ auto_switch_tiers|safe }};
 	var wordFieldsByTier = {{ word_fields_by_tier|safe }};
 	var keyboardsByTier = {{ keyboards_by_tier|safe }};

@@ -747,6 +747,10 @@ hr.separator {
 .popup_field {
 }
 
+.popup_key {
+	color: #565659;
+}
+
 .popup_value {
 }
 
@@ -885,8 +889,7 @@ hr.separator {
 
 .documents_list {
 	border-radius: 4px;
-	overflow: auto;
-	max-height: 50vh;
+	padding-bottom: 20px;
 }
 
 .modal {

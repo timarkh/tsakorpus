@@ -751,3 +751,6 @@ msgstr "Виртуальная клавиатура"
 
 msgid "Other corpora"
 msgstr "Другие корпуса"
+
+msgid "Filter"
+msgstr "Фильтр"

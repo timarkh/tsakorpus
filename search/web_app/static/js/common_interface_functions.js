@@ -233,6 +233,30 @@ function toggle_interlinear() {
 	}
 }
 
+	
+function enable_datatables(tableName) {
+	var paging = true;
+	var rowCount = $(tableName + " tr").length;
+	if (rowCount <= 50) {
+		paging = false;
+	}
+	$(tableName).DataTable({
+		fixedHeader: {
+			header: true
+		},
+		layout: {
+			topEnd: {
+				search: {
+					text: filterCaption + ': _INPUT_'
+				}
+			}
+		},
+		paging: paging,
+		pageLength: 50,
+		lengthChange: false
+	});
+}
+
 function html_decode(input){
   var e = document.createElement('textarea');
   e.innerHTML = input;

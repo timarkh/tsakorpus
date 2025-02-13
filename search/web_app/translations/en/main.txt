@@ -742,3 +742,6 @@ msgstr "Virtual keyboard"
 
 msgid "Other corpora"
 msgstr "Other corpora"
+
+msgid "Filter"
+msgstr "Filter"

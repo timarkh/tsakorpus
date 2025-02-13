@@ -20,6 +20,12 @@ from .auxiliary_functions import jsonp, gzipped, nocache, lang_sorting_key, copy
 from .search_pipelines import *
 
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static/favicons'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+
 @app.route('/search')
 @app.route('/search_minimalistic')
 def search_page():
