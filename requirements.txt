@@ -6,3 +6,4 @@ Flask-Babel
 lxml
 ijson
 XlsxWriter
+sqlitedict

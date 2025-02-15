@@ -18,6 +18,81 @@ import argparse
 from prepare_data import PrepareData
 from json_doc_reader import JSONDocReader
 from json2html import JSON2HTML
+from sqlitedict import SqliteDict
+
+DEBUG = False
+if DEBUG:
+    from pympler import asizeof
+
+def sizeof_fmt(num):
+    for unit in ('', 'K', 'M', 'G', 'T', 'P', 'E', 'Z'):
+        if abs(num) < 1024.0:
+            return f'{num:3.1f} {unit}B'
+        num /= 1024.0
+    return f'{num:.1f} YB'
+
+
+class DBDict:
+    """
+    A class that works like a dictionary, but only stores the data in memory
+    until it has maxCount keys. After that, it creates an sqlite database in
+    the current working directory and puts all the rest there.
+    No methods for sorting or deleting items are implemented. No removal of
+    no-longer-needed databases is performed.
+    """
+    def __init__(self, maxCount=1000000, dbName='tmp'):
+        self.d = {}
+        self.maxCount = maxCount
+        self.db = None
+        self.dbName = dbName + '.sqlite'
+        self.l = 0
+
+    def __len__(self):
+        return self.l
+
+    def __getitem__(self, item):
+        try:
+            return self.d[item]
+        except KeyError:
+            if self.db is None:
+                raise KeyError('')
+            return self.db[item]
+
+    def __setitem__(self, key, value):
+        if key in self.d:
+            self.d[key] = value
+            return
+        if self.db is not None and key in self.db:
+            self.db[key] = value
+            return
+        self.l += 1
+        if self.l <= self.maxCount:
+            self.d[key] = value
+            return
+        if self.db is None:
+            self.db = SqliteDict(self.dbName, outer_stack=False)
+        self.db[key] = value
+
+    def __iter__(self):
+        for k in self.d:
+            yield k
+        if self.db is not None:
+            for k in self.db:
+                yield k
+
+    def items(self):
+        for k, v in self.d.items():
+            yield k, v
+        if self.db is not None:
+            for k, v in self.db.items():
+                yield k, v
+
+    def __contains__(self, item):
+        if item in self.d:
+            return True
+        if self.db is not None and item in self.db:
+            return True
+        return False
 
 
 class Indexator:
@@ -26,6 +101,7 @@ class Indexator:
     database.
     """
     SETTINGS_DIR = '../conf'
+    MAX_MEM_DICT_SIZE = 100000
     rxBadFileName = re.compile('[^\\w_.-]*', flags=re.DOTALL)
 
     def __init__(self, overwrite=False):
@@ -97,8 +173,12 @@ class Indexator:
         self.shuffled_ids = [i for i in range(1, 1000000)]
         random.shuffle(self.shuffled_ids)
         self.shuffled_ids.insert(0, 0)    # id=0 is special and should not change
-        self.tmpWordIDs = [{} for i in range(len(self.languages))]    # word as JSON -> its integer ID
-        self.tmpLemmaIDs = [{} for i in range(len(self.languages))]   # lemma as string -> its integer ID
+        self.tmpWordIDs = [DBDict(maxCount=math.ceil(self.MAX_MEM_DICT_SIZE / len(self.languages)),
+                                  dbName='tmpWordID_' + str(i))
+                           for i in range(len(self.languages))]       # word as JSON -> its integer ID
+        self.tmpLemmaIDs = [DBDict(maxCount=math.ceil(self.MAX_MEM_DICT_SIZE / len(self.languages)),
+                                   dbName='tmpLemmaID_' + str(i))
+                            for i in range(len(self.languages))]      # lemma as string -> its integer ID
         # Apart from the two dictionaries above, words and lemmata
         # have string IDs starting with 'w' or 'l' followed by an integer
         self.word2lemma = [{} for i in range(len(self.languages))]    # word/lemma ID -> ID of its lemma (or -1, if none)
@@ -127,6 +207,9 @@ class Indexator:
 
         self.filenames = []   # List of tuples (filename, filesize)
         self.corpusSizeInBytes = 0
+        for fname in os.listdir('.'):
+            if fname.lower().endswith(('.sqlite', '.sqlite-journal')):
+                os.remove(fname)
 
     def delete_indices(self):
         """
@@ -982,6 +1065,11 @@ class Indexator:
               self.sID, 'sentences,',
               self.totalNumWords, 'words,',
               sum(len(self.wordFreqs[i]) for i in range(len(self.languages))), 'word types (different words).')
+        if DEBUG:
+            print('*** Memory usage: ***')
+            for k, v in sorted(self.__dict__.items(), key=lambda x: (-asizeof.asizeof(x[1]), x[0])):
+                if type(v) not in (bool, str, int, float, None):
+                    print(k + ': ' + sizeof_fmt(asizeof.asizeof(v)))
 
 
 if __name__ == '__main__':
