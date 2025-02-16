@@ -1,5 +1,4 @@
 import html
-
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
 from elasticsearch.helpers import bulk
@@ -19,6 +18,7 @@ from prepare_data import PrepareData
 from json_doc_reader import JSONDocReader
 from json2html import JSON2HTML
 from sqlitedict import SqliteDict
+import pickle
 
 DEBUG = False
 if DEBUG:
@@ -40,9 +40,10 @@ class DBDict:
     No methods for sorting or deleting items are implemented. No removal of
     no-longer-needed databases is performed.
     """
-    def __init__(self, maxCount=1000000, dbName='tmp'):
+    def __init__(self, maxCount=1000000, dbName='tmp', pickleKeys=False):
         self.d = {}
         self.maxCount = maxCount
+        self.pickleKeys = pickleKeys
         self.db = None
         self.dbName = dbName + '.sqlite'
         self.l = 0
@@ -51,6 +52,8 @@ class DBDict:
         return self.l
 
     def __getitem__(self, item):
+        if self.pickleKeys:
+            item = pickle.dumps(item)
         try:
             return self.d[item]
         except KeyError:
@@ -59,6 +62,8 @@ class DBDict:
             return self.db[item]
 
     def __setitem__(self, key, value):
+        if self.pickleKeys:
+            key = pickle.dumps(key)
         if key in self.d:
             self.d[key] = value
             return
@@ -75,19 +80,29 @@ class DBDict:
 
     def __iter__(self):
         for k in self.d:
+            if self.pickleKeys:
+                k = pickle.loads(k)
             yield k
         if self.db is not None:
             for k in self.db:
+                if self.pickleKeys:
+                    k = pickle.loads(k)
                 yield k
 
     def items(self):
         for k, v in self.d.items():
+            if self.pickleKeys:
+                k = pickle.loads(k)
             yield k, v
         if self.db is not None:
             for k, v in self.db.items():
+                if self.pickleKeys:
+                    k = pickle.loads(k)
                 yield k, v
 
     def __contains__(self, item):
+        if self.pickleKeys:
+            item = pickle.dumps(item)
         if item in self.d:
             return True
         if self.db is not None and item in self.db:
@@ -184,9 +199,15 @@ class Indexator:
         self.word2lemma = [{} for i in range(len(self.languages))]    # word/lemma ID -> ID of its lemma (or -1, if none)
         self.wordFreqs = [{} for i in range(len(self.languages))]     # word/lemma ID -> its frequency
         self.wordSFreqs = [{} for i in range(len(self.languages))]    # word/lemma ID -> its number of sentences
-        self.wordDocFreqs = [{} for i in range(len(self.languages))]  # (word/lemma ID, dID) -> word frequency in the document
-        # self.wordSIDs = [{} for i in range(len(self.languages))]      # word's ID -> set of sentence IDs
-        self.wordDIDs = [{} for i in range(len(self.languages))]      # word/lemma ID -> set of document IDs
+        self.wordDocFreqs = [DBDict(maxCount=math.ceil(self.MAX_MEM_DICT_SIZE / len(self.languages)),
+                                    dbName='wordDocFreqs_' + str(i), pickleKeys=True)
+                             for i in range(len(self.languages))]        # (word/lemma ID, dID) -> word frequency in the document
+        self.curWordDocFreqs = [{} for i in range(len(self.languages))]  # word/lemma ID -> word frequency in current document
+        self.wordDIDs = [DBDict(maxCount=math.ceil(self.MAX_MEM_DICT_SIZE / len(self.languages)),
+                                dbName='wordDIDs_' + str(i))
+                         for i in range(len(self.languages))]        # word/lemma ID -> set of document IDs
+        # self.wordSIDs = [{} for i in range(len(self.languages))]       # word's ID -> set of sentence IDs
+        # self.wordDIDs = [{} for i in range(len(self.languages))]         # word/lemma ID -> set of document IDs
         self.wfs = set()         # set of word forms (for sorting)
         self.lemmata = set()     # set of lemmata (for sorting)
         self.sID = 0          # current sentence ID for each language
@@ -382,13 +403,9 @@ class Indexator:
                     except KeyError:
                         self.wordSFreqs[langID][itemID] = 1
                 try:
-                    self.wordDIDs[langID][itemID].add(self.dID)
+                    self.curWordDocFreqs[langID][itemID] += 1
                 except KeyError:
-                    self.wordDIDs[langID][itemID] = {self.dID}
-                try:
-                    self.wordDocFreqs[langID][(itemID, self.dID)] += 1
-                except KeyError:
-                    self.wordDocFreqs[langID][(itemID, self.dID)] = 1
+                    self.curWordDocFreqs[langID][itemID] = 1
         if not bFullyAnalyzed:
             return 'incomplete'
         if not bUniquelyAnalyzed:
@@ -853,6 +870,7 @@ class Indexator:
         prevLast = False
         sentences = []
         paraIDs = [{} for i in range(len(self.languages))]
+        self.curWordDocFreqs = [{} for i in range(len(self.languages))]
         for s, bLast in self.iterSent.get_sentences(fname):
             sRandomID = self.randomize_id(self.sID)
             if 'lang' in s:
@@ -917,6 +935,13 @@ class Indexator:
             self.add_parallel_sids(sentences, paraIDs)
             for s in sentences:
                 yield s
+        for langID in range(len(self.languages)):
+            for itemID, freq in self.curWordDocFreqs[langID].items():
+                try:
+                    self.wordDIDs[langID][itemID].add(self.dID)
+                except KeyError:
+                    self.wordDIDs[langID][itemID] = {self.dID}
+                self.wordDocFreqs[langID][(itemID, self.dID)] = freq
 
     def index_sentences(self, fname):
         """

@@ -2,6 +2,7 @@ import json
 import html
 import copy
 import math
+import random
 import re
 import jinja2
 from flask import render_template
@@ -1262,7 +1263,7 @@ class SentenceViewer:
 
     def process_words_collected_from_sentences(self, hitsProcessedAll,
                                                sortOrder='freq', searchType='word',
-                                               startFrom=0, pageSize=10):
+                                               startFrom=0, pageSize=10, randomSeed=0):
         """
         Process all words collected from the sentences with a multi-word query. Modify
         hitsProcessedAll so that hitsProcessedAll['words'] stores data about all
@@ -1292,6 +1293,8 @@ class SentenceViewer:
                 hitsProcessedAll['words'].sort(key=lambda w: w['_source']['wf'])
             elif sortOrder == 'lemma' and searchType == 'word':
                 hitsProcessedAll['words'].sort(key=lambda w: w['_source']['lemma'])
+            elif sortOrder == 'random':
+                random.Random(randomSeed).shuffle(hitsProcessedAll['words'])
         processedWords = []
         for i in range(startFrom, min(len(hitsProcessedAll['words']), startFrom + pageSize)):
             word = hitsProcessedAll['words'][i]

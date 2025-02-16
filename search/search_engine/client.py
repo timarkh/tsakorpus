@@ -119,6 +119,7 @@ class SearchClient:
             indexName += '.' + str(partition - 1)
         else:
             indexName += '*'
+        # print(esQuery)
         if self.settings.query_timeout > 0:
             hits = self.es.search(index=indexName,
                                   body=esQuery, request_timeout=self.settings.query_timeout)
@@ -138,6 +139,7 @@ class SearchClient:
             indexName += '.' + str(partition - 1)
         else:
             indexName += '*'
+        # print(esQuery)
         if self.settings.query_timeout > 0:
             iterator = helpers.scan(self.es, index=indexName,
                                     query=esQuery, request_timeout=self.settings.query_timeout)

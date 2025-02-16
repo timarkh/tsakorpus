@@ -811,7 +811,8 @@ def find_words_json(searchType='word', page=0):
                                                                                 'page') - 1) * get_session_data(
                                                                                 'page_size'),
                                                                             pageSize=get_session_data('page_size'),
-                                                                            searchType=searchType)
+                                                                            searchType=searchType,
+                                                                            randomSeed=get_session_data('seed'))
             if len(cur_search_context().processed_words) <= 0:
                 # hitsProcessed were further changed by process_words_collected_from_sentences()
                 # We store them for later use: if the user clicks on "Download more",

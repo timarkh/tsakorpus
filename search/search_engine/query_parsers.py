@@ -1095,13 +1095,13 @@ class InterfaceQueryParser:
             negQuery = ('negq' + strWordNum in htmlQuery)
             if searchIndex == 'sentences':
                 curPrelimQuery[pathPfx + 'wtype'] = self.make_bool_query('word',
-                                                                         pathPfx + 'wtype', lang)
+                                                                         pathPfx + 'wtype', lang, keyword_query=True)
             elif searchIndex == 'words':
                 curWtype = 'word'
                 if 'wtype' + strWordNum in htmlQuery:
                     curWtype = htmlQuery['wtype' + strWordNum]
                 curPrelimQuery[pathPfx + 'wtype'] = self.make_bool_query(curWtype,
-                                                                         pathPfx + 'wtype', lang)
+                                                                         pathPfx + 'wtype', lang, keyword_query=True)
             for field in ['wf', 'w_id', 'l_id']:
                 if field + strWordNum in htmlQuery and len(htmlQuery[field + strWordNum]) > 0:
                     curPrelimQuery[pathPfx + field] = self.make_bool_query(htmlQuery[field + strWordNum],
