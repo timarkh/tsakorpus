@@ -9,6 +9,7 @@
 	overflow: auto;
 	white-space: nowrap;
 	min-height: 50vh;
+	max-height: calc(80vh - 250px);
 }
 
 .gloss_column {

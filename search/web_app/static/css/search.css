@@ -1450,16 +1450,23 @@ svg circle {
 }
 
 .tab-content {
+	float: none;
+}
+
+#fulltext_div {
+	margin-left: 15px;
 	float: left;
 }
 
-@media (min-height: 700px) and (orientation:landscape) {
+@media (min-height: 700px) and (min-width: 1080px) and (orientation:landscape) {
 	.centered {
 		position: fixed;
-		top: 50%;
+		top: calc(50% + 20px);
 		left: 50%;
 		transform: translate(-50%, -50%);
 		min-inline-size: fit-content;
+		min-width: 550px;
+		max-height: calc(100% - 100px);
 	}
 }
 
