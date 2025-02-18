@@ -103,6 +103,7 @@ class CorpusSettings:
         self.regex_simple_search = None
         self.search_remove_whitespaces = True
         self.detect_lemma_queries = False
+        self.word_fields_shortcuts = {}
 
         # Server configuration
         self.session_cookie_domain = None
@@ -166,6 +167,7 @@ class CorpusSettings:
         self.dict_dFields = {
             'lang_props.gramm_shortcuts',
             'lang_props.gloss_shortcuts',
+            'word_fields_shortcuts',
             'meta_analyzer_patterns'
         }
 

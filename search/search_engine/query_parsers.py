@@ -163,7 +163,17 @@ class InterfaceQueryParser:
         if field == 'ana.gloss_index' or field.endswith('.ana.gloss_index'):
             # return {'regexp': {field: text}}
             return {'regexp': {field: self.make_simple_gloss_query(text, lang)}}
-        elif keyword_query:
+        if rewrite:
+            fieldShort = field
+            if field.startswith('words.'):
+                fieldShort = field[6:]
+            if fieldShort.startswith('ana.'):
+                fieldShort = fieldShort[4:]
+            if (fieldShort in self.settings.word_fields_shortcuts
+                    and text in self.settings.word_fields_shortcuts[fieldShort]):
+                text = self.settings.word_fields_shortcuts[fieldShort][text]
+                return self.make_bool_query(text, field, lang, keyword_query=keyword_query, rewrite=False)
+        if keyword_query:
             return {'match': {field: text}}
         elif not (field == 'ana.gr' or field.endswith('.ana.gr')):
             if field in self.settings.viewable_meta:
