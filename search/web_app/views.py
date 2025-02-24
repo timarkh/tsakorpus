@@ -362,7 +362,8 @@ def search_sent(page=-1):
     #     return render_template('search_results/result_sentences.html', message='Request timeout.')
     cur_search_context().add_sent_to_session(hits)
     hitsProcessed = sentView.process_sent_json(hits,
-                                               translit=cur_search_context().translit)
+                                               translit=cur_search_context().translit,
+                                               curLocale=get_locale())
     # hitsProcessed['languages'] = settings.languages
     if len(settings.languages) > 1 and 'hits' in hits and 'hits' in hits['hits']:
         add_parallel(hits['hits']['hits'], hitsProcessed)
@@ -712,7 +713,8 @@ def get_glossed_sentence(n):
     bInterlinearAdded = False
     for langID, lang, langView in sorted(curLangs):
         if not bInterlinearAdded:
-            result[langID] = sentView.get_glossed_sentence(curSentData['languages'][langView]['source'], lang=lang)
+            result[langID] = sentView.get_glossed_sentence(curSentData['languages'][langView]['source'],
+                                                           lang=lang, curLocale=get_locale())
             bInterlinearAdded = True
         else:
             s = curSentData['languages'][langView]['source']

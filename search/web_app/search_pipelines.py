@@ -56,7 +56,8 @@ def get_parallel_for_one_sent_html(sSource, numHit):
                                              getHeader=False,
                                              lang=lang,
                                              langView=langView,
-                                             translit=curSearchContext.translit)['languages'][langView]['text']
+                                             translit=curSearchContext.translit,
+                                             curLocale=get_locale())['languages'][langView]['text']
         yield sentHTML, langView
 
 
@@ -870,7 +871,8 @@ def find_sent_context(curSentData, n):
                                                             numSent=lastSentNum,
                                                             getHeader=False,
                                                             lang=langReal,
-                                                            translit=cur_search_context().translit)
+                                                            translit=cur_search_context().translit,
+                                                            curLocale=get_locale())
                 curCxLang[side] = expandedContext['languages'][langReal]['text']
                 if settings.media:
                     sentView.relativize_src_alignment(expandedContext, curSentData['src_alignment_files'])

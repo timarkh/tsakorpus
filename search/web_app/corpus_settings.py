@@ -63,6 +63,7 @@ class CorpusSettings:
         # Interface options and tools
         self.interface_languages = ['en', 'ru']
         self.default_locale = 'en'
+        self.localize_metadata_values = False
         self.transliterations = None
         self.input_methods = None
         self.keyboards = {}

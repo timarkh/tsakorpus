@@ -99,3 +99,9 @@ Adjusting existing translations for your corpus
 You will probably have many corpus-specific messages, e.g. tooltips in tag selection popups or language names. You have to add them to the tab-delimited files in ``/search/web_app/translations/`` (see above). Unless you want to change some default interface messages such as "Search sentences" or "Show statistics", you will not have to edit ``main.txt`` and ``header.txt`` in language folders.
 
 A more user-friendly way of configuring translations for your corpus is running the ``config`` page (see :doc:`configuration </configuration>`). When you save the configuration, language folders with all necessary keys will be generatedin ``/USER_CONFIG/translations``. Edit them and replace files in ``/search/web_app/translations/`` with them in your :doc:`fork </forks>`.
+
+
+Localized metadata values
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you have multilingual document-level metadata (such as titles) and want to only display values in the current interface language, you can create separate metadata fields for different languages (e.g. ``title_en`` and ``title_fr``) and set ``localize_metadata_values`` in ``corpus.json`` (see :doc:`configuration`).

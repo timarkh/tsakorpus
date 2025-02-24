@@ -30,7 +30,7 @@ def initialize_session():
                                           'seed': int(datetime.now().timestamp()),
                                           'excluded_doc_ids': set(),
                                           'progress': 100,
-                                          'search_context': SearchContext()}
+                                          'search_context': SearchContext(curLocale=settings.default_locale)}
 
 
 def get_session_data(fieldName):
@@ -81,6 +81,8 @@ def set_session_data(fieldName, value):
     if session['session_id'] not in sessionData:
         sessionData[session['session_id']] = {}
     sessionData[session['session_id']][fieldName] = value
+    if fieldName == 'locale':
+        sessionData[session['session_id']]['search_context'].locale = value
 
 
 def in_session(fieldName):

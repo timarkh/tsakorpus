@@ -6,6 +6,7 @@ import random
 import re
 import jinja2
 from flask import render_template
+# from .session_management import get_locale
 try:
     from .transliteration import *
 except ImportError:
@@ -360,7 +361,7 @@ class SentenceViewer:
                     offEnds[i - indexSubtr] = {'smatch'}
                 indexSubtr += 5
 
-    def process_sentence_header(self, sentSource, format='html'):
+    def process_sentence_header(self, sentSource, format='html', curLocale=''):
         """
         Retrieve the metadata of the document the sentence
         belongs to. Return a string with this data that can
@@ -372,6 +373,7 @@ class SentenceViewer:
         authour or title.
         """
         docID = sentSource['doc_id']
+        curLocale = '_' + curLocale
         meta = self.sc.get_doc_by_id(docID)
         if (meta is None
                 or 'hits' not in meta
@@ -396,6 +398,15 @@ class SentenceViewer:
             dateDisplay = str(meta['year_from'])
             if meta['year_to'] != meta['year_from']:
                 dateDisplay += '–' + str(meta['year_to'])
+
+        # Localize values if needed, e.g. store title_en as just title
+        # if curLocale == '_en'
+        if self.settings.localize_metadata_values and len(curLocale) > 1:
+            for k in [_ for _ in meta.keys()]:
+                if k.endswith(curLocale):
+                    meta[k[:-len(curLocale)]] = meta[k]
+                    del meta[k]
+
         metaHtml = render_template('modals/metadata_table.html',
                                    data={'meta': meta},
                                    viewable_meta=self.settings.viewable_meta)
@@ -588,13 +599,13 @@ class SentenceViewer:
             alignment['start'] = str(float(alignment['start']) + difference)
             alignment['end'] = str(float(alignment['end']) + difference)
 
-    def process_sentence_csv(self, sJSON, lang='', translit=None):
+    def process_sentence_csv(self, sJSON, lang='', translit=None, curLocale=''):
         """
         Process one sentence taken from response['hits']['hits'].
         Return a CSV string for this sentence.
         """
         sDict = self.process_sentence(sJSON, numSent=0, getHeader=False, format='csv',
-                                      lang=lang, translit=translit)
+                                      lang=lang, translit=translit, curLocale=curLocale)
         if ('languages' not in sDict
                 or lang not in sDict['languages']
                 or 'text' not in sDict['languages'][lang]
@@ -654,7 +665,8 @@ class SentenceViewer:
             metaSpan += '</span>'
         return metaSpan
 
-    def process_sentence(self, s, numSent=1, getHeader=False, lang='', langView='', translit=None, format='html'):
+    def process_sentence(self, s, numSent=1, getHeader=False, lang='', langView='',
+                         translit=None, format='html', curLocale=''):
         """
         Process one sentence taken from response['hits']['hits'].
         If getHeader is True, retrieve the metadata from the database.
@@ -674,7 +686,7 @@ class SentenceViewer:
 
         header = {}
         if getHeader:
-            header = self.process_sentence_header(sSource, format)
+            header = self.process_sentence_header(sSource, format, curLocale=curLocale)
         if 'highlight' in s and 'text' in s['highlight']:
             highlightedText = s['highlight']['text']
             if type(highlightedText) == list:
@@ -795,7 +807,8 @@ class SentenceViewer:
                 'toggled_on': relationsSatisfied,
                 'src_alignment': fragmentInfo}
 
-    def get_glossed_sentence(self, s, getHeader=True, lang='', glossOnly=False, translit=None):
+    def get_glossed_sentence(self, s, getHeader=True, lang='', glossOnly=False,
+                             translit=None, curLocale=''):
         """
         Process one sentence taken from response['hits']['hits'].
         If getHeader is True, retrieve the metadata from the database.
@@ -827,7 +840,7 @@ class SentenceViewer:
 
         header = ''
         if getHeader:
-            header = ' [' + self.process_sentence_header(s, 'csv')[0] + ']'
+            header = ' [' + self.process_sentence_header(s, 'csv', curLocale=curLocale)[0] + ']'
         if 'words' not in s:
             return {s['text'] + header}
         text = self.transliterate_baseline(s['text'].strip(' \t\n').replace('\n', '\\n '),
@@ -1427,7 +1440,7 @@ class SentenceViewer:
         lang = self.settings.languages[langID]
         return langID, lang
 
-    def process_sent_json(self, response, translit=None):
+    def process_sent_json(self, response, translit=None, curLocale=''):
         result = {
             'n_occurrences': 0,
             'n_sentences': 0,
@@ -1469,7 +1482,8 @@ class SentenceViewer:
                                                getHeader=True,
                                                lang=lang,
                                                langView=langView,
-                                               translit=translit)
+                                               translit=translit,
+                                               curLocale=curLocale)
             if 'src_alignment' in curContext:
                 srcAlignmentInfo.update(curContext['src_alignment'])
             result['contexts'].append(curContext)
