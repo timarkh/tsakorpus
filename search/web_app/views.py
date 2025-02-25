@@ -220,11 +220,16 @@ def get_doc_stats(metaField, lang='all'):
         return jsonify({})
     query = copy_request_args()
     change_display_options(query)
-    docIDs = subcorpus_ids(query)
+    docIDs = subcorpus_ids(query, curLocale=get_locale())
     langID = -1
     if lang != 'all' and lang in settings.languages:
         langID = settings.languages.index(lang)
-    buckets = get_buckets_for_doc_metafield(metaField, langID=langID, docIDs=docIDs)
+    buckets = get_buckets_for_doc_metafield(metaField, langID=langID,
+                                            docIDs=docIDs, curLocale=get_locale())
+    if metaField in settings.localized_metadata_values and len(buckets) <= 0:
+        # Maybe there was no localized version of this field for this interface language
+        buckets = get_buckets_for_doc_metafield(metaField, langID=langID,
+                                                docIDs=docIDs, curLocale='')
     return jsonify(buckets)
 
 
@@ -345,7 +350,8 @@ def get_word_stats(searchType, metaField):
         searchIndex = 'sentences'
 
     results = get_word_buckets(searchType, metaField, nWords, htmlQuery,
-                               queryWordConstraints, langID, searchIndex)
+                               queryWordConstraints, langID, searchIndex,
+                               curLocale=get_locale())
     return jsonify(results)
 
 
@@ -443,11 +449,24 @@ def search_doc():
     query = copy_request_args()
     log_query('doc', query)
     change_display_options(query)
-    query = sc.qp.subcorpus_query(query,
-                                  sortOrder=get_session_data('sort'),
-                                  query_size=settings.max_docs_retrieve,
-                                  primaryLanguages=settings.primary_languages)
-    hits = sc.get_docs(query)
+    esQuery = sc.qp.subcorpus_query(query,
+                                    sortOrder=get_session_data('sort'),
+                                    query_size=settings.max_docs_retrieve,
+                                    primaryLanguages=settings.primary_languages,
+                                    curLocale=get_locale())
+    hits = sc.get_docs(esQuery)
+    if (len(settings.localized_metadata_values) > 0
+            and 'hits' not in hits
+            or 'total' not in hits['hits']
+            or hits['hits']['total']['value'] <= 0):
+        # Maybe some metadata fields were localized, but there are
+        # no localized fields for this interface language
+        esQuery = sc.qp.subcorpus_query(query,
+                                        sortOrder=get_session_data('sort'),
+                                        query_size=settings.max_docs_retrieve,
+                                        primaryLanguages=settings.primary_languages,
+                                        curLocale='')
+        hits = sc.get_docs(esQuery)
     hitsProcessed = sentView.process_docs_json(hits,
                                                exclude=get_session_data('excluded_doc_ids'),
                                                corpusSize=settings.corpus_size,
@@ -466,7 +485,7 @@ def autocomplete_meta(metafield):
     query = request.args['query']
     if metafield not in settings.viewable_meta:
         return jsonify({'query': query, 'suggestions': []})
-    suggests = suggest_metafield(metafield, query)
+    suggests = suggest_metafield(metafield, query, curLocale=get_locale())
     return jsonify({'query': query,
                     'suggestions': suggests})
 
@@ -539,8 +558,12 @@ def send_text_html(doc_fname):
             'rows': [],
             'page': 1
         }
+    viewableMeta = copy.deepcopy(settings.viewable_meta)
+    viewableMeta += [vm + '_' + il
+                     for vm in settings.localized_metadata_values
+                     for il in settings.interface_languages]
     data['meta'] = {k: data['meta'][k]
-                    for k in data['meta'] if k in settings.viewable_meta}
+                    for k in data['meta'] if k in viewableMeta}
     page = request.args.get('page', 1)
     try:
         page = int(page) - 1
@@ -562,7 +585,7 @@ def send_text_html(doc_fname):
                            citation=settings.citation,
                            start_page_url=settings.start_page_url,
                            locales=settings.interface_languages,
-                           viewable_meta=settings.viewable_meta,
+                           viewable_meta=viewableMeta,
                            data=data,
                            max_page_number=maxPage + 1)
 

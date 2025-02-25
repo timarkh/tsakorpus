@@ -104,4 +104,4 @@ A more user-friendly way of configuring translations for your corpus is running 
 Localized metadata values
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you have multilingual document-level metadata (such as titles) and want to only display values in the current interface language, you can create separate metadata fields for different languages (e.g. ``title_en`` and ``title_fr``) and set ``localize_metadata_values`` in ``corpus.json`` (see :doc:`configuration`).
+If you have multilingual document-level metadata (such as titles) and want to only display values in the current interface language, you can create separate metadata fields for different languages (e.g. ``title_en`` and ``title_fr``) and list them in ``localized_metadata_values`` in ``corpus.json`` (see :doc:`configuration`).

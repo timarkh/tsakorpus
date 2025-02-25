@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import re
@@ -275,6 +276,14 @@ class PrepareData:
                     'analyzer': 'lowercase_normalizer'
                 }
                 m[meta + '_kw'] = {'type': 'keyword'}
+            if ('localized_metadata_values' in self.settings
+                    and 'interface_languages' in self.settings
+                    and meta in self.settings['localized_metadata_values']):
+                for lang in self.settings['interface_languages']:
+                    if len(lang) > 0:
+                        m[meta + '_' + lang] = copy.deepcopy(m[meta])
+                        if meta + '_kw' in m:
+                            m[meta + '_' + lang + '_kw'] = copy.deepcopy(m[meta + '_kw'])
         mapping = {
             'mappings': {
                 'properties': m

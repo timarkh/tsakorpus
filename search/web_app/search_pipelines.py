@@ -87,7 +87,7 @@ def add_parallel(hits, htmlResponse):
         htmlResponse['languages'] += [l for l in sorted(addLanguages)]
 
 
-def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=300):
+def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=300, curLocale=''):
     """
     Group all documents into buckets, each corresponding to one
     of the unique values for the fieldName metafield. Consider
@@ -96,8 +96,13 @@ def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=
     Return a dictionary with the values and corresponding document
     count.
     """
+    bLocalized = False
+    fieldNameNotLocalized = fieldName
     if fieldName not in settings.search_meta['stat_options'] or langID >= len(settings.languages) > 1:
         return {}
+    if fieldName in settings.localized_metadata_values and len(curLocale) > 0:
+        fieldName += '_' + curLocale
+        bLocalized = True
     innerQuery = {'match_all': {}}
     if docIDs is not None:
         innerQuery = {'ids': {'values': list(docIDs)}}
@@ -136,8 +141,9 @@ def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=
         }
     }
     hits = sc.get_docs(esQuery)
-    if 'aggregations' not in hits or 'metafield' not in hits['aggregations']:
-        return {}
+    if ('aggregations' not in hits or 'metafield' not in hits['aggregations']
+            or len(hits['aggregations']['metafield']['buckets']) <= 0):
+        return []
     buckets = []
     for bucket in hits['aggregations']['metafield']['buckets']:
         bucketListItem = {'name': bucket['key'],
@@ -159,17 +165,22 @@ def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=
     return buckets
 
 
-def suggest_metafield(fieldName, query):
+def suggest_metafield(fieldName, query, curLocale=''):
     """
     Return autocomplete suggestions for a metafield based on a partial
     query typed by the user.
     """
+    bLocalized = False
+    fieldNameNotLocalized = fieldName
     if fieldName not in settings.search_meta['stat_options']:
         return []
     if len(query.replace('*', '')) < 2:
         return []
     if '*' not in query:
         query = '*' + query + '*'
+    if fieldName in settings.localized_metadata_values and len(curLocale) > 0:
+        fieldName += '_' + curLocale
+        bLocalized = True
     if not (fieldName.startswith('year') or fieldName in settings.integer_meta_fields):
         queryFieldName = fieldName + '_kw'
     else:
@@ -201,6 +212,9 @@ def suggest_metafield(fieldName, query):
                           'data': bucket['doc_count']}
         buckets.append(bucketListItem)
     buckets.sort(key=lambda b: (-b['data'], b['value']))
+    if bLocalized and len(buckets) <= 0:
+        # Maybe there was no localized version of this field for this interface language
+        return suggest_metafield(fieldNameNotLocalized, query, curLocale='')
     if len(buckets) > settings.max_suggestions:
         buckets = buckets[:settings.max_suggestions]
     return buckets
@@ -356,25 +370,40 @@ def get_buckets_for_sent_metafield(fieldName, langID=-1, docIDs=None, maxBuckets
 
 
 def get_word_buckets(searchType, metaField, nWords, htmlQuery,
-                     queryWordConstraints, langID, searchIndex):
+                     queryWordConstraints, langID, searchIndex,
+                     curLocale=''):
     """
     Perform an actual DB search for a request about the distribution
     of a word/context over the values of a document-level or a
     sentence-level metafield.
     """
+    bLocalized = False
     bSentenceLevel = (metaField in settings.sentence_meta)
     if bSentenceLevel:
         queryFieldName = 'sent_meta_' + metaField + '_kw1'
     elif metaField not in settings.line_plot_meta:
-        queryFieldName = metaField + '_kw'
+        queryFieldName = metaField
+        if metaField in settings.localized_metadata_values and len(curLocale) > 0:
+            queryFieldName = metaField + '_' + curLocale
+            bLocalized = True
+        queryFieldName += '_kw'
     else:
         queryFieldName = metaField
-    docIDs = subcorpus_ids(htmlQuery)
+        if metaField in settings.localized_metadata_values and len(curLocale) > 0:
+            queryFieldName = metaField + '_' + curLocale
+            bLocalized = True
+    docIDs = subcorpus_ids(htmlQuery, curLocale=curLocale)
 
     if bSentenceLevel:
         buckets = get_buckets_for_sent_metafield(metaField, langID=langID, docIDs=docIDs)
     else:
-        buckets = get_buckets_for_doc_metafield(metaField, langID=langID, docIDs=docIDs)
+        buckets = get_buckets_for_doc_metafield(metaField, langID=langID,
+                                                docIDs=docIDs, curLocale=curLocale)
+        if bLocalized and len(buckets) <= 0:
+            # Maybe there was no localized version of this field for this interface language
+            return get_word_buckets(searchType, metaField, nWords, htmlQuery,
+                                    queryWordConstraints, langID, searchIndex,
+                                    curLocale='')
     results = []
     if searchType == 'context':
         nWordsProcess = 1
@@ -401,7 +430,7 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
             # elif type(curHtmlQuery[metaField]) == str:
             #     curHtmlQuery[metaField] += ',' + bucket['name']
             if not bSentenceLevel:
-                curHtmlQuery['doc_ids'] = subcorpus_ids(curHtmlQuery)
+                curHtmlQuery['doc_ids'] = subcorpus_ids(curHtmlQuery, curLocale=get_locale())
             query = sc.qp.html2es(curHtmlQuery,
                                   searchOutput=searchIndex,
                                   groupBy='word',
@@ -451,17 +480,23 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
                 newBucket['n_words_conf_int'] = [0.0, 0.0]
             curWordBuckets.append(newBucket)
         results.append(curWordBuckets)
+        # if bLocalized and len(curWordBuckets) <= 0:
+        #     # Maybe there was no localized version of this field for this interface language
+        #     return get_word_buckets(searchType, metaField, nWords, htmlQuery,
+        #                             queryWordConstraints, langID, searchIndex,
+        #                             curLocale='')
     return results
 
 
-def subcorpus_ids(htmlQuery):
+def subcorpus_ids(htmlQuery, curLocale=''):
     """
     Return IDs of the documents specified by the subcorpus selection
     fields in htmlQuery.
     """
     subcorpusQuery = sc.qp.subcorpus_query(htmlQuery, sortOrder='',
                                            exclude=get_session_data('excluded_doc_ids'),
-                                           primaryLanguages=settings.primary_languages)
+                                           primaryLanguages=settings.primary_languages,
+                                           curLocale=curLocale)
     if subcorpusQuery is None or ('query' in subcorpusQuery and subcorpusQuery['query'] == {'match_all': {}}):
         return None
     iterator = sc.get_all_docs(subcorpusQuery)
@@ -563,7 +598,7 @@ def find_sentences_json(page=0):
 
     docIDs = None
     if 'doc_ids' not in query and 'sent_ids' not in query:
-        docIDs = subcorpus_ids(query)
+        docIDs = subcorpus_ids(query, curLocale=get_locale())
         if docIDs is not None:
             query['doc_ids'] = docIDs
             partition = 0
@@ -700,7 +735,7 @@ def find_words_json(searchType='word', page=0):
         query = get_session_data('last_query')
     set_session_data('page', page)
     if 'doc_ids' not in query:
-        docIDs = subcorpus_ids(query)
+        docIDs = subcorpus_ids(query, curLocale=get_locale())
         if docIDs is not None:
             query['doc_ids'] = docIDs
     else:

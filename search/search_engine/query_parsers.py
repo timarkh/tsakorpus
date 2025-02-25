@@ -890,7 +890,8 @@ class InterfaceQueryParser:
 
     def subcorpus_query(self, htmlQuery, query_from=0, query_size=10,
                         sortOrder='random', randomSeed=None,
-                        exclude=None, primaryLanguages=None):
+                        exclude=None, primaryLanguages=None,
+                        curLocale=''):
         """
         Make an ES query to the docs index based on subcorpus selection
         fields in htmlQuery.
@@ -899,10 +900,14 @@ class InterfaceQueryParser:
         rangeQueriesFrom = {}
         rangeQueriesTo = {}
         for field in self.docMetaFields:
+            fieldNotLocalized = field
             if field in ('year_from', 'year_to'):
                 continue
             elif field in htmlQuery and (type(htmlQuery[field]) == int or len(htmlQuery[field]) > 0):
-                queryParts.append(self.make_bool_query(htmlQuery[field], field, 'all', keyword_query=True))
+                fieldNotLocalized = field
+                if len(curLocale) > 0 and field in self.settings.localized_metadata_values:
+                    field += '_' + curLocale
+                queryParts.append(self.make_bool_query(htmlQuery[fieldNotLocalized], field, 'all', keyword_query=True))
             elif (field + '__from' in htmlQuery
                   and (type(htmlQuery[field + '__from']) == int
                        or len(htmlQuery[field + '__from']) > 0)):
