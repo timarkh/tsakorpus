@@ -401,11 +401,11 @@ class SentenceViewer:
 
         # Localize values if needed, e.g. store title_en as just title
         # if curLocale == '_en'
-        if len(self.settings.localized_metadata_values) > 0 and len(curLocale) > 1:
+        if len(self.settings.localized_meta_values) > 0 and len(curLocale) > 1:
             for k in [_ for _ in meta.keys()]:
                 if k.endswith(curLocale):
                     kGeneric = k[:-len(curLocale)]
-                    if kGeneric in self.settings.localized_metadata_values:
+                    if kGeneric in self.settings.localized_meta_values:
                         meta[kGeneric] = meta[k]
                         del meta[k]
 

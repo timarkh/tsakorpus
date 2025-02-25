@@ -63,7 +63,7 @@ class CorpusSettings:
         # Interface options and tools
         self.interface_languages = ['en', 'ru']
         self.default_locale = 'en'
-        self.localized_metadata_values = []
+        self.localized_meta_values = []
         self.transliterations = None
         self.input_methods = None
         self.keyboards = {}
@@ -129,7 +129,7 @@ class CorpusSettings:
         self.lsFields = {
             'sentence_meta',
             'viewable_meta',
-            'localized_metadata_values',
+            'localized_meta_values',
             'case_sensitive_meta_fields',
             'word_fields',
             'interface_languages',

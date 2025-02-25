@@ -100,7 +100,7 @@ def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=
     fieldNameNotLocalized = fieldName
     if fieldName not in settings.search_meta['stat_options'] or langID >= len(settings.languages) > 1:
         return {}
-    if fieldName in settings.localized_metadata_values and len(curLocale) > 0:
+    if fieldName in settings.localized_meta_values and len(curLocale) > 0:
         fieldName += '_' + curLocale
         bLocalized = True
     innerQuery = {'match_all': {}}
@@ -178,7 +178,7 @@ def suggest_metafield(fieldName, query, curLocale=''):
         return []
     if '*' not in query:
         query = '*' + query + '*'
-    if fieldName in settings.localized_metadata_values and len(curLocale) > 0:
+    if fieldName in settings.localized_meta_values and len(curLocale) > 0:
         fieldName += '_' + curLocale
         bLocalized = True
     if not (fieldName.startswith('year') or fieldName in settings.integer_meta_fields):
@@ -383,13 +383,13 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
         queryFieldName = 'sent_meta_' + metaField + '_kw1'
     elif metaField not in settings.line_plot_meta:
         queryFieldName = metaField
-        if metaField in settings.localized_metadata_values and len(curLocale) > 0:
+        if metaField in settings.localized_meta_values and len(curLocale) > 0:
             queryFieldName = metaField + '_' + curLocale
             bLocalized = True
         queryFieldName += '_kw'
     else:
         queryFieldName = metaField
-        if metaField in settings.localized_metadata_values and len(curLocale) > 0:
+        if metaField in settings.localized_meta_values and len(curLocale) > 0:
             queryFieldName = metaField + '_' + curLocale
             bLocalized = True
     docIDs = subcorpus_ids(htmlQuery, curLocale=curLocale)

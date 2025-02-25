@@ -226,7 +226,7 @@ def get_doc_stats(metaField, lang='all'):
         langID = settings.languages.index(lang)
     buckets = get_buckets_for_doc_metafield(metaField, langID=langID,
                                             docIDs=docIDs, curLocale=get_locale())
-    if metaField in settings.localized_metadata_values and len(buckets) <= 0:
+    if metaField in settings.localized_meta_values and len(buckets) <= 0:
         # Maybe there was no localized version of this field for this interface language
         buckets = get_buckets_for_doc_metafield(metaField, langID=langID,
                                                 docIDs=docIDs, curLocale='')
@@ -455,7 +455,7 @@ def search_doc():
                                     primaryLanguages=settings.primary_languages,
                                     curLocale=get_locale())
     hits = sc.get_docs(esQuery)
-    if (len(settings.localized_metadata_values) > 0
+    if (len(settings.localized_meta_values) > 0
             and 'hits' not in hits
             or 'total' not in hits['hits']
             or hits['hits']['total']['value'] <= 0):
@@ -560,7 +560,7 @@ def send_text_html(doc_fname):
         }
     viewableMeta = copy.deepcopy(settings.viewable_meta)
     viewableMeta += [vm + '_' + il
-                     for vm in settings.localized_metadata_values
+                     for vm in settings.localized_meta_values
                      for il in settings.interface_languages]
     data['meta'] = {k: data['meta'][k]
                     for k in data['meta'] if k in viewableMeta}

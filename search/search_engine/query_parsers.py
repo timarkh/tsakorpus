@@ -905,7 +905,7 @@ class InterfaceQueryParser:
                 continue
             elif field in htmlQuery and (type(htmlQuery[field]) == int or len(htmlQuery[field]) > 0):
                 fieldNotLocalized = field
-                if len(curLocale) > 0 and field in self.settings.localized_metadata_values:
+                if len(curLocale) > 0 and field in self.settings.localized_meta_values:
                     field += '_' + curLocale
                 queryParts.append(self.make_bool_query(htmlQuery[fieldNotLocalized], field, 'all', keyword_query=True))
             elif (field + '__from' in htmlQuery
