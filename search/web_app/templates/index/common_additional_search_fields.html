@@ -20,7 +20,7 @@
 		</select><br>
 		{% else %}
 		<label for="sent_meta_{{ field }}1">{{ _('metafield_' + field) | capitalize }}:</label>
-		<input type="text" class="search_input" name="sent_meta_{{ field }}1" id="sent_meta_{{ field }}1" {% if "sent_meta_" + field in default_values %} value='{{ default_values["sent_meta_" + field] }}' {% endif %}{% if multiple_choice_fields and "sent_meta_" + field in multiple_choice_fields %}<span class="gram_selector_link bi bi-table" data-field="sent_meta_{{ field }}" data-nword="1"></span>{% endif %}><br>
+		<input type="text" class="search_input" name="sent_meta_{{ field }}1" id="sent_meta_{{ field }}1" {% if "sent_meta_" + field in default_values %} value='{{ default_values["sent_meta_" + field] }}' {% endif %}>{% if multiple_choice_fields and "sent_meta_" + field in multiple_choice_fields %}<span class="gram_selector_link bi bi-table" data-field="sent_meta_{{ field }}" data-nword="1"></span>{% endif %}<br>
 		{% endif %}
 	{% endfor %}
 {% endif %}
