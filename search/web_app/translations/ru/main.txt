@@ -32,7 +32,7 @@ msgstr "до "
 
 #: templates/index.html:26
 msgid "Select combinations of tags"
-msgstr "Выбор грамматических тэгов"
+msgstr "Выбор тэгов"
 
 #: templates/index.html:27
 msgid "Select glosses"
