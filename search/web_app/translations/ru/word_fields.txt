@@ -10,3 +10,4 @@ trans_fr2	перевод 2 (FR)
 logogram	логограмма
 transcription	транскрипция
 segment	сегмент
+ps	часть речи (синтаксис)

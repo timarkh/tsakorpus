@@ -21,6 +21,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
     rxFloat = re.compile('^[0-9]+(?:\.[0-9]+)?$')
     rxTrailingZeroes = re.compile('^0+(?=[1-9])|\.0+$')
     rxNonDigit = re.compile('[^0-9]+')
+    rxMCPOS = re.compile('^([^%#>:\\[\\] ]+)(?:\\.\\[[^\\[\\]]*\\])?$')
     mediaExtensions = {'.wav', '.mp3', '.mp4', '.avi'}
     sentenceEndPunct = {'declarative': '.', 'interrogative': '?'}
     namespaces = {'tei': 'http://www.tei-c.org/ns/1.0',
@@ -112,7 +113,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             return []
         return self.wordIDseq[self.wordIDseq.index(idFrom):self.wordIDseq.index(idTo) + 1]
 
-    def add_pos_ana(self, ana, pos):
+    def add_pos_ana(self, ana, pos, field='gr.pos'):
         """
         Add the part of speech tag to single JSON analysis, taking into
         account the correspondences between source file tags and the target
@@ -120,12 +121,12 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         """
         if pos in self.tp.parser.posRules:
             pos = self.tp.parser.posRules[pos]
-        if 'gr.pos' not in ana:
-            ana['gr.pos'] = pos
-        elif type(ana['gr.pos']) == str and ana['gr.pos'] != pos:
-            ana['gr.pos'] = [ana['gr.pos'], pos]
-        elif pos not in ana['gr.pos']:
-            ana['gr.pos'].append(pos)
+        if field not in ana:
+            ana[field] = pos
+        elif type(ana[field]) == str and ana[field] != pos:
+            ana[field] = [ana[field], pos]
+        elif pos not in ana[field]:
+            ana[field].append(pos)
 
     def collect_annotation(self, annoTree):
         """
@@ -260,7 +261,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         """
         Add the information from the annotation tier events for the
         current word to the analysis. For each tier, the name of the
-        tier is the used as the name of the field, and the text of
+        tier is used as the name of the field, and the text of
         the event is used as the value.
         """
         for tierName in curWordAnno:
@@ -311,9 +312,18 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
             if 'gg' in curWordAnno:
                 ana['gloss_de'] = curWordAnno['gg']
                 self.tp.parser.process_gloss_in_ana(ana, 'de')
+            if 'mc' in curWordAnno:
+                pos = set()
+                for mcPart in curWordAnno['mc'].split('-'):
+                    m = self.rxMCPOS.search(mcPart)
+                    if m is not None:
+                        pos.add(m.group(1))
+                if len(pos) == 1:
+                    self.add_pos_ana(ana, [p for p in pos][0])
             if 'ps' in curWordAnno:
-                self.add_pos_ana(ana, curWordAnno['ps'])
-
+                if 'gr.pos' not in ana:
+                    self.add_pos_ana(ana, curWordAnno['ps'])
+                self.add_pos_ana(ana, curWordAnno['ps'], field='ps')
             self.tp.parser.process_gloss_in_ana(ana)    # "Surface" representations (mb)
             if 'gloss_index' in ana:
                 stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index'],
