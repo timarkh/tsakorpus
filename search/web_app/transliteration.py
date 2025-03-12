@@ -2,7 +2,7 @@ import re
 from transliterators.adyghe import adyghe_translit_ipa, adyghe_input_normal
 from transliterators.khinalug import khinalug_input_normal
 from transliterators.tajik import tajik_input_normal
-from transliterators.beserman import beserman_translit_cyrillic, beserman_translit_upa
+from transliterators.beserman import beserman_translit_cyrillic, beserman_translit_cyrillictranscr, beserman_translit_upa, beserman_translit_ipa
 from transliterators.udmurt import udmurt_translit_upa
 from transliterators.erzya import erzya_translit_upa
 from transliterators.albanian import albanian_input_normal, albanian_input_simplified
