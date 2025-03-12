@@ -138,46 +138,44 @@ class Txt2JSON:
                     curMetaDict[fieldName] = metaValues[i].strip()
         fMeta.close()
 
-    def add_coma_key_to_meta(self, dictMeta, el):
+    def add_coma_key_to_meta(self, dictMeta, el, fname):
         """
         Add metadata for a single key-value pair represented
         as an XML element taken from the COMA file.
         """
         if 'Name' not in el.attrib or 'coma_meta_conversion' not in self.corpusSettings:
             return
-        if re.search('\\b[Dd]ate +of +recording\\b', el.attrib['Name']) is not None:
-            # Ad-hoc for the date of creation
-            # Ignore dates in round brackets
-            truncatedText = el.text
-            if "(" in el.text:
-                truncatedText = el.text[0:el.text.find("(")]
-            # For approximate recoring dates (e.g., '1979 to 1983', '1979-1983'), use both
-            # Dates such as '1880s to 1890s' are also handled
-            m = re.findall(r'(?:^|\s|-)([0-9]{4}s{0,1})', truncatedText)
-            if len(m) > 0:
-                dictMeta['year_from'] = m[0][:-1] if m[0].endswith("s") else m[0]
-                if len(m) == 1:
-                    dictMeta['year_to'] = m[0][:-1] if m[0].endswith("s") else m[0]
-                else:
-                    if int(m[1].rstrip('s')) >= int(m[0].rstrip('s')):
-                        dictMeta['year_to'] = f'{m[1][:-2]}9' if m[1].endswith("s") else m[1]
-                    else:
-                        # Inverted order of dates ('2000s or 1990s')
-                        dictMeta['year_from'] = m[1][:-1] if m[1].endswith("s") else m[1]
-                        dictMeta['year_to'] = f'{m[0][:-2]}9' if m[0].endswith("s") else m[0]
-            else:
-                # e.g., 197X
-                m = re.search('^([12][0-9])([0-9X])X\\b', truncatedText)
-                if m is not None:
-                    if m.group(2) in ('X', 'x', 'Х', 'х'):
-                        dictMeta['year_from'] = int(m.group(1)) * 100
-                        dictMeta['year_to'] = dictMeta['year_from'] + 99
-                    else:
-                        dictMeta['year_from'] = int(m.group(1)) * 100 + int(m.group(2)) * 10
-                        dictMeta['year_to'] = dictMeta['year_from'] + 9
-                    dictMeta['year_from'] = str(dictMeta['year_from'])
-                    dictMeta['year_to'] = str(dictMeta['year_to'])
+        # Ad hoc for Enets
+        specialFiles = dict()
+        with open("from-to-dates.csv", "r") as datesfile:
+            for line in datesfile.readlines():
+                csvValues = line[:-1].split("	")
+                specialFiles[csvValues[0]] = {"year_from": csvValues[2], "year_to": csvValues[3]}
 
+        if re.search('\\b[Dd]ate +of +recording\\b', el.attrib['Name']) is not None:
+            if fname in specialFiles.keys():
+                dictMeta['year_from'] = specialFiles[fname]['year_from']
+                dictMeta['year_to'] = specialFiles[fname]['year_to']
+            else:
+                # Ad-hoc for the date of creation
+                # Ignore dates in round brackets
+                truncatedText = el.text
+                if "(" in el.text:
+                    truncatedText = el.text[0:el.text.find("(")]
+                # For uncertain recoring dates (e.g., "1979 to 1983"), use both
+                # Dates such as '1880s to 1890s' are also handled
+                m = re.findall(r'(?:^|\s)([0-9]{4}s{0,1})', truncatedText)
+                if len(m) > 0:
+                    dictMeta['year_from'] = m[0][:-1] if m[0].endswith("s") else m[0]
+                    if len(m) == 1:
+                        dictMeta['year_to'] = m[0][:-1] if m[0].endswith("s") else m[0]
+                    else:
+                        if int(m[1].rstrip('s')) >= int(m[0].rstrip('s')):
+                            dictMeta['year_to'] = f'{m[1][:-2]}9' if m[1].endswith("s") else m[1]
+                        else:
+                            # Inverted order of dates ('2000s or 1990s')
+                            dictMeta['year_from'] = m[1][:-1] if m[1].endswith("s") else m[1]
+                            dictMeta['year_to'] = f'{m[0][:-2]}9' if m[0].endswith("s") else m[0]
         elif el.attrib['Name'] in self.corpusSettings['coma_meta_conversion']:
             dictMeta[self.corpusSettings['coma_meta_conversion'][el.attrib['Name']]] = el.text.strip()
 
@@ -265,7 +263,7 @@ class Txt2JSON:
                 for descrKey in exbDescr:
                     if descrKey.tag != 'Key':
                         continue
-                    self.add_coma_key_to_meta(curMetaDict, descrKey)
+                    self.add_coma_key_to_meta(curMetaDict, descrKey, fname)
             if len(fname) > 0:
                 if 'title' not in curMetaDict:
                     if len(title) > 0:
@@ -303,7 +301,7 @@ class Txt2JSON:
             fTarget = gzip.open(fnameTarget, 'wt', encoding='utf-8')
         else:
             fTarget = open(fnameTarget, 'w', encoding='utf-8')
-        json.dump(textJSON, fp=fTarget, ensure_ascii=False,
+        json.dump(textJSON, fp=fTarget, ensure_ascii=False, sort_keys=True,
                   indent=self.corpusSettings['json_indent'])
         fTarget.close()
 

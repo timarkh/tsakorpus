@@ -795,60 +795,6 @@ class Eaf2JSON(Txt2JSON):
             for sent in self.process_tier(tier, aID2pID, srcFile, alignedTier=True):
                 yield sent
 
-    def add_speaker_marks(self, sentences):
-        """
-        Add the name/code of the speaker in the beginning of every
-        sentence that starts the turn.
-        """
-        if 'insert_speaker_marks' in self.corpusSettings and not self.corpusSettings['insert_speaker_marks']:
-            return
-        langs2process = [i for i in range(len(self.corpusSettings['languages']))]
-        if 'speaker_marks_languages' in self.corpusSettings:
-            langs2process = [i for i in range(len(self.corpusSettings['languages']))
-                               if self.corpusSettings['languages'][i] in self.corpusSettings['speaker_marks_languages']]
-        langs2process = set(langs2process)
-        prevSpeaker = ''
-        for i in range(len(sentences)):
-            if 'meta' not in sentences[i] or 'speaker' not in sentences[i]['meta']:
-                continue
-            if 'lang' in sentences[i] and sentences[i]['lang'] not in langs2process:
-                continue
-            speaker = '[' + sentences[i]['meta']['speaker'] + ']'
-            addOffset = len(speaker) + 2
-            if sentences[i]['meta']['speaker'] != prevSpeaker:
-                sentences[i]['text'] = '\n' + speaker + ' ' + sentences[i]['text']
-                sentences[i]['words'].insert(0, {'off_start': -len(speaker) - 1,
-                                                 'off_end': -1,
-                                                 'wf': speaker,
-                                                 'wtype': 'punct',
-                                                 'next_word': 0})
-                sentences[i]['words'].insert(0, {'off_start': -len(speaker) - 2,
-                                                 'off_end': -len(speaker) - 1,
-                                                 'wf': '\n',
-                                                 'wtype': 'punct',
-                                                 'next_word': -1})
-                for w in sentences[i]['words']:
-                    w['off_start'] += addOffset
-                    w['off_end'] += addOffset
-                    w['next_word'] += 2
-                if 'para_alignment' in sentences[i]:
-                    for pa in sentences[i]['para_alignment']:
-                        if pa['off_start'] > 0:
-                            pa['off_start'] += addOffset
-                        pa['off_end'] += addOffset
-                if 'src_alignment' in sentences[i]:
-                    for sa in sentences[i]['src_alignment']:
-                        if sa['off_start_sent'] > 0:
-                            sa['off_start_sent'] += addOffset
-                        sa['off_end_sent'] += addOffset
-                if 'style_spans' in sentences[i]:
-                    for ss in sentences[i]['style_spans']:
-                        ss['off_start'] += addOffset
-                        ss['off_end'] += addOffset
-            prevSpeaker = sentences[i]['meta']['speaker']
-            if 'last' in sentences[i] and sentences[i]['last']:
-                prevSpeaker = ''
-
     def add_sentence_meta(self, sentences, meta):
         """
         Add some of the document-level metadata to the sentences.
@@ -913,7 +859,7 @@ class Eaf2JSON(Txt2JSON):
         self.tp.splitter.add_next_word_id(textJSON['sentences'])
         if 'add_contextual_flags' in self.corpusSettings and self.corpusSettings['add_contextual_flags']:
             self.tp.splitter.add_contextual_flags(textJSON['sentences'])
-        self.add_speaker_marks(textJSON['sentences'])
+        self.tp.splitter.add_speaker_marks(textJSON['sentences'])
         self.add_sentence_meta(textJSON['sentences'], curMeta)
         self.clean_up_sentences(textJSON['sentences'])
         if 'capitalize_sentences' in self.corpusSettings and self.corpusSettings['capitalize_sentences']:

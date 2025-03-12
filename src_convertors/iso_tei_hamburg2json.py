@@ -17,11 +17,11 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
 
     rxBracketGloss = re.compile('[.-]?\\[.*?\\]')
     rxWordPunc = re.compile('^( *)([^\\w]*)(.*?)([^\\w]*?)( *)$')
-    rxLetters = re.compile('\w+')
-    rxFloat = re.compile('^[0-9]+(?:\.[0-9]+)?$')
-    rxTrailingZeroes = re.compile('^0+(?=[1-9])|\.0+$')
+    rxLetters = re.compile('\\w+')
+    rxFloat = re.compile('^[0-9]+(?:\\.[0-9]+)?$')
+    rxTrailingZeroes = re.compile('^0+(?=[1-9])|\\.0+$')
     rxNonDigit = re.compile('[^0-9]+')
-    rxMCPOS = re.compile('^([^%#>:\\[\\] ]+)(?:\\.\\[[^\\[\\]]*\\])?$')
+    rxMCPOS = re.compile('^([^%#>:\\[\\]() ]+)(?:\\([^%#>:\\[\\] ]*\\))?(?:\\.\\[[^\\[\\]]*\\])?$')
     mediaExtensions = {'.wav', '.mp3', '.mp4', '.avi'}
     sentenceEndPunct = {'declarative': '.', 'interrogative': '?'}
     namespaces = {'tei': 'http://www.tei-c.org/ns/1.0',
@@ -74,10 +74,10 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 else:
                     print('Speaker with ID ' + speakerCode + ' not referenced in Coma.')
                     if 'sex' in speaker.attrib:
-                        if speaker.attrib['sex'] in ['1', 'M']:
-                            speakerMeta[speakerID]['sex'] = 'M'
-                        elif speaker.attrib['sex'] in ['2', 'F']:
-                            speakerMeta[speakerID]['sex'] = 'F'
+                        if speaker.attrib['sex'] in ['1', 'M', 'male']:
+                            speakerMeta[speakerID]['sex'] = 'male'
+                        elif speaker.attrib['sex'] in ['2', 'F', 'female']:
+                            speakerMeta[speakerID]['sex'] = 'female'
                         else:
                             speakerMeta[speakerID]['sex'] = speaker.attrib['sex']
                     if 'age' in speaker.attrib:
@@ -387,6 +387,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         """
         alignment = {'off_start_src': self.tlis[sentBoundaries[0]]['time'],
                      'off_end_src': self.tlis[sentBoundaries[1]]['time'],
+                     'true_off_start_src': self.tlis[sentBoundaries[0]]['time'],
                      'off_start_sent': 0,
                      'off_end_sent': len(sent['text']),
                      'mtype': 'audio',
@@ -395,6 +396,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         if (self.rxFloat.search(alignment['off_start_src']) is None
                 or self.rxFloat.search(alignment['off_end_src']) is None):
             return
+        alignment['true_off_start_src'] = float(alignment['true_off_start_src'])
         self.fragmentize_src_alignment(alignment)
         sent['src_alignment'] = [alignment]
 
@@ -632,21 +634,21 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                                    'text': '',
                                    'lang': 0,
                                    'para_alignment': [{'para_id': self.pID}]}
-                        if firstSentence and 'who' in anno.attrib and anno.attrib['who'] in self.participants:
-                            firstSentence = False
-                            curSent['words'].insert(0, {'wtype': 'punct',
-                                                        'wf': '[' + self.participants[anno.attrib['who']]['speaker'] + ']'})
-                            curSent['words'].insert(0, {'wtype': 'punct', 'wf': '\n'})
-                            curSent['text'] = '\n[' + self.participants[anno.attrib['who']]['speaker'] + '] '
+                        # if firstSentence and 'who' in anno.attrib and anno.attrib['who'] in self.participants:
+                        #     firstSentence = False
+                        #     curSent['words'].insert(0, {'wtype': 'punct',
+                        #                                 'wf': '[' + self.participants[anno.attrib['who']]['speaker'] + ']'})
+                        #     curSent['words'].insert(0, {'wtype': 'punct', 'wf': '\n'})
+                        #     curSent['text'] = '\n[' + self.participants[anno.attrib['who']]['speaker'] + '] '
                         if len(sentMeta) > 0:
                             curSent['meta'] = copy.deepcopy(sentMeta)
                 if curSent is not None:
+                    if 'src_alignment' not in curSent:
+                        self.add_src_alignment(curSent, [prevAnchor, curAnchor], srcFile)
                     curSentences.append(curSent)
             if curSent is not None:
-                if 'src_alignment' not in curSent or len(curSent['src_alignment']) <= 0:
-                    self.add_src_alignment(curSent, [annoStart, annoEnd], srcFile)
-                elif endAnchor != curAnchor:
-                    self.add_src_alignment(curSent, [curAnchor, endAnchor], srcFile)
+                pass
+                # self.add_src_alignment(curSent, [curAnchor, endAnchor], srcFile)
             self.process_words(anno)
             self.add_full_text(anno, curSentences)
             self.add_para_offsets(curSentences)
@@ -714,12 +716,19 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         else:
             srcFile = ''
         textJSON['sentences'] = [s for s in self.get_sentences(srcTree, srcFile)]
-        textJSON['sentences'].sort(key=lambda s: s['lang'])
+        # Sort by language; inside each language, sort sentences by their time offsets.
+        if any('src_alignment' not in s for s in textJSON['sentences']):
+            textJSON['sentences'].sort(key=lambda s: s['lang'])
+        else:
+            textJSON['sentences'].sort(key=lambda s: (s['lang'], s['src_alignment'][0]['true_off_start_src']))
         for i in range(len(textJSON['sentences']) - 1):
             if textJSON['sentences'][i]['lang'] != textJSON['sentences'][i + 1]['lang']:
                 textJSON['sentences'][i]['last'] = True
         self.tp.splitter.recalculate_offsets(textJSON['sentences'])
         self.tp.splitter.add_next_word_id(textJSON['sentences'])
+        if 'add_contextual_flags' in self.corpusSettings and self.corpusSettings['add_contextual_flags']:
+            self.tp.splitter.add_contextual_flags(textJSON['sentences'])
+        self.tp.splitter.add_speaker_marks(textJSON['sentences'])
         self.write_output(fnameTarget, textJSON)
         for s in textJSON['sentences']:
             for word in s['words']:
