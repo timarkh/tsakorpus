@@ -14,6 +14,8 @@ from transliterators.aramaic import aramaic_urmi_input_normal, aramaic_turoyo_in
 def trans_IPA_baseline(text, lang):
     if lang == 'adyghe':
         return adyghe_translit_ipa(text)
+    elif lang == 'beserman':
+        return beserman_translit_ipa(text)
     return text
 
 
@@ -30,6 +32,12 @@ def trans_UPA_baseline(text, lang):
 def trans_cyrillic_baseline(text, lang):
     if lang == 'beserman':
         return beserman_translit_cyrillic(text)
+    return text
+
+
+def trans_cyrillictranscr_baseline(text, lang):
+    if lang == 'beserman':
+        return beserman_translit_cyrillictranscr(text)
     return text
 
 
