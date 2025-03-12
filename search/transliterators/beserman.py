@@ -13,6 +13,18 @@ dic2cyr = {'a': 'а', 'b': 'б', 'v': 'в',
 cyr2dic = {v: k for k, v in dic2cyr.items()}
 cyr2dic.update({'я': 'ʼa', 'е': 'ʼe', 'и': 'ʼi',
                 'ё': 'ʼo', 'ю': 'ʼu', 'ь': 'ʼ', 'ы': 'ɨ', 'у': 'u'})
+dic2cyrtrans = {'a': 'а', 'b': 'б', 'v': 'в',
+                'g': 'г', 'd': 'д', 'e': 'э',
+                'ž': 'ж', 'š': 'ш', 'ɤ': 'ӧ',
+                'ə': 'ъ', 'ǯ': 'ӝ', 'č': 'ӵ',
+                'z': 'з', 'i': 'и', 'j': 'й', 'k': 'к',
+                'l': 'л', 'm': 'м', 'n': 'н',
+                'o': 'о', 'p': 'п', 'r': 'р',
+                's': 'с', 't': 'т', 'u': 'у',
+                'c': 'ц', 'w': 'ў', 'x': 'х',
+                'y': 'ы', 'f': 'ф', 'ɨ': 'ы',
+                'ʼ': "'", 'ü': 'ӱ'}
+
 cyrHard2Soft = {'а': 'я', 'э': 'е', 'е': 'е', 'ӥ': 'и', 'о': 'ё', 'у': 'ю'}
 rxSoften = re.compile('(?<![чӟ])ʼ([аэӥоу])', flags=re.I)
 rxCyrSoften = re.compile('([čǯ])(?!ʼ)', flags=re.I)
@@ -85,6 +97,14 @@ def beserman_translit_cyrillic(text):
 
 
 def beserman_translit_upa(text):
+    text = text.replace('č', 'č')
+    text = text.replace('Č', 'Č')
+    text = text.replace('š', 'š')
+    text = text.replace('Š', 'Š')
+    text = text.replace('ž', 'ž')
+    text = text.replace('Ž', 'Ž')
+    text = text.replace('ǯ', 'ǯ')
+    text = text.replace('Ǯ', 'Ǯ')
     text = text.replace("'", 'ʼ')
     text = text.replace('ə', 'ə̑')
     text = text.replace('Ə', 'Ə̑')
@@ -109,3 +129,79 @@ def beserman_translit_upa(text):
     text = text.replace('Nʼ', 'Ń')
     text = text.replace('ʼ', '̓')
     return text
+
+
+def beserman_translit_ipa(text):
+    text = text.replace('č', 'č')
+    text = text.replace('Č', 'Č')
+    text = text.replace('š', 'š')
+    text = text.replace('Š', 'Š')
+    text = text.replace('ž', 'ž')
+    text = text.replace('Ž', 'Ž')
+    text = text.replace('ǯ', 'ǯ')
+    text = text.replace('Ǯ', 'Ǯ')
+    text = text.replace("'", 'ʼ')
+    text = text.replace('ə', 'ʌ')
+    text = text.replace('Ə', 'Ʌ')
+    text = text.replace('ɤ', 'ɘ')
+    text = text.replace('ü', 'ʉ')
+    text = text.replace('čʼ', 't͡ɕ')
+    text = text.replace('Čʼ', 'T͡ɕ')
+    text = text.replace('ǯʼ', 'd͡ʑ')
+    text = text.replace('Ǯʼ', 'D͡ʑ')
+    text = text.replace('šʼ', 'ɕ')
+    text = text.replace('Šʼ', 'ɕ')
+    text = text.replace('žʼ', 'ʑ')
+    text = text.replace('Žʼ', 'ʑ')
+    text = text.replace('č', 't͡ʂ')
+    text = text.replace('Č', 'T͡ʂ')
+    text = text.replace('ǯ', 'd͡ʐ')
+    text = text.replace('Ǯ', 'D͡ʐ')
+    text = text.replace('š', 'ʂ')
+    text = text.replace('Š', 'ʂ')
+    text = text.replace('ž', 'ʐ')
+    text = text.replace('Ž', 'ʐ')
+    text = text.replace('dʼ', 'dʲ')
+    text = text.replace('Dʼ', 'Dʲ')
+    text = text.replace('tʼ', 'tʲ')
+    text = text.replace('Tʼ', 'Tʲ')
+    text = text.replace('lʼ', 'lʲ')
+    text = text.replace('Lʼ', 'Lʲ')
+    text = text.replace('nʼ', 'nʲ')
+    text = text.replace('Nʼ', 'Nʲ')
+    text = text.replace('ʼ', 'ʲ')
+    text = text.replace('c', 't͡s')
+    text = text.replace('C', 'T͡s')
+    return text
+
+
+def beserman_translit_cyrillictranscr(text):
+    def char_repl(c):
+        if c in dic2cyrtrans:
+            return dic2cyrtrans[c]
+        if c.lower() in dic2cyrtrans:
+            return dic2cyrtrans[c.lower()].upper()
+        return c
+    text = text.replace('č', 'č')
+    text = text.replace('Č', 'Č')
+    text = text.replace('š', 'š')
+    text = text.replace('Š', 'Š')
+    text = text.replace('ž', 'ž')
+    text = text.replace('Ž', 'Ž')
+    text = text.replace('ǯ', 'ǯ')
+    text = text.replace('Ǯ', 'Ǯ')
+    text = text.replace('čʼ', 'ч')
+    text = text.replace('Čʼ', 'Ч')
+    text = text.replace('ǯʼ', 'ӟ')
+    text = text.replace('Ǯʼ', 'Ӟ')
+    text = text.replace('šʼ', 'с\'')
+    text = text.replace('Šʼ', 'С\'')
+    text = text.replace('žʼ', 'з\'')
+    text = text.replace('Žʼ', 'З\'')
+    text = re.sub('(.)', lambda m: char_repl(m.group(1)), text)
+    return text
+
+
+if __name__ == '__main__':
+    print(beserman_translit_cyrillictranscr('Čʼem dərja kənoje velʼtišʼkomə.'))
+    print(beserman_translit_ipa('Čʼem dərja kənoje velʼtišʼkomə.'))
