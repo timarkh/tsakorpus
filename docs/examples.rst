@@ -45,7 +45,7 @@ This is an incomplete list of public Tsakorpus instances, sorted by language fam
   * Bashkir: `spoken <https://lingconlab.ru/spoken_bashkir/search>`_
   * Dolgan: `spoken <https://inel.corpora.uni-hamburg.de/DolganCorpus/search>`_
   * Khakas: `spoken <https://lingconlab.ru/spoken_khakas/search>`_
-  * Sakha (Yakut): `spoken (Yakut/Russian code switching) <https://lingconlab.ru/cs_yakut/search>`
+  * Sakha (Yakut): `spoken (Yakut/Russian code switching) <https://lingconlab.ru/cs_yakut/search>`_
 
 * Uralic
 
