@@ -230,7 +230,8 @@ class Txt2JSON:
                                 if type(value) == str:
                                     value = [value]
                                 sJson[metaKeyTsakorpus] += value
-                            sJson[metaKeyTsakorpus] = value
+                            else:
+                                sJson[metaKeyTsakorpus] = value
         return speakerMeta
 
     def load_meta_coma(self, fnameMeta):
