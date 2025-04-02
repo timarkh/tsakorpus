@@ -219,7 +219,7 @@ class Txt2JSON:
                 if len(value) > 0:
                     sJson[metaKeyTsakorpus] = value
             if 'coma_meta_speaker_lang_conversion' in self.corpusSettings:
-                for l in s.xpath('Language'):
+                for l in s.xpath('Language[@Type=\'L1\']'):
                     for metaKeyComa, metaKeyTsakorpus in self.corpusSettings['coma_meta_speaker_lang_conversion'].items():
                         metaKeyComa = 'Description/Key[@Name=\'' + metaKeyComa + "']"
                         value = self.extract_value_coma(l, metaKeyComa)
