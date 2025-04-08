@@ -495,6 +495,7 @@ def subcorpus_ids(htmlQuery, curLocale=''):
     """
     subcorpusQuery = sc.qp.subcorpus_query(htmlQuery, sortOrder='',
                                            exclude=get_session_data('excluded_doc_ids'),
+                                           inverted=get_session_data('invert_subcorpus'),
                                            primaryLanguages=settings.primary_languages,
                                            curLocale=curLocale)
     if subcorpusQuery is None or ('query' in subcorpusQuery and subcorpusQuery['query'] == {'match_all': {}}):

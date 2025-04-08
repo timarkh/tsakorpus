@@ -12,6 +12,7 @@ function assign_subcorpus_events() {
 	$('.switchable_subcorpus_option').unbind('click');
 	$('#subcorpus_selector_ok').unbind('click');
 	$('#subcorpus_selector_clear').unbind('click');
+	$('#subcorpus_selector_invert').unbind('click');
 	$('#subcorpus_stats_link').unbind('click');
 	$('#select_meta_stat').unbind('change');
 	$('#select_meta_lang').unbind('change');
@@ -19,6 +20,7 @@ function assign_subcorpus_events() {
 	$('#load_documents_link').click(load_subcorpus_documents);
 	$('#subcorpus_selector_ok').click(close_subcorpus_selector);
 	$('#subcorpus_selector_clear').click(clear_subcorpus);
+	$('#subcorpus_selector_invert').click(invert_subcorpus);
 	$('#subcorpus_stats_link').click(load_subcorpus_stats);
 	$('#select_meta_stat').change(load_subcorpus_stats);
 	$('#select_meta_lang').change(load_subcorpus_stats);
@@ -327,7 +329,8 @@ function print_document_list(results) {
 }
 
 function close_subcorpus_selector() {
-	$('.nav-tabs a[href="#select_subcorpus_parameters"]').tab('show');
+	$('#subcorpus_parameters_link').click();
+	// $('.nav-tabs a[href="#select_subcorpus_parameters"]').tab('show');
 	$('#subcorpus_selector').modal('hide');
 }
 
@@ -338,12 +341,38 @@ function clear_subcorpus() {
 	$('.subcorpus_input').each(function (index) {
 		$(this).val('');
 	});
+	$('#subcorpus_selector_invert').removeClass('btn-dark');
+	$('#subcorpus_selector_invert').addClass('btn-light');
+	$('#subcorpus_selector_invert').data('inverted', "false");
 	excludeDocs = [];
 	$.ajax({
 		url: "clear_subcorpus",
 		data: $("#search_main").serialize(),
 		type: "GET",
 		success: close_subcorpus_selector,
+		error: function(errorThrown) {
+			alert( JSON.stringify(errorThrown) );
+		}
+	});
+}
+
+function invert_subcorpus() {
+	$.ajax({
+		url: "invert_subcorpus",
+		data: $("#search_main").serialize(),
+		type: "GET",
+		success: function(results) {
+			if ($('#subcorpus_selector_invert').attr("data-inverted") == "false") {
+				$('#subcorpus_selector_invert').removeClass('btn-light');
+				$('#subcorpus_selector_invert').addClass('btn-dark');
+				$('#subcorpus_selector_invert').attr("data-inverted", "true");
+			} else {
+				$('#subcorpus_selector_invert').removeClass('btn-dark');
+				$('#subcorpus_selector_invert').addClass('btn-light');
+				$('#subcorpus_selector_invert').attr("data-inverted", "false");
+			}
+			print_document_list(results);
+		},
 		error: function(errorThrown) {
 			alert( JSON.stringify(errorThrown) );
 		}

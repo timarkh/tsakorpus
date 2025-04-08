@@ -889,8 +889,8 @@ class InterfaceQueryParser:
         return query
 
     def subcorpus_query(self, htmlQuery, query_from=0, query_size=10,
-                        sortOrder='random', randomSeed=None,
-                        exclude=None, primaryLanguages=None,
+                        sortOrder='', randomSeed=None,
+                        exclude=None, inverted=False, primaryLanguages=None,
                         curLocale=''):
         """
         Make an ES query to the docs index based on subcorpus selection
@@ -942,8 +942,12 @@ class InterfaceQueryParser:
             else:
                 queryParts.append(self.make_range_query([None, rangeQueriesTo[field]], field))
         # Remove manually excluded documents by ID
-        if exclude is not None and len(exclude) > 0:
-            queryParts.append({'bool': {'must_not': [{'terms': {'_id': list(exclude)}}]}})
+        if exclude is not None:
+            if not inverted:
+                if len(exclude) > 0:
+                    queryParts.append({'bool': {'must_not': [{'terms': {'_id': list(exclude)}}]}})
+            else:
+                queryParts.append({'bool': {'must': [{'terms': {'_id': list(exclude)}}]}})
         if len(queryParts) > 0:
             query = {'bool': {'must': queryParts}}
             if sortOrder == 'random':

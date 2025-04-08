@@ -1345,7 +1345,7 @@ class SentenceViewer:
                     w['_source']['rank'] = '&gt; ' + str(min(math.ceil(q * 100) for q in quantiles
                                                              if w['_source']['freq'] >= quantiles[q])) + '%'
 
-    def process_doc(self, d, exclude=None):
+    def process_doc(self, d, exclude=None, inverted=False):
         """
         Process one document taken from response['hits']['hits'].
         """
@@ -1353,8 +1353,13 @@ class SentenceViewer:
             return ''
         dSource = d['_source']
         dID = d['_id']
-        doc = {'fields': [], 'excluded': (exclude is not None and int(dID) in exclude),
-               'id': dID}
+        doc = {
+            'fields': [],
+            'excluded': (exclude is not None and
+                         ((not inverted and int(dID) in exclude) or
+                          (inverted and int(dID) not in exclude))),
+            'id': dID
+        }
         dateDisplayed = '-'
         if 'year_from' in dSource:
             dateDisplayed = str(dSource['year_from'])
@@ -1575,7 +1580,7 @@ class SentenceViewer:
                                                              translit=translit))
         return result
 
-    def process_docs_json(self, response, exclude=None, corpusSize=1, primaryLanguages=None):
+    def process_docs_json(self, response, exclude=None, inverted=False, corpusSize=1, primaryLanguages=None):
         result = {'n_words': 0, 'n_sentences': 0, 'n_docs': 0,
                   'size_percent': 0.0,
                   'message': 'Nothing found.',
@@ -1594,15 +1599,19 @@ class SentenceViewer:
             for lang in primaryLanguages:
                 result['n_words'] = int(round(response['aggregations']['agg_nwords_' + lang]['value'], 0))
         result['docs'] = []
+        if exclude is None:
+            exclude = set()
         for iHit in range(len(response['hits']['hits'])):
-            if exclude is not None and int(response['hits']['hits'][iHit]['_id']) in exclude:
+            docID = int(response['hits']['hits'][iHit]['_id'])
+            if ((not inverted and docID in exclude) or
+                    (inverted and docID not in exclude)):
                 result['n_docs'] -= 1
                 if primaryLanguages is not None and len(primaryLanguages) > 0:
                     for lang in primaryLanguages:
                         result['n_words'] -= int(round(response['hits']['hits'][iHit]['_source']['n_words_' + lang], 0))
                 else:
                     result['n_words'] -= int(round(response['hits']['hits'][iHit]['_source']['n_words'], 0))
-            result['docs'].append(self.process_doc(response['hits']['hits'][iHit], exclude))
+            result['docs'].append(self.process_doc(response['hits']['hits'][iHit], exclude, inverted=inverted))
         result['size_percent'] = min(100, max(0, round(result['n_words'] * 100 / corpusSize, 3)))
         return result
 

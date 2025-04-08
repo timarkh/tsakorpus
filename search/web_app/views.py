@@ -443,6 +443,13 @@ def search_word(searchType='word', page=-1):
                            show_next=bShowNextButton)
 
 
+@app.route('/invert_subcorpus')
+def invert_subcorpus():
+    bInverted = get_session_data('invert_subcorpus')
+    set_session_data('invert_subcorpus', not bInverted)
+    return search_doc()
+
+
 @app.route('/search_doc')
 @jsonp
 def search_doc():
@@ -450,7 +457,6 @@ def search_doc():
     log_query('doc', query)
     change_display_options(query)
     esQuery = sc.qp.subcorpus_query(query,
-                                    sortOrder=get_session_data('sort'),
                                     query_size=settings.max_docs_retrieve,
                                     primaryLanguages=settings.primary_languages,
                                     curLocale=get_locale())
@@ -462,13 +468,13 @@ def search_doc():
         # Maybe some metadata fields were localized, but there are
         # no localized fields for this interface language
         esQuery = sc.qp.subcorpus_query(query,
-                                        sortOrder=get_session_data('sort'),
                                         query_size=settings.max_docs_retrieve,
                                         primaryLanguages=settings.primary_languages,
                                         curLocale='')
         hits = sc.get_docs(esQuery)
     hitsProcessed = sentView.process_docs_json(hits,
                                                exclude=get_session_data('excluded_doc_ids'),
+                                               inverted=get_session_data('invert_subcorpus'),
                                                corpusSize=settings.corpus_size,
                                                primaryLanguages=settings.primary_languages)
     hitsProcessed['media'] = settings.media
@@ -653,17 +659,26 @@ def toggle_document(docID):
     are not included in the search.
     """
     excludedDocIDs = get_session_data('excluded_doc_ids')
+    inverted = get_session_data('invert_subcorpus')
     nWords = sc.get_n_words_in_document(docId=docID,
                                         primaryLanguages=settings.primary_languages)
     sizePercent = round(nWords * 100 / settings.corpus_size, 3)
     if docID in excludedDocIDs:
         excludedDocIDs.remove(docID)
-        nDocs = 1
+        if not inverted:
+            nDocs = 1
+        else:
+            nWords = -1 * nWords
+            sizePercent = -1 * sizePercent
+            nDocs = -1
     else:
         excludedDocIDs.add(docID)
-        nWords = -1 * nWords
-        sizePercent = -1 * sizePercent
-        nDocs = -1
+        if inverted:
+            nDocs = 1
+        else:
+            nWords = -1 * nWords
+            sizePercent = -1 * sizePercent
+            nDocs = -1
     return jsonify({'n_words': nWords, 'n_docs': nDocs, 'size_percent': sizePercent})
 
 
@@ -673,6 +688,7 @@ def clear_subcorpus():
     Flush the list of excluded document IDs.
     """
     set_session_data('excluded_doc_ids', set())
+    set_session_data('invert_subcorpus', False)
     return ''
 
 

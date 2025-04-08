@@ -29,6 +29,7 @@ def initialize_session():
                                           'last_query': {},
                                           'seed': int(datetime.now().timestamp()),
                                           'excluded_doc_ids': set(),
+                                          'invert_subcorpus': False,    # if True, then excluded_doc_ids actually contain selected doc IDs
                                           'progress': 100,
                                           'search_context': SearchContext(curLocale=settings.default_locale)}
 
@@ -58,6 +59,8 @@ def get_session_data(fieldName):
         sessionData[session['session_id']]['seed'] = int(datetime.now().timestamp())
     elif fieldName == 'excluded_doc_ids' and fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']]['excluded_doc_ids'] = set()
+    elif fieldName == 'invert_subcorpus' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['invert_subcorpus'] = False
     elif fieldName == 'progress' and fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']]['progress'] = 0
     elif fieldName not in sessionData[session['session_id']]:
