@@ -317,7 +317,9 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 for mcPart in curWordAnno['mc'].split('-'):
                     m = self.rxMCPOS.search(mcPart)
                     if m is not None:
-                        pos.add(m.group(1))
+                        if ('bad_pos_mc' not in self.corpusSettings
+                                or m.group(1) not in self.corpusSettings['bad_pos_mc']):
+                            pos.add(m.group(1))
                 if len(pos) == 1:
                     self.add_pos_ana(ana, [p for p in pos][0])
             if 'ps' in curWordAnno:
