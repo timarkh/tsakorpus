@@ -240,7 +240,7 @@ class InterfaceQueryParser:
         glossField = field.endswith('gloss_index')
         iOpPos, strOp = self.find_operator(strQuery, start, end, glossField)
         if iOpPos == -1:
-            if strQuery[start] == '(' and strQuery[end - 1] == ')':
+            if strQuery[start] == '(' and strQuery[end - 1] == ')' and not glossField:
                 return self.make_bool_query(strQuery, field, lang, start=start + 1, end=end - 1, rewrite=rewrite)
             else:
                 return self.make_simple_term_query(strQuery[start:end], field, lang, rewrite=rewrite)
