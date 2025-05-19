@@ -893,6 +893,8 @@ class Indexator:
             if 'sent_id_sort_enabled' in self.settings and self.settings['sent_id_sort_enabled']:
                 s['sent_id'] = self.sentID
                 self.sentID += 1
+            if 'meta' in s:
+                self.add_meta_keywords(s['meta'])
             if len(docMeta) > 0:
                 if 'meta' not in s:
                     s['meta'] = copy.deepcopy(docMeta)
@@ -967,13 +969,15 @@ class Indexator:
         """
         bulk(self.es, self.iterate_sentences(fname), chunk_size=1000, request_timeout=120)
 
-    @staticmethod
-    def add_meta_keywords(meta):
+    def add_meta_keywords(self, meta):
         """
         For each text field in the metadata, add a keyword version
         of the same field.
         """
-        for field in [k for k in meta.keys() if not k.startswith('year')]:
+        for field in [k for k in meta.keys()
+                      if not (k.startswith('year')
+                              or ('integer_meta_fields' in self.settings
+                                  and meta in self.settings['integer_meta_fields']))]:
             meta[field + '_kw'] = meta[field]
 
     def index_doc(self, fname):
