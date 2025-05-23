@@ -308,15 +308,11 @@ def get_buckets_for_sent_metafield(fieldName, langID=-1, docIDs=None, maxBuckets
     if fieldName not in settings.search_meta['stat_options'] or langID >= len(settings.languages) > 1:
         return {}
     if langID >= 0:
-        innerQuery = {'match': {'lang': langID}}
+        innerQuery = {'bool': {'must': [{'term': {'lang': langID}}]}}
     else:
-        innerQuery = {'match_all': {}}
+        innerQuery = {'bool': {'must': [{'match_all': {}}]}}
     if docIDs is not None:
-        innerQuery = {'filter': {'bool': {'must': [{'terms': {'d_id': docIDs}}]}}}
-    # if not fieldName.startswith('year'):
-    #     queryFieldName = fieldName + '_kw'
-    # else:
-    #     queryFieldName = fieldName
+        innerQuery['bool']['filter'] = {'bool': {'must': {'terms': {'doc_id': docIDs}}}}
     if not fieldName.startswith('meta.'):
         queryFieldName = 'meta.' + fieldName
     else:
@@ -378,9 +374,12 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
     sentence-level metafield.
     """
     bLocalized = False
-    bSentenceLevel = (metaField in settings.sentence_meta)
+    bSentenceLevel = (metaField in settings.sentence_meta or metaField in settings.doc_to_sentence_meta)
     if bSentenceLevel:
-        queryFieldName = 'sent_meta_' + metaField + '_kw1'
+        queryFieldName = 'sent_meta_' + metaField
+        if not (metaField.startswith('year') or metaField in settings.integer_meta_fields):
+            queryFieldName += '_kw'
+        queryFieldName += '1'
     elif metaField not in settings.line_plot_meta:
         queryFieldName = metaField
         if metaField in settings.localized_meta_values and len(curLocale) > 0:
@@ -392,7 +391,7 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
         if metaField in settings.localized_meta_values and len(curLocale) > 0:
             queryFieldName = metaField + '_' + curLocale
             bLocalized = True
-    docIDs = subcorpus_ids(htmlQuery, curLocale=curLocale)
+    docIDs = subcorpus_ids(htmlQuery, curLocale=curLocale, disregard_sent_meta=True)
 
     if bSentenceLevel:
         buckets = get_buckets_for_sent_metafield(metaField, langID=langID, docIDs=docIDs)
@@ -429,8 +428,7 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
             curHtmlQuery[queryFieldName] = bucket['name']
             # elif type(curHtmlQuery[metaField]) == str:
             #     curHtmlQuery[metaField] += ',' + bucket['name']
-            if not bSentenceLevel:
-                curHtmlQuery['doc_ids'] = subcorpus_ids(curHtmlQuery, curLocale=get_locale())
+            curHtmlQuery['doc_ids'] = subcorpus_ids(curHtmlQuery, curLocale=get_locale(), disregard_sent_meta=True)
             query = sc.qp.html2es(curHtmlQuery,
                                   searchOutput=searchIndex,
                                   groupBy='word',
@@ -488,11 +486,16 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
     return results
 
 
-def subcorpus_ids(htmlQuery, curLocale=''):
+def subcorpus_ids(htmlQuery, curLocale='', disregard_sent_meta=False):
     """
     Return IDs of the documents specified by the subcorpus selection
     fields in htmlQuery.
+    If disregard_sent_meta == True, do not take into account those
+    document-level metadata values that are in doc_to_sentence_meta, i.e.,
+    that were also copied to the sentences for faster search.
     """
+    if disregard_sent_meta:
+        htmlQuery = sc.qp.doc_to_sent_meta_html_query(htmlQuery)
     subcorpusQuery = sc.qp.subcorpus_query(htmlQuery, sortOrder='',
                                            exclude=get_session_data('excluded_doc_ids'),
                                            inverted=get_session_data('invert_subcorpus'),
@@ -597,9 +600,14 @@ def find_sentences_json(page=0):
                 if 'negq' + str(iQueryWord) in query and query['negq' + str(iQueryWord)] == 'on':
                     negWords.append(iQueryWord)
 
-    docIDs = None
+    docIDs = None           # IDs of subcorpus docs that should be taken into
+                            # account when searching (i.e., those that are not
+                            # based on document-level metadata that have not been
+                            # copied to the sentences)
+    subcorpusDocIDs = None  # All IDs of the subcorpus docs
     if 'doc_ids' not in query and 'sent_ids' not in query:
-        docIDs = subcorpus_ids(query, curLocale=get_locale())
+        docIDs = subcorpus_ids(query, curLocale=get_locale(), disregard_sent_meta=True)
+        subcorpusDocIDs = subcorpus_ids(query, curLocale=get_locale(), disregard_sent_meta=False)
         if docIDs is not None:
             query['doc_ids'] = docIDs
             partition = 0
@@ -712,7 +720,7 @@ def find_sentences_json(page=0):
             and 'hits' in hits and 'hits' in hits['hits']):
         for hit in hits['hits']['hits']:
             hit['toggled_on'] = sc.qp.wr.check_sentence(hit, wordConstraints, nWords=nWords)
-    if docIDs is not None and len(docIDs) > 0:
+    if subcorpusDocIDs is not None and len(subcorpusDocIDs) > 0:
         hits['subcorpus_enabled'] = True
     return hits
 

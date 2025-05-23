@@ -12,6 +12,8 @@ class InterfaceQueryParser:
     rxGlossQuerySrc = re.compile('^([^{}]*)\\{([^{}]*)\\}$')
     rxFieldNum = re.compile('^([^0-9]+)([0-9]+)$')
     rxNumber = re.compile('^(?:0|-?[1-9][0-9]*)$')
+    rxDigits = re.compile('^[1-9][0-9]*$')
+    rxKWIndexAtEnd = re.compile('_kw[0-9]+$')
     maxQuerySize = 500  # maximum number of hits to be requested
 
     dictOperators = {',': 'must',
@@ -812,10 +814,10 @@ class InterfaceQueryParser:
                     if k.endswith('_kw'):
                         boolQuery = self.make_bool_query(v, k, lang=lang, keyword_query=True)
                     elif (k.endswith('__to')
-                          and k[5:len(k)-4] in self.settings.integer_meta_fields):
+                          and k[5:len(k)-4] in self.settings.integer_meta_fields) or k == 'meta.year__to':
                         boolQuery = self.make_range_query([None, v], k[:-4])
                     elif (k.endswith('__from')
-                          and k[5:len(k)-6] in self.settings.integer_meta_fields):
+                          and k[5:len(k)-6] in self.settings.integer_meta_fields) or k == 'meta.year__from':
                         boolQuery = self.make_range_query([v, None], k[:-6])
                     else:
                         boolQuery = self.make_bool_query(v, k, lang=lang)
@@ -1067,6 +1069,39 @@ class InterfaceQueryParser:
         # will be viewed.
         return query_from, langID, lang, searchIndex
 
+    def doc_to_sent_meta_html_query(self, htmlQuery):
+        """
+        Rename parameters in an HTML query so that the document-level
+        metadata parameters are transformed into sentence-level parameters
+        if they are in doc_to_sentence_meta.
+        """
+        if len(self.settings.doc_to_sentence_meta) <= 0:
+            return htmlQuery
+        htmlQueryNoSentMeta = {}
+        for k, v in htmlQuery.items():
+            kNoKW = self.rxKWIndexAtEnd.sub('', k)
+            if kNoKW in self.settings.doc_to_sentence_meta:
+                if k == kNoKW:
+                    # Rewrite a document-level constraint as a sentence-level constraint
+                    # on the first query word.
+                    # If the value is not numerical, search in the XXX_kw field.
+                    if not (k.startswith('year') or k in self.settings.integer_meta_fields):
+                        k += '_kw1'
+                    else:
+                        k += '1'
+                k = 'sent_meta_' + k
+            elif (kNoKW in ('year_from', 'year_to')
+                  and 'year' in self.settings.doc_to_sentence_meta
+                  and self.rxDigits.search(v) is not None):
+                k = 'sent_meta_' + k.replace('_', '__') + '1'
+                v = int(v)
+            if k in htmlQueryNoSentMeta and len(htmlQueryNoSentMeta[k]) > 0:
+                if htmlQueryNoSentMeta[k] != v:
+                    htmlQueryNoSentMeta[k] += ',' + v
+            else:
+                htmlQueryNoSentMeta[k] = v
+        return htmlQueryNoSentMeta
+
     def html2es(self, htmlQuery, page=1, query_size=10, sortOrder='random',
                 randomSeed=None, searchOutput='sentences', groupBy='word',
                 distances=None, includeNextWordField=False,
@@ -1080,6 +1115,7 @@ class InterfaceQueryParser:
             return {'query': {'match_none': ''}}
 
         self.remove_nonsense(htmlQuery)
+        htmlQuery = self.doc_to_sent_meta_html_query(htmlQuery)
         # print(htmlQuery)
 
         prelimQuery = {'words': []}
