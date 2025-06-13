@@ -1,7 +1,7 @@
 Virtual keyboards
 =================
 
-If some of your languages use non-ASCII characters, it might be a good idea to add a virtual keyboard. The user can enable or disable virtual keyboards for main language-dependent text boxes by clikcing on a keyboard sign. The virtual keyboard is based on the `KioskBoard <https://furcan.github.io/KioskBoard/>`_ plugin.
+If some of your languages use non-ASCII characters, it might be a good idea to add a virtual keyboard. The user can enable or disable virtual keyboards for main language-dependent text boxes by clicking on a keyboard sign. The virtual keyboard is based on the `KioskBoard <https://furcan.github.io/KioskBoard/>`_ plugin.
 
 This is how you can add virtual keyboards for all or some of your languages:
 
