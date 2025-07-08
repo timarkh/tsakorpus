@@ -1,3 +1,4 @@
+import copy
 import html
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
@@ -276,21 +277,24 @@ class Indexator:
         """
         self.sentWordMapping = self.pd.generate_words_mapping(wordFreqs=False)
         self.wordMapping = self.pd.generate_words_mapping(wordFreqs=True)
-        self.sentMapping = self.pd.generate_sentences_mapping(self.sentWordMapping,
-                                                              corpusSizeInBytes=self.corpusSizeInBytes)
         self.docMapping = self.pd.generate_docs_mapping()
+        self.sentMapping = self.pd.generate_sentences_mapping(self.sentWordMapping, self.docMapping,
+                                                              corpusSizeInBytes=self.corpusSizeInBytes)
 
         self.es_ic.create(index=self.name + '.docs',
-                          body=self.docMapping)
+                          mappings=self.docMapping['mappings'],
+                          settings=self.docMapping['settings'])
         self.es_ic.create(index=self.name + '.words',
-                          body=self.wordMapping)
+                          mappings=self.wordMapping['mappings'],
+                          settings=self.wordMapping['settings'])
         if 'partitions' in self.settings and self.settings['partitions'] > 1:
             for i in range(int(self.settings['partitions'])):
                 self.es_ic.create(index=self.name + '.sentences.' + str(i),
                                   body=self.sentMapping)
         else:
             self.es_ic.create(index=self.name + '.sentences',
-                              body=self.sentMapping)
+                          mappings=self.sentMapping['mappings'],
+                          settings=self.sentMapping['settings'])
 
     def randomize_id(self, realID):
         """
@@ -866,6 +870,13 @@ class Indexator:
                         pa['sent_ids'] += paraIDs[i][paraID]
 
     def iterate_sentences(self, fname):
+        docMeta = {}
+        if 'doc_to_sentence_meta' in self.settings:
+            docMeta = self.iterSent.get_metadata(fname)
+            self.add_meta_keywords(docMeta)
+            docMeta = {k: v for k, v in docMeta.items()
+                       if (k in self.settings['doc_to_sentence_meta']
+                           or (k.endswith('_kw') and k[:-3] in self.settings['doc_to_sentence_meta']))}
         self.numSents = 0
         prevLast = False
         sentences = []
@@ -882,6 +893,15 @@ class Indexator:
             if 'sent_id_sort_enabled' in self.settings and self.settings['sent_id_sort_enabled']:
                 s['sent_id'] = self.sentID
                 self.sentID += 1
+            if 'meta' in s:
+                self.add_meta_keywords(s['meta'])
+            if len(docMeta) > 0:
+                if 'meta' not in s:
+                    s['meta'] = copy.deepcopy(docMeta)
+                else:
+                    for k, v in docMeta.items():
+                        if k not in s['meta']:
+                            s['meta'][k] = v
             if 'words' in s:
                 sentAnaMeta = self.process_sentence_words(s['words'], langID)
                 s['n_words'] = sum(1 for w in s['words'] if 'wtype' in w and w['wtype'] == 'word')
@@ -949,13 +969,15 @@ class Indexator:
         """
         bulk(self.es, self.iterate_sentences(fname), chunk_size=1000, request_timeout=120)
 
-    @staticmethod
-    def add_meta_keywords(meta):
+    def add_meta_keywords(self, meta):
         """
         For each text field in the metadata, add a keyword version
         of the same field.
         """
-        for field in [k for k in meta.keys() if not k.startswith('year')]:
+        for field in [k for k in meta.keys()
+                      if not (k.startswith('year')
+                              or ('integer_meta_fields' in self.settings
+                                  and meta in self.settings['integer_meta_fields']))]:
             meta[field + '_kw'] = meta[field]
 
     def index_doc(self, fname):

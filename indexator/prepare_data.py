@@ -292,7 +292,7 @@ class PrepareData:
         }
         return mapping
 
-    def generate_sentences_mapping(self, word_mapping, corpusSizeInBytes=0):
+    def generate_sentences_mapping(self, word_mapping, doc_mapping, corpusSizeInBytes=0):
         """
         Return Elasticsearch mapping for the type "sentence", based
         on searchable features described in the corpus settings.
@@ -398,6 +398,15 @@ class PrepareData:
                 'type': 'integer'
             }
         }
+        # Document-level metadata that should be denormalized, i.e., included
+        # in each sentence of the document to speed up search
+        if 'doc_to_sentence_meta' in self.settings:
+            for meta in self.settings['doc_to_sentence_meta']:
+                if meta in doc_mapping['mappings']['properties']:
+                    sentMetaDict[meta] = doc_mapping['mappings']['properties'][meta]
+                if meta + '_kw' in doc_mapping['mappings']['properties']:
+                    sentMetaDict[meta + '_kw'] = doc_mapping['mappings']['properties'][meta + '_kw']
+        # Normal sentence-level metadata
         for meta in self.settings['sentence_meta']:
             if meta.startswith('year') or ('integer_meta_fields' in self.settings
                                            and meta in self.settings['integer_meta_fields']):
@@ -431,6 +440,7 @@ class PrepareData:
                 }
             }
         }
+        mapping['settings']['analysis']['analyzer'].update(self.docNormalizer['analysis']['analyzer'])
         return mapping
 
     def generate_mappings(self):
@@ -440,8 +450,8 @@ class PrepareData:
         """
         mSentWord = self.generate_words_mapping(wordFreqs=False)
         mWord = self.generate_words_mapping()
-        mSent = self.generate_sentences_mapping(mSentWord)
         mDoc = self.generate_docs_mapping()
+        mSent = self.generate_sentences_mapping(mSentWord, mDoc)
         mappings = {
             'docs': mDoc,
             'sentences': mSent,

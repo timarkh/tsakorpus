@@ -34,6 +34,7 @@ class CorpusSettings:
 
         # Metadata and annotation
         self.sentence_meta = []
+        self.doc_to_sentence_meta = []
         self.sentence_meta_values = {}
         self.viewable_meta = []
         self.word_fields = []
@@ -128,6 +129,7 @@ class CorpusSettings:
                                  if type(self.__dict__[k]) == int)
         self.lsFields = {
             'sentence_meta',
+            'doc_to_sentence_meta',
             'viewable_meta',
             'localized_meta_values',
             'case_sensitive_meta_fields',
