@@ -26,6 +26,16 @@ class Splitter:
         except:
             print('Please check your sentence end regexp.')
             self.rxSentEnd = re.compile('[.?!]')
+        if ('sent_end_if_needed_punc' in self.settings
+                and 'max_preferable_sent_len' in self.settings
+                and self.settings['max_preferable_sent_len'] > 1):
+            try:
+                self.rxSentEndIfNeeded = re.compile(self.settings['sent_end_if_needed_punc'])
+            except:
+                print('Please check your sentence end (if needed) regexp.')
+                self.rxSentEndIfNeeded = re.compile('^$')
+        else:
+            self.rxSentEndIfNeeded = re.compile('^$')
         try:
             self.rxSentStart = re.compile(self.settings['sent_start'])
         except:
@@ -318,6 +328,9 @@ class Splitter:
             if tokens[i]['wtype'] == 'punct':
                 if (i == len(tokens) - 1
                         or (self.settings['newline_ends_sent'] and wf == '\\n')
+                        or ('max_preferable_sent_len' in self.settings
+                            and len(curSentence['words']) >= self.settings['max_preferable_sent_len'] - 1
+                            and self.rxSentEndIfNeeded.search(wf) is not None)
                         or (self.rxSentEnd.search(wf) is not None
                             and i > 0
                             and tokens[i - 1]['wf'] not in self.settings['abbreviations']
