@@ -169,6 +169,8 @@ List of parameters
 
 - ``session_cookie_domain`` (string) -- value of the Flask's ``SESSION_COOKIE_DOMAIN`` parameter, if different from the base domain name of your resource. You may want to set it if you have multiple corpora on different subdomains.
 
+- ``share_query_url`` (Boolean) -- whether the query in the "Share query" modal should start with the URL of the current corpus, followed by ``?``. This way, it works like a full URL where the query is encoded in the GET parameters. Defaults to ``false``.
+
 - ``start_page_url`` (string) -- a string with the URL of the start page of the corpus, if there is one. It is used to link the header of the search page to the start page.
 
 - ``text_fields_analyzer_pattern`` (string) -- regex to be used by the Elasticsearch analyzer to split the contents of non-keyword word-level analysis fields, such as word translations, into simple tokens for storage and search purposes. By default, it equals ``[.\n()\\[\\]/,:;?!" ]``. It is used in indexation only. The idea is that if e.g. a translation of a lemma contains a whitespace or a comma, it should be possible to find it by searching for either part, the one before the whitespace/comma and the one after it.

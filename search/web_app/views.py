@@ -78,6 +78,7 @@ def search_page():
                                                         ensure_ascii=False, indent=-1),
                            int_meta_fields=json.dumps(settings.integer_meta_fields,
                                                       ensure_ascii=False, indent=-1),
+                           share_query_url=str(settings.share_query_url).lower(),
                            generate_dictionary=settings.generate_dictionary,
                            citation=settings.citation,
                            start_page_url=settings.start_page_url,

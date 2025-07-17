@@ -9,6 +9,9 @@ function share_query_str() {
 	if (excludeDocs.length > 0) {
 		query += 'exclude_docs=' + excludeDocs.join();
 	}
+	if (shareQueryPrependCorpusURL) {
+		query = window.location.href + "?" + query;
+	}
 	return query;
 }
 
@@ -45,6 +48,8 @@ async function expand_all_words() {
 }
 
 async function load_query_str(query) {
+	rxURL = /^http[^?]*\?/g;
+	query = query.replace(rxURL, "");
 	if (query.length <= 0) { return; }
 	var pairs = query.split('&');
 	var dictFields = {};
