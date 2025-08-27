@@ -54,6 +54,7 @@ def search_page():
                            ready_for_work=ready4work,
                            locale=get_locale(),
                            corpus_name=settings.corpus_name,
+                           documentation_url=settings.documentation_url,
                            languages=settings.languages,
                            all_lang_search=settings.all_language_search_enabled,
                            transliterations=settings.transliterations,

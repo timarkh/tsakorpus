@@ -85,6 +85,7 @@ class CorpusSettings:
         self.fulltext_page_size = 100     # Size of one page of the full-text representation in sentences
         self.accidental_word_fields = []
         self.default_view = 'standard'
+        self.documentation_url = None
         self.share_query_url = False
 
         # Languages and their properties

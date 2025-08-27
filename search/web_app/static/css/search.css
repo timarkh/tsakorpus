@@ -595,7 +595,7 @@ label {
 #corpus_header a.bi {
 	font-size: 24px;
 	padding-right: 10px;
-	vertical-align: top;
+	vertical-align: middle !important;
 	cursor: pointer;
 	line-height: 1;
 }
@@ -1307,6 +1307,7 @@ hr.separator {
 	cursor: pointer;
 	color: #212224;
 	text-decoration: none;
+	vertical-align: middle !important;
 }
 
 .locale:hover {

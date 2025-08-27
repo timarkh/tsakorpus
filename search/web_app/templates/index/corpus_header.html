@@ -29,4 +29,10 @@
 	{% endif %}
 
 	<a id="show_help" class="bi bi-question-circle-fill" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Show help') }}"></a>
+	
+	{% if documentation_url %}
+		|&nbsp;&nbsp;
+		<a id="documentation" href="{{ documentation_url }}">{{ _('corpus_documentation') }}</a>
+	{% endif %}
+	{% include "inner_header_right.html" ignore missing %} <!-- user-defined right-hand side of the inner header, if any -->
 </header>
