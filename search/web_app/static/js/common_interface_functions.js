@@ -94,6 +94,13 @@ function show_citation(e) {
 	$('#citation_dialogue').modal('show');
 }
 
+function show_error_report_form(e) {
+	let n_sent = $(e.currentTarget).attr('data-nsent');
+	$('.error_report_input').val('');
+	$('#error_report_nsent').val(n_sent);
+	$('#error_report_dialogue').modal('show');
+}
+
 function toggle_glossed_layer(e) {
 	classToToggle = ".popup_" + $(this).attr('data');
 	if ($(this).is(':checked')) {

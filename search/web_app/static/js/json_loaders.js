@@ -350,6 +350,7 @@ function assign_input_events() {
 	$('#load_query').unbind('click');
 	$('#query_load_ok').unbind('click');
 	$('#display_settings_ok').unbind('click');
+	$("#error_report_ok").unbind('click');
 	$('.toggle_glossed_layer').unbind('click');
 	$(".tier_select").unbind('change');
 	$(".word_plus").click(add_word_inputs);
@@ -375,6 +376,7 @@ function assign_input_events() {
 	$('#load_query').click(show_load_query);
 	$('#query_load_ok').click(load_query);
 	$('#display_settings_ok').click(hide_settings);
+	$("#error_report_ok").click(send_error_report);
 	$('.toggle_glossed_layer').click(toggle_glossed_layer);
 	$(".tier_select").change(change_tier);
 	assign_tooltips();
@@ -616,4 +618,25 @@ async function search_if_query() {
 		await load_query();
 		$('#search_sent').click();
 	}
+}
+
+function send_error_report() {
+	$.ajax({
+		url: "report_error",
+		data: $("#error_report_form").serialize(),
+		type: "GET",
+		success: function(result) {
+			$('.report_error').each(function (index) {
+				var data_nsent = $(this).attr('data-nsent');
+				if (data_nsent == $('#error_report_nsent').val()) {
+					$(this).css("color", "green");
+					return;
+				}
+			});
+			$('#error_report_dialogue').modal('hide');
+		},
+		error: function(errorThrown) {
+			alert( JSON.stringify(errorThrown) );
+		}
+	});
 }

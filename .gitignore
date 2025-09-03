@@ -54,5 +54,6 @@ conf/categories_*.json
 conf/corpus_*.json
 messages.pot
 query_log.txt
+error_reports.txt
 *.sqlite
 *.sqlite-journal

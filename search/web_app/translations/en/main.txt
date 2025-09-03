@@ -745,3 +745,19 @@ msgstr "Other corpora"
 
 msgid "Filter"
 msgstr "Filter"
+
+msgid "Send an error report"
+msgstr "Send an error report"
+
+msgid "Please enter the details below"
+msgstr "Please enter the details below"
+
+msgid "Description:"
+msgstr "Description:"
+
+msgid "Your contact details (optional):"
+msgstr "Your contact details (optional):"
+
+msgid "Report an error"
+msgstr "Report an error"
+

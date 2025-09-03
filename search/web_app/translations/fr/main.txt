@@ -745,3 +745,18 @@ msgstr "Autres corpus"
 
 msgid "Filter"
 msgstr "Filtrer"
+
+msgid "Send an error report"
+msgstr "Envoyer un rapport d'erreur"
+
+msgid "Please enter the details below"
+msgstr "Veuillez saisir les détails ci-dessous"
+
+msgid "Description:"
+msgstr "Description :"
+
+msgid "Your contact details (optional):"
+msgstr "Vos coordonnées (facultatif) :"
+
+msgid "Report an error"
+msgstr "Signaler une erreur"

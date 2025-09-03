@@ -112,3 +112,42 @@
 	</div>
 </div>
 {% endif %}
+
+{% if error_reports_enabled %}
+<div class="modal fade modal-dialog-scrollable" id="error_report_dialogue" tabindex="-1" role="dialog" aria-labelledby="error_report_dialogue_header" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="error_report_dialogue_header">{{ _('Send an error report') }}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+			</div>
+			<div class="modal-body" id="error_report_dialogue_body">
+			<p>{{ _('Please enter the details below') }}</p>
+			<form id="error_report_form">
+				<input type="hidden" name="n_sent" id="error_report_nsent" value="">
+				<div class="row justify-content-start">
+					<div class="col-4 col-sm-3">
+						<label for="error_report_body" id="_label_error_report_body" class="search_label">{{ _('Description:') }}</label>
+					</div>
+					<div class="col-8">
+						<textarea class="error_report_input" name="error_report_body" id="error_report_body"></textarea>
+					</div>
+				</div>
+				<div class="row justify-content-start">
+					<div class="col-4 col-sm-3">
+						<label for="error_report_reference" id="_label_error_report_reference" class="search_label">{{ _('Your contact details (optional):') }}</label>
+					</div>
+					<div class="col-8">
+						<input type="text" class="error_report_input" name="error_report_reference" id="error_report_reference">
+					</div>
+				</div>
+			</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default btn-success" aria-label="OK" id="error_report_ok">OK</button>
+				<button type="button" class="btn btn-default btn-danger" aria-label="{{ _('Cancel') }}" id="error_report_cancel" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}

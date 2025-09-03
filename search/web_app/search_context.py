@@ -181,13 +181,16 @@ class SearchContext:
                 if side in context['languages'][lang] and len(context['languages'][lang][side]) > 0:
                     curSent['languages'][lang][side + '_id'] = neighboringIDs[lang][side]
 
-    def prepare_results_for_download(self):
+    def prepare_results_for_download(self, page=-1):
         """
         Return a list of search results in a format easily transformable
-        to CSV/XLSX.
+        to CSV/XLSX. If page == -1, return all pages visited in the current session.
         """
         result = []
-        for page in self.page_data:
+        pages2download = self.page_data.keys()
+        if page >= 0:
+            pages2download = [page]
+        for page in pages2download:
             for sent in self.page_data[page]:
                 if not sent['toggled_off']:
                     curLine = sent['header_csv']

@@ -54,6 +54,7 @@ function assign_word_events() {
 	//$("span.style_span").unbind('click');
 	$("span.expand").unbind('click');
 	$("span.get_glossed_copy").unbind('click');
+	$("span.report_error").unbind('click');
 	$("span.context_header").unbind('click');
 	$(".search_w").unbind('click');
 	$(".search_l").unbind('click');
@@ -67,6 +68,7 @@ function assign_word_events() {
 	//$('span.style_span').click(highlight_cur_word);
 	$('span.expand').click(expand_context);
 	$('span.get_glossed_copy').click(copy_glossed_sentence);
+	$('span.report_error').click(show_error_report_form);
 	$('span.context_header').click(show_doc_meta);
 	$('.search_w').click(search_word_from_list);
 	$('.search_l').click(search_lemma_from_list);

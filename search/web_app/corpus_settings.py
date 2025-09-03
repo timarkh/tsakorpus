@@ -87,6 +87,7 @@ class CorpusSettings:
         self.default_view = 'standard'
         self.documentation_url = None
         self.share_query_url = False
+        self.error_reports_enabled = False
 
         # Languages and their properties
         self.languages = []

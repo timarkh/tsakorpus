@@ -219,6 +219,12 @@
 	padding-right: 3px;
 }
 
+.report_error {
+	margin: auto;
+	margin-left: -7px;
+	padding-right: 3px;
+}
+
 .fulltext_link {
     font-size: 20px;
 	margin: auto;
@@ -253,6 +259,20 @@
 	border-radius: 4px;
 }
 
+.bi-chat-left-dots {
+	width: 22px;
+	font-size: 22px;
+	color: #dc3545;
+	cursor: pointer;
+	margin: auto;
+	margin-left: 5px;
+	margin-right: 5px;
+	text-align: center;
+	display: inline-table;
+	padding: 4px;
+	border-radius: 4px;
+}
+
 .bi-arrows-fullscreen:hover {
 	background-color: #20A030;
 	color: white;
@@ -261,6 +281,11 @@
 
 .bi-clipboard-check:hover {
 	background-color: #1667aa;
+	color: white;
+}
+
+.bi-chat-left-dots:hover {
+	background-color: #dc3545;
 	color: white;
 }
 
@@ -466,6 +491,13 @@
 label {
 	font-weight: 500;
 	margin-bottom: 0;
+}
+
+.error_report_input {
+	width: 90%;
+	margin-bottom: 12px;
+	border-radius: 2px;
+	border: solid 1px #707070;
 }
 
 .disabled_search_input {

@@ -80,6 +80,7 @@ def search_page():
                            int_meta_fields=json.dumps(settings.integer_meta_fields,
                                                       ensure_ascii=False, indent=-1),
                            share_query_url=str(settings.share_query_url).lower(),
+                           error_reports_enabled=settings.error_reports_enabled,
                            generate_dictionary=settings.generate_dictionary,
                            citation=settings.citation,
                            start_page_url=settings.start_page_url,
@@ -393,7 +394,8 @@ def search_sent(page=-1):
 
     return render_template('search_results/result_sentences.html',
                            data=hitsProcessed,
-                           max_page_number=maxPageNumber)
+                           max_page_number=maxPageNumber,
+                           error_reports_enabled=settings.error_reports_enabled)
 
 
 @app.route('/get_sent_context/<int:n>')
@@ -792,6 +794,32 @@ def help_dialogue():
                            media=settings.media,
                            video=settings.video,
                            gloss_search_enabled=settings.gloss_search_enabled)
+
+@app.route('/report_error')
+def report_error():
+    if 'n_sent' not in request.args or 'error_report_body' not in request.args:
+        return ''
+    data = {
+        'doc': '',
+        'sent': '',
+        'report': '',
+        'sender': ''
+    }
+    nSent = request.args['n_sent']
+    try:
+        nSent = int(nSent)
+        pageData = cur_search_context().page_data
+        if pageData is None or len(pageData) <= 0:
+            return ''
+        sentencesTxt = cur_search_context().prepare_results_for_download(page=get_session_data('page'))
+        data['sent'] = '\t'.join(sentencesTxt[nSent])
+    except:
+        return ''
+    data['report'] = request.args['error_report_body']
+    if 'error_report_reference' in request.args:
+        data['sender'] = request.args['error_report_reference']
+    log_query('error_report', data, 'error_reports.txt')
+    return ''
 
 
 @app.route('/other_corpora_dialogue')

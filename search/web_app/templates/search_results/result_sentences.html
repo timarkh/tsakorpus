@@ -43,7 +43,8 @@
 		{% endfor %}
 		</span>
 		<span class="get_glossed_copy bi bi-clipboard-check" title="{{ _('Copy example to clipboard') }}" data-nsent="{{ loop.index - 1 }}"></span>
-		<span class='expand bi bi-arrows-fullscreen' title="{{ _('Expand context') }}" data-nsent="{{ loop.index - 1 }}"></span>
+		<span class='expand bi bi-arrows-fullscreen' title="{{ _('Expand context') }}" data-nsent="{{ loop.index - 1 }}"></span>{% if error_reports_enabled %}
+		<span class='report_error bi bi-chat-left-dots' title="{{ _('Report an error') }}" data-nsent="{{ loop.index - 1 }}"></span>{% endif %}
 		</div>
 	</div>
 {% endfor %}

@@ -754,3 +754,18 @@ msgstr "Другие корпуса"
 
 msgid "Filter"
 msgstr "Фильтр"
+
+msgid "Send an error report"
+msgstr "Сообщение об ошибке"
+
+msgid "Please enter the details below"
+msgstr "Пожалуйста, опишите найденную ошибку."
+
+msgid "Description:"
+msgstr "Описание:"
+
+msgid "Your contact details (optional):"
+msgstr "Ваши контактные данные (по желанию):"
+
+msgid "Report an error"
+msgstr "Сообщить об ошибке"
