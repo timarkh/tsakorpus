@@ -97,6 +97,7 @@ function show_citation(e) {
 function show_error_report_form(e) {
 	let n_sent = $(e.currentTarget).attr('data-nsent');
 	$('.error_report_input').val('');
+	$('#error_report_body').val(selected_text());
 	$('#error_report_nsent').val(n_sent);
 	$('#error_report_dialogue').modal('show');
 }
@@ -264,6 +265,18 @@ function enable_datatables(tableName) {
 		pageLength: 50,
 		lengthChange: false
 	});
+}
+
+function selected_text() {
+    let s = "";
+
+    if (window.getSelection) {
+        s = window.getSelection().toString();
+    }
+    else if (document.selection && document.selection.type != "Control") {
+        s = document.selection.createRange().text;
+    }
+    return s;
 }
 
 function html_decode(input){

@@ -14,6 +14,7 @@ from . import sentView, settings
 
 class SearchContext:
     rxCSVMeta = re.compile('^\\[.*:.*\\]$')
+    rxCSVMetaSplit = re.compile('^\\[(.*?) *: *(.*)\\]$')
 
     def __init__(self, curLocale=''):
         """
@@ -181,10 +182,12 @@ class SearchContext:
                 if side in context['languages'][lang] and len(context['languages'][lang][side]) > 0:
                     curSent['languages'][lang][side + '_id'] = neighboringIDs[lang][side]
 
-    def prepare_results_for_download(self, page=-1):
+    def prepare_results_for_download(self, page=-1, format='csv'):
         """
         Return a list of search results in a format easily transformable
         to CSV/XLSX. If page == -1, return all pages visited in the current session.
+        If format == 'csv' (default), return a list of values that can be tab-joined
+        later. If format == 'json', return a more well-structured dictionary.
         """
         result = []
         pages2download = self.page_data.keys()
@@ -194,11 +197,32 @@ class SearchContext:
             for sent in self.page_data[page]:
                 if not sent['toggled_off']:
                     curLine = sent['header_csv']
+                    if format == 'json':
+                        curLineJSON = {'doc_meta': {}, 'sent_meta': {}, 'tiers': [], 'glossed': ''}
+                        for metaValue in curLine:
+                            m = self.rxCSVMetaSplit.search(metaValue)
+                            if m is None:
+                                continue
+                            curLineJSON['doc_meta'][m.group(1)] = m.group(2)
+                        curLine = curLineJSON
                     for s in sent['highlighted_text_csv']:
                         for sPart in s.split('\t'):
-                            if len(sPart) > 0 and (self.rxCSVMeta.search(sPart) is None or sPart not in curLine):
-                                curLine.append(sPart)
+                            if len(sPart) > 0:
+                                if format == 'json':
+                                    m = self.rxCSVMetaSplit.search(sPart)
+                                    if m is not None:
+                                        k, v = m.group(1), m.group(2)
+                                        if k not in curLine['doc_meta'] and k not in curLine['sent_meta']:
+                                            curLine['sent_meta'][k] = v
+                                    else:
+                                        curLine['tiers'].append(sPart)
+                                else:
+                                    if (self.rxCSVMeta.search(sPart) is None or sPart not in curLine):
+                                        curLine.append(sPart)
                     if settings.gloss_search_enabled and 'glossed' in sent:
-                        curLine.append(sent['glossed'])
+                        if format == 'json':
+                            curLine['glossed'] = sent['glossed']
+                        else:
+                            curLine.append(sent['glossed'])
                     result.append(curLine)
         return result

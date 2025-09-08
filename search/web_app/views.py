@@ -800,8 +800,10 @@ def report_error():
     if 'n_sent' not in request.args or 'error_report_body' not in request.args:
         return ''
     data = {
-        'doc': '',
-        'sent': '',
+        'doc_meta': {},
+        'sent_meta': {},
+        'tiers': [],
+        'glossed': '',
         'report': '',
         'sender': ''
     }
@@ -811,8 +813,9 @@ def report_error():
         pageData = cur_search_context().page_data
         if pageData is None or len(pageData) <= 0:
             return ''
-        sentencesTxt = cur_search_context().prepare_results_for_download(page=get_session_data('page'))
-        data['sent'] = '\t'.join(sentencesTxt[nSent])
+        sentencesData = cur_search_context().prepare_results_for_download(page=get_session_data('page'), format='json')
+        for k, v in sentencesData[nSent].items():
+            data[k] = copy.deepcopy(v)
     except:
         return ''
     data['report'] = request.args['error_report_body']
