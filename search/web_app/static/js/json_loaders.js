@@ -352,6 +352,7 @@ function assign_input_events() {
 	$('#display_settings_ok').unbind('click');
 	$("#error_report_ok").unbind('click');
 	$('.toggle_glossed_layer').unbind('click');
+	$('.toggle_lang').unbind('click');
 	$(".tier_select").unbind('change');
 	$(".word_plus").click(add_word_inputs);
 	$(".word_minus").click(del_word_inputs);
@@ -378,6 +379,7 @@ function assign_input_events() {
 	$('#display_settings_ok').click(hide_settings);
 	$("#error_report_ok").click(send_error_report);
 	$('.toggle_glossed_layer').click(toggle_glossed_layer);
+	$('.toggle_lang').click(toggle_lang);
 	$(".tier_select").change(change_tier);
 	assign_tooltips();
 	initialize_keyboards();

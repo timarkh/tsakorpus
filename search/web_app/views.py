@@ -15,7 +15,7 @@ import xlsxwriter
 from werkzeug.utils import secure_filename
 from . import app, settings, sc, sentView, MAX_PAGE_SIZE
 from .session_management import get_locale, get_session_data, change_display_options, set_session_data
-from .auxiliary_functions import jsonp, gzipped, nocache, lang_sorting_key, copy_request_args,\
+from .auxiliary_functions import process_request_cookies, jsonp, gzipped, nocache, lang_sorting_key, copy_request_args,\
     distance_constraints_too_complex, remove_sensitive_data, log_query
 from .search_pipelines import *
 
@@ -49,6 +49,8 @@ def search_page():
     if type(locales) == list:
         locales = {x: x for x in locales}
 
+    process_request_cookies()
+
     return render_template('index.html',
                            minimalistic=bMinimalistic,
                            ready_for_work=ready4work,
@@ -79,6 +81,9 @@ def search_page():
                                                         ensure_ascii=False, indent=-1),
                            int_meta_fields=json.dumps(settings.integer_meta_fields,
                                                       ensure_ascii=False, indent=-1),
+                           translit=get_session_data('translit'),
+                           page_size=get_session_data('page_size'),
+                           hidden_tiers=get_session_data('hidden_tiers'),
                            share_query_url=str(settings.share_query_url).lower(),
                            error_reports_enabled=settings.error_reports_enabled,
                            generate_dictionary=settings.generate_dictionary,
@@ -684,6 +689,21 @@ def toggle_document(docID):
             sizePercent = -1 * sizePercent
             nDocs = -1
     return jsonify({'n_words': nWords, 'n_docs': nDocs, 'size_percent': sizePercent})
+
+
+@app.route('/toggle_lang/<lang>')
+def toggle_lang(lang):
+    """
+    The user switched one of the languages / tiers on or off
+    in their display settings. Remember their choice.
+    """
+    if lang in settings.languages:
+        hiddenTiers = get_session_data('hidden_tiers')
+        if lang in hiddenTiers:
+            set_session_data('hidden_tiers', [tier for tier in hiddenTiers if tier != lang])
+        else:
+            set_session_data('hidden_tiers', hiddenTiers + [lang])
+    return ''
 
 
 @app.route('/clear_subcorpus')

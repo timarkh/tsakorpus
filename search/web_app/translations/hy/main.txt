@@ -190,6 +190,9 @@ msgstr "Գլոսսաներ՝"
 msgid "Language/tier:"
 msgstr "Լեզու/շերտ՝"
 
+msgid "Languages / tiers:"
+msgstr "Լեզուներ / շերտեր՝"
+
 #: templates/index/query_area.html:36
 #: templates/modals/subcorpus_selection.html:58
 msgid "langname_all"

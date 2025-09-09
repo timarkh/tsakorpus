@@ -190,6 +190,9 @@ msgstr "Gloss:"
 msgid "Language/tier:"
 msgstr "Language/tier:"
 
+msgid "Languages / tiers:"
+msgstr "Languages / tiers:"
+
 #: templates/index/query_area.html:36
 #: templates/modals/subcorpus_selection.html:58
 msgid "langname_all"

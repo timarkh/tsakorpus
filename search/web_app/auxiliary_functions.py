@@ -1,11 +1,12 @@
 import gzip
+import re
 from functools import wraps, update_wrapper
 import copy
 import math
 import json
 import time
 from flask import request, current_app, after_this_request, make_response
-from . import settings
+from . import settings, session_management
 from .transliteration import *
 
 
@@ -175,6 +176,27 @@ def remove_sensitive_data(hits):
                 del hit['_source']['prev_id']
             if 'next_id' in hit['_source']:
                 del hit['_source']['next_id']
+
+
+def process_request_cookies():
+    """
+    If there are cookies for parameters such as the interface language,
+    remember their values.
+    """
+    localeCookie = request.cookies.get('locale')
+    if localeCookie is not None and localeCookie in settings.interface_languages:
+        session_management.set_session_data('locale', localeCookie, setCookie=False)
+    pageSizeCookie = request.cookies.get('page_size')
+    if pageSizeCookie is not None:
+        if not (type(pageSizeCookie) == str and re.search('^\\d+$', pageSizeCookie) is None):
+            pageSizeCookie = int(pageSizeCookie)
+        session_management.set_session_data('page_size', pageSizeCookie, setCookie=False)
+    translitCookie = request.cookies.get('translit')
+    if translitCookie is not None and translitCookie in settings.transliterations:
+        session_management.set_session_data('translit', translitCookie, setCookie=False)
+    hiddenTiersCookie = request.cookies.get('hidden_tiers')
+    if hiddenTiersCookie is not None:
+        session_management.set_session_data('hidden_tiers', json.loads(hiddenTiersCookie), setCookie=False)
 
 
 def log_query(queryType, args, fnameLog='query_log.txt'):

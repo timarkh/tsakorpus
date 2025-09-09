@@ -112,6 +112,21 @@ function toggle_glossed_layer(e) {
 	}
 }
 
+function toggle_lang(e) {
+	classToToggle = ".sent_lang_" + $(this).attr('data');
+	if ($(this).is(':checked')) {
+		$(classToToggle).css("display", "");
+	}
+	else {
+		$(classToToggle).css("display", "none");
+	}
+	// Notify the server
+	$.ajax({
+		url: "toggle_lang/" + $(this).attr('data'),
+		type: "GET"
+	});
+}
+
 function highlight_word_spans(item, i) {
 	if (item == "word" || item.includes('match') || !item.startsWith("w")) return;
 	$('.' + item).addClass('w_highlighted');
@@ -239,6 +254,16 @@ function toggle_interlinear() {
 		});
 		$('.ana_interlinear').remove();
 	}
+	// Hide tiers unselected by the user via a cookie from a previous session
+	$('.toggle_lang').each(function (index) {
+		classToToggle = ".sent_lang_" + $(this).attr('data');
+		if ($(this).is(':checked')) {
+			$(classToToggle).css("display", "");
+		}
+		else {
+			$(classToToggle).css("display", "none");
+		}
+	});
 }
 
 	

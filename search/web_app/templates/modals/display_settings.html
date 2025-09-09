@@ -10,7 +10,7 @@
 					<div class="settings_column">
 						<div class="row">
 							<label for="page_size" class="col-sm-6 col-form-label">{{ _('Results per page:') }}</label>
-							<input form="search_main" type="number" name="page_size" id="page_size" value="10" min="1" max="{{ max_page_size }}" class="search_input distance_input">
+							<input form="search_main" type="number" name="page_size" id="page_size" value="{{ page_size }}" min="1" max="{{ max_page_size }}" class="search_input distance_input">
 						</div>
 						<div class="row">
 							<label for="sort" class="col-sm-6 col-form-label">{{ _('Sorting:') }}</label>
@@ -48,7 +48,7 @@
 							<label for="translit" class="col-sm-6 col-form-label">{{ _('Transliteration: ') }}</label>
 							<select form="search_main" name="translit" id="translit" class="search_input">
 							{% for tr in transliterations %}
-								<option value="{{ tr }}">{{ _('translitname_' + tr) }}</option>
+								<option value="{{ tr }}"{% if translit==tr %} selected{% endif %}>{{ _('translitname_' + tr) }}</option>
 							{% endfor %}
 							</select>
 						</div>
@@ -85,6 +85,17 @@
 							<label for="toggle_additional_ana_fields" class="col-sm-6">{{ _('Additional fields') }}</label>
 						</div>
 					</div>
+					{% if languages|length > 1 %}
+					<div class="settings_column_leftalign">
+						<h5>{{ _('Languages / tiers:') }}</h5>
+						{% for lang in languages %}
+						<div class="row">
+							<input type="checkbox" name="toggle_lang_{{ lang }}" data="{{ lang }}" class="toggle_lang row_checkbox" id="toggle_lang_{{ lang }}"{% if lang not in hidden_tiers %} checked{% endif %}>
+							<label for="toggle_lang_{{ lang }}" class="col-sm-6">{{ _('langname_' + lang) }}</label>
+						</div>
+						{% endfor %}
+					</div>
+					{% endif %}
 				</div>
 			</div>
 			<div class="modal-footer">

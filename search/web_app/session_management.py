@@ -3,13 +3,16 @@ Manage session data and cookies.
 """
 
 
-from flask import session
+from flask import session, after_this_request
 import uuid
-import random
+import json
 import re
 from datetime import datetime
 from . import settings, sessionData, MAX_PAGE_SIZE
 from .search_context import SearchContext
+
+
+fields2cookies = {'locale', 'page_size', 'translit', 'hidden_tiers'}
 
 
 def initialize_session():
@@ -30,6 +33,7 @@ def initialize_session():
                                           'seed': int(datetime.now().timestamp()),
                                           'excluded_doc_ids': set(),
                                           'invert_subcorpus': False,    # if True, then excluded_doc_ids actually contain selected doc IDs
+                                          'hidden_tiers': [],
                                           'progress': 100,
                                           'search_context': SearchContext(curLocale=settings.default_locale)}
 
@@ -61,6 +65,8 @@ def get_session_data(fieldName):
         sessionData[session['session_id']]['excluded_doc_ids'] = set()
     elif fieldName == 'invert_subcorpus' and fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']]['invert_subcorpus'] = False
+    elif fieldName == 'hidden_tiers' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['hidden_tiers'] = []
     elif fieldName == 'progress' and fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']]['progress'] = 0
     elif fieldName not in sessionData[session['session_id']]:
@@ -73,19 +79,47 @@ def get_session_data(fieldName):
         return None
 
 
-def set_session_data(fieldName, value):
+def add_cookie(fieldName, value):
+    if type(value) in (list, dict):
+        value = json.dumps(value, indent=-1, sort_keys=True, ensure_ascii=False)
+    elif type(value) != str:
+        value = str(value)
+
+    @after_this_request
+    def add_cookie_to_response(response):
+        response.set_cookie(fieldName, value, samesite='Strict', max_age=90 * 60 * 60 * 24)
+        return response
+
+
+def set_session_data(fieldName, value, setCookie=True):
     """
     Set the value of the fieldName parameter for the current session.
     If the session has not yet been initialized, initialize it first.
+    If setCookie == True and a parameter values should be stored in a
+    cookie, add a cookie to the current request.
     """
     global sessionData
-    if 'session_id' not in session:
+    if ('session_id' not in session
+            or session['session_id'] not in sessionData
+            or 'search_context' not in sessionData[session['session_id']]):
         initialize_session()
-    if session['session_id'] not in sessionData:
-        sessionData[session['session_id']] = {}
-    sessionData[session['session_id']][fieldName] = value
+
+    if fieldName == 'page_size':
+        if value > MAX_PAGE_SIZE:
+            value = MAX_PAGE_SIZE
+        elif value < 1:
+            value = 1
+
+    if fieldName == 'translit':
+        sessionData[session['session_id']]['search_context'].translit = value
+    else:
+        sessionData[session['session_id']][fieldName] = value
+
     if fieldName == 'locale':
-        sessionData[session['session_id']]['search_context'].locale = value
+        sessionData[session['session_id']]['search_context'].locale = value     # Stored in two places
+
+    if setCookie and fieldName in fields2cookies:
+        add_cookie(fieldName, value)
 
 
 def in_session(fieldName):
@@ -131,6 +165,7 @@ def change_display_options(query):
         set_session_data('distance_strict', False)
     if 'translit' in query:
         searchContext.translit = query['translit']
+        add_cookie('translit', query['translit'])
     else:
         searchContext.translit = None
     if ('random_seed' in query
