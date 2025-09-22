@@ -303,6 +303,7 @@ class PrepareData:
             'next_id': {'type': 'keyword'},
             'doc_id': {'type': 'keyword'},
             'sent_id': {'type': 'long'},
+            'sent_id_local': {'type': 'long'},
             'partition': {'type': 'keyword'},
             'text': {'type': 'text'},
             'lang': {'type': 'keyword'},

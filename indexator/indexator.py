@@ -870,13 +870,24 @@ class Indexator:
                         pa['sent_ids'] += paraIDs[i][paraID]
 
     def iterate_sentences(self, fname):
-        docMeta = {}
+        curSentID = 0
+        docMeta = self.iterSent.get_metadata(fname)
+        bFulltextEnabled = False
+        bSentIDSortEnabled = False
+        if ('fulltext_view_enabled' in self.settings
+                and self.settings['fulltext_view_enabled']
+                and 'fulltext_id' in docMeta):
+            bFulltextEnabled = True
+        if ('sent_id_sort_enabled' in self.settings and self.settings['sent_id_sort_enabled']):
+            bSentIDSortEnabled = True
+
         if 'doc_to_sentence_meta' in self.settings:
-            docMeta = self.iterSent.get_metadata(fname)
             self.add_meta_keywords(docMeta)
             docMeta = {k: v for k, v in docMeta.items()
                        if (k in self.settings['doc_to_sentence_meta']
                            or (k.endswith('_kw') and k[:-3] in self.settings['doc_to_sentence_meta']))}
+        else:
+            docMeta = {}
         self.numSents = 0
         prevLast = False
         sentences = []
@@ -884,15 +895,18 @@ class Indexator:
         self.curWordDocFreqs = [{} for i in range(len(self.languages))]
         for s, bLast in self.iterSent.get_sentences(fname):
             sRandomID = self.randomize_id(self.sID)
+
             if 'lang' in s:
                 langID = s['lang']
             else:
                 langID = 0
                 s['lang'] = langID
             s['n_words'] = 0
-            if 'sent_id_sort_enabled' in self.settings and self.settings['sent_id_sort_enabled']:
-                s['sent_id'] = self.sentID
+
+            if bSentIDSortEnabled:
+                s['sent_id'] = self.sentID      # unique for the entire corpus (unlike sent_id_local)
                 self.sentID += 1
+
             if 'meta' in s:
                 self.add_meta_keywords(s['meta'])
             if len(docMeta) > 0:

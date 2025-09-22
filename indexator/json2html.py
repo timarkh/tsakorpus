@@ -38,12 +38,16 @@ class JSON2HTML:
         sent = re.sub('  +', ' ', sent)
         return sent
 
-    def finalize_html_paragraph(self, sentByTier, colClass, paraNum):
+    def finalize_html_paragraph(self, sentByTier, colClass, paraNum, sentID=''):
         """
         Make one HTML paragraph with parallel sentences.
         """
+        if type(sentID) != str:
+            sentID = str(sentID)
+        if len(sentID) > 0:
+            sentID = ' id="' + sentID + '"'
         remainingCol = max(2, 12 - colClass * len(sentByTier))
-        paragraph = '<div class="d-none d-sm-block col-md-' + str(remainingCol // 2) + '"></div>'
+        paragraph = '<div class="d-none d-sm-block col-md-' + str(remainingCol // 2) + '"' + sentID + '></div>'
         paragraph += '<div class="paragraph_num">'
         if paraNum % 10 == 0:
             paragraph += '<div>' + str(paraNum) + '</div>'
@@ -80,6 +84,9 @@ class JSON2HTML:
                 for para in s['para_alignment']:
                     if 'para_id' in para:
                         curParaIDs.append(para['para_id'])
+            curSentID = ''
+            if 'sent_id_local' in s:
+                curSentID = 'sent_' + str(s['sent_id_local'])
             s['doc_id'] = '0'
             s = {
                 '_source': s
@@ -93,7 +100,8 @@ class JSON2HTML:
             if len(sentProcessed['languages']['lang' + str(nTier)]['text']) > 0:
                 curSentData = {
                     'html': sentProcessed['languages']['lang' + str(nTier)]['text'] + ' \n',
-                    'para_ids': curParaIDs
+                    'para_ids': curParaIDs,
+                    'sent_id': curSentID
                 }
                 htmlByTier[nTier].append(curSentData)
                 paraIDsByTier[nTier] |= set(curSentData['para_ids'])
@@ -135,6 +143,7 @@ class JSON2HTML:
             curParagraph = [''] * nTiers
             curParagraph[0] = self.finalize_html_sentence(htmlByTier[0][curPointers[0]]['html'])
             curParaIDs = set(htmlByTier[0][curPointers[0]]['para_ids'])
+            curSentID = htmlByTier[0][curPointers[0]]['sent_id']
             for iTier in range(1, nTiers):
                 remainingParaIDs = (paraIDsByTier[iTier] & curParaIDs) - usedParaIDsByTier[iTier]
                 while len(remainingParaIDs) > 0 and curPointers[iTier] < len(htmlByTier[iTier]):
@@ -142,7 +151,7 @@ class JSON2HTML:
                     usedParaIDsByTier[iTier] |= set(htmlByTier[iTier][curPointers[iTier]]['para_ids'])
                     remainingParaIDs -= set(htmlByTier[iTier][curPointers[iTier]]['para_ids'])
                     curPointers[iTier] += 1
-            dataFinal['rows'].append(self.finalize_html_paragraph(curParagraph, colClass, curPointers[0] + 1))
+            dataFinal['rows'].append(self.finalize_html_paragraph(curParagraph, colClass, curPointers[0] + 1, curSentID))
             curPointers[0] += 1
 
         if not os.path.exists(os.path.dirname(fnameOut)):

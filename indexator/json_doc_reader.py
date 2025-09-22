@@ -18,6 +18,7 @@ class JSONDocReader:
         self.lastDocMeta = None         # for lazy calculations
         self.settings = settings
         self.nonpersistentID = random.randint(1, 100)
+        self.sentID = 0
 
     @staticmethod
     def insert_meta_year(metadata):
@@ -92,6 +93,16 @@ class JSONDocReader:
             return
         sentence['meta']['year'] = self.lastDocMeta['year_from']
 
+    def insert_local_sent_id(self, sentence):
+        """
+        If fulltext view is enabled for this document, also add a local
+        sentence ID.
+        """
+        if 'fulltext_id' not in self.lastDocMeta:
+            return
+        sentence['sent_id_local'] = self.sentID
+        self.sentID += 1
+
     def get_sentences(self, fname):
         """
         If the file is not too large, iterate through its
@@ -99,6 +110,7 @@ class JSONDocReader:
         """
         if os.stat(fname).st_size > self.filesize_limit > 0:
             return
+        self.sentID = 0
         self.get_metadata(fname)
         if self.format == 'json':
             fIn = open(fname, 'r', encoding='utf-8-sig')
@@ -111,6 +123,7 @@ class JSONDocReader:
             fIn.close()
             for i in range(len(doc['sentences'])):
                 self.insert_doc_level_meta(doc['sentences'][i])
+                self.insert_local_sent_id(doc['sentences'][i])
                 if i < len(doc['sentences']) - 1:
                     yield doc['sentences'][i], False
                 else:
@@ -128,6 +141,7 @@ class JSONDocReader:
             prevSent = {}
             for sentence in ijson.items(fIn, 'sentences.item'):
                 self.insert_doc_level_meta(sentence)
+                self.insert_local_sent_id(sentence)
                 if prevSent != {}:
                     yield prevSent, False
                 prevSent = sentence
