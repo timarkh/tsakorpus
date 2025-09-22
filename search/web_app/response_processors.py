@@ -1365,6 +1365,7 @@ class SentenceViewer:
             'excluded': (exclude is not None and
                          ((not inverted and int(dID) in exclude) or
                           (inverted and int(dID) not in exclude))),
+            'fulltext_id': '',
             'id': dID
         }
         dateDisplayed = '-'
@@ -1380,6 +1381,8 @@ class SentenceViewer:
                 doc['fields'].append(dSource[field])
             else:
                 doc['fields'].append('')
+        if self.settings.fulltext_view_enabled and 'fulltext_id' in dSource:
+            doc['fulltext_id'] = dSource['fulltext_id']
         return doc
 
     def retrieve_highlighted_words(self, sentence, numSent, queryWordID=''):

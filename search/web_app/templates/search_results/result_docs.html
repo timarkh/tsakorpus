@@ -6,6 +6,7 @@
 	<table class="documents_list_table">
 		<thead>
 			<th>&nbsp;</th>
+			{% if fulltext_view_enabled %}<th>&nbsp;</th>{% endif %}
 			{% for f in data.metafields %}
 				{% if f not in sentence_meta %}
 				<th>{{ _('metafield_' + f) }}</th>
@@ -16,6 +17,7 @@
 			{% for doc in data.docs %}
 				<tr id="doc{{ doc.id }}" {% if doc.excluded %} class="context_off" {% endif %}>
 				<td><input type="checkbox" class="doc_toggle_chk" {% if not doc.excluded %}checked{% endif %}></td>
+				{% if fulltext_view_enabled %}<td>{% if doc.fulltext_id|length > 0 %}<a class="bi bi-book fulltext_link_subcorpus" href="docs/{{ doc.fulltext_id }}" target="_blank" title="{{ _('Full text (opens in a new tab)') }}"> </a>{% endif %}</td>{% endif %}
 				{% for field in doc.fields %}
 					<td>{{ field|safe }}</td>
 				{% endfor %}

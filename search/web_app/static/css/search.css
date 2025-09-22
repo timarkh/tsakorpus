@@ -232,6 +232,16 @@
 	padding-right: 3px;
 }
 
+.fulltext_link_subcorpus {
+    font-size: 18px;
+	margin: auto;
+	color: #8f4a00!important;
+}
+
+.fulltext_link_subcorpus:hover {
+	color: #cf7a13!important;
+}
+
 .bi-arrows-fullscreen {
 	width: 22px;
 	font-size: 22px;

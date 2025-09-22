@@ -488,7 +488,9 @@ def search_doc():
                                                primaryLanguages=settings.primary_languages)
     hitsProcessed['media'] = settings.media
     hitsProcessed['images'] = settings.images
-    return render_template('search_results/result_docs.html', data=hitsProcessed,
+    return render_template('search_results/result_docs.html',
+                           data=hitsProcessed,
+                           fulltext_view_enabled=settings.fulltext_view_enabled,
                            sentence_meta=settings.sentence_meta)
 
 
