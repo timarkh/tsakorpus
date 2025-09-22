@@ -443,8 +443,15 @@ class SentenceViewer:
                 if newField not in result:
                     result.append(newField)
         else:
+            fulltextPage = 0
+            sentID = -1
+            if 'sent_id_local' in sentSource:
+                sentID = sentSource['sent_id_local']
+                fulltextPage = sentID // self.settings.fulltext_page_size + 1
             result = render_template('search_results/sentence_header.html',
                                      fulltext_view_enabled=self.settings.fulltext_view_enabled,
+                                     fulltext_page=fulltextPage,
+                                     sent_id=sentID,
                                      author_meta=self.authorMeta,
                                      date_display=dateDisplay,
                                      metaHtml=metaHtml,

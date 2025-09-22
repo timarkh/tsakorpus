@@ -1,5 +1,7 @@
 import copy
 import html
+import shutil
+
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
 from elasticsearch.helpers import bulk
@@ -122,6 +124,7 @@ class Indexator:
 
     def __init__(self, overwrite=False):
         random.seed(datetime.now().timestamp())
+        self.fulltextDir = '../search/corpus_html'
         self.overwrite = overwrite  # whether to overwrite an existing index without asking
         with open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
                   'r', encoding='utf-8') as fSettings:
@@ -1019,7 +1022,7 @@ class Indexator:
                 and 'fulltext_id' in meta):
             fnameOut = meta['fulltext_id'] + '.json'
             self.j2h.process_file(fname,
-                                  os.path.join('../search/corpus_html',
+                                  os.path.join(self.fulltextDir,
                                                self.name,
                                                fnameOut))
         curAction = {'_index': self.name + '.docs',
@@ -1108,6 +1111,17 @@ class Indexator:
         else:
             print('Interface translations compiled.')
 
+    def clean_dirs(self):
+        """
+        Flush contents of all directories whose content should be generated
+        again.
+        """
+        if ('fulltext_view_enabled' in self.settings
+                and self.settings['fulltext_view_enabled']):
+            if os.path.exists(self.fulltextDir):
+                shutil.rmtree(self.fulltextDir)
+            os.makedirs(self.fulltextDir)
+
     def load_corpus(self):
         """
         Drop the current database, if any, and load the entire corpus.
@@ -1119,6 +1133,7 @@ class Indexator:
             return
         self.analyze_dir()
         self.create_indices()
+        self.clean_dirs()
         self.index_dir()
         t2 = time.time()
         print('Corpus indexed in', t2-t1, 'seconds:',

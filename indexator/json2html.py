@@ -38,19 +38,19 @@ class JSON2HTML:
         sent = re.sub('  +', ' ', sent)
         return sent
 
-    def finalize_html_paragraph(self, sentByTier, colClass, paraNum, sentID=''):
+    def finalize_html_paragraph(self, sentByTier, colClass, sentID=-1):
         """
         Make one HTML paragraph with parallel sentences.
         """
-        if type(sentID) != str:
-            sentID = str(sentID)
-        if len(sentID) > 0:
-            sentID = ' id="' + sentID + '"'
+        if sentID >= 0:
+            sentDivID = ' id="sent_' + str(sentID) + '"'
+        else:
+            sentDivID = ''
         remainingCol = max(2, 12 - colClass * len(sentByTier))
-        paragraph = '<div class="d-none d-sm-block col-md-' + str(remainingCol // 2) + '"' + sentID + '></div>'
+        paragraph = '<div class="d-none d-sm-block col-md-' + str(remainingCol // 2) + '"' + sentDivID + '></div>'
         paragraph += '<div class="paragraph_num">'
-        if paraNum % 10 == 0:
-            paragraph += '<div>' + str(paraNum) + '</div>'
+        if sentID % 10 == 0:
+            paragraph += '<div>' + str(sentID) + '</div>'
         paragraph += '</div>\n'
         for iTier in range(len(sentByTier)):
             sent = sentByTier[iTier]
@@ -86,7 +86,9 @@ class JSON2HTML:
                         curParaIDs.append(para['para_id'])
             curSentID = ''
             if 'sent_id_local' in s:
-                curSentID = 'sent_' + str(s['sent_id_local'])
+                # All sentences in this iterator are numbered consecutively,
+                # starting from 1
+                curSentID = s['sent_id_local']      # int
             s['doc_id'] = '0'
             s = {
                 '_source': s
@@ -151,7 +153,7 @@ class JSON2HTML:
                     usedParaIDsByTier[iTier] |= set(htmlByTier[iTier][curPointers[iTier]]['para_ids'])
                     remainingParaIDs -= set(htmlByTier[iTier][curPointers[iTier]]['para_ids'])
                     curPointers[iTier] += 1
-            dataFinal['rows'].append(self.finalize_html_paragraph(curParagraph, colClass, curPointers[0] + 1, curSentID))
+            dataFinal['rows'].append(self.finalize_html_paragraph(curParagraph, colClass, curSentID))
             curPointers[0] += 1
 
         if not os.path.exists(os.path.dirname(fnameOut)):

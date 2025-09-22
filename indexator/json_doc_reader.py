@@ -100,8 +100,8 @@ class JSONDocReader:
         """
         if 'fulltext_id' not in self.lastDocMeta:
             return
-        sentence['sent_id_local'] = self.sentID
         self.sentID += 1
+        sentence['sent_id_local'] = self.sentID
 
     def get_sentences(self, fname):
         """

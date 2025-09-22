@@ -5,15 +5,13 @@
 	<link rel="stylesheet" type="text/css" href="../static/bootstrap-5.0.0-beta1-dist/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="../static/css/search.css">
 	<link rel="stylesheet" type="text/css" href="../static/css/gramm_gloss_selection.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+	<link rel="stylesheet" type="text/css" href="../static/icons-1.4.1/font/bootstrap-icons.css">
 	<script src="../static/jquery-3.5.1-dist/jquery-3.5.1.min.js"></script>
 	<script type='text/javascript' src='../static/bootstrap-5.0.0-beta1-dist/js/bootstrap.bundle.min.js'></script>
 	<script type='text/javascript' src='../static/js/common_interface_functions.js'></script>
 	<script type='text/javascript' src='../static/js/fulltext.js'></script>
-	<!-- <script type='text/javascript' src='../static/js/json_loaders.js'></script> -->
 	<script type='text/javascript'>
 	</script>
-	<!-- <link href="https://fonts.googleapis.com/css?family=Lato:400,400i" rel="stylesheet"> -->
 	{% include "head_add.html" ignore missing %}
 </head>
 <body>
@@ -37,8 +35,8 @@
 		</div>
 {% endif %}
 		{% for row in data.rows %}
-			<div class="row sentence_fulltext">
-			{{ row | safe }}
+			<div class="row sentence_fulltext{% if row.selected %} fulltext_selected{% endif %}">
+			{{ row.contents | safe }}
 			</div>
 		{% endfor %}
 {% if max_page_number > 0 %}

@@ -28,7 +28,7 @@
 		<a id="cite_corpus" class="bi bi-chat-quote" data-tooltip="tooltip" data-placement="bottom" title="{{ _('How to cite') }}"></a>
 	{% endif %}
 
-	<a id="show_help" class="bi bi-question-circle-fill" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Show help') }}"></a>
+	<a id="show_help" class="bi bi-question-circle-fill{% if fulltext_view %} no-animation{% endif %}" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Show help') }}"></a>
 	
 	{% if documentation_url %}
 		|&nbsp;&nbsp;

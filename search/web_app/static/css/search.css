@@ -298,6 +298,11 @@
 
 }
 
+.fulltext_selected {
+    background-color: #fadd98!important;
+    font-weight: bold;
+}
+
 .sentence_fulltext:hover {
     background-color: #fff3d1;
 }
@@ -652,6 +657,10 @@ label {
 #show_help {
 	color: darkorange;
 	animation: blinkHelp 1.5s;
+}
+
+.no-animation {
+	animation: none!important;
 }
 
 #cite_corpus {

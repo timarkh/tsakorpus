@@ -579,6 +579,14 @@ def send_text_html(doc_fname):
                      for il in settings.interface_languages]
     data['meta'] = {k: data['meta'][k]
                     for k in data['meta'] if k in viewableMeta}
+
+    sent = request.args.get('sent', 0)
+    try:
+        sent = int(sent)
+    except:
+        sent = 0
+    sent = 'sent_' + str(sent)
+
     page = request.args.get('page', 1)
     try:
         page = int(page) - 1
@@ -586,20 +594,29 @@ def send_text_html(doc_fname):
         page = 0
     if page < 0:
         page = 0
+
     maxPage = len(data['rows']) // settings.fulltext_page_size
     if page > maxPage:
         page = maxPage
     data['rows'] = data['rows'][page * settings.fulltext_page_size:
                                 (page + 1) * settings.fulltext_page_size]
+    data['rows'] = [{'contents': r, 'selected': (re.search(' id="' + sent + '"', r) is not None)}
+                    for r in data['rows']]
     data['page'] = page + 1
+
+    locales = settings.interface_languages
+    if type(locales) == list:
+        locales = {x: x for x in locales}
+
     return render_template('fulltext.html',
+                           fulltext_view=True,      # flag used to switch of some of the index page behavior in the header
                            locale=get_locale(),
                            corpus_name=settings.corpus_name,
                            languages=settings.languages,
                            generate_dictionary=settings.generate_dictionary,
                            citation=settings.citation,
                            start_page_url=settings.start_page_url,
-                           locales=settings.interface_languages,
+                           locales=locales,
                            viewable_meta=viewableMeta,
                            data=data,
                            max_page_number=maxPage + 1)
