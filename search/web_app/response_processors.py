@@ -361,6 +361,24 @@ class SentenceViewer:
                     offEnds[i - indexSubtr] = {'smatch'}
                 indexSubtr += 5
 
+    def determine_subcorpora(self, meta):
+        """
+        Determine to which of the pre-defined subcorpora a document with
+        the given metadata belongs to. Subcorpora are defined by the "subcorpora"
+        dictionary in corpus.json.
+        """
+        subcorpora = []
+        for subcorpusID, conditions in self.settings.subcorpora.items():
+            bMatch = True
+            for k, v in conditions.items():
+                if k not in meta or v.search(meta[k]) is None:
+                    bMatch = False
+                    break
+            if bMatch:
+                subcorpora.append(subcorpusID)
+        subcorpora.sort()
+        return subcorpora
+
     def process_sentence_header(self, sentSource, format='html', curLocale=''):
         """
         Retrieve the metadata of the document the sentence
@@ -455,7 +473,8 @@ class SentenceViewer:
                                      author_meta=self.authorMeta,
                                      date_display=dateDisplay,
                                      metaHtml=metaHtml,
-                                     meta=meta)
+                                     meta=meta,
+                                     subcorpora=self.determine_subcorpora(meta))
         return result
 
     def get_word_offsets(self, sSource, numSent, matchOffsets=None):

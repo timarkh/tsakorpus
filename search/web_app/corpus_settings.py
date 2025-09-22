@@ -37,6 +37,7 @@ class CorpusSettings:
         self.doc_to_sentence_meta = []
         self.sentence_meta_values = {}
         self.viewable_meta = []
+        self.subcorpora = {}
         self.word_fields = []
         self.search_meta = {'columns': [], 'stat_options': []}
         self.ambiguous_analyses = True
@@ -175,7 +176,8 @@ class CorpusSettings:
             'lang_props.gramm_shortcuts',
             'lang_props.gloss_shortcuts',
             'word_fields_shortcuts',
-            'meta_analyzer_patterns'
+            'meta_analyzer_patterns',
+            'subcorpora'
         }
 
         # Fields that should never be saved to corpus.json.
@@ -252,6 +254,14 @@ class CorpusSettings:
                                   if lang in self.languages]
         if len(self.primary_languages) == len(self.languages):
             self.primary_languages = []     # Trivial coincidence
+
+        # Compile regexes for determining if a document belongs to one of the pre-defined
+        # subcorpora
+        for subcorpusID in self.subcorpora:
+            for k, v in self.subcorpora[subcorpusID].items():
+                if not (v.startswith('^') and v.endswith('$') and '|' not in v):
+                    v = '^(' + v + ')$'
+                self.subcorpora[subcorpusID][k] = re.compile(v)
 
     def as_dict(self):
         """

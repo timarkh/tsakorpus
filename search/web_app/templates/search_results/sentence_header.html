@@ -1,5 +1,8 @@
 <span class="context_header" data-meta="{% if metaHtml %}{{ metaHtml }}{% endif %}">
 {% if meta %}
+{% for subcorpus in subcorpora %}
+<div class="circle subcorpus_{{ subcorpus }}" data-tooltip="tooltip" data-placement="bottom" title="{{ _('Subcorpus:') }} {{ _('metavalue_' + subcorpus) }}"> </div>
+{% endfor %}
 {% if meta.title %}
 <span class="ch_title">{{ meta.title }}</span>
 {% else %}
