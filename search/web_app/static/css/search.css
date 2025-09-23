@@ -332,6 +332,7 @@
 .sent_results {
 	/* max-height: calc(100vh - 310px); */
 	overflow-y: auto;
+	min-height: 100px;
 }
 
 .p_highlighted {
@@ -556,6 +557,12 @@ label {
 	margin-bottom: 5px;
 	padding: 5px;
 	line-height: 1.5;
+}
+
+@media (max-height: 600px) {
+	.hidden_if_small_screen {
+		display: none;
+	}
 }
 
 #corpus_title {

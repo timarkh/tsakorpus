@@ -414,11 +414,12 @@ function assign_show_hide() {
 			case "toggle-query_slide":
 				if(!el.is(":animated")){
 					iconSwap = $('#hide_query_icon');
+					$("#corpus_header").toggleClass('hidden_if_small_screen');
 					iconSwap.toggleClass('bi-arrow-bar-down');
 					iconSwap.toggleClass('bi-arrow-bar-up');
 					$('#hide_query_caption').toggle();
 					wrapper.removeClass("transitions");
-					el.slideToggle(dur,function(){wrapper.addClass("transitions");});
+					el.slideToggle(dur, function() {wrapper.addClass("transitions");});
 				}
 				break;
 		}
