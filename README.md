@@ -1,4 +1,4 @@
-# Tsakorpus 2.0
+# Tsakorpus 3.0
 
 If you want to use Tsakorpus, download the most recent version from this repository.
 
@@ -18,11 +18,13 @@ Feel free to ask questions or discuss Tsakorpus [on the Discussions page](https:
 
 Tsakorpus was tested on Windows and Ubuntu. Its dependencies are the following:
 
-* elasticsearch 7.x (tested on 7.6-7.12)
-* python >= 3.5
-* python modules: elasticsearch 7.x, flask, lxml, ijson, Flask-Babel, xlsxwriter (you can use requirements.txt)
+* elasticsearch 9.x or 7.x (probably also works on 8.x)
+* python >= 3.12
+* python modules: elasticsearch, flask, lxml, ijson, Flask-Babel, xlsxwriter, sqlitedict, pympler (you can use requirements.txt)
 * for converting media-aligned corpora: ffmpeg
 * it is recommended to deploy tsakorpus through apache2 with wsgi or nginx
+
+**Caution**: the major version number of the ``elasticsearch`` Python module must be equal to the major version number of your Elasticsearch! If you use ``requirements.txt``, the latest ``9.x`` version will be installed. If you use another Elasticsearch version, edit the requirements manually (e.g., ``elasticsearch>=7.0.0,<8.0.0`` for Elasticsearch 7.x).
 
 The following resources are used by tsakorpus, but do not need to be installed:
 

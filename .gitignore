@@ -26,6 +26,7 @@ parts/
 sdist/
 var/
 venv/
+tsakorpus-venv/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -57,3 +58,4 @@ query_log.txt
 error_reports.txt
 *.sqlite
 *.sqlite-journal
+elastic_pwd

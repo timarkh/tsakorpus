@@ -62,7 +62,11 @@ List of parameters
 
 - ``doc_to_sentence_meta`` (list of strings) -- names of the document-level metadata fields that should be copied into each sentence for search speedup. Such denormalization makes sense for all keyword or integer metadata fields that you expect to be used in subcorpus selection or statistics, if your corpus is large and has many documents (at least thousands). If the user selects a subcorpus using only the values of such fields, that GET query is translated into a single sentence-level Elasticsearch query. Otherwise, all document IDs for the subcorpus are found first, then their list is inserted into the sentence-level query. If that list is too long, that can substantially affect search time or even lead to a crash.
 
-- ``elastic_url`` (string) -- by default, Tsakorpus connects to the Elasticsearch running on ``localhost:9200`` without user authentication. If you want to connect to Elasticsearch running on another host or port, or if you want to supply username and password, you can put a URL to be used here, e.g. ``http://user:password@localhost:9200/``. Make sure ``corpus.json`` does not have too broad read permissions. Defaults to empty string.
+- ``elastic_pwd`` (string) -- for Elasticsearch 9.x, specifies the password for basic authentication. If empty, the value of the environment variable ``ELASTIC_PASSWORD`` is used, if it exists. If it does not, the system will look for a password in a separate file ``search/elastic_pwd``. If it does not exist either, defaults to an empty string.
+
+- ``elastic_url`` (string) -- by default, Tsakorpus connects to the Elasticsearch running on ``localhost:9200`` without user authentication. If you want to connect to Elasticsearch running on another host or port, you can put a URL to be used here. On Elasticsearch 7.x, you can also supply the username and the password here, e.g. ``http://user:password@localhost:9200/``. On 9.x, they should be supplied in separate parameters, ``elastic_user`` and ``elastic_pwd``. Make sure ``corpus.json`` does not have too broad read permissions. Defaults to empty string.
+
+- ``elastic_user`` (string) -- for Elasticsearch 9.x, specifies the username for basic authentication. Defaults to ``elastic``.
 
 - ``error_reports_enabled`` (Boolean) -- whether the user can send reports about mistakes in search hits. If enabled, each search hit will contain a button that toggles a modal form for writing the report. All reports are stored in ``search/error_reports.txt``. Defaults to ``False``.
 

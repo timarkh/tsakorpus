@@ -1,3 +1,6 @@
+import elasticsearch
+ESVersion = elasticsearch.__version__[0]   # Should be 7 or 9 (or use 8 at your own risk, I didn't test it)
+
 from elasticsearch import Elasticsearch, helpers
 from elasticsearch.client import IndicesClient
 import subprocess
@@ -44,18 +47,48 @@ class SearchClient:
         self.settings = settings
         self.name = self.settings.corpus_name
         esTimeout = max(20, self.settings.query_timeout)
+
         self.es = None
+        if not self.check_elastic_version():
+            return
         if self.settings.elastic_url is not None and len(self.settings.elastic_url) > 0:
             # Connect to a non-default URL or supply username and password
-            self.es = Elasticsearch([self.settings.elastic_url], timeout=esTimeout)
+            if ESVersion == 7:
+                self.es = Elasticsearch([self.settings.elastic_url], timeout=esTimeout)
+            else:
+                self.es = Elasticsearch([self.settings.elastic_url], request_timeout=60,
+                                        basic_auth=(self.settings.elastic_user, self.settings.elastic_pwd))
         else:
-            self.es = Elasticsearch(timeout=esTimeout)
+            if ESVersion == 7:
+                self.es = Elasticsearch(timeout=esTimeout)
+            else:
+                self.es = Elasticsearch("http://localhost:9200", request_timeout=60,
+                                        basic_auth=(self.settings.elastic_user, self.settings.elastic_pwd))
+
         self.es_ic = IndicesClient(self.es)
         self.qp = InterfaceQueryParser(settings_dir, self.settings)
         self.logging = 'none'   # none|query|hits
         self.query_log = []
         # Logging is only switched temporarily when the user clicks on
         # "show query" or "show response" buttons in debug mode.
+
+    def check_elastic_version(self):
+        """
+        Check if the Elasticsearch has one of the accepted versions
+        and if version-specific settings (if any) are provided.
+        Return False if something is wrong, True otherwise.
+        """
+        if ESVersion == 8:
+            print('Warning: this Tsakorpus version has not been tested with Elasticsearch 8.x.')
+        elif ESVersion not in (7, 9):
+            print('Wrong Elasticsearch version:', ESVersion)
+            return False
+        if ESVersion == 9:
+            if len(self.settings.elastic_pwd) <= 0:
+                print('With Elasticsearch 9, a password for basic authentication has to be provided.')
+            if len(self.settings.elastic_user) <= 0:
+                self.settings.elastic_user = 'elastic'
+        return True
 
     def start_query_logging(self):
         """

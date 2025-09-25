@@ -2,6 +2,9 @@ import copy
 import html
 import shutil
 
+import elasticsearch
+ESVersion = elasticsearch.__version__[0]   # Should be 7 or 9 (or use 8 at your own risk, I didn't test it)
+
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
 from elasticsearch.helpers import bulk
@@ -129,6 +132,8 @@ class Indexator:
         with open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
                   'r', encoding='utf-8') as fSettings:
             self.settings = json.load(fSettings)
+        if not self.check_elastic_version():
+            return
         self.j2h = JSON2HTML(settings=self.settings)
         self.name = self.settings['corpus_name']
         self.languages = self.settings['languages']
@@ -184,9 +189,17 @@ class Indexator:
         self.es = None
         if 'elastic_url' in self.settings and len(self.settings['elastic_url']) > 0:
             # Connect to a non-default URL or supply username and password
-            self.es = Elasticsearch([self.settings['elastic_url']], timeout=60)
+            if ESVersion == 7:
+                self.es = Elasticsearch([self.settings['elastic_url']], timeout=60)
+            else:
+                self.es = Elasticsearch([self.settings['elastic_url']], request_timeout=60,
+                                        basic_auth=(self.settings['elastic_user'], self.settings['elastic_pwd']))
         else:
-            self.es = Elasticsearch(timeout=60)
+            if ESVersion == 7:
+                self.es = Elasticsearch(timeout=60)
+            else:
+                self.es = Elasticsearch("http://localhost:9200", request_timeout=60,
+                                        basic_auth=(self.settings['elastic_user'], self.settings['elastic_pwd']))
         self.es_ic = IndicesClient(self.es)
 
         self.shuffled_ids = [i for i in range(1, 1000000)]
@@ -235,6 +248,31 @@ class Indexator:
         for fname in os.listdir('.'):
             if fname.lower().endswith(('.sqlite', '.sqlite-journal')):
                 os.remove(fname)
+
+    def check_elastic_version(self):
+        """
+        Check if the Elasticsearch has one of the accepted versions
+        and if version-specific settings (if any) are provided.
+        Return False if something is wrong, True otherwise.
+        """
+        if ESVersion == 8:
+            print('Warning: this Tsakorpus version has not been tested with Elasticsearch 8.x.')
+        elif ESVersion not in (7, 9):
+            print('Wrong Elasticsearch version:', ESVersion)
+            return False
+        if ESVersion == 9:
+            if 'elastic_pwd' not in self.settings:
+                if 'ELASTIC_PASSWORD' in os.environ:
+                    self.settings['elastic_pwd'] = os.environ['ELASTIC_PASSWORD']
+                elif os.path.exists('../search/elastic_pwd'):
+                    with open('../search/elastic_pwd', 'r', encoding='utf-8') as fIn:
+                        self.elastic_pwd = fIn.read()
+                else:
+                    print('With Elasticsearch 9, a password for basic authentication has to be provided.')
+                    return False
+            if 'elastic_user' not in self.settings:
+                self.settings['elastic_user'] = 'elastic'
+        return True
 
     def delete_indices(self):
         """

@@ -24,6 +24,8 @@ class CorpusSettings:
         self.corpus_name = ''
         self.input_format = 'json'
         self.elastic_url = ''
+        self.elastic_user = ''
+        self.elastic_pwd = None
 
         # Corpus type
         self.images = False
@@ -233,6 +235,15 @@ class CorpusSettings:
 
         if 'stat_options' not in self.search_meta:
             self.search_meta['stat_options'] = []
+
+        if self.elastic_pwd is None:
+            if 'ELASTIC_PASSWORD' in os.environ:
+                self.elastic_pwd = os.environ['ELASTIC_PASSWORD']
+            elif os.path.exists('elastic_pwd'):
+                with open('elastic_pwd', 'r', encoding='utf-8') as fIn:
+                    self.elastic_pwd = fIn.read()
+            else:
+                self.elastic_pwd = ''
 
         # Move data to self.word_fields_by_tier for convenience
         self.word_fields_by_tier = {}
