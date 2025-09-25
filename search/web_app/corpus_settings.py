@@ -26,6 +26,7 @@ class CorpusSettings:
         self.elastic_url = ''
         self.elastic_user = ''
         self.elastic_pwd = None
+        self.elastic_cacert = ''
 
         # Corpus type
         self.images = False

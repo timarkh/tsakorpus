@@ -192,14 +192,24 @@ class Indexator:
             if ESVersion == 7:
                 self.es = Elasticsearch([self.settings['elastic_url']], timeout=60)
             else:
-                self.es = Elasticsearch([self.settings['elastic_url']], request_timeout=60,
-                                        basic_auth=(self.settings['elastic_user'], self.settings['elastic_pwd']))
+                if 'elastic_cacert' not in self.settings or len(self.settings['elastic_cacert']) <= 0:
+                    self.es = Elasticsearch([self.settings['elastic_url']], request_timeout=60,
+                                            basic_auth=(self.settings['elastic_user'], self.settings['elastic_pwd']))
+                else:
+                    self.es = Elasticsearch([self.settings['elastic_url']], request_timeout=60,
+                                            basic_auth=(self.settings['elastic_user'], self.settings['elastic_pwd']),
+                                            ca_certs=self.settings['elastic_cacert'])
         else:
             if ESVersion == 7:
                 self.es = Elasticsearch(timeout=60)
             else:
-                self.es = Elasticsearch("http://localhost:9200", request_timeout=60,
-                                        basic_auth=(self.settings['elastic_user'], self.settings['elastic_pwd']))
+                if 'elastic_cacert' not in self.settings or len(self.settings['elastic_cacert']) <= 0:
+                    self.es = Elasticsearch("http://localhost:9200", request_timeout=60,
+                                            basic_auth=(self.settings['elastic_user'], self.settings['elastic_pwd']))
+                else:
+                    self.es = Elasticsearch("https://localhost:9200", request_timeout=60,
+                                            basic_auth=(self.settings['elastic_user'], self.settings['elastic_pwd']),
+                                            ca_certs=self.settings['elastic_cacert'])
         self.es_ic = IndicesClient(self.es)
 
         self.shuffled_ids = [i for i in range(1, 1000000)]

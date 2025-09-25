@@ -56,14 +56,24 @@ class SearchClient:
             if ESVersion == 7:
                 self.es = Elasticsearch([self.settings.elastic_url], timeout=esTimeout)
             else:
-                self.es = Elasticsearch([self.settings.elastic_url], request_timeout=60,
-                                        basic_auth=(self.settings.elastic_user, self.settings.elastic_pwd))
+                if len(self.settings.elastic_cacert) > 0:
+                    self.es = Elasticsearch([self.settings.elastic_url], request_timeout=60,
+                                            basic_auth=(self.settings.elastic_user, self.settings.elastic_pwd),
+                                            ca_certs=self.settings.elastic_cacert)
+                else:
+                    self.es = Elasticsearch([self.settings.elastic_url], request_timeout=60,
+                                            basic_auth=(self.settings.elastic_user, self.settings.elastic_pwd))
         else:
             if ESVersion == 7:
                 self.es = Elasticsearch(timeout=esTimeout)
             else:
-                self.es = Elasticsearch("http://localhost:9200", request_timeout=60,
-                                        basic_auth=(self.settings.elastic_user, self.settings.elastic_pwd))
+                if len(self.settings.elastic_cacert) > 0:
+                    self.es = Elasticsearch("https://localhost:9200", request_timeout=60,
+                                            basic_auth=(self.settings.elastic_user, self.settings.elastic_pwd),
+                                            ca_certs=self.settings.elastic_cacert)
+                else:
+                    self.es = Elasticsearch("http://localhost:9200", request_timeout=60,
+                                            basic_auth=(self.settings.elastic_user, self.settings.elastic_pwd))
 
         self.es_ic = IndicesClient(self.es)
         self.qp = InterfaceQueryParser(settings_dir, self.settings)
