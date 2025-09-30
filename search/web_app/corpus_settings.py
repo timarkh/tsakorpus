@@ -92,6 +92,7 @@ class CorpusSettings:
         self.documentation_url = None
         self.share_query_url = False
         self.error_reports_enabled = False
+        self.inel_exmaralda_links = False
 
         # Languages and their properties
         self.languages = []

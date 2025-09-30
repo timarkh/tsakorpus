@@ -644,6 +644,9 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                         #     curSent['text'] = '\n[' + self.participants[anno.attrib['who']]['speaker'] + '] '
                         if len(sentMeta) > 0:
                             curSent['meta'] = copy.deepcopy(sentMeta)
+                        else:
+                            curSent['meta'] = {}
+                        curSent['meta']['exb_anchor'] = curAnchor
                 if curSent is not None:
                     if 'src_alignment' not in curSent:
                         self.add_src_alignment(curSent, [prevAnchor, curAnchor], srcFile)

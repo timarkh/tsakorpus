@@ -388,7 +388,7 @@ class SentenceViewer:
         fields that accompany the sentence in a CSV file (format='csv').
         In the latter case, the first element should contain
         a short description string, including things such as
-        authour or title.
+        author or title.
         """
         docID = sentSource['doc_id']
         curLocale = '_' + curLocale
@@ -447,11 +447,11 @@ class SentenceViewer:
             meta = {self.rxKW.sub('', k): v
                     for k, v in meta.items()
                     if self.rxKW.sub('', k) in self.settings.viewable_meta
-                    and k not in ['filename', 'filename_kw']}
+                    and k not in ['filename_kw']}
             sortedMetaFields = []
             for f in self.settings.viewable_meta:
                 # Sort in the same order as listed in conf/corpus.json
-                if f not in ['filename', 'filename_kw'] and f not in self.settings.sentence_meta:
+                if f not in ['filename_kw'] and f not in self.settings.sentence_meta:
                     sortedMetaFields.append(f)
             for f in sortedMetaFields:
                 v = ''
@@ -466,6 +466,22 @@ class SentenceViewer:
             if 'sent_id_local' in sentSource:
                 sentID = sentSource['sent_id_local']
                 fulltextPage = sentID // self.settings.fulltext_page_size + 1
+            externalLink = ''
+            if self.settings.inel_exmaralda_links:
+                # NB: Only makes sense in the context of the INEL project at the University of Hamburg
+                exbAnchor = ''
+                if 'filename' in meta:
+                    fname = meta['filename'].replace('\\', '/')
+                    fname = re.sub('^[/\\\\]?(?:corpus[/\\\\]|xml[/\\\\]|exb[/\\\\])*', '',
+                                                fname)
+                    if fname.lower().endswith('.xml'):
+                        fname = fname[:-4]
+                    if not fname.lower().endswith('.exb'):
+                        fname += '.exb'
+                    fname = re.sub('^tsakorpus_|_inel$', '', self.settings.corpus_name) + '/' + fname
+                    if 'meta' in sentSource and 'exb_anchor' in sentSource['meta']:
+                        exbAnchor = '___' + sentSource['meta']['exb_anchor']
+                    externalLink = 'exmaralda:' + fname + exbAnchor
             result = render_template('search_results/sentence_header.html',
                                      fulltext_view_enabled=self.settings.fulltext_view_enabled,
                                      fulltext_page=fulltextPage,
@@ -474,7 +490,8 @@ class SentenceViewer:
                                      date_display=dateDisplay,
                                      metaHtml=metaHtml,
                                      meta=meta,
-                                     subcorpora=self.determine_subcorpora(meta))
+                                     subcorpora=self.determine_subcorpora(meta),
+                                     external_link=externalLink)
         return result
 
     def get_word_offsets(self, sSource, numSent, matchOffsets=None):
