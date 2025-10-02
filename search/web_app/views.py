@@ -93,6 +93,8 @@ def search_page():
                            default_view=settings.default_view,
                            max_request_time=settings.query_timeout + 1,
                            max_page_size=MAX_PAGE_SIZE,
+                           max_context_expand=settings.max_context_expand,
+                           inel_exmaralda_links=settings.inel_exmaralda_links,
                            locales=locales,
                            random_seed=get_session_data('seed'),
                            query_string=queryString)
@@ -377,7 +379,8 @@ def search_sent(page=-1):
     cur_search_context().add_sent_to_session(hits)
     hitsProcessed = sentView.process_sent_json(hits,
                                                translit=cur_search_context().translit,
-                                               curLocale=get_locale())
+                                               curLocale=get_locale(),
+                                               enableURILinks=get_session_data('enable_uri_links'))
     # hitsProcessed['languages'] = settings.languages
     if len(settings.languages) > 1 and 'hits' in hits and 'hits' in hits['hits']:
         add_parallel(hits['hits']['hits'], hitsProcessed)
@@ -390,6 +393,13 @@ def search_sent(page=-1):
     if 'subcorpus_enabled' in hits:
         hitsProcessed['subcorpus_enabled'] = True
     cur_search_context().sync_page_data(hitsProcessed['page'], hitsProcessed)
+    sentData = cur_search_context().sentence_data
+    contexts = []
+    for iSent in range(len(sentData)):
+        for iAdjacent in range(get_session_data('context_size') - sentData[iSent]['times_expanded']):
+            context, adjacentIDs = find_sent_context(sentData[iSent], iSent)
+            cur_search_context().update_expanded_contexts(context, adjacentIDs)
+            contexts.append(context)
     maxPageNumber = (min(hitsProcessed['n_sentences'], settings.max_hits_retrieve) - 1) \
                     // hitsProcessed['page_size'] + 1
     hitsProcessed['too_many_hits'] = (settings.max_hits_retrieve < hitsProcessed['n_sentences'])
@@ -400,7 +410,8 @@ def search_sent(page=-1):
     return render_template('search_results/result_sentences.html',
                            data=hitsProcessed,
                            max_page_number=maxPageNumber,
-                           error_reports_enabled=settings.error_reports_enabled)
+                           error_reports_enabled=settings.error_reports_enabled,
+                           expanded_contexts=contexts)
 
 
 @app.route('/get_sent_context/<int:n>')

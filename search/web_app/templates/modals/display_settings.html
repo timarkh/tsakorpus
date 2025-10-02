@@ -30,6 +30,32 @@
 								{% endif %}
 							</select>
 						</div>
+						{% if max_context_expand > 0 %}
+						<div class="row">
+							<label for="context_size" class="col-sm-6 col-form-label">{{ _('Default context size:') }}</label>
+							<select form="search_main" name="context_size" id="context_size" class="search_input">
+								<option value="0" selected>{{ _('no context') }}</option>
+								{% if max_context_expand >= 1 %}
+									<option value="1">{{ _('±1') }}</option>
+								{% endif %}
+								{% if max_context_expand >= 2 %}
+									<option value="2">{{ _('±2') }}</option>
+								{% endif %}
+								{% if max_context_expand >= 3 %}
+									<option value="3">{{ _('±3') }}</option>
+								{% endif %}
+								{% if max_context_expand >= 4 %}
+									<option value="4">{{ _('±4') }}</option>
+								{% endif %}
+							</select>
+						</div>
+						{% endif %}
+						{% if inel_exmaralda_links %}
+						<div class="row">
+							<input form="search_main" type="checkbox" name="enable_uri_links" id="enable_uri_links" class="row_checkbox">
+							<label for="enable_uri_links" class="">{{ _('Show links to the local copy of the corpus') }}</label>
+						</div>
+						{% endif %}
 						<div class="row">
 							<input form="search_main" type="checkbox" name="distance_strict" id="distance_strict" class="row_checkbox" checked>
 							<label for="distance_strict" class="">{{ _('Word distance requirements are strict') }}</label>

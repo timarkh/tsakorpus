@@ -12,7 +12,7 @@ from . import settings, sessionData, MAX_PAGE_SIZE
 from .search_context import SearchContext
 
 
-fields2cookies = {'locale', 'page_size', 'translit', 'hidden_tiers'}
+fields2cookies = {'locale', 'page_size', 'context_size', 'translit', 'hidden_tiers', 'enable_uri_links'}
 
 
 def initialize_session():
@@ -25,6 +25,8 @@ def initialize_session():
     session['session_id'] = str(uuid.uuid4())
     sessionData[session['session_id']] = {'page_size': 10,
                                           'page': 1,
+                                          'context_size': 0,
+                                          'enable_uri_links': False,
                                           'login': False,
                                           'locale': settings.default_locale,
                                           'sort': '',
@@ -57,6 +59,8 @@ def get_session_data(fieldName):
         sessionData[session['session_id']]['locale'] = 'en'
     elif fieldName == 'page_size' and fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']]['page_size'] = 10
+    elif fieldName == 'context_size' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['context_size'] = 0
     elif fieldName == 'last_sent_num' and fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']]['last_sent_num'] = -1
     elif fieldName == 'seed' and fieldName not in sessionData[session['session_id']]:
@@ -110,6 +114,13 @@ def set_session_data(fieldName, value, setCookie=True):
         elif value < 1:
             value = 1
 
+    if fieldName == 'context_size':
+        value = int(value)
+        if value > settings.max_context_expand:
+            value = settings.max_context_expand
+        elif value < 0:
+            value = 0
+
     if fieldName == 'translit':
         sessionData[session['session_id']]['search_context'].translit = value
     else:
@@ -147,6 +158,7 @@ def change_display_options(query):
     """
     searchContext = cur_search_context()
     searchContext.after_key = None
+
     if 'page_size' in query:
         try:
             ps = int(query['page_size'])
@@ -157,17 +169,37 @@ def change_display_options(query):
             set_session_data('page_size', ps)
         except:
             set_session_data('page_size', 10)
+
+    if 'context_size' in query:
+        try:
+            cs = int(query['context_size'])
+            if cs > settings.max_context_expand:
+                cs = settings.max_context_expand
+            elif cs < 0:
+                cs = 0
+            set_session_data('context_size', cs)
+        except:
+            set_session_data('context_size', 0)
+
     if 'sort' in query:
         set_session_data('sort', query['sort'])
+
     if 'distance_strict' in query:
         set_session_data('distance_strict', True)
     else:
         set_session_data('distance_strict', False)
+
+    if 'enable_uri_links' in query:
+        set_session_data('enable_uri_links', True)
+    else:
+        set_session_data('enable_uri_links', False)
+
     if 'translit' in query:
         searchContext.translit = query['translit']
         add_cookie('translit', query['translit'])
     else:
         searchContext.translit = None
+
     if ('random_seed' in query
             and re.search('^[1-9][0-9]*', query['random_seed']) is not None
             and 0 < int(query['random_seed']) < 1000000):

@@ -763,3 +763,16 @@ msgstr "Vos coordonnées (facultatif) :"
 
 msgid "Report an error"
 msgstr "Signaler une erreur"
+
+msgid "Open text locally for editing (requires a local copy)"
+msgstr "Ouvrir le texte localement pour le modifier (nécessite une copie locale)"
+
+msgid "Default context size:"
+msgstr "Taille du contexte par défaut :"
+
+msgid "no context"
+msgstr "aucun contexte"
+
+msgid "Show links to the local copy of the corpus"
+msgstr "Afficher les liens vers la copie locale du corpus"
+

@@ -772,3 +772,16 @@ msgstr "Ваши контактные данные (по желанию):"
 
 msgid "Report an error"
 msgstr "Сообщить об ошибке"
+
+msgid "Open text locally for editing (requires a local copy)"
+msgstr "Открыть текст для редактирования (корпус должен быть загружен)"
+
+msgid "Default context size:"
+msgstr "Размер контекста по умолчанию:"
+
+msgid "no context"
+msgstr "без контекста"
+
+msgid "Show links to the local copy of the corpus"
+msgstr "Показывать ссылки на локальные файлы корпуса"
+

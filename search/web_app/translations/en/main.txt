@@ -764,3 +764,15 @@ msgstr "Your contact details (optional):"
 msgid "Report an error"
 msgstr "Report an error"
 
+msgid "Open text locally for editing (requires a local copy)"
+msgstr "Open text locally for editing (requires a local copy)"
+
+msgid "Default context size:"
+msgstr "Default context size:"
+
+msgid "no context"
+msgstr "no context"
+
+msgid "Show links to the local copy of the corpus"
+msgstr "Show links to the local copy of the corpus"
+

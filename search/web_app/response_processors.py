@@ -6,7 +6,6 @@ import random
 import re
 import jinja2
 from flask import render_template
-# from .session_management import get_locale
 try:
     from .transliteration import *
 except ImportError:
@@ -379,7 +378,7 @@ class SentenceViewer:
         subcorpora.sort()
         return subcorpora
 
-    def process_sentence_header(self, sentSource, format='html', curLocale=''):
+    def process_sentence_header(self, sentSource, format='html', curLocale='', enableURILinks=False):
         """
         Retrieve the metadata of the document the sentence
         belongs to. Return a string with this data that can
@@ -467,21 +466,24 @@ class SentenceViewer:
                 sentID = sentSource['sent_id_local']
                 fulltextPage = sentID // self.settings.fulltext_page_size + 1
             externalLink = ''
-            if self.settings.inel_exmaralda_links:
-                # NB: Only makes sense in the context of the INEL project at the University of Hamburg
-                exbAnchor = ''
-                if 'filename' in meta:
-                    fname = meta['filename'].replace('\\', '/')
-                    fname = re.sub('^[/\\\\]?(?:corpus[/\\\\]|xml[/\\\\]|exb[/\\\\])*', '',
-                                                fname)
-                    if fname.lower().endswith('.xml'):
-                        fname = fname[:-4]
-                    if not fname.lower().endswith('.exb'):
-                        fname += '.exb'
-                    fname = re.sub('^tsakorpus_|_inel$', '', self.settings.corpus_name) + '/' + fname
-                    if 'meta' in sentSource and 'exb_anchor' in sentSource['meta']:
-                        exbAnchor = '___' + sentSource['meta']['exb_anchor']
-                    externalLink = 'exmaralda:' + fname + exbAnchor
+            if enableURILinks:
+                # Right now, only INEL Exmaralda links are supported. However,
+                # more project-specific link types might appear in the future
+                if self.settings.inel_exmaralda_links:
+                    # NB: Only makes sense in the context of the INEL project at the University of Hamburg
+                    exbAnchor = ''
+                    if 'filename' in meta:
+                        fname = meta['filename'].replace('\\', '/')
+                        fname = re.sub('^[/\\\\]?(?:corpus[/\\\\]|xml[/\\\\]|exb[/\\\\])*', '',
+                                                    fname)
+                        if fname.lower().endswith('.xml'):
+                            fname = fname[:-4]
+                        if not fname.lower().endswith('.exb'):
+                            fname += '.exb'
+                        fname = re.sub('^tsakorpus_|_inel$', '', self.settings.corpus_name) + '/' + fname
+                        if 'meta' in sentSource and 'exb_anchor' in sentSource['meta']:
+                            exbAnchor = '___' + sentSource['meta']['exb_anchor']
+                        externalLink = 'exmaralda:' + fname + exbAnchor
             result = render_template('search_results/sentence_header.html',
                                      fulltext_view_enabled=self.settings.fulltext_view_enabled,
                                      fulltext_page=fulltextPage,
@@ -711,7 +713,7 @@ class SentenceViewer:
         return metaSpan
 
     def process_sentence(self, s, numSent=1, getHeader=False, lang='', langView='',
-                         translit=None, format='html', curLocale=''):
+                         translit=None, format='html', curLocale='', enableURILinks=False):
         """
         Process one sentence taken from response['hits']['hits'].
         If getHeader is True, retrieve the metadata from the database.
@@ -731,7 +733,7 @@ class SentenceViewer:
 
         header = {}
         if getHeader:
-            header = self.process_sentence_header(sSource, format, curLocale=curLocale)
+            header = self.process_sentence_header(sSource, format, curLocale=curLocale, enableURILinks=enableURILinks)
         if 'highlight' in s and 'text' in s['highlight']:
             highlightedText = s['highlight']['text']
             if type(highlightedText) == list:
@@ -1493,7 +1495,7 @@ class SentenceViewer:
         lang = self.settings.languages[langID]
         return langID, lang
 
-    def process_sent_json(self, response, translit=None, curLocale=''):
+    def process_sent_json(self, response, translit=None, curLocale='', enableURILinks=False):
         result = {
             'n_occurrences': 0,
             'n_sentences': 0,
@@ -1536,7 +1538,8 @@ class SentenceViewer:
                                                lang=lang,
                                                langView=langView,
                                                translit=translit,
-                                               curLocale=curLocale)
+                                               curLocale=curLocale,
+                                               enableURILinks=enableURILinks)
             if 'src_alignment' in curContext:
                 srcAlignmentInfo.update(curContext['src_alignment'])
             result['contexts'].append(curContext)
