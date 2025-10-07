@@ -86,6 +86,7 @@ def search_page():
                            hidden_tiers=get_session_data('hidden_tiers'),
                            share_query_url=str(settings.share_query_url).lower(),
                            error_reports_enabled=settings.error_reports_enabled,
+                           docx_enabled=settings.docx_enabled,
                            generate_dictionary=settings.generate_dictionary,
                            citation=settings.citation,
                            start_page_url=settings.start_page_url,
@@ -411,6 +412,7 @@ def search_sent(page=-1):
                            data=hitsProcessed,
                            max_page_number=maxPageNumber,
                            error_reports_enabled=settings.error_reports_enabled,
+                           docx_enabled=settings.docx_enabled,
                            expanded_contexts=contexts)
 
 
@@ -678,6 +680,8 @@ def download_example_docx(sentNum):
     """
     Create and return a DOCX file with an example from the search hits.
     """
+    if not settings.docx_enabled:
+        return ''
     sentData = cur_search_context().sentence_data
     if sentData is None or len(sentData) <= sentNum or sentNum < 0:
         return ''

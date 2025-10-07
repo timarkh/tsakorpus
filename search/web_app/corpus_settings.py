@@ -95,10 +95,11 @@ class CorpusSettings:
         self.inel_exmaralda_links = False
 
         # DOCX parameters for saved examples
+        self.docx_enabled = False
         self.docx_tabular = True
         self.docx_glossed = True
         self.docx_tags = False
-        self.docx_translation_tiers = ['russian', 'english']
+        self.docx_translation_tiers = []
         self.docx_additional_tiers = []
         self.docx_normal_font_face = 'Brill'
         self.docx_normal_font_size = 12
