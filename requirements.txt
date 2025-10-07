@@ -8,3 +8,4 @@ ijson
 XlsxWriter
 sqlitedict
 pympler
+python-docx

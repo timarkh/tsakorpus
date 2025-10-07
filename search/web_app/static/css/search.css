@@ -269,6 +269,19 @@
 	border-radius: 4px;
 }
 
+.bi-file-earmark-word {
+	width: 22px;
+	font-size: 22px;
+	cursor: pointer;
+	margin: auto;
+	margin-left: 4px;
+	margin-right: 5px;
+	text-align: center;
+	display: inline-table;
+	padding: 4px;
+	border-radius: 4px;
+}
+
 .bi-chat-left-dots {
 	width: 22px;
 	font-size: 22px;
@@ -291,6 +304,11 @@
 
 .bi-clipboard-check:hover {
 	background-color: #1667aa;
+	color: white;
+}
+
+.bi-file-earmark-word:hover {
+	background-color: #085da6;
 	color: white;
 }
 

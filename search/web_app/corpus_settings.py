@@ -94,6 +94,19 @@ class CorpusSettings:
         self.error_reports_enabled = False
         self.inel_exmaralda_links = False
 
+        # DOCX parameters for saved examples
+        self.docx_tabular = True
+        self.docx_glossed = True
+        self.docx_tags = False
+        self.docx_translation_tiers = ['russian', 'english']
+        self.docx_additional_tiers = []
+        self.docx_normal_font_face = 'Brill'
+        self.docx_normal_font_size = 12
+        self.docx_example_font_face = 'Brill'
+        self.docx_example_font_size = 11
+        self.docx_gloss_font_face = 'Brill'
+        self.docx_gloss_font_size = 11
+
         # Languages and their properties
         self.languages = []
         self.primary_languages = []
@@ -153,7 +166,9 @@ class CorpusSettings:
             'languages',
             'primary_languages',
             'rtl_languages',
-            'search_meta.stat_options'
+            'search_meta.stat_options',
+            'docx_translation_tiers',
+            'docx_additional_tiers'
         }
 
         # dictionaries where values are strings
@@ -275,6 +290,13 @@ class CorpusSettings:
                 if not (v.startswith('^') and v.endswith('$') and '|' not in v):
                     v = '^(' + v + ')$'
                 self.subcorpora[subcorpusID][k] = re.compile(v)
+
+        # Compile regexes for processing glossed examples
+        for lang in self.lang_props:
+            for k in ('gloss_regex', 'enclitics_regex', 'proclitics_regex'):
+                if k in self.lang_props[lang]:
+                    v = self.lang_props[lang][k]
+                    self.lang_props[lang][k] = re.compile(v)
 
     def as_dict(self):
         """

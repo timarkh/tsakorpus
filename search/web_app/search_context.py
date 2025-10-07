@@ -44,7 +44,7 @@ class SearchContext:
 
     def add_sent_data_for_session(self, sent, sentData):
         """
-        Add information about one particluar sentence to the
+        Add information about one particular sentence to the
         sentData dictionary for storing in the session data
         dictionary.
         Modify sentData, do not return anything.

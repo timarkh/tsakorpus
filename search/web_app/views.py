@@ -13,7 +13,7 @@ import shutil
 import uuid
 import xlsxwriter
 from werkzeug.utils import secure_filename
-from . import app, settings, sc, sentView, MAX_PAGE_SIZE
+from . import app, settings, sc, sentView, MAX_PAGE_SIZE, docxex
 from .session_management import get_locale, get_session_data, change_display_options, set_session_data
 from .auxiliary_functions import process_request_cookies, jsonp, gzipped, nocache, lang_sorting_key, copy_request_args,\
     distance_constraints_too_complex, remove_sensitive_data, log_query
@@ -670,6 +670,45 @@ def download_cur_results_xlsx():
             worksheet.write(i, j, results[i][j])
     workbook.close()
     return send_from_directory('../tmp', XLSXFilename)
+
+
+@app.route('/download_example_docx/<int:sentNum>')
+@nocache
+def download_example_docx(sentNum):
+    """
+    Create and return a DOCX file with an example from the search hits.
+    """
+    sentData = cur_search_context().sentence_data
+    if sentData is None or len(sentData) <= sentNum or sentNum < 0:
+        return ''
+    curSentData = cur_search_context().sentence_data[sentNum]
+    lang = settings.languages[0]
+    if 'languages' not in curSentData or lang not in curSentData['languages']:
+        return ''
+    baselineSrc = curSentData['languages'][lang]['source']
+    translations = []
+    for langTrans in settings.docx_translation_tiers:
+        if langTrans in curSentData['languages']:
+            translations.append(curSentData['languages'][langTrans]['source'])
+    additionalInfo = []
+    for langTrans in settings.docx_additional_tiers:
+        if langTrans in curSentData['languages']:
+            additionalInfo.append(curSentData['languages'][langTrans]['source'])
+
+    DOCXFilename = 'example-' + str(uuid.uuid4()) + '.docx'
+    if not os.path.exists('tmp'):
+        os.makedirs('tmp')
+
+    fTranslit = lambda x: sentView.transliterate_baseline(x, lang, translit=cur_search_context().translit)
+    wordDoc = docxex.get_docx(lang, [baselineSrc],
+                              tabular=settings.docx_tabular,
+                              gloss=settings.docx_glossed,
+                              tags=settings.docx_tags,
+                              translations=translations,
+                              additionalInfo=additionalInfo,
+                              translit=fTranslit)
+    wordDoc.save(os.path.join('tmp', DOCXFilename))
+    return send_from_directory('../tmp', DOCXFilename)
 
 
 @app.route('/toggle_sentence/<int:sentNum>')

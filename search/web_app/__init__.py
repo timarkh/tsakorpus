@@ -126,6 +126,9 @@ sentView = SentenceViewer(settings, sc)
 sc.qp.rp = sentView
 sc.qp.wr.rp = sentView
 
+from .docx_examples import DocxExampleProcessor
+docxex = DocxExampleProcessor(settings)
+
 try:
     settings.corpus_size = sc.get_n_words(primaryLanguages=settings.primary_languages)  # size of the corpus in words
     settings.corpus_size_total = sc.get_n_words(primaryLanguages=None)
