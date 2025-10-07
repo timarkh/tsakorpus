@@ -50,8 +50,6 @@ class DocxExampleProcessor:
                 p.add_run(run.lower()).font.small_caps = True
             else:
                 p.add_run(run)
-        else:
-            p.text = text
 
     def process_example(self, wordDoc, langProps, s, translit, translations, additionalInfo,
                         tabular=True, gloss=True, tags=False):
@@ -164,7 +162,7 @@ class DocxExampleProcessor:
             p.text = translations[iTrans]
             DocxExampleProcessor.p_no_margins(wordDoc, p)
         for iAddInfo in range(len(additionalInfo)):
-            p = table.cell(nRows + iAddInfo, 1).paragraphs[0]
+            p = table.cell(nRows + len(translations) + iAddInfo, 1).paragraphs[0]
             p.text = additionalInfo[iAddInfo]
             DocxExampleProcessor.p_no_margins(wordDoc, p)
         # self.set_cell_margins(table, 0, 0)
