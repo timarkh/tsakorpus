@@ -44,10 +44,10 @@ class DocxExampleProcessor:
         if 'gloss_regex' not in langProps:
             p.text = text.strip()
             return
-        text = langProps['gloss_regex'].sub(lambda m: '$' + m.group(1).lower() + '$', text)
+        text = langProps['gloss_regex'].sub(lambda m: '$' + m.group(1) + '$', text)
         for run in self.rxGlossesNonGlosses.findall(text):
             if langProps['gloss_regex'].search(run) is not None:
-                p.add_run(run).font.small_caps = True
+                p.add_run(run.lower()).font.small_caps = True
             else:
                 p.add_run(run)
         else:
@@ -125,8 +125,8 @@ class DocxExampleProcessor:
         # If a gloss is overly long, something is probably wrong with it,
         # so the user will want to shorten it anyway. Therefore, it would
         # be ok for it to be wrapped
-        nCharsGloss = len(''.join(re.sub('^.{20,}',
-                                         'X' * 20, g.strip()) for g in glosses))
+        nCharsGloss = len(''.join(re.sub('^.{30,}',
+                                         'X' * 30, g.strip()) for g in glosses))
         nRows = math.ceil(max(nCharsWords // (450 / self.settings.docx_example_font_size),
                               nCharsGloss // (600 / self.settings.docx_gloss_font_size)) + 1)
         nCols = 1 + math.ceil(len(words) / nRows)
