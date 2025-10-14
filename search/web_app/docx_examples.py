@@ -15,6 +15,7 @@ class DocxExampleProcessor:
     rxPuncL = re.compile('^(?:[/?!. ]*\\[|[#*(\\[“]+)$')
     rxLetters = re.compile('\\w')
     rxLeadingNewline = re.compile('^(\n|\\\\n) *', flags=re.DOTALL)
+    rxTrailingNewline = re.compile(' *(\n|\\\\n)$', flags=re.DOTALL)
     rxGlossesNonGlosses = re.compile('([^$]+)')
 
     def __init__(self, settings):
@@ -69,10 +70,14 @@ class DocxExampleProcessor:
                         # Start new paragraph
                         p = wordDoc.add_paragraph('')
                         DocxExampleProcessor.p_no_margins(wordDoc, p)
-                    text = self.rxLeadingNewline.sub('', text)
                 elif iSent > 0:
                     text = ' ' + text.lstrip()
                 self.add_pure_text(p, text, translit)
+                if self.rxTrailingNewline.search(text) is not None:
+                    if iSent < len(sentences) - 1:
+                        # Start new paragraph
+                        p = wordDoc.add_paragraph('')
+                        DocxExampleProcessor.p_no_margins(wordDoc, p)
 
             for iTier in range(len(translations)):
                 p = wordDoc.add_paragraph('‘')
@@ -84,10 +89,14 @@ class DocxExampleProcessor:
                             # Start new paragraph
                             p = wordDoc.add_paragraph('')
                             DocxExampleProcessor.p_no_margins(wordDoc, p)
-                        text = self.rxLeadingNewline.sub('', text)
                     elif iSent > 0:
                         text = ' ' + text.lstrip()
                     self.add_pure_text(p, text)
+                    if self.rxTrailingNewline.search(text) is not None:
+                        if iSent < len(translations[iTier]) - 1:
+                            # Start new paragraph
+                            p = wordDoc.add_paragraph('')
+                            DocxExampleProcessor.p_no_margins(wordDoc, p)
                 p.text += '’'
 
         else:
@@ -119,6 +128,8 @@ class DocxExampleProcessor:
         """
         # Right now, this is trivial, but maybe we'll add bold/italics
         # and whatnot in the future
+        text = self.rxLeadingNewline.sub('', text)
+        text = self.rxTrailingNewline.sub('', text)
         if translit is not None:
             p.text += translit(text.rstrip())
         else:
