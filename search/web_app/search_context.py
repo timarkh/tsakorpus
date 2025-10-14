@@ -8,6 +8,7 @@ because it can be quite large and cookies have size limits.
 This means that Tsakorpus API is not as RESTful as you might
 have imagined.
 """
+import copy
 import re
 from . import sentView, settings
 
@@ -85,6 +86,8 @@ class SearchContext:
                 sentData['languages'][langView] = {'id': sent['_id'],
                                                    'next_id': nextID,
                                                    'prev_id': prevID,
+                                                   'source_next': [],
+                                                   'source_prev': [],
                                                    'highlighted_text': highlightedText,
                                                    'source': sent['_source']}
             else:
@@ -181,6 +184,27 @@ class SearchContext:
             for side in ['next', 'prev']:
                 if side in context['languages'][lang] and len(context['languages'][lang][side]) > 0:
                     curSent['languages'][lang][side + '_id'] = neighboringIDs[lang][side]
+                    curSent['languages'][lang]['source_' + side].append(context['languages'][lang][side + '_source'])
+
+    def get_expanded_context(self, n, lang):
+        """
+        Return a list with the sources of all sentences in current n_th expanded
+        context, from left to right. If the context has not been expanded, this
+        list will contain one item (the search hit).
+        """
+        if n < 0 or n >= len(self.sentence_data):
+            return []
+        curSent = self.sentence_data[n]
+        if lang not in curSent['languages']:
+            return []
+        context = []
+        curSentLang = curSent['languages'][lang]
+        for iContextSent in range(len(curSentLang['source_prev']) - 1, -1, -1):
+            context.append(copy.deepcopy(curSentLang['source_prev'][iContextSent]))
+        context.append(curSentLang['source'])
+        for iContextSent in range(len(curSentLang['source_next'])):
+            context.append(copy.deepcopy(curSentLang['source_next'][iContextSent]))
+        return context
 
     def prepare_results_for_download(self, page=-1, format='csv'):
         """

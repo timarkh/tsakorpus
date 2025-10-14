@@ -42,7 +42,7 @@
 			{% endif %}
 		{% endfor %}
 		</span>
-		<span class="get_glossed_copy bi bi-clipboard-check" title="{{ _('Copy example to clipboard') }}" data-nsent="{{ loop.index - 1 }}"></span>{% if error_reports_enabled %}
+		<span class="get_glossed_copy bi bi-clipboard-check" title="{{ _('Copy example to clipboard') }}" data-nsent="{{ loop.index - 1 }}"></span>{% if docx_enabled %}
 		<a href="download_example_docx/{{ loop.index - 1 }}" download="results-{{ loop.index - 1 }}.docx" class="download_example_docx bi bi-file-earmark-word" title="{{ _('Download this example in docx') }}" data-nsent="{{ loop.index - 1 }}"></a>{% endif %}{% if error_reports_enabled %}
 		<span class='report_error bi bi-chat-left-dots' title="{{ _('Report an error') }}" data-nsent="{{ loop.index - 1 }}"></span>{% endif %}
 		<span class='expand bi bi-arrows-fullscreen' title="{{ _('Expand context') }}" data-nsent="{{ loop.index - 1 }}"></span>
@@ -60,7 +60,8 @@ var srcAlignments = {{ data.src_alignment | safe }};
 <div class="after_hits row_section_fixed">
 	<div class="download_results alert-light">
 		<a href="download_cur_results_csv" download="results-{{ data.page }}.csv" class="bi bi-file-earmark-ruled-fill link_icon" data-tooltip="tooltip" data-placement="top" title="{{ _('download as CSV') }}"></a>
-		<a href="download_cur_results_xlsx" download="results-{{ data.page }}.xlsx" class="bi bi-file-earmark-excel-fill link_icon" data-tooltip="tooltip" data-placement="top" title="{{ _('download as XLSX') }}"></a>
+		<a href="download_cur_results_xlsx" download="results-{{ data.page }}.xlsx" class="bi bi-file-earmark-excel-fill link_icon" data-tooltip="tooltip" data-placement="top" title="{{ _('download as XLSX') }}"></a>{% if docx_enabled %}
+		<a href="download_cur_results_docx" download="results-{{ data.page }}.docx" class="bi bi-file-earmark-word-fill link_icon" data-tooltip="tooltip" data-placement="top" title="{{ _('download current page as DOCX') }}"></a>{% endif %}
 	</div>
 	{% include "search_results/pagination.html" %}
 </div>

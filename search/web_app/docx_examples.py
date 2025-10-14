@@ -14,6 +14,7 @@ class DocxExampleProcessor:
     rxPuncR = re.compile('^[.,?!:;)"/\\-\\]”]+$')
     rxPuncL = re.compile('^(?:[/?!. ]*\\[|[#*(\\[“]+)$')
     rxLetters = re.compile('\\w')
+    rxLeadingNewline = re.compile('^(\n|\\\\n) *', flags=re.DOTALL)
     rxGlossesNonGlosses = re.compile('([^$]+)')
 
     def __init__(self, settings):
@@ -51,13 +52,84 @@ class DocxExampleProcessor:
             else:
                 p.add_run(run)
 
-    def process_example(self, wordDoc, langProps, s, translit, translations, additionalInfo,
-                        tabular=True, gloss=True, tags=False):
+    def process_examples(self, wordDoc, langProps, sentences, translit, translations, additionalInfo,
+                         tabular=True, gloss=True, tags=False):
         """
-        Add one example to the docx file object.
+        Add one example to a docx file object.
         """
-        if 'words' not in s:
+        if len(sentences) <= 0 or any ('words' not in s for s in sentences):
             return
+        if not tabular:
+            p = wordDoc.add_paragraph('')
+            DocxExampleProcessor.p_no_margins(wordDoc, p)
+            for iSent in range(len(sentences)):
+                text = sentences[iSent]['text']
+                if self.rxLeadingNewline.search(text) is not None:
+                    if iSent > 0:
+                        # Start new paragraph
+                        p = wordDoc.add_paragraph('')
+                        DocxExampleProcessor.p_no_margins(wordDoc, p)
+                    text = self.rxLeadingNewline.sub('', text)
+                elif iSent > 0:
+                    text = ' ' + text.lstrip()
+                self.add_pure_text(p, text, translit)
+
+            for iTier in range(len(translations)):
+                p = wordDoc.add_paragraph('‘')
+                DocxExampleProcessor.p_no_margins(wordDoc, p)
+                for iSent in range(len(translations[iTier])):
+                    text = translations[iTier][iSent].strip('‘’')
+                    if self.rxLeadingNewline.search(text) is not None:
+                        if iSent > 0:
+                            # Start new paragraph
+                            p = wordDoc.add_paragraph('')
+                            DocxExampleProcessor.p_no_margins(wordDoc, p)
+                        text = self.rxLeadingNewline.sub('', text)
+                    elif iSent > 0:
+                        text = ' ' + text.lstrip()
+                    self.add_pure_text(p, text)
+                p.text += '’'
+
+        else:
+            for iSent in range(len(sentences)):
+                curSent = sentences[iSent]
+                curTrans = []
+                curAddInfo = []
+                for iTier in range(len(translations)):
+                    if iSent < len(translations[iTier]):
+                        curTrans.append(translations[iTier][iSent])
+                    else:
+                        curTrans.append('')
+
+                for iTier in range(len(additionalInfo)):
+                    if iSent < len(additionalInfo[iTier]):
+                        curAddInfo.append(additionalInfo[iTier][iSent])
+                    else:
+                        curAddInfo.append('')
+
+                self.add_glossed_example(wordDoc, langProps, curSent, translit,
+                                         curTrans, curAddInfo,
+                                         gloss=gloss, tags=tags)
+                p = wordDoc.add_paragraph('')
+                DocxExampleProcessor.p_no_margins(wordDoc, p)
+
+    def add_pure_text(self, p, text, translit=None):
+        """
+        Add one example to a paragraph of a docx file object, without glosses.
+        """
+        # Right now, this is trivial, but maybe we'll add bold/italics
+        # and whatnot in the future
+        if translit is not None:
+            p.text += translit(text.rstrip())
+        else:
+            p.text += text.rstrip()
+        p.style = 'Normal'
+
+    def add_glossed_example(self, wordDoc, langProps, s, translit, translations, additionalInfo,
+                            gloss=True, tags=False):
+        """
+        Add one glossed example to a docx file object as a table.
+        """
         text = s['text']
         words = []
         glosses = []
@@ -150,9 +222,8 @@ class DocxExampleProcessor:
                     table.cell(nRows + iMergedRow, 1).merge(table.cell(nRows + iMergedRow, iCol))
             p = table.cell(iDoubleRow * 2, iCol).paragraphs[0]
             p.add_run(words[iCell].strip()).italic = True
-            DocxExampleProcessor.p_no_margins(wordDoc, p)
+            DocxExampleProcessor.p_no_margins(wordDoc, p, 'LanguageExample')
             p = table.cell(iDoubleRow * 2 + 1, iCol).paragraphs[0]
-            p.style = wordDoc.styles['Gloss']
             DocxExampleProcessor.p_no_margins(wordDoc, p, 'Gloss')
             if re.search('^(?:[ /*?!.,()_«»-]*|\\[S[0-9]+\\]:?)$', words[iCell].strip()) is not None:
                 continue
@@ -168,49 +239,91 @@ class DocxExampleProcessor:
         # self.set_cell_margins(table, 0, 0)
         table.autofit = True
 
-    def get_docx(self, lang, sentences, tabular=True, gloss=True, tags=False,
-                 translations=None, additionalInfo=None, translit=None):
+    def extract_translations(self, translations, tabular=True, addQuotes=True):
         """
-        Create a docx with the sentences, either as tables or as paragraphs.
+        Extract and clean translations / additional tiers from lists of source
+        dictionaries of the respective sentences.
+        """
+        # iContext: Contexts = (possibly expanded) search hits
+        # iTier: Each context may have multiple translation / additional tiers
+        # iSent: Each translation / additional tier is a list of sentences
+        for iContext in range(len(translations)):
+            for iTier in range(len(translations[iContext])):
+                for iSent in range(len(translations[iContext][iTier])):
+                    if 'text' in translations[iContext][iTier][iSent]:
+                        translations[iContext][iTier][iSent] = translations[iContext][iTier][iSent]['text']
+                    else:
+                        translations[iContext][iTier][iSent] = ''
+                    translations[iContext][iTier][iSent] = translations[iContext][iTier][iSent].strip().replace('\\n', '\n')
+                    if tabular:
+                        translations[iContext][iTier][iSent] = translations[iContext][iTier][iSent].strip().replace(
+                            '\n', ' ')
+                        if addQuotes:
+                            if not translations[iContext][iTier][iSent].startswith('‘'):
+                                translations[iContext][iTier][iSent] = '‘' + translations[iContext][iTier][iSent]
+                            if not translations[iContext][iTier][iSent].endswith('’'):
+                                translations[iContext][iTier][iSent] += '’'
+
+
+    def get_docx(self, lang, contexts, tabular=True, gloss=True, tags=False,
+                 translations=None, additionalInfo=None, translit=None,
+                 normal_font_face='', normal_font_size=-1,
+                 example_font_face='', example_font_size=-1,
+                 gloss_font_face='', gloss_font_size=-1):
+        """
+        Create a docx with the contexts, either as tables or as paragraphs. Each
+        context contains one or more sentences in a list.
         """
         if lang not in self.settings.lang_props:
             return None
+        langProps = self.settings.lang_props[lang]
+
+        if len(normal_font_face) <= 0:
+            normal_font_face = self.settings.docx_normal_font_face
+        if normal_font_size <= 0:
+            normal_font_face = self.settings.docx_normal_font_size
+        if len(example_font_face) <= 0:
+            example_font_face = self.settings.docx_example_font_face
+        if example_font_size <= 0:
+            example_font_size = self.settings.docx_example_font_size
+        if len(gloss_font_face) <= 0:
+            gloss_font_face = self.settings.docx_gloss_font_face
+        if gloss_font_size <= 0:
+            gloss_font_size = self.settings.docx_gloss_font_size
+
         if translations is None:
             translations = []
-        for i in range(len(translations)):
-            if 'text' in translations[i]:
-                translations[i] = translations[i]['text']
-            else:
-                translations[i] = ''
-            translations[i] = translations[i].strip().replace('\n', ' ')
-            if not translations[i].startswith('‘'):
-                translations[i] = '‘' + translations[i]
-            if not translations[i].endswith('’'):
-                translations[i] += '’'
+        self.extract_translations(translations, tabular=tabular)
         if additionalInfo is None:
             additionalInfo = []
-        for i in range(len(additionalInfo)):
-            if 'text' in additionalInfo[i]:
-                additionalInfo[i] = additionalInfo[i]['text']
-            else:
-                additionalInfo[i] = ''
+        self.extract_translations(additionalInfo, tabular=tabular, addQuotes=False)
         if translit is None:
             translit = lambda x: x
-        langProps = self.settings.lang_props[lang]
 
         wordDoc = Document()
         exampleStyle = wordDoc.styles.add_style('LanguageExample', WD_STYLE_TYPE.PARAGRAPH)
         glossStyle = wordDoc.styles.add_style('Gloss', WD_STYLE_TYPE.PARAGRAPH)
         normalStyle = wordDoc.styles['Normal']
-        normalStyle.font.name = self.settings.docx_normal_font_face
-        normalStyle.font.size = Pt(self.settings.docx_normal_font_size)
+        normalStyle.font.name = normal_font_face
+        normalStyle.font.size = Pt(normal_font_size)
         normalStyle.paragraph_format.space_after = Cm(0)
-        exampleStyle.font.name = self.settings.docx_example_font_face
-        exampleStyle.font.size = Pt(self.settings.docx_example_font_size)
-        glossStyle.font.name = self.settings.docx_gloss_font_face
-        glossStyle.font.size = Pt(self.settings.docx_gloss_font_size)
-        for s in sentences:
-            self.process_example(wordDoc, langProps, s, translit, translations, additionalInfo, tabular, gloss, tags)
+        exampleStyle.font.name = example_font_face
+        exampleStyle.font.size = Pt(example_font_size)
+        glossStyle.font.name = gloss_font_face
+        glossStyle.font.size = Pt(gloss_font_size)
+        for iContext in range(len(contexts)):
+            curContext = contexts[iContext]
+            if iContext < len(translations):
+                curTrans = translations[iContext]
+            else:
+                curTrans = []
+            if iContext < len(additionalInfo):
+                curAddInfo = additionalInfo[iContext]
+            else:
+                curAddInfo = []
+            self.process_examples(wordDoc, langProps, curContext, translit,
+                                  curTrans, curAddInfo,
+                                  tabular, gloss, tags)
             p = wordDoc.add_paragraph('')
             DocxExampleProcessor.p_no_margins(wordDoc, p)
         return wordDoc

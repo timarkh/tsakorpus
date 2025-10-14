@@ -122,6 +122,58 @@
 						{% endfor %}
 					</div>
 					{% endif %}
+					{% if docx_enabled %}
+					<div class="settings_column_leftalign">
+						<h5>{{ _('DOCX download options') }}</h5>
+						<div class="row">
+							<input type="checkbox" form="search_main" name="docx_tabular" class="row_checkbox" id="docx_tabular"{% if docx_tabular %} checked{% endif %}>
+							<label for="docx_tabular" class="col-sm-10">{{ _('Each example as a table') }}</label>
+						</div>
+						<div class="row">
+							<input type="checkbox" form="search_main" name="docx_glossed" class="row_checkbox" id="docx_glossed"{% if docx_glossed %} checked{% endif %}>
+							<label for="docx_glossed" class="col-sm-10">{{ _('Export glosses') }}</label>
+						</div>
+						<div class="row">
+							<label for="docx_normal_font_face" class="col-sm-5 col-form-label">{{ _('Default font: ') }}</label>
+							<select form="search_main" name="docx_normal_font_face" id="docx_normal_font_face" class="search_input">
+							{% for ff in docx_font_faces %}
+								<option value="{{ ff }}"{% if docx_normal_font_face==ff %} selected{% endif %}>{{ ff }}</option>
+							{% endfor %}
+							</select>
+							<select form="search_main" name="docx_normal_font_size" id="docx_normal_font_size" class="select_fsize search_input">
+							{% for fs in docx_font_sizes %}
+								<option value="{{ fs }}"{% if docx_normal_font_size==fs %} selected{% endif %}>{{ fs }}</option>
+							{% endfor %}
+							</select>
+						</div>
+						<div class="row">
+							<label for="docx_example_font_face" class="col-sm-5 col-form-label">{{ _('Example baseline: ') }}</label>
+							<select form="search_main" name="docx_example_font_face" id="docx_example_font_face" class="search_input">
+							{% for ff in docx_font_faces %}
+								<option value="{{ ff }}"{% if docx_example_font_face==ff %} selected{% endif %}>{{ ff }}</option>
+							{% endfor %}
+							</select>
+							<select form="search_main" name="docx_example_font_size" id="docx_example_font_size" class="select_fsize search_input">
+							{% for fs in docx_font_sizes %}
+								<option value="{{ fs }}"{% if docx_example_font_size==fs %} selected{% endif %}>{{ fs }}</option>
+							{% endfor %}
+							</select>
+						</div>
+						<div class="row">
+							<label for="docx_gloss_font_face" class="col-sm-5 col-form-label">{{ _('Gloss: ') }}</label>
+							<select form="search_main" name="docx_gloss_font_face" id="docx_gloss_font_face" class="search_input">
+							{% for ff in docx_font_faces %}
+								<option value="{{ ff }}"{% if docx_gloss_font_face==ff %} selected{% endif %}>{{ ff }}</option>
+							{% endfor %}
+							</select>
+							<select form="search_main" name="docx_gloss_font_size" id="docx_gloss_font_size" class="select_fsize search_input">
+							{% for fs in docx_font_sizes %}
+								<option value="{{ fs }}"{% if docx_gloss_font_size==fs %} selected{% endif %}>{{ fs }}</option>
+							{% endfor %}
+							</select>
+						</div>
+					</div>
+					{% endif %}
 				</div>
 			</div>
 			<div class="modal-footer">

@@ -36,6 +36,14 @@ def initialize_session():
                                           'excluded_doc_ids': set(),
                                           'invert_subcorpus': False,    # if True, then excluded_doc_ids actually contain selected doc IDs
                                           'hidden_tiers': [],
+                                          'docx_tabular': settings.docx_tabular,
+                                          'docx_glossed': settings.docx_glossed,
+                                          'docx_normal_font_face': settings.docx_normal_font_face,
+                                          'docx_normal_font_size': settings.docx_normal_font_size,
+                                          'docx_example_font_face': settings.docx_example_font_face,
+                                          'docx_example_font_size': settings.docx_example_font_size,
+                                          'docx_gloss_font_face': settings.docx_gloss_font_face,
+                                          'docx_gloss_font_size': settings.docx_gloss_font_size,
                                           'progress': 100,
                                           'search_context': SearchContext(curLocale=settings.default_locale)}
 
@@ -73,6 +81,24 @@ def get_session_data(fieldName):
         sessionData[session['session_id']]['hidden_tiers'] = []
     elif fieldName == 'progress' and fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']]['progress'] = 0
+
+    elif fieldName == 'docx_tabular' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['docx_tabular'] = settings.docx_tabular
+    elif fieldName == 'docx_glossed' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['docx_glossed'] = settings.docx_glossed
+    elif fieldName == 'docx_normal_font_face' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['docx_normal_font_face'] = settings.docx_normal_font_face
+    elif fieldName == 'docx_normal_font_size' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['docx_normal_font_size'] = settings.docx_normal_font_size
+    elif fieldName == 'docx_example_font_face' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['docx_example_font_face'] = settings.docx_example_font_face
+    elif fieldName == 'docx_example_font_size' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['docx_example_font_size'] = settings.docx_example_font_size
+    elif fieldName == 'docx_gloss_font_face' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['docx_gloss_font_face'] = settings.docx_gloss_font_face
+    elif fieldName == 'docx_gloss_font_size' and fieldName not in sessionData[session['session_id']]:
+        sessionData[session['session_id']]['docx_gloss_font_size'] = settings.docx_gloss_font_size
+
     elif fieldName not in sessionData[session['session_id']]:
         sessionData[session['session_id']][fieldName] = ''
     try:
@@ -204,3 +230,30 @@ def change_display_options(query):
             and re.search('^[1-9][0-9]*', query['random_seed']) is not None
             and 0 < int(query['random_seed']) < 1000000):
         set_session_data('seed', int(query['random_seed']))
+
+    if 'docx_tabular' in query:
+        set_session_data('docx_tabular', True)
+    else:
+        set_session_data('docx_tabular', False)
+    if 'docx_glossed' in query:
+        set_session_data('docx_glossed', True)
+    else:
+        set_session_data('docx_glossed', False)
+    if 'docx_normal_font_face' in query:
+        set_session_data('docx_normal_font_face', query['docx_normal_font_face'])
+    if 'docx_example_font_face' in query:
+        set_session_data('docx_example_font_face', query['docx_example_font_face'])
+    if 'docx_gloss_font_face' in query:
+        set_session_data('docx_gloss_font_face', query['docx_gloss_font_face'])
+    if ('docx_normal_font_size' in query
+            and re.search('^[1-9][0-9]*', query['docx_normal_font_size']) is not None
+            and 0 < int(query['docx_normal_font_size']) < 48):
+        set_session_data('docx_normal_font_size', int(query['docx_normal_font_size']))
+    if ('docx_example_font_size' in query
+            and re.search('^[1-9][0-9]*', query['docx_example_font_size']) is not None
+            and 0 < int(query['docx_example_font_size']) < 48):
+        set_session_data('docx_example_font_size', int(query['docx_example_font_size']))
+    if ('docx_gloss_font_size' in query
+            and re.search('^[1-9][0-9]*', query['docx_gloss_font_size']) is not None
+            and 0 < int(query['docx_gloss_font_size']) < 48):
+        set_session_data('docx_gloss_font_size', int(query['docx_gloss_font_size']))

@@ -274,8 +274,8 @@
 	font-size: 22px;
 	cursor: pointer;
 	margin: auto;
-	margin-left: 4px;
-	margin-right: 5px;
+	margin-left: 1px;
+	margin-right: 4px;
 	text-align: center;
 	display: inline-table;
 	padding: 4px;
@@ -520,6 +520,10 @@
 	border: solid 1px #707070;
 	box-shadow: none;
 	transition: box-shadow 0.3s, border 0.3s;
+}
+
+.select_fsize {
+	width: 15%!important;
 }
 
 label {

@@ -62,6 +62,26 @@ List of parameters
 
 - ``doc_to_sentence_meta`` (list of strings) -- names of the document-level metadata fields that should be copied into each sentence for search speedup. Such denormalization makes sense for all keyword or integer metadata fields that you expect to be used in subcorpus selection or statistics, if your corpus is large and has many documents (at least thousands). If the user selects a subcorpus using only the values of such fields, that GET query is translated into a single sentence-level Elasticsearch query. Otherwise, all document IDs for the subcorpus are found first, then their list is inserted into the sentence-level query. If that list is too long, that can substantially affect search time or even lead to a crash.
 
+- ``docx_additional_tiers`` (list of strings) -- if ``docx_enabled`` is True, determines which tier(s) should be added to the exported examples as additional lines below the translations (e.g., IDs of sentences). Defaults to an empty list.
+
+- ``docx_enabled`` (Boolean) -- enables "Download as DOCX" buttons (search results as glossed examples in tables or running text). Defaults to ``false``.
+
+- ``docx_example_font_face`` (string) -- if ``docx_enabled`` is True, sets the default typeface for the glossed example baseline in DOCX exports. Defaults to ``Brill``.
+
+- ``docx_example_font_size`` (integer) -- if ``docx_enabled`` is True, sets the default font size for the glossed example baseline in DOCX exports. Defaults to ``11``.
+
+- ``docx_gloss_font_face`` (string) -- if ``docx_enabled`` is True, sets the default typeface for the glosses in DOCX exports. Defaults to ``Brill``.
+
+- ``docx_gloss_font_size`` (integer) -- if ``docx_enabled`` is True, sets the default font size for the glosses in DOCX exports. Defaults to ``11``.
+
+- ``docx_normal_font_face`` (string) -- if ``docx_enabled`` is True, sets the default typeface for translations, additional tiers and examples as running text in DOCX exports. Defaults to ``Brill``.
+
+- ``docx_normal_font_size`` (integer) -- if ``docx_enabled`` is True, sets the default font size for translations, additional tiers and examples as running text in DOCX exports. Defaults to ``12``.
+
+- ``docx_tabular`` (Boolean) -- if ``docx_enabled`` is True, sets the default behavior of DOCX exports (``true`` for glossed examples in tables). Defaults to ``true``.
+
+- ``docx_translation_tiers`` (list of strings) -- if ``docx_enabled`` is True, determines which tier(s) should be added to the exported examples as translations in single quotes. Defaults to an empty list.
+
 - ``elastic_cacert`` (string) -- for Elasticsearch 9.x, specifies the path to CA certificates file (``/etc/elasticsearch/certs/http_ca.crt`` in a default installation). Defaults to an empty string. If no certificates and no Elasticsearch URL are provided, connect to ``localhost:9200`` via ``http``. If certificates are provided, use ``https``.
 
 - ``elastic_pwd`` (string) -- for Elasticsearch 9.x, specifies the password for basic authentication. If empty, the value of the environment variable ``ELASTIC_PASSWORD`` is used, if it exists. If it does not, the system will look for a password in a separate file ``search/elastic_pwd``. If it does not exist either, defaults to an empty string.

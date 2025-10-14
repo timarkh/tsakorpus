@@ -878,9 +878,13 @@ def find_sent_context(curSentData, n):
     is taken from the current search context). Return the context data
     and IDs of the sentences adjacent to the found ones.
     """
-    context = {'n': n, 'languages': {lang: {} for lang in curSentData['languages']},
-               'src_alignment': {}}
+    context = {
+        'n': n,
+        'languages': {lang: {} for lang in curSentData['languages']},
+        'src_alignment': {}
+    }
     adjacentIDs = {lang: {'next': -1, 'prev': -1} for lang in curSentData['languages']}
+
     for lang in curSentData['languages']:
         try:
             langID = settings.languages.index(lang)
@@ -890,15 +894,20 @@ def find_sent_context(curSentData, n):
         for side in ['next', 'prev']:
             curCxLang = context['languages'][lang]
             if side + '_id' in curSentData['languages'][lang]:
-                curCxLang[side] = sc.get_sentence_by_id(curSentData['languages'][lang][side + '_id'])
-            if (side in curCxLang
-                    and len(curCxLang[side]) > 0
-                    and 'hits' in curCxLang[side]
-                    and 'hits' in curCxLang[side]['hits']
-                    and len(curCxLang[side]['hits']['hits']) > 0):
+                curCxLang[side + '_source'] = sc.get_sentence_by_id(curSentData['languages'][lang][side + '_id'])
+            if (side + '_source' in curCxLang
+                    and len(curCxLang[side + '_source']) > 0
+                    and 'hits' in curCxLang[side + '_source']
+                    and 'hits' in curCxLang[side + '_source']['hits']
+                    and len(curCxLang[side + '_source']['hits']['hits']) > 0):
                 lastSentNum = cur_search_context().last_sent_num + 1
-                curSent = curCxLang[side]['hits']['hits'][0]
-                if '_source' in curSent and 'lang' not in curSent['_source']:
+                curSent = curCxLang[side + '_source']['hits']['hits'][0]
+                if '_source' not in curSent:
+                    curCxLang[side + '_source'] = {}
+                    curCxLang[side] = ''
+                    continue
+                if 'lang' not in curSent['_source']:
+                    curCxLang[side + '_source'] = {}
                     curCxLang[side] = ''
                     continue
                 langReal = lang
@@ -907,22 +916,26 @@ def find_sent_context(curSentData, n):
                 # langReal is the real language of the expanded context.
                 # lang and langReal can be different if there are tiers that
                 # contain sentences in more than one language.
-                if '_source' in curSent and curSent['_source']['lang'] != langID:
+                if curSent['_source']['lang'] != langID:
                     langReal = settings.languages[curSent['_source']['lang']]
-                if '_source' in curSent and side + '_id' in curSent['_source']:
+                if side + '_id' in curSent['_source']:
                     adjacentIDs[lang][side] = curSent['_source'][side + '_id']
+
                 expandedContext = sentView.process_sentence(curSent,
                                                             numSent=lastSentNum,
                                                             getHeader=False,
                                                             lang=langReal,
                                                             translit=cur_search_context().translit,
                                                             curLocale=get_locale())
+                curCxLang[side + '_source'] = curSent['_source']
                 curCxLang[side] = expandedContext['languages'][langReal]['text']
+
                 if settings.media:
                     sentView.relativize_src_alignment(expandedContext, curSentData['src_alignment_files'])
                     if 'src_alignment' in expandedContext:
                         context['src_alignment'].update(expandedContext['src_alignment'])
                 cur_search_context().last_sent_num = lastSentNum
             else:
+                curCxLang[side + '_source'] = {}
                 curCxLang[side] = ''
     return context, adjacentIDs

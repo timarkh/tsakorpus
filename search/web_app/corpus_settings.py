@@ -101,6 +101,9 @@ class CorpusSettings:
         self.docx_tags = False
         self.docx_translation_tiers = []
         self.docx_additional_tiers = []
+        self.docx_font_faces = ['Arial', 'Brill', 'Cambria', 'Charis SIL', 'Doulos SIL', 'Gentium',
+                                'Linguistics Pro', 'Noto Sans', 'Times New Roman']
+        self.docx_font_sizes = [8, 9, 10, 11, 12, 14]
         self.docx_normal_font_face = 'Brill'
         self.docx_normal_font_size = 12
         self.docx_example_font_face = 'Brill'
@@ -169,7 +172,8 @@ class CorpusSettings:
             'rtl_languages',
             'search_meta.stat_options',
             'docx_translation_tiers',
-            'docx_additional_tiers'
+            'docx_additional_tiers',
+            'docx_font_faces'
         }
 
         # dictionaries where values are strings

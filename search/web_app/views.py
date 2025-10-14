@@ -87,6 +87,16 @@ def search_page():
                            share_query_url=str(settings.share_query_url).lower(),
                            error_reports_enabled=settings.error_reports_enabled,
                            docx_enabled=settings.docx_enabled,
+                           docx_tabular=settings.docx_tabular,
+                           docx_glossed=settings.docx_glossed,
+                           docx_font_faces=settings.docx_font_faces,
+                           docx_font_sizes=settings.docx_font_sizes,
+                           docx_normal_font_face=settings.docx_normal_font_face,
+                           docx_normal_font_size=settings.docx_normal_font_size,
+                           docx_example_font_face=settings.docx_example_font_face,
+                           docx_example_font_size=settings.docx_example_font_size,
+                           docx_gloss_font_face=settings.docx_gloss_font_face,
+                           docx_gloss_font_size=settings.docx_gloss_font_size,
                            generate_dictionary=settings.generate_dictionary,
                            citation=settings.citation,
                            start_page_url=settings.start_page_url,
@@ -674,43 +684,70 @@ def download_cur_results_xlsx():
     return send_from_directory('../tmp', XLSXFilename)
 
 
+@app.route('/download_cur_results_docx')
 @app.route('/download_example_docx/<int:sentNum>')
 @nocache
-def download_example_docx(sentNum):
+def download_example_docx(sentNum=-1):
     """
     Create and return a DOCX file with an example from the search hits.
     """
     if not settings.docx_enabled:
         return ''
     sentData = cur_search_context().sentence_data
-    if sentData is None or len(sentData) <= sentNum or sentNum < 0:
+    pageData = cur_search_context().page_data
+    if sentData is None or pageData is None or len(sentData) <= sentNum or sentNum < -1:
         return ''
-    curSentData = cur_search_context().sentence_data[sentNum]
+    page = get_session_data('page')
+    if page is None or page == '':
+        page = 0
+
+    if sentNum >= 0:
+        contextNums = [sentNum]
+    else:
+        # Export all examples on the page
+        contextNums = [n for n in range(len(cur_search_context().sentence_data))]
+
     lang = settings.languages[0]
-    if 'languages' not in curSentData or lang not in curSentData['languages']:
-        return ''
-    baselineSrc = curSentData['languages'][lang]['source']
+    baseline = []
     translations = []
-    for langTrans in settings.docx_translation_tiers:
-        if langTrans in curSentData['languages']:
-            translations.append(curSentData['languages'][langTrans]['source'])
     additionalInfo = []
-    for langTrans in settings.docx_additional_tiers:
-        if langTrans in curSentData['languages']:
-            additionalInfo.append(curSentData['languages'][langTrans]['source'])
+
+    for sentNum in contextNums:
+        curSentData = cur_search_context().sentence_data[sentNum]
+        if 'languages' not in curSentData or lang not in curSentData['languages']:
+            continue
+        if sentNum < len(pageData[page]) and pageData[page][sentNum]['toggled_off']:
+            continue
+
+        baseline.append(cur_search_context().get_expanded_context(sentNum, lang))
+        translations.append([])
+        for langTrans in settings.docx_translation_tiers:
+            if langTrans in curSentData['languages']:
+                translations[-1].append(cur_search_context().get_expanded_context(sentNum, langTrans))
+        additionalInfo.append([])
+        for langTrans in settings.docx_additional_tiers:
+            if langTrans in curSentData['languages']:
+                additionalInfo[-1].append(cur_search_context().get_expanded_context(sentNum, langTrans))
+
+    fTranslit = lambda x: sentView.transliterate_baseline(x, lang, translit=cur_search_context().translit)
 
     DOCXFilename = 'example-' + str(uuid.uuid4()) + '.docx'
     if not os.path.exists('tmp'):
         os.makedirs('tmp')
-
-    fTranslit = lambda x: sentView.transliterate_baseline(x, lang, translit=cur_search_context().translit)
-    wordDoc = docxex.get_docx(lang, [baselineSrc],
-                              tabular=settings.docx_tabular,
-                              gloss=settings.docx_glossed,
+    wordDoc = docxex.get_docx(lang, baseline,
+                              tabular=get_session_data('docx_tabular'),
+                              gloss=get_session_data('docx_glossed'),
                               tags=settings.docx_tags,
                               translations=translations,
                               additionalInfo=additionalInfo,
-                              translit=fTranslit)
+                              translit=fTranslit,
+                              normal_font_face=get_session_data('docx_normal_font_face'),
+                              normal_font_size=get_session_data('docx_normal_font_size'),
+                              example_font_face=get_session_data('docx_example_font_face'),
+                              example_font_size=get_session_data('docx_example_font_size'),
+                              gloss_font_face=get_session_data('docx_gloss_font_face'),
+                              gloss_font_size=get_session_data('docx_gloss_font_size')
+                              )
     wordDoc.save(os.path.join('tmp', DOCXFilename))
     return send_from_directory('../tmp', DOCXFilename)
 
