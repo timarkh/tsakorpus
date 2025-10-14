@@ -15,6 +15,8 @@ class Tokenizer:
         self.settings = copy.deepcopy(settings)
         if 'non_word_internal_punct' not in self.settings:
             self.settings['non_word_internal_punct'] = ['\n', '\\n']
+        if 'word_internal_punct' not in self.settings:
+            self.settings['word_internal_punct'] = []
         self.tokenSplitRegexes = []
         self.specialTokenRegexes = []
         self.add_split_token_regexes()
@@ -169,7 +171,8 @@ class Tokenizer:
                 else:
                     curToken['wtype'] = 'word'
                 continue
-            bPunc = (self.rxPunc.search(c) is not None) or (c in self.settings['non_word_internal_punct'])
+            bPunc = ((self.rxPunc.search(c) is not None and c not in self.settings['word_internal_punct'])
+                     or (c in self.settings['non_word_internal_punct']))
             if ((bPunc and curToken['wtype'] == 'word') or
                     (not bPunc and curToken['wtype'] == 'punct')):
                 curToken['off_end'] = i
