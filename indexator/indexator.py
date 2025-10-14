@@ -187,6 +187,16 @@ class Indexator:
 
         # Initialize Elasticsearch connection
         self.es = None
+        if ESVersion == 9:
+            if 'elastic_pwd' not in self.settings:
+                if 'ELASTIC_PASSWORD' in os.environ:
+                    self.settings['elastic_pwd'] = os.environ['ELASTIC_PASSWORD']
+                elif os.path.exists('../search/elastic_pwd'):
+                    with open('../search/elastic_pwd', 'r', encoding='utf-8') as fIn:
+                        self.settings['elastic_pwd'] = fIn.read()
+                else:
+                    self.settings['elastic_pwd'] = ''
+
         if 'elastic_url' in self.settings and len(self.settings['elastic_url']) > 0:
             # Connect to a non-default URL or supply username and password
             if ESVersion == 7:

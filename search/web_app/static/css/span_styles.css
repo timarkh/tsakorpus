@@ -18,6 +18,25 @@ in different styles) */
 	color: #444444;
 }
 
+/* Style for bibliographic references */
+
+.bib_ref_link {
+	text-decoration-line: underline;
+	text-decoration-style: dotted;
+	cursor: pointer;
+}
+
+.bib_ref_link:hover:before {
+  content: attr(data-bibref-tooltip);
+  background-color: #000;
+  opacity: 75%;
+  color: #fff;
+  top: 2em;
+  padding: 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  position: absolute;
+}
 
 /* Styles for annotation spans */
 

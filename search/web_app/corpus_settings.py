@@ -10,6 +10,7 @@ import copy
 import re
 import os
 import shutil
+from pybtex.database import parse_file
 if __name__.startswith('web_app.'):
     from . import load_csv_translations
 
@@ -45,6 +46,7 @@ class CorpusSettings:
         self.search_meta = {'columns': [], 'stat_options': []}
         self.ambiguous_analyses = True
         self.keep_lemma_order = False
+        self.bibref = {}
 
         # Indexation and search options
         self.debug = False

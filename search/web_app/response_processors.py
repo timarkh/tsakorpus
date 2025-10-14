@@ -303,6 +303,29 @@ class SentenceViewer:
         # result = result.replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
         return result
 
+    def prepare_bib_ref(self, words, indexes):
+        """
+        Generate data for bibliographical references.
+        """
+        dataBibref = []
+        dataBibrefTooltips = []
+        for iStr in indexes:
+            mWordNo = self.rxWordNo.search(iStr)
+            if mWordNo is None:
+                continue
+            i = int(mWordNo.group(1))
+            if i < 0 or i >= len(words):
+                continue
+            word = words[i]
+            if word['wtype'] != 'word' or 'bib_ref' not in word:
+                continue
+            dataBibref.append(word['bib_ref'])
+            if word['bib_ref'] in self.settings.bibref and 'default' in self.settings.bibref[word['bib_ref']]:
+                dataBibrefTooltips.append(self.settings.bibref[word['bib_ref']]['default'])
+            else:
+                dataBibrefTooltips.append(word['bib_ref'])
+        return dataBibref, dataBibrefTooltips
+
     def build_span(self, sentSrc, curWords, curStyles, lang, matchWordOffsets, translit=None):
         """
         Build a string with a starting span for a word in the baseline.
@@ -320,8 +343,11 @@ class SentenceViewer:
             dataAna = self.prepare_analyses(sentSrc['words'], curWords,
                                             lang, matchWordOffsets,
                                             translit=translit)
+            dataBibref, dataBibrefTooltips = self.prepare_bib_ref(sentSrc['words'], curWords)
         else:
             dataAna = ''
+            dataBibref = []
+            dataBibrefTooltips = []
         dataAna = html.escape(dataAna)
 
         def highlightClass(nWord):
@@ -333,7 +359,12 @@ class SentenceViewer:
 
         spanStart = '<span class="' + curClass + \
                     ' '.join(wn + highlightClass(wn)
-                             for wn in curWords) + '" data-ana="' + dataAna + '">'
+                             for wn in curWords)
+        if len(dataBibref) > 0:
+            spanStart += (' bib_ref_link" data-bibref="' + '|'.join(dataBibref)
+                          + '" data-bibref-tooltip="' + '; '.join(html.escape(bt) for bt in dataBibrefTooltips))
+        spanStart += '" data-ana="' + dataAna + '">'
+
         for styleTag in curStyles:
             spanStart += styleTag
         return spanStart
@@ -593,6 +624,8 @@ class SentenceViewer:
         the class and other attributes, such as tooltip text.
         """
         offStarts, offEnds = {}, {}
+        if 'words' not in sSource:
+            return offStarts, offEnds
         if 'style_spans' not in sSource:
             return offStarts, offEnds
         for iSpan in range(len(sSource['style_spans'])):

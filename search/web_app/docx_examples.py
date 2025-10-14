@@ -275,6 +275,17 @@ class DocxExampleProcessor:
                             if not translations[iContext][iTier][iSent].endswith('’'):
                                 translations[iContext][iTier][iSent] += '’'
 
+    def extract_bibref(self, translations):
+        references = set()
+        for iContext in range(len(translations)):
+            for iTier in range(len(translations[iContext])):
+                for iSent in range(len(translations[iContext][iTier])):
+                    if 'words' not in translations[iContext][iTier][iSent]:
+                        continue
+                    for w in translations[iContext][iTier][iSent]['words']:
+                        if 'bib_ref' in w:
+                            references.add(w['bib_ref'])
+        return references
 
     def get_docx(self, lang, contexts, tabular=True, gloss=True, tags=False,
                  translations=None, additionalInfo=None, translit=None,
@@ -302,11 +313,15 @@ class DocxExampleProcessor:
         if gloss_font_size <= 0:
             gloss_font_size = self.settings.docx_gloss_font_size
 
+        references = set()
+
         if translations is None:
             translations = []
+        references |= self.extract_bibref(translations)
         self.extract_translations(translations, tabular=tabular)
         if additionalInfo is None:
             additionalInfo = []
+        references |= self.extract_bibref(additionalInfo)
         self.extract_translations(additionalInfo, tabular=tabular, addQuotes=False)
         if translit is None:
             translit = lambda x: x
@@ -324,6 +339,12 @@ class DocxExampleProcessor:
         glossStyle.font.size = Pt(gloss_font_size)
         for iContext in range(len(contexts)):
             curContext = contexts[iContext]
+            for s in curContext:
+                if 'words' in s:
+                    for w in s['words']:
+                        if 'bib_ref' in w:
+                            references.add(w['bib_ref'])
+
             if iContext < len(translations):
                 curTrans = translations[iContext]
             else:
@@ -337,6 +358,20 @@ class DocxExampleProcessor:
                                   tabular, gloss, tags)
             p = wordDoc.add_paragraph('')
             DocxExampleProcessor.p_no_margins(wordDoc, p)
+        if len(references) > 0:
+            p = wordDoc.add_paragraph('')
+            DocxExampleProcessor.p_no_margins(wordDoc, p)
+            p = wordDoc.add_paragraph('References')
+            DocxExampleProcessor.p_no_margins(wordDoc, p)
+            refFormatted = []
+            for ref in references:
+                if ref in self.settings.bibref and 'default' in self.settings.bibref[ref]:
+                    refFormatted.append(self.settings.bibref[ref]['default'])
+                else:
+                    refFormatted.append(ref)
+            for ref in refFormatted:
+                p = wordDoc.add_paragraph(ref)
+                DocxExampleProcessor.p_no_margins(wordDoc, p)
         return wordDoc
 
 
