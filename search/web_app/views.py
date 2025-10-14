@@ -105,6 +105,7 @@ def search_page():
                            max_request_time=settings.query_timeout + 1,
                            max_page_size=MAX_PAGE_SIZE,
                            max_context_expand=settings.max_context_expand,
+                           default_context_size=settings.default_context_size,
                            inel_exmaralda_links=settings.inel_exmaralda_links,
                            locales=locales,
                            random_seed=get_session_data('seed'),

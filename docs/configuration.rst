@@ -50,6 +50,8 @@ List of parameters
 
 - ``debug`` (Boolean) -- whether additional debug elements, such as "Show JSON query / Show JSON response", are turned on in the web interface. Defaults to ``false``.
 
+- ``default_context_size`` (integer) -- how many adjacent sentecnes are displayed together with each search hit by default. Defaults to ``0``.
+
 - ``default_locale`` (string) -- code of the default :doc:`interface language </interface_languages>`.
 
 - ``default_values`` (dictionary) -- dictionary where keys are names of text boxes in the word search panel and values are the strings that should appear there by default. Currently, it only works for simple string-valued sentence-level metadata fields. The text boxes should be called by the IDs they have in the HTML, e.g. ``sent_meta_speaker`` rather than ``speaker`` if ``speaker`` is a sentence-levele metadata field.

@@ -34,18 +34,18 @@
 						<div class="row">
 							<label for="context_size" class="col-sm-6 col-form-label">{{ _('Default context size:') }}</label>
 							<select form="search_main" name="context_size" id="context_size" class="search_input">
-								<option value="0" selected>{{ _('no context') }}</option>
+								<option value="0"{% if default_context_size==0 %} selected{% endif %}>{{ _('no context') }}</option>
 								{% if max_context_expand >= 1 %}
-									<option value="1">{{ _('±1') }}</option>
+									<option value="1"{% if default_context_size==1 %} selected{% endif %}>{{ _('±1') }}</option>
 								{% endif %}
 								{% if max_context_expand >= 2 %}
-									<option value="2">{{ _('±2') }}</option>
+									<option value="2"{% if default_context_size==2 %} selected{% endif %}>{{ _('±2') }}</option>
 								{% endif %}
 								{% if max_context_expand >= 3 %}
-									<option value="3">{{ _('±3') }}</option>
+									<option value="3"{% if default_context_size==3 %} selected{% endif %}>{{ _('±3') }}</option>
 								{% endif %}
 								{% if max_context_expand >= 4 %}
-									<option value="4">{{ _('±4') }}</option>
+									<option value="4"{% if default_context_size==4 %} selected{% endif %}>{{ _('±4') }}</option>
 								{% endif %}
 							</select>
 						</div>

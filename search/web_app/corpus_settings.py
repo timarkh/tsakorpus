@@ -93,6 +93,7 @@ class CorpusSettings:
         self.share_query_url = False
         self.error_reports_enabled = False
         self.inel_exmaralda_links = False
+        self.default_context_size = 0
 
         # DOCX parameters for saved examples
         self.docx_enabled = False
