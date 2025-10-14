@@ -64,25 +64,25 @@ List of parameters
 
 - ``doc_to_sentence_meta`` (list of strings) -- names of the document-level metadata fields that should be copied into each sentence for search speedup. Such denormalization makes sense for all keyword or integer metadata fields that you expect to be used in subcorpus selection or statistics, if your corpus is large and has many documents (at least thousands). If the user selects a subcorpus using only the values of such fields, that GET query is translated into a single sentence-level Elasticsearch query. Otherwise, all document IDs for the subcorpus are found first, then their list is inserted into the sentence-level query. If that list is too long, that can substantially affect search time or even lead to a crash.
 
-- ``docx_additional_tiers`` (list of strings) -- if ``docx_enabled`` is True, determines which tier(s) should be added to the exported examples as additional lines below the translations (e.g., IDs of sentences). Defaults to an empty list.
+- ``docx_additional_tiers`` (list of strings) -- if ``docx_enabled`` is ``true``, determines which tier(s) should be added to the exported examples as additional lines below the translations (e.g., IDs of sentences). Defaults to an empty list.
 
 - ``docx_enabled`` (Boolean) -- enables "Download as DOCX" buttons (search results as glossed examples in tables or running text). Defaults to ``false``.
 
-- ``docx_example_font_face`` (string) -- if ``docx_enabled`` is True, sets the default typeface for the glossed example baseline in DOCX exports. Defaults to ``Brill``.
+- ``docx_example_font_face`` (string) -- if ``docx_enabled`` is ``true``, sets the default typeface for the glossed example baseline in DOCX exports. Defaults to ``Brill``.
 
-- ``docx_example_font_size`` (integer) -- if ``docx_enabled`` is True, sets the default font size for the glossed example baseline in DOCX exports. Defaults to ``11``.
+- ``docx_example_font_size`` (integer) -- if ``docx_enabled`` is ``true``, sets the default font size for the glossed example baseline in DOCX exports. Defaults to ``11``.
 
-- ``docx_gloss_font_face`` (string) -- if ``docx_enabled`` is True, sets the default typeface for the glosses in DOCX exports. Defaults to ``Brill``.
+- ``docx_gloss_font_face`` (string) -- if ``docx_enabled`` is ``true``, sets the default typeface for the glosses in DOCX exports. Defaults to ``Brill``.
 
-- ``docx_gloss_font_size`` (integer) -- if ``docx_enabled`` is True, sets the default font size for the glosses in DOCX exports. Defaults to ``11``.
+- ``docx_gloss_font_size`` (integer) -- if ``docx_enabled`` is ``true``, sets the default font size for the glosses in DOCX exports. Defaults to ``11``.
 
-- ``docx_normal_font_face`` (string) -- if ``docx_enabled`` is True, sets the default typeface for translations, additional tiers and examples as running text in DOCX exports. Defaults to ``Brill``.
+- ``docx_normal_font_face`` (string) -- if ``docx_enabled`` is ``true``, sets the default typeface for translations, additional tiers and examples as running text in DOCX exports. Defaults to ``Brill``.
 
-- ``docx_normal_font_size`` (integer) -- if ``docx_enabled`` is True, sets the default font size for translations, additional tiers and examples as running text in DOCX exports. Defaults to ``12``.
+- ``docx_normal_font_size`` (integer) -- if ``docx_enabled`` is ``true``, sets the default font size for translations, additional tiers and examples as running text in DOCX exports. Defaults to ``12``.
 
-- ``docx_tabular`` (Boolean) -- if ``docx_enabled`` is True, sets the default behavior of DOCX exports (``true`` for glossed examples in tables). Defaults to ``true``.
+- ``docx_tabular`` (Boolean) -- if ``docx_enabled`` is ``true``, sets the default behavior of DOCX exports (``true`` for glossed examples in tables). Defaults to ``true``.
 
-- ``docx_translation_tiers`` (list of strings) -- if ``docx_enabled`` is True, determines which tier(s) should be added to the exported examples as translations in single quotes. Defaults to an empty list.
+- ``docx_translation_tiers`` (list of strings) -- if ``docx_enabled`` is ``true``, determines which tier(s) should be added to the exported examples as translations in single quotes. Defaults to an empty list.
 
 - ``elastic_cacert`` (string) -- for Elasticsearch 9.x, specifies the path to CA certificates file (``/etc/elasticsearch/certs/http_ca.crt`` in a default installation). Defaults to an empty string. If no certificates and no Elasticsearch URL are provided, connect to ``localhost:9200`` via ``http``. If certificates are provided, use ``https``.
 
@@ -94,13 +94,13 @@ List of parameters
 
 - ``error_reports_enabled`` (Boolean) -- whether the user can send reports about mistakes in search hits. If enabled, each search hit will contain a button that toggles a modal form for writing the report. All reports are stored in ``search/error_reports.txt``. Defaults to ``False``.
 
-- ``exclude_from_dict`` (dictionary) -- if ``generate_dictionary`` is set to ``True``, this dictionary specifies which words should not be taken into account when generating a dictionary. For example, you may want to omit words annotated as hesitation or code switching. Keys are analysis fields (with the ``gr.`` prefix for grammatical categories, e.g. ``gr.pos``). Values are regexes. Words that have at liest one analysis field at least one value of which matches the corresponding regex will be excluded from the dictionary.
+- ``exclude_from_dict`` (dictionary) -- if ``generate_dictionary`` is set to ``true``, this dictionary specifies which words should not be taken into account when generating a dictionary. For example, you may want to omit words annotated as hesitation or code switching. Keys are analysis fields (with the ``gr.`` prefix for grammatical categories, e.g. ``gr.pos``). Values are regexes. Words that have at liest one analysis field at least one value of which matches the corresponding regex will be excluded from the dictionary.
 
 - ``fulltext_search_enabled`` (Boolean) -- boolean value that determines whether a text box for full-text search should be displayed. Defaults to ``true``.
 
-- ``fulltext_view_enabled`` (Boolean) -- whether it is allowed to view entire annotated texts. If turned on, HTML rendering is generated for texts at indexation time (which can slow down the process significantly). Full texts are only generated for those JSON files that have ``fulltext_id`` metadata field filled in. The name of the resulting file is its value. Defaults to ``false``.
+- ``fulltext_view_enabled`` (Boolean) -- whether it is allowed to view entire annotated texts. If turned on, HTML rendering is generated for texts at indexation time (which can slow down the process significantly). Full texts are only generated for those JSON files that have ``fulltext_id`` metadata field filled in, or if ``use_nonpersistent_fulltext_id`` is set to ``true``. The name of the resulting file is its value. Defaults to ``false``.
 
-- ``generate_dictionary`` (Boolean) -- whether a dictionary of lexemes should be generated at indexation time for each of the languages. If true, the dictionary is stored in the ``search/web_app/templates`` directory and could be accessed by clicking the book glyph in the web interface. Defaults to ``false``.
+- ``generate_dictionary`` (Boolean) -- whether a dictionary of lexemes should be generated at indexation time for each of the languages. If true, the dictionary is stored in the ``search/web_app/templates`` directory and could be accessed by clicking the book glyph in the web interface. Defaults to ``false``. Additional information that should be included in the dictionary can be listed in ``lemma_table_fields``.
 
 - ``gloss_search_enabled`` (Boolean) -- whether the gloss search text box should be present in the word query form. Should be enabled for glossed corpora.
 
@@ -144,7 +144,7 @@ List of parameters
 
 - ``languages`` (list of strings) -- names of the languages used in the corpus. The order of the languages determines how they are encoded in the index (the code of the language is its index in this list) and, in the case of parallel corpora, in which order they are displayed within one parallel context.
 
-- ``lemma_table_fields`` (list of strings) -- names of the word-level analysis fields that should be displayed in the table with Lemma search results, along with the lemma, which appears automatically, and the dictionary categories, which appear if ``word_search_display_gr`` is set. Defaults to empty list. For each language, columns corresponding to the fields that are not on the ``lang_props[LANGNAME].lexical_fields`` list will be left empty. See also ``word_table_fields``.
+- ``lemma_table_fields`` (list of strings) -- names of the word-level analysis fields that should be displayed in the table with Lemma search results and in the dictionary (if ``generate_dictionary`` is set). It will appear along with the lemma, which is included automatically, and the dictionary categories, which appear if ``word_search_display_gr`` is set. Defaults to empty list. For each language, columns corresponding to the fields that are not on the ``lang_props[LANGNAME].lexical_fields`` list will be left empty. See also ``word_table_fields``.
 
 - ``line_plot_meta`` (list of strings) -- names of the metadata fields whose values are numerical and should be represented in statistics by a line plot rather than by a histogram. Defaults to ``["year"]``.
 
