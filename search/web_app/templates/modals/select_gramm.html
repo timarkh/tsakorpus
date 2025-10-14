@@ -5,7 +5,7 @@
 	<div class="gloss_column">
 	{% for tag in col %}
 	{% if tag.type == "gramm" or tag.type == "tag" %}
-		<div class="switchable_gramm" data-cat="{{ tag.category|safe }}" data-grammtag="{{ tag.value|safe }}">{{ tag.value|safe }}
+		<div class="switchable_gramm" data-cat="{{ tag.category|safe }}" data-grammtag="{{ tag.value|safe }}">{{ _('tagname_' + tag.value)|safe }}
 		{% if tag.tooltip %}
 			<span class="tooltip_prompt alert alert-warning">{{ _('tooltip_' + tag.tooltip)|safe }}</span>
 		{% endif %}

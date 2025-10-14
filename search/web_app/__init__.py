@@ -51,12 +51,34 @@ def generate_po(lang):
                                                       'metafield_'))
             dictMessages.update(load_csv_translations(os.path.join(srcDir, 'metadata_values.txt'),
                                                       'metavalue_'))
+            dictMessages.update(load_csv_translations(os.path.join(srcDir, 'tags.txt'),
+                                                      'tagname_'))
             dictMessages.update(load_csv_translations(os.path.join(srcDir, 'tooltips.txt'),
                                                       'tooltip_'))
             dictMessages.update(load_csv_translations(os.path.join(srcDir, 'transliterations.txt'),
                                                       'translitname_'))
             dictMessages.update(load_csv_translations(os.path.join(srcDir, 'word_fields.txt'),
                                                       'wordfield_'))
+
+            # Enhance dictionaries with prefixed values that must have been defined, but have not
+            for tagList in [settings.multiple_choice_fields] + [settings.lang_props[lang]
+                                                                for lang in settings.lang_props
+                                                                if 'gramm_selection' in settings.lang_props[lang] or 'gloss_selection' in settings.lang_props[lang]]:
+                for field in tagList:
+                    selectTable = tagList[field]
+                    if 'columns' not in selectTable:
+                        continue
+                    for c in selectTable['columns']:
+                        for item in c:
+                            if 'type' in item and item['type'] in ('gramm', 'tag', 'gloss'):
+                                if 'value' in item and 'tagname_' + item['value'] not in dictMessages:
+                                    dictMessages['tagname_' + item['value']] = item['value']
+                                if 'tooltip' in item and 'tooltip_' + item['tooltip'] not in dictMessages:
+                                    dictMessages['tooltip_' + item['tooltip']] = item['tooltip']
+                            elif 'type' in item and item['type'] == 'header' and 'value' in item:
+                                if 'tooltip_' + item['value'] not in dictMessages:
+                                    dictMessages['tooltip_' + item['value']] = item['value']
+
             for k in sorted(dictMessages):
                 fOut.write('msgid "' + k.replace('\n', '\\n').replace('"', '&quot;').replace('%', '%%') + '"\n')
                 fOut.write('msgstr "' + dictMessages[k].replace('\n', '\\n').replace('"', '&quot;').replace('%', '%%') + '"\n\n')
