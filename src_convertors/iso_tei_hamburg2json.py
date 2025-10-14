@@ -402,6 +402,21 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         self.fragmentize_src_alignment(alignment)
         sent['src_alignment'] = [alignment]
 
+    def enhance_ref_tier(self, text):
+        """
+        Remove redundant numerical sentence IDs and add a bibliographic reference,
+        if it can be found in the metadata.
+        """
+        text = re.sub(' +\([0-9]{1-4}(\\.[0-9]{1-4})? *$', '', text)
+        if self.curMeta is None:
+            return text + ' (INEL)'
+        if 'published_in' in self.curMeta and self.rxEmptyValueComa.search(self.curMeta) is None:
+            text += '(INEL / ' + self.curMeta['published_in'] + ')'
+            # Do not forget to add "INEL" and all bibliographic references to
+            # the special tokens list in conversion_settings.json!
+            # They should be assigned a "bib_ref" field.
+        return text
+
     def get_parallel_sentences(self, srcTree, sentBoundaries, srcFile):
         """
         Iterate over sentences in description tiers aligned with the
@@ -427,6 +442,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                 if text is None or len(text) <= 0:
                     continue
                 text = self.tp.cleaner.clean_text(text)
+                if tierName == 'ref':
+                    text = self.enhance_ref_tier(text)
                 words = self.tp.tokenizer.tokenize(text)
                 paraAlignment = {'off_start': 0, 'off_end': len(text), 'para_id': self.pID}
                 paraSent = {'words': words, 'text': text, 'para_alignment': [paraAlignment],
@@ -701,12 +718,12 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         words with at least one analysis in the document.
         """
         print(fnameSrc)
-        curMeta = self.get_meta(fnameSrc)
-        if len(curMeta) == 1:
+        self.curMeta = self.get_meta(fnameSrc)
+        if len(self.curMeta) == 1:
             curMeta = {'filename': fnameSrc, 'title': fnameSrc, 'author': '',
                        'year_from': '1900', 'year_to': str(datetime.datetime.now().year)}
 
-        textJSON = {'meta': curMeta, 'sentences': []}
+        textJSON = {'meta': self.curMeta, 'sentences': []}
         nTokens, nWords, nAnalyzed = 0, 0, 0
         self.seg2pID = {}
         self.morph2wordID = {}
