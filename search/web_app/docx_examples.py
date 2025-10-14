@@ -369,7 +369,7 @@ class DocxExampleProcessor:
                     refFormatted.append(self.settings.bibref[ref]['default'])
                 else:
                     refFormatted.append(ref)
-            for ref in refFormatted:
+            for ref in sorted(refFormatted):
                 p = wordDoc.add_paragraph(ref)
                 DocxExampleProcessor.p_no_margins(wordDoc, p)
         return wordDoc
