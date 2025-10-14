@@ -407,7 +407,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         Remove redundant numerical sentence IDs and add a bibliographic reference,
         if it can be found in the metadata.
         """
-        text = re.sub(' +\\([0-9]{1-4}(\\.[0-9]{1-4})?\\) *$', '', text)
+        text = re.sub(' +\\([0-9]{1,4}(\\.[0-9]{1,4})?\\) *$', '', text)
         if self.curMeta is None:
             return text + ' (INEL)'
         if 'published_in' in self.curMeta and self.rxEmptyValueComa.search(self.curMeta['published_in']) is None:
