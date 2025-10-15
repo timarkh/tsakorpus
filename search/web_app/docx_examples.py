@@ -375,7 +375,6 @@ class DocxExampleProcessor:
                 p.paragraph_format.first_line_indent = Cm(1)
                 p.paragraph_format.space_before = Cm(0)
                 p.paragraph_format.space_after = Cm(0)
-                DocxExampleProcessor.p_no_margins(wordDoc, p)
         return wordDoc
 
 
