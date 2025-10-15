@@ -410,12 +410,14 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         text = re.sub(' +\\([0-9]{1,4}(\\.[0-9]{1,4})?\\) *$', '', text)
         if self.curMeta is None:
             return text + ' (INEL)'
-        if 'published_in' in self.curMeta and self.rxEmptyValueComa.search(self.curMeta['published_in']) is None:
+        elif 'published_in' in self.curMeta and self.rxEmptyValueComa.search(self.curMeta['published_in']) is None:
             text += ' (INEL / ' + self.curMeta['published_in'] + ')'
             text = text.strip()
             # Do not forget to add "INEL" and all bibliographic references to
             # the special tokens list in conversion_settings.json!
             # They should be assigned a "bib_ref" field.
+        else:
+            text += ' (INEL)'
         return text
 
     def get_parallel_sentences(self, srcTree, sentBoundaries, srcFile):
@@ -580,6 +582,8 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
                     spanText = span.text
                     if spanText is None:
                         spanText = ''
+                    if tierName == 'ref':
+                        spanText = self.enhance_ref_tier(spanText)
                     seg2text[(self.seg2pID[span.attrib['from']],
                               self.seg2pID[span.attrib['from']])] = spanText.strip()
         for s in curSentences:
