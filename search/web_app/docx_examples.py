@@ -360,9 +360,10 @@ class DocxExampleProcessor:
             DocxExampleProcessor.p_no_margins(wordDoc, p)
         if len(references) > 0:
             p = wordDoc.add_paragraph('')
-            DocxExampleProcessor.p_no_margins(wordDoc, p)
-            p = wordDoc.add_paragraph('References')
-            DocxExampleProcessor.p_no_margins(wordDoc, p)
+            p.add_run('References').font.bold = True
+            p.paragraph_format.first_line_indent = Cm(0)
+            p.paragraph_format.space_before = Cm(2)
+            p.paragraph_format.space_after = Cm(0)
             refFormatted = []
             for ref in references:
                 if ref in self.settings.bibref and 'default' in self.settings.bibref[ref]:
@@ -371,6 +372,9 @@ class DocxExampleProcessor:
                     refFormatted.append(ref)
             for ref in sorted(refFormatted):
                 p = wordDoc.add_paragraph(ref)
+                p.paragraph_format.first_line_indent = Cm(1)
+                p.paragraph_format.space_before = Cm(0)
+                p.paragraph_format.space_after = Cm(0)
                 DocxExampleProcessor.p_no_margins(wordDoc, p)
         return wordDoc
 

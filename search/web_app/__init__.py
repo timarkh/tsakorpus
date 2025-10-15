@@ -66,7 +66,7 @@ def generate_po(lang):
                                                                 if 'gramm_selection' in settings.lang_props[lang] or 'gloss_selection' in settings.lang_props[lang]]:
                 for field in tagList:
                     selectTable = tagList[field]
-                    if 'columns' not in selectTable:
+                    if type(selectTable) != dict or 'columns' not in selectTable:
                         continue
                     for c in selectTable['columns']:
                         for item in c:
