@@ -44,7 +44,7 @@ async function expand_all_words() {
 		
 		div_extra_fields.css('transition', oldTransitionDuration);
 	})
-	await sleep(20);
+	await sleep(150);
 }
 
 async function load_query_str(query) {
@@ -96,32 +96,33 @@ async function load_query_str(query) {
 	}
 	// Expand additional fields where not expanded, otherwise their values
 	// will not be able to get there
-	await expand_all_words();
-	// Expand word distance sections where needed
-	$.each(word_rels, function (i, wordNum) {
-		$('#wsearch_' + wordNum + ' .add_rel').trigger('click');
-	});
-	// Toggle negative queries where needed
-	$.each(neg_queries, function (i, wordNum) {
-		if (wordNum > 1) {
-			$('#wsearch_' + wordNum + ' .neg_query').trigger('click');
-		}
-		else {
-			$('#first_word .neg_query').trigger('click');
-		}
-	});
-	// Insert the values supplied in query
-	$.each(dictFields, function (field, value) {
-		if ($('#' + field).length > 0 && $('#' + field).attr('type') == 'checkbox') {
-			if (value == 'on') {
-				$('#' + field).prop('checked', true);
+	$.when(expand_all_words()).done(function() {
+		// Expand word distance sections where needed
+		$.each(word_rels, function (i, wordNum) {
+			$('#wsearch_' + wordNum + ' .add_rel').trigger('click');
+		});
+		// Toggle negative queries where needed
+		$.each(neg_queries, function (i, wordNum) {
+			if (wordNum > 1) {
+				$('#wsearch_' + wordNum + ' .neg_query').trigger('click');
 			}
-			return;
-		}
-		$('#' + field).val(value);
-	});
-	$.each(docs2exclude, function (i, docID) {
-		exclude_doc(docID);
+			else {
+				$('#first_word .neg_query').trigger('click');
+			}
+		});
+		// Insert the values supplied in query
+		$.each(dictFields, function (field, value) {
+			if ($('#' + field).length > 0 && $('#' + field).attr('type') == 'checkbox') {
+				if (value == 'on') {
+					$('#' + field).prop('checked', true);
+				}
+				return;
+			}
+			$('#' + field).val(value);
+		});
+		$.each(docs2exclude, function (i, docID) {
+			exclude_doc(docID);
+		});
 	});
 }
 
