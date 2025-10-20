@@ -1236,7 +1236,7 @@ class InterfaceQueryParser:
         for k in [_ for _ in htmlQuery.keys()]:
             if k not in ('n_words', 'lang', 'lang1') and re.search('[^0-9]1$', k) is None:
                 del htmlQuery[k]
-            elif re.search('^sentence_index', k) is not None:
+            elif re.search('^(?:sentence_index|sent_meta_)', k) is not None:
                 del htmlQuery[k]
             elif k not in ('n_words', 'lang', 'lang1', 'lex1'):
                 if k == 'n_ana1' and htmlQuery[k] in ('any', 'analyzed'):
@@ -1250,6 +1250,10 @@ class InterfaceQueryParser:
             htmlQuery['wtype1'] = 'lemma'
         esQuery = self.html2es(htmlQuery, query_size=0, sortOrder='', searchOutput='words')
         if searchType == 'lemma':
+            if 'bool' not in esQuery['query']:
+                esQuery['query']['bool'] = {}
+            if 'must_not' not in esQuery['query']['bool']:
+                esQuery['query']['bool']['must_not'] = []
             esQuery['query']['bool']['must_not'].append({'term': {'l_id': 'l0'}})
         if searchType == 'lemma' and wfFields:
             esQuery['aggs'] = {
