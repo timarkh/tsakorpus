@@ -1043,7 +1043,8 @@ class InterfaceQueryParser:
                 lang = 'all'
                 langID = -1
             else:
-                return None, None, None, None
+                langID = 0
+                lang = self.settings.languages[0]
         else:
             lang = htmlQuery['lang1']
             langID = self.settings.languages.index(lang)

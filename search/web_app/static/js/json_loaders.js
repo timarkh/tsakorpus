@@ -300,11 +300,16 @@ function get_sentences() {
 
 function get_sentences_page(page) {
 	clear_saved_words_table();
+	var data = $("#search_main").serialize();
+	if ($('#query_to_load').val().length > 1) {
+		data = $('#query_to_load').val();
+		$('#query_to_load').val("");
+	}
 	if (page < 0) {
 		remember_query('sentence');
 		$.ajax({
 			url: "search_sent",
-			data: $("#search_main").serialize(),
+			data: data,
 			type: "GET",
 			beforeSend: start_progress_bar,
 			complete: stop_progress_bar,
@@ -619,7 +624,7 @@ function search_if_enter(e) {
 async function search_if_query() {
 	if ($('#query_to_load').val().length > 1) {
 		await load_query();
-		$('#search_sent').click();
+		get_sentences();
 	}
 }
 
