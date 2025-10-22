@@ -162,17 +162,38 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
             curWordAnno = wordAnno[tupleKey]
             # mp: morph breaks with empty morphemes (corresponds to the mc tier: POS and morph categories)
             # mb: morph breaks without empty morphemes (corresponds to the gr/ge tiers: actual glosses)
-            if 'mb' in curWordAnno:
-                ana['parts'] = curWordAnno['mb']
             if 'ge' in curWordAnno:
                 ana['gloss'] = curWordAnno['ge']
                 self.glosses |= set(g for g in self.rxSplitGlosses.split(ana['gloss']) if g.upper() == g)
                 # print(ana['gloss'], self.rxSplitGlosses.split(ana['gloss']))
+            if 'mp' in curWordAnno:
+                ana['parts'] = curWordAnno['mp']  # Will be overwritten by mb, if any
+                ana['parts_deep'] = curWordAnno['mp']
+                self.tp.parser.process_gloss_in_ana(ana)
+                if 'gloss_index' in ana:
+                    stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index'],
+                                                                     self.corpusSettings['languages'][0])
+                    if len(stems) > 0 and type(stems[0]) == list:
+                        stems = stems[0]
+                    ana['lex'] = ' '.join(s[1] for s in stems)
+
+            if 'mb' in curWordAnno:
+                ana['parts'] = curWordAnno['mb']
+            if 'gr' in curWordAnno:
+                ana['gloss_ru'] = curWordAnno['gr']
+                self.tp.parser.process_gloss_in_ana(ana, 'ru')
+            if 'gg' in curWordAnno:
+                ana['gloss_de'] = curWordAnno['gg']
+                self.tp.parser.process_gloss_in_ana(ana, 'de')
             self.tp.parser.process_gloss_in_ana(ana)
             if 'gloss_index' in ana:
                 stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index'],
                                                                  self.corpusSettings['languages'][0])
-                ana['lex'] = ' '.join(s[1] for s in stems)
+                if len(stems) > 0 and type(stems[0]) == list:
+                    stems = stems[0]
+                if 'lex' not in ana:
+                    ana['lex'] = ' '.join(s[1] for s in stems)
+                ana['gloss_index'] = self.rxBracketGloss.sub('', newIndexGloss)
                 ana['trans_en'] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
                 self.add_ana_fields(ana, curWordAnno)
                 useGlossList = False
@@ -180,6 +201,18 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                     useGlossList = True
                 self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0], useGlossList=useGlossList)
                 ana['gloss_index'] = self.rxBracketGloss.sub('', newIndexGloss)
+            for glossLang in ('ru', 'de'):
+                if 'gloss_index_' + glossLang in ana:
+                    stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index_' + glossLang],
+                                                                     self.corpusSettings['languages'][0])
+                    ana['trans_' + glossLang] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
+                    del ana['gloss_index_' + glossLang]
+                    del ana['gloss_' + glossLang]
+                    if 'glosses_covert_' + glossLang in ana:
+                        del ana['glosses_covert_' + glossLang]
+
+            self.tp.parser.process_gloss_in_ana(ana, partsAttr='parts_deep',
+                                                partPfx='_', overwrite=False)    # Add "Deep" representations (mp)
             curToken['ana'] = [ana]
             yield curToken
 
