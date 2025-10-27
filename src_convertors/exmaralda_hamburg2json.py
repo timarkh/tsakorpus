@@ -16,7 +16,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
     rxBracketGloss = re.compile('\\.?\\[.*?\\]')
     rxSplitGlosses = re.compile('-|\\.(?=\\[)')
     rxWordPunc = re.compile('^( *)([^\\w]*)(.*?)([^\\w]*?)( *)$')
-    txTierXpath = '/basic-transcription/basic-body/tier[@id=\'tx\']'
+    txTierXpath = '/basic-transcription/basic-body/tier[@category=\'tx\']'
     mediaExtensions = {'.wav', '.mp3', '.mp4', '.avi'}
 
     def __init__(self, settingsDir='conf_conversion'):
@@ -93,17 +93,19 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         wordTlis = self.get_word_tlis(srcTree)
         wordAnno = {}
         for tier in srcTree.xpath('/basic-transcription/basic-body/tier[@type=\'a\']'):
-            if 'id' not in tier.attrib:
+            if 'id' not in tier.attrib or 'category' not in tier.attrib:
                 continue
-            # tierID = tier.attrib['id']
-            tierID = tier.attrib['category']
-            if tierID in self.corpusSettings['translation_tiers'] or tierID in ('tx', 'ts'):
+            speaker = ''
+            if 'speaker' in tier.attrib:
+                speaker = tier.attrib['speaker']
+            tierName = tier.attrib['category']
+            if tierName in self.corpusSettings['translation_tiers'] or tierName in ('tx', 'ts'):
                 continue
             for event in tier:
                 if ('start' not in event.attrib or 'end' not in event.attrib
                         or event.text is None):
                     continue
-                tupleKey = (event.attrib['start'], event.attrib['end'])
+                tupleKey = (event.attrib['start'], event.attrib['end'], speaker)
 
                 # If an annotation spans several tokens, add it to each of them:
                 tupleKeys = [tupleKey]
@@ -113,12 +115,12 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                                      or self.tlis[tupleKey[0]]['n'] <= self.tlis[wordTli[0]]['n'])
                                 and (wordTli[1] == tupleKey[1]
                                      or self.tlis[tupleKey[1]]['n'] >= self.tlis[wordTli[1]]['n'])):
-                            tupleKeys.append(wordTli)
+                            tupleKeys.append((wordTli[0], wordTli[1], speaker))
 
                 for tk in tupleKeys:
                     if tk not in wordAnno:
                         wordAnno[tk] = {}
-                    wordAnno[tk][tierID] = event.text
+                    wordAnno[tk][tierName] = event.text
         return wordAnno
 
     def add_ana_fields(self, ana, curWordAnno):
@@ -136,85 +138,91 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
             else:
                 ana[tierName] = curWordAnno[tierName]
 
-    def get_words(self, srcTree):
+    def get_words(self, srcTree, speaker=''):
         """
-        Iterate over words found in the tx tier of the XML tree.
+        Iterate over words found in the tx tier(s) of the XML tree.
         """
-        txTier = srcTree.xpath(Exmaralda_Hamburg2JSON.txTierXpath)
+        txTiers = srcTree.xpath(Exmaralda_Hamburg2JSON.txTierXpath)
         wordAnno = self.collect_annotation(srcTree)
-        for event in txTier[0]:
-            if 'start' not in event.attrib or 'end' not in event.attrib:
+        for txTier in txTiers:
+            curSpeaker = ''
+            if 'speaker' in txTier.attrib:
+                curSpeaker = txTier.attrib['speaker']
+            if curSpeaker != speaker:
                 continue
-            tupleKey = (event.attrib['start'], event.attrib['end'])
-            if tupleKey not in wordAnno:
-                continue
-            wf = event.text
-            if wf is None:
-                continue
-            curToken = {'wf': wf, 'wtype': 'word',
-                        'tli_start': event.attrib['start'],
-                        'tli_end': event.attrib['end']}
-            if self.tp.tokenizer.rxOnlyPunc.search(wf.strip()) is not None:
-                curToken['wtype'] = 'punct'
-                yield curToken
-                continue
-            ana = {}
-            curWordAnno = wordAnno[tupleKey]
-            # mp: morph breaks with empty morphemes (corresponds to the mc tier: POS and morph categories)
-            # mb: morph breaks without empty morphemes (corresponds to the gr/ge tiers: actual glosses)
-            if 'ge' in curWordAnno:
-                ana['gloss'] = curWordAnno['ge']
-                self.glosses |= set(g for g in self.rxSplitGlosses.split(ana['gloss']) if g.upper() == g)
-                # print(ana['gloss'], self.rxSplitGlosses.split(ana['gloss']))
-            if 'mp' in curWordAnno:
-                ana['parts'] = curWordAnno['mp']  # Will be overwritten by mb, if any
-                ana['parts_deep'] = curWordAnno['mp']
+            for event in txTier:
+                if 'start' not in event.attrib or 'end' not in event.attrib:
+                    continue
+                tupleKey = (event.attrib['start'], event.attrib['end'], curSpeaker)
+                if tupleKey not in wordAnno:
+                    wordAnno[tupleKey] = {}
+                wf = event.text
+                if wf is None:
+                    continue
+                curToken = {'wf': wf, 'wtype': 'word',
+                            'tli_start': event.attrib['start'],
+                            'tli_end': event.attrib['end']}
+                if self.tp.tokenizer.rxOnlyPunc.search(wf.strip()) is not None:
+                    curToken['wtype'] = 'punct'
+                    yield curToken
+                    continue
+                ana = {}
+                curWordAnno = wordAnno[tupleKey]
+                # mp: morph breaks with empty morphemes (corresponds to the mc tier: POS and morph categories)
+                # mb: morph breaks without empty morphemes (corresponds to the gr/ge tiers: actual glosses)
+                if 'ge' in curWordAnno:
+                    ana['gloss'] = curWordAnno['ge']
+                    self.glosses |= set(g for g in self.rxSplitGlosses.split(ana['gloss']) if g.upper() == g)
+                    # print(ana['gloss'], self.rxSplitGlosses.split(ana['gloss']))
+                if 'mp' in curWordAnno:
+                    ana['parts'] = curWordAnno['mp']  # Will be overwritten by mb, if any
+                    ana['parts_deep'] = curWordAnno['mp']
+                    self.tp.parser.process_gloss_in_ana(ana)
+                    if 'gloss_index' in ana:
+                        stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index'],
+                                                                         self.corpusSettings['languages'][0])
+                        if len(stems) > 0 and type(stems[0]) == list:
+                            stems = stems[0]
+                        ana['lex'] = ' '.join(s[1] for s in stems)
+
+                if 'mb' in curWordAnno:
+                    ana['parts'] = curWordAnno['mb']
+                if 'gr' in curWordAnno:
+                    ana['gloss_ru'] = curWordAnno['gr']
+                    self.tp.parser.process_gloss_in_ana(ana, 'ru')
+                if 'gg' in curWordAnno:
+                    ana['gloss_de'] = curWordAnno['gg']
+                    self.tp.parser.process_gloss_in_ana(ana, 'de')
                 self.tp.parser.process_gloss_in_ana(ana)
                 if 'gloss_index' in ana:
                     stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index'],
                                                                      self.corpusSettings['languages'][0])
                     if len(stems) > 0 and type(stems[0]) == list:
                         stems = stems[0]
-                    ana['lex'] = ' '.join(s[1] for s in stems)
+                    if 'lex' not in ana:
+                        ana['lex'] = ' '.join(s[1] for s in stems)
+                    ana['gloss_index'] = self.rxBracketGloss.sub('', newIndexGloss)
+                    ana['trans_en'] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
+                    self.add_ana_fields(ana, curWordAnno)
+                    useGlossList = False
+                    if 'glosses' in self.corpusSettings:
+                        useGlossList = True
+                    self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0], useGlossList=useGlossList)
+                    ana['gloss_index'] = self.rxBracketGloss.sub('', newIndexGloss)
+                for glossLang in ('ru', 'de'):
+                    if 'gloss_index_' + glossLang in ana:
+                        stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index_' + glossLang],
+                                                                         self.corpusSettings['languages'][0])
+                        ana['trans_' + glossLang] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
+                        del ana['gloss_index_' + glossLang]
+                        del ana['gloss_' + glossLang]
+                        if 'glosses_covert_' + glossLang in ana:
+                            del ana['glosses_covert_' + glossLang]
 
-            if 'mb' in curWordAnno:
-                ana['parts'] = curWordAnno['mb']
-            if 'gr' in curWordAnno:
-                ana['gloss_ru'] = curWordAnno['gr']
-                self.tp.parser.process_gloss_in_ana(ana, 'ru')
-            if 'gg' in curWordAnno:
-                ana['gloss_de'] = curWordAnno['gg']
-                self.tp.parser.process_gloss_in_ana(ana, 'de')
-            self.tp.parser.process_gloss_in_ana(ana)
-            if 'gloss_index' in ana:
-                stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index'],
-                                                                 self.corpusSettings['languages'][0])
-                if len(stems) > 0 and type(stems[0]) == list:
-                    stems = stems[0]
-                if 'lex' not in ana:
-                    ana['lex'] = ' '.join(s[1] for s in stems)
-                ana['gloss_index'] = self.rxBracketGloss.sub('', newIndexGloss)
-                ana['trans_en'] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
-                self.add_ana_fields(ana, curWordAnno)
-                useGlossList = False
-                if 'glosses' in self.corpusSettings:
-                    useGlossList = True
-                self.tp.parser.gloss2gr(ana, self.corpusSettings['languages'][0], useGlossList=useGlossList)
-                ana['gloss_index'] = self.rxBracketGloss.sub('', newIndexGloss)
-            for glossLang in ('ru', 'de'):
-                if 'gloss_index_' + glossLang in ana:
-                    stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index_' + glossLang],
-                                                                     self.corpusSettings['languages'][0])
-                    ana['trans_' + glossLang] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
-                    del ana['gloss_index_' + glossLang]
-                    del ana['gloss_' + glossLang]
-                    if 'glosses_covert_' + glossLang in ana:
-                        del ana['glosses_covert_' + glossLang]
-
-            self.tp.parser.process_gloss_in_ana(ana, partsAttr='parts_deep',
-                                                partPfx='_', overwrite=False)    # Add "Deep" representations (mp)
-            curToken['ana'] = [ana]
-            yield curToken
+                self.tp.parser.process_gloss_in_ana(ana, partsAttr='parts_deep',
+                                                    partPfx='_', overwrite=False)    # Add "Deep" representations (mp)
+                curToken['ana'] = [ana]
+                yield curToken
 
     def fragmentize_src_alignment(self, alignment):
         """
@@ -251,6 +259,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                         wa['src_id'] += word['tli_start']
                 wordAlignments.append({'off_start_src': self.tlis[word['tli_start']]['time'],
                                        'off_end_src': '',
+                                       'true_off_start_src': float(self.tlis[word['tli_start']]['time']),
                                        'off_start_sent': word['off_start'],
                                        'off_end_sent': word['off_end'],
                                        'mtype': 'audio',
@@ -275,6 +284,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         if len(self.tlis[sentBoundaries[0]]['time']) > 0:
             wordAlignments = []     # for the time being
             wordAlignments.append({'off_start_src': self.tlis[sentBoundaries[0]]['time'],
+                                   'true_off_start_src': float(self.tlis[sentBoundaries[0]]['time']),
                                    'off_end_src': self.tlis[sentBoundaries[1]]['time'],
                                    'off_start_sent': 0,
                                    'off_end_sent': len(sent['text']),
@@ -313,7 +323,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         for iTier in range(len(self.corpusSettings['translation_tiers'])):
             tierName = self.corpusSettings['translation_tiers'][iTier]
             events = srcTree.xpath('/basic-transcription/basic-body/'
-                                   'tier[@id=\'' + tierName + '\']/'
+                                   'tier[@category=\'' + tierName + '\']/'
                                    'event[@start=\'' + sentBoundaries[0] +
                                    '\' and @end=\'' + sentBoundaries[1] + '\']')
             for event in events:
@@ -346,59 +356,77 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         """
         Iterate over sentences in the XML tree.
         """
-        refTiers = srcTree.xpath('/basic-transcription/basic-body/tier[@id=\'ref\']')
+        refTiers = srcTree.xpath('/basic-transcription/basic-body/tier[@category=\'ref\']')
         if len(refTiers) <= 0:
             return
-        refTier = refTiers[0]
-        # TODO: Multiple layers
-        sentBoundaries = self.get_sentence_boundaries(refTier)
-        prevSentIndex = -1
-        curSent = {'text': '', 'words': [], 'lang': 0}
-        for word in self.get_words(srcTree):
-            curSentIndex = self.find_sentence_index(sentBoundaries, word['tli_start'])
-            if curSentIndex != prevSentIndex and len(curSent['text']) > 0:
+        for refTier in refTiers:
+            speaker = ''
+            if 'speaker' in refTier.attrib:
+                speaker = refTier.attrib['speaker']
+            sentMeta = {}
+            if 'speaker' in refTier.attrib:
+                if speaker in self.speakerMeta:
+                    sentMeta = self.speakerMeta[speaker]
+                else:
+                    sentMeta = {'speaker': speaker}
+            sentBoundaries = self.get_sentence_boundaries(refTier)
+            prevSentIndex = -1
+            curSent = {'text': '', 'words': [], 'lang': 0}
+            if len(sentMeta) > 0:
+                curSent['meta'] = sentMeta
+            for word in self.get_words(srcTree, speaker):
+                curSentIndex = self.find_sentence_index(sentBoundaries, word['tli_start'])
+                if curSentIndex != prevSentIndex and len(curSent['text']) > 0:
+                    paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
+                    curSent['para_alignment'] = [paraAlignment]
+                    self.add_src_alignment(curSent, sentBoundaries[prevSentIndex], srcFile)
+                    yield curSent
+                    curSent = {'text': '', 'words': [], 'lang': 0}
+                    if len(sentMeta) > 0:
+                        curSent['meta'] = sentMeta
+                    for paraSent in self.get_parallel_sentences(srcTree, sentBoundaries[curSentIndex],
+                                                                srcFile):
+                        if len(sentMeta) > 0:
+                            paraSent['meta'] = sentMeta
+                        yield paraSent
+                prevSentIndex = curSentIndex
+                if word['wtype'] == 'punct':
+                    word['off_start'] = len(curSent['text'])
+                    curSent['text'] += word['wf']
+                    word['off_end'] = len(curSent['text'])
+                    word['wf'] = word['wf'].strip()
+                    continue
+                m = self.rxWordPunc.search(word['wf'])
+                spacesL, punctL, wf, punctR, spacesR =\
+                    m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)
+                curSent['text'] += spacesL
+                if len(punctL) > 0:
+                    punc = {'wf': punctL, 'wtype': 'punct',
+                            'off_start': len(curSent['text']),
+                            'off_end': len(curSent['text']) + len(punctL)}
+                    curSent['text'] += punctL
+                    curSent['words'].append(punc)
+                word['off_start'] = len(curSent['text'])
+                curSent['text'] += wf
+                word['off_end'] = len(curSent['text'])
+                word['wf'] = wf
+                curSent['words'].append(word)
+                if len(punctR) > 0:
+                    punc = {'wf': punctR, 'wtype': 'punct',
+                            'off_start': len(curSent['text']),
+                            'off_end': len(curSent['text']) + len(punctR)}
+                    curSent['text'] += punctR
+                    curSent['words'].append(punc)
+                curSent['text'] += spacesR
+            if len(curSent['text']) > 0:
                 paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
                 curSent['para_alignment'] = [paraAlignment]
-                self.add_src_alignment(curSent, sentBoundaries[prevSentIndex], srcFile)
+                self.add_src_alignment(curSent, sentBoundaries[curSentIndex], srcFile)
                 yield curSent
-                curSent = {'text': '', 'words': [], 'lang': 0}
-                for paraSent in self.get_parallel_sentences(srcTree, sentBoundaries[curSentIndex],
-                                                            srcFile):
-                    yield paraSent
-            prevSentIndex = curSentIndex
-            if word['wtype'] == 'punct':
-                word['off_start'] = len(curSent['text'])
-                curSent['text'] += word['wf']
-                word['off_end'] = len(curSent['text'])
-                word['wf'] = word['wf'].strip()
-                continue
-            m = self.rxWordPunc.search(word['wf'])
-            spacesL, punctL, wf, punctR, spacesR =\
-                m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)
-            curSent['text'] += spacesL
-            if len(punctL) > 0:
-                punc = {'wf': punctL, 'wtype': 'punct',
-                        'off_start': len(curSent['text']),
-                        'off_end': len(curSent['text']) + len(punctL)}
-                curSent['text'] += punctL
-                curSent['words'].append(punc)
-            word['off_start'] = len(curSent['text'])
-            curSent['text'] += wf
-            word['off_end'] = len(curSent['text'])
-            word['wf'] = wf
-            curSent['words'].append(word)
-            if len(punctR) > 0:
-                punc = {'wf': punctR, 'wtype': 'punct',
-                        'off_start': len(curSent['text']),
-                        'off_end': len(curSent['text']) + len(punctR)}
-                curSent['text'] += punctR
-                curSent['words'].append(punc)
-            curSent['text'] += spacesR
-        if len(curSent['text']) > 0:
-            paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
-            curSent['para_alignment'] = [paraAlignment]
-            self.add_src_alignment(curSent, sentBoundaries[curSentIndex], srcFile)
-            yield curSent
+
+    def load_speaker_meta(self):
+        for speakerID in self.speakerMeta:
+            self.speakerMeta[speakerID]['speaker'] = speakerID
 
     def convert_file(self, fnameSrc, fnameTarget):
         """
@@ -417,13 +445,18 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         nTokens, nWords, nAnalyzed = 0, 0, 0
         srcTree = etree.parse(fnameSrc)
         self.tlis = self.get_tlis(srcTree)
+        self.load_speaker_meta()
         srcFileNode = srcTree.xpath('/basic-transcription/head/meta-information/referenced-file')
         if len(srcFileNode) > 0 and 'url' in srcFileNode[0].attrib:
             srcFile = self.rxStripDir.sub('', srcFileNode[0].attrib['url'])
         else:
             srcFile = ''
         textJSON['sentences'] = [s for s in self.get_sentences(srcTree, srcFile)]
-        textJSON['sentences'].sort(key=lambda s: s['lang'])
+        # Sort by language; inside each language, sort sentences by their time offsets.
+        if any('src_alignment' not in s for s in textJSON['sentences']):
+            textJSON['sentences'].sort(key=lambda s: s['lang'])
+        else:
+            textJSON['sentences'].sort(key=lambda s: (s['lang'], s['src_alignment'][0]['true_off_start_src']))
         for i in range(len(textJSON['sentences']) - 1):
             if textJSON['sentences'][i]['lang'] != textJSON['sentences'][i + 1]['lang']:
                 textJSON['sentences'][i]['last'] = True
@@ -435,6 +468,9 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                     nAnalyzed += 1
         self.tp.splitter.recalculate_offsets(textJSON['sentences'])
         self.tp.splitter.add_next_word_id(textJSON['sentences'])
+        if 'add_contextual_flags' in self.corpusSettings and self.corpusSettings['add_contextual_flags']:
+            self.tp.splitter.add_contextual_flags(textJSON['sentences'])
+        self.tp.splitter.add_speaker_marks(textJSON['sentences'])
         self.write_output(fnameTarget, textJSON)
         return nTokens, nWords, nAnalyzed
 
