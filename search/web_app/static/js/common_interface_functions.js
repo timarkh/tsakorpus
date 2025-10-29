@@ -177,12 +177,14 @@ function assign_gram_popup() {
 	$("span.word, span.word_in_table").unbind('hover');
 	$("span.word, span.word_in_table").unbind('mousemove');
 	$('.word, .word_in_table').hover(function (e) {
-		$('#analysis').replaceWith('<div id="analysis">' + $("<textarea/>").html(($(this).attr("data-ana"))).text() + '</div>');
-		anaWidth = $('#analysis').width();
-		anaHeight = $('#analysis').height();
-		$('#analysis').css('left', $(document).innerWidth() - anaWidth - 30);
-		$('#analysis').css('top', $(document).innerHeight() - anaHeight - 30);
-		$('#analysis').show();
+		if ($(this).attr("data-ana").includes("popup_ana")) {
+			$('#analysis').replaceWith('<div id="analysis">' + $("<textarea/>").html(($(this).attr("data-ana"))).text() + '</div>');
+			anaWidth = $('#analysis').width();
+			anaHeight = $('#analysis').height();
+			$('#analysis').css('left', $(document).innerWidth() - anaWidth - 30);
+			$('#analysis').css('top', $(document).innerHeight() - anaHeight - 30);
+			$('#analysis').show();
+		}
         if ($('.sentence_meta').length > 0) {
 			var prevEl = $(this).prev();
 			while (prevEl.length > 0) {

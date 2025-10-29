@@ -259,7 +259,7 @@ class DumbMorphParser:
         categories, add these categories.
         If useGlossList, use the list of glosses to distinguish between
         glosses and stem translations. In the opposite case, consider
-        everyjting other than "STEM" a gloss.
+        everything other than "STEM" a gloss.
         """
         # TODO: Add rules for translating the glosses into tags.
         if 'gloss_index' not in ana:

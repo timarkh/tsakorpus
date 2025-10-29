@@ -221,6 +221,9 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
 
                 self.tp.parser.process_gloss_in_ana(ana, partsAttr='parts_deep',
                                                     partPfx='_', overwrite=False)    # Add "Deep" representations (mp)
+
+                if 'glosses_covert' in ana:
+                    del ana['glosses_covert']
                 curToken['ana'] = [ana]
                 yield curToken
 
