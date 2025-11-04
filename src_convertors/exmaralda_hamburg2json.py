@@ -15,6 +15,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
 
     rxBracketGloss = re.compile('\\.?\\[.*?\\]')
     rxSplitGlosses = re.compile('-|\\.(?=\\[)')
+    rxSpecialWords = re.compile('^ *\\(\\(.*?\\)\\) *$')
     rxWordPunc = re.compile('^( *)([^\\w]*)(.*?)([^\\w]*?)( *)$')
     txTierXpath = '/basic-transcription/basic-body/tier[@category=\'tx\']'
     mediaExtensions = {'.wav', '.mp3', '.mp4', '.avi'}
@@ -162,7 +163,8 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                 curToken = {'wf': wf, 'wtype': 'word',
                             'tli_start': event.attrib['start'],
                             'tli_end': event.attrib['end']}
-                if self.tp.tokenizer.rxOnlyPunc.search(wf.strip()) is not None:
+                if (self.tp.tokenizer.rxOnlyPunc.search(wf.strip()) is not None
+                        or self.rxSpecialWords.search(wf) is not None):
                     curToken['wtype'] = 'punct'
                     yield curToken
                     continue
@@ -322,7 +324,6 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         defined by the tuple sentBoundaries that contains the start
         and the end time label for the sentence.
         """
-        self.pID += 1
         for iTier in range(len(self.corpusSettings['translation_tiers'])):
             tierName = self.corpusSettings['translation_tiers'][iTier]
             events = srcTree.xpath('/basic-transcription/basic-body/'
@@ -380,6 +381,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
             for word in self.get_words(srcTree, speaker):
                 curSentIndex = self.find_sentence_index(sentBoundaries, word['tli_start'])
                 if curSentIndex != prevSentIndex and len(curSent['text']) > 0:
+                    self.pID += 1
                     paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
                     curSent['para_alignment'] = [paraAlignment]
                     self.add_src_alignment(curSent, sentBoundaries[prevSentIndex], srcFile)
@@ -387,7 +389,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                     curSent = {'text': '', 'words': [], 'lang': 0}
                     if len(sentMeta) > 0:
                         curSent['meta'] = sentMeta
-                    for paraSent in self.get_parallel_sentences(srcTree, sentBoundaries[curSentIndex],
+                    for paraSent in self.get_parallel_sentences(srcTree, sentBoundaries[prevSentIndex],
                                                                 srcFile):
                         if len(sentMeta) > 0:
                             paraSent['meta'] = sentMeta
@@ -422,10 +424,18 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                     curSent['words'].append(punc)
                 curSent['text'] += spacesR
             if len(curSent['text']) > 0:
+                self.pID += 1
                 paraAlignment = {'off_start': 0, 'off_end': len(curSent['text']), 'para_id': self.pID}
                 curSent['para_alignment'] = [paraAlignment]
                 self.add_src_alignment(curSent, sentBoundaries[curSentIndex], srcFile)
                 yield curSent
+                if len(sentMeta) > 0:
+                    curSent['meta'] = sentMeta
+                for paraSent in self.get_parallel_sentences(srcTree, sentBoundaries[curSentIndex],
+                                                            srcFile):
+                    if len(sentMeta) > 0:
+                        paraSent['meta'] = sentMeta
+                    yield paraSent
 
     def load_speaker_meta(self):
         for speakerID in self.speakerMeta:
