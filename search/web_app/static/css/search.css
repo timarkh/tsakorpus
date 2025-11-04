@@ -611,7 +611,7 @@ label {
 	height: 100%;
 }
 
-.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .stat_w, .search_l, .stat_l, #show_help, #cite_corpus {
+.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .search_from_ana, .stat_w, .search_l, .stat_l, #show_help, #cite_corpus {
 	cursor: pointer;
 }
 
@@ -619,6 +619,13 @@ label {
 	padding-left: 10px;
 	padding-right: 5px;
 }
+
+.search_from_ana {
+	padding-right: 2px;
+	font-size: 0.7em;
+	color: #87a17f;
+}
+
 
 .add_rel, .word_plus, .word_minus, .word_expand, .neg_query {
 	margin-bottom: 3px;

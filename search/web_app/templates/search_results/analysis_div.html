@@ -1,7 +1,7 @@
 {% if ana.lex|length > 0 or ana.pos|length > 0 or ana.grdic|trim|length > 0 %}
 <div class="popup_grdic">
 {% if ana.lex|length > 0 %}
-<span class="popup_lex">{{ ana.lex }}</span>
+<span class="search_from_ana bi bi-arrow-right-circle-fill" data-tooltip="tooltip" data-placement="top" data-field="lex" data-value="{{ ana.lex }}" title="{{ _('Search in corpus') }}"> </span> <span class="popup_lex">{{ ana.lex }}</span>
 {% endif %}
 {% if ana.pos|length > 0 %}
 <span class="popup_pos">{{ ana.pos }}
@@ -16,7 +16,7 @@
 </div>
 {% endif %} 
 {% for item in ana.lex_fields %}
-<div class="popup_field popup_field_{{ item.key }}"><span class="popup_key">{{ item.key }}: </span><span class="popup_value">{{ item.value }}</span></div>
+<div class="popup_field popup_field_{{ item.key }}"><span class="search_from_ana bi bi-arrow-right-circle-fill" data-tooltip="tooltip" data-placement="top" data-field="{{ item.key }}" data-value="{{ item.value }}" title="{{ _('Search in corpus') }}"> </span> <span class="popup_key">{{ item.key }}: </span><span class="popup_value">{{ item.value }}</span></div>
 {% endfor %} 
 {% for item in ana.other_fields %}
 {% if item.key == "parts" %}

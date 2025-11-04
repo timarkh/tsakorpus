@@ -21,6 +21,7 @@ function print_html(results) {
 	$("#search_results").html(results);
 	$('#video_prompt').show();
 	toggle_interlinear();
+	assign_input_events();
 }
 
 function update_wordlist(results) {
@@ -150,6 +151,18 @@ function search_word_from_list(e) {
 	$('.words_list_table').detach().appendTo('#saved_words_table');
 	$('#td_load_more_words').toggle(false);
 	$('#saved_words_table').toggle(true);
+	$(e.currentTarget).css('color', 'blueviolet');
+	$("#search_sent").click();
+}
+
+
+function search_word_from_ana(e) {
+	let field = $(e.currentTarget).attr('data-field');
+	let value = $(e.currentTarget).attr('data-value');
+	if ((field == "") || (value == "")) return;
+	clear_search_form();
+	hide_tooltips();
+	$('#' + field + '1').val(value);
 	$(e.currentTarget).css('color', 'blueviolet');
 	$("#search_sent").click();
 }

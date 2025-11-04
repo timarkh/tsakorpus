@@ -359,6 +359,7 @@ function assign_input_events() {
 	$('.toggle_glossed_layer').unbind('click');
 	$('.toggle_lang').unbind('click');
 	$(".tier_select").unbind('change');
+	$(".search_from_ana").unbind('click');
 	$(".word_plus").click(add_word_inputs);
 	$(".word_minus").click(del_word_inputs);
 	$(".word_expand").click(expand_word_input);
@@ -386,6 +387,7 @@ function assign_input_events() {
 	$('.toggle_glossed_layer').click(toggle_glossed_layer);
 	$('.toggle_lang').click(toggle_lang);
 	$(".tier_select").change(change_tier);
+	$(".search_from_ana").click(search_word_from_ana);
 	assign_tooltips();
 	initialize_keyboards();
 	assign_autocomplete();

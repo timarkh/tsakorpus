@@ -184,6 +184,8 @@ function assign_gram_popup() {
 			$('#analysis').css('left', $(document).innerWidth() - anaWidth - 30);
 			$('#analysis').css('top', $(document).innerHeight() - anaHeight - 30);
 			$('#analysis').show();
+			$(".search_from_ana").unbind('click');
+			$(".search_from_ana").click(search_word_from_ana);
 		}
         if ($('.sentence_meta').length > 0) {
 			var prevEl = $(this).prev();
@@ -198,28 +200,32 @@ function assign_gram_popup() {
 				prevEl.show();
 			}
         }
-	}, function () {
-		$('#analysis').hide();
+	}, function (e) {
+		if (!e.shiftKey) {
+			$('#analysis').hide();
+		}
         $('.sentence_meta').hide();
 	});
 	$('.word, .word_in_table').mousemove(function (e) {
-		anaWidth = $('#analysis').width();
-		anaHeight = $('#analysis').height();
-		if (e.pageX + moveLeft + anaWidth + 30 < $(document).innerWidth()) {
-			$('#analysis').css('left', e.pageX + moveLeft);
-			$('#analysis').width(anaWidth);
-		}
-		else {
-			$('#analysis').css('left', $(document).innerWidth() - anaWidth - 30);
-			$('#analysis').width(anaWidth);
-		}
-		if (e.pageY + moveDown + anaHeight + 30 < $(document).innerHeight()) {
-			$('#analysis').css('top', e.pageY + moveDown);
-			$('#analysis').height(anaHeight);
-		}
-		else {
-			$('#analysis').css('top', $(document).innerHeight() - anaHeight - 30);
-			$('#analysis').height(anaHeight);
+		if (!e.shiftKey) {
+			anaWidth = $('#analysis').width();
+			anaHeight = $('#analysis').height();
+			if (e.pageX + moveLeft + anaWidth + 30 < $(document).innerWidth()) {
+				$('#analysis').css('left', e.pageX + moveLeft);
+				$('#analysis').width(anaWidth);
+			}
+			else {
+				$('#analysis').css('left', $(document).innerWidth() - anaWidth - 30);
+				$('#analysis').width(anaWidth);
+			}
+			if (e.pageY + moveDown + anaHeight + 30 < $(document).innerHeight()) {
+				$('#analysis').css('top', e.pageY + moveDown);
+				$('#analysis').height(anaHeight);
+			}
+			else {
+				$('#analysis').css('top', $(document).innerHeight() - anaHeight - 30);
+				$('#analysis').height(anaHeight);
+			}
 		}
 	});
 }
@@ -266,6 +272,7 @@ function toggle_interlinear() {
 			$(classToToggle).css("display", "none");
 		}
 	});
+	assign_input_events();
 }
 
 	
