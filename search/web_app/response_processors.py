@@ -63,7 +63,7 @@ class SentenceViewer:
                 if not os.path.exists(os.path.join(templateDir, templateFilename)):
                     with open(os.path.join(templateDir, templateFilename[:-11] + '.html'),
                               'r', encoding='utf-8') as fIn:
-                        # Rempve parts that cause problems when generating the dictionary
+                        # Remove parts that cause problems when generating the dictionary
                         # outside of a flask/babel app
                         templateText = re.sub('\\{% if noSearchButton.*?\\{% *endif *%\\}', '', fIn.read())
                         with open(os.path.join(templateDir, templateFilename),
@@ -272,6 +272,7 @@ class SentenceViewer:
         try:
             return render_template('search_results/analysis_div.html', ana=ana4template).strip()
         except (AttributeError, RuntimeError):
+            # Called at indexation time for generating HTML
             return self.render_jinja_html('../search/web_app/templates/search_results',
                                           'analysis_div__dict.html',
                                           ana=ana4template,
@@ -297,6 +298,7 @@ class SentenceViewer:
         try:
             return render_template('search_results/analyses_popup.html', data=data4template)
         except (AttributeError, RuntimeError):
+            # Called at indexation time for generating HTML
             return self.render_jinja_html('../search/web_app/templates/search_results',
                                           'analyses_popup__dict.html',
                                           data=data4template,
