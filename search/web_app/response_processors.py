@@ -4,6 +4,7 @@ import copy
 import math
 import random
 import re
+import os
 import jinja2
 from flask import render_template
 try:
@@ -58,6 +59,16 @@ class SentenceViewer:
         try:
             template = self.templates[(templateDir, templateFilename)]
         except KeyError:
+            if templateFilename.endswith('__dict.html'):
+                if not os.path.exists(os.path.join(templateDir, templateFilename)):
+                    with open(os.path.join(templateDir, templateFilename[:-11] + '.html'),
+                              'r', encoding='utf-8') as fIn:
+                        # Rempve parts that cause problems when generating the dictionary
+                        # outside of a flask/babel app
+                        templateText = re.sub('\\{% if noSearchButton.*?\\{% *endif *%\\}', '', fIn.read())
+                        with open(os.path.join(templateDir, templateFilename),
+                                  'w', encoding='utf-8') as fOut:
+                            fOut.write(templateText)
             template = jinja2.Environment(
                 loader=jinja2.FileSystemLoader(templateDir + '/')
             ).get_template(templateFilename)
@@ -199,7 +210,7 @@ class SentenceViewer:
             except (AttributeError, RuntimeError):
                 # Called at indexation time for generating HTML
                 return self.render_jinja_html('../search/web_app/templates/search_results',
-                                              'grammar_popup.html',
+                                              'grammar_popup__dict.html',
                                               grAnaPart=grAnaPart,
                                               noSearchButton=True).strip()
         try:
@@ -207,7 +218,7 @@ class SentenceViewer:
         except (AttributeError, RuntimeError):
             # Called at indexation time for generating HTML
             return self.render_jinja_html('../search/web_app/templates/search_results',
-                                          'gramdic_popup.html',
+                                          'gramdic_popup__dict.html',
                                           grAnaPart=grAnaPart,
                                           noSearchButton=True).strip()
 
@@ -262,7 +273,7 @@ class SentenceViewer:
             return render_template('search_results/analysis_div.html', ana=ana4template).strip()
         except (AttributeError, RuntimeError):
             return self.render_jinja_html('../search/web_app/templates/search_results',
-                                          'analysis_div.html',
+                                          'analysis_div__dict.html',
                                           ana=ana4template,
                                           noSearchButton=True).strip()
 
@@ -287,7 +298,7 @@ class SentenceViewer:
             return render_template('search_results/analyses_popup.html', data=data4template)
         except (AttributeError, RuntimeError):
             return self.render_jinja_html('../search/web_app/templates/search_results',
-                                          'analyses_popup.html',
+                                          'analyses_popup__dict.html',
                                           data=data4template,
                                           noSearchButton=True)
 

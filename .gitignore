@@ -59,3 +59,7 @@ error_reports.txt
 *.sqlite
 *.sqlite-journal
 elastic_pwd
+analysis_div__dict.html
+analyses_popup__dict.html
+grammar_popup__dict.html
+gramdic_popup__dict.html
