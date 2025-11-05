@@ -197,13 +197,19 @@ class SentenceViewer:
             try:
                 return render_template('search_results/grammar_popup.html', grAnaPart=grAnaPart).strip()
             except (AttributeError, RuntimeError):
+                # Called at indexation time for generating HTML
                 return self.render_jinja_html('../search/web_app/templates/search_results',
-                                              'grammar_popup.html', grAnaPart=grAnaPart).strip()
+                                              'grammar_popup.html',
+                                              grAnaPart=grAnaPart,
+                                              noSearchButton=True).strip()
         try:
             return render_template('search_results/gramdic_popup.html', grAnaPart=grAnaPart).strip()
         except (AttributeError, RuntimeError):
+            # Called at indexation time for generating HTML
             return self.render_jinja_html('../search/web_app/templates/search_results',
-                                          'gramdic_popup.html', grAnaPart=grAnaPart).strip()
+                                          'gramdic_popup.html',
+                                          grAnaPart=grAnaPart,
+                                          noSearchButton=True).strip()
 
     def build_ana_div(self, ana, lang, translit=None):
         """
@@ -256,7 +262,9 @@ class SentenceViewer:
             return render_template('search_results/analysis_div.html', ana=ana4template).strip()
         except (AttributeError, RuntimeError):
             return self.render_jinja_html('../search/web_app/templates/search_results',
-                                          'analysis_div.html', ana=ana4template).strip()
+                                          'analysis_div.html',
+                                          ana=ana4template,
+                                          noSearchButton=True).strip()
 
     def build_ana_popup(self, word, lang, matchingAnalyses=None, translit=None):
         """
@@ -279,7 +287,9 @@ class SentenceViewer:
             return render_template('search_results/analyses_popup.html', data=data4template)
         except (AttributeError, RuntimeError):
             return self.render_jinja_html('../search/web_app/templates/search_results',
-                                          'analyses_popup.html', data=data4template)
+                                          'analyses_popup.html',
+                                          data=data4template,
+                                          noSearchButton=True)
 
     def prepare_analyses(self, words, indexes, lang, matchWordOffsets=None, translit=None):
         """
