@@ -109,7 +109,8 @@ def search_page():
                            inel_exmaralda_links=settings.inel_exmaralda_links,
                            locales=locales,
                            random_seed=get_session_data('seed'),
-                           query_string=queryString)
+                           query_string=queryString,
+                           show_info_alert=settings.show_info_alert)
 
 
 @app.route('/search_sent_query/<int:page>')

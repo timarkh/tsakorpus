@@ -95,6 +95,7 @@ class CorpusSettings:
         self.error_reports_enabled = False
         self.inel_exmaralda_links = False
         self.default_context_size = 0
+        self.show_info_alert = False
 
         # DOCX parameters for saved examples
         self.docx_enabled = False
