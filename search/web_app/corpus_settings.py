@@ -65,6 +65,7 @@ class CorpusSettings:
         self.max_hits_retrieve = 10000      # Increasing this value will have no effect unless you also reconfigure Elasticsearch
         self.query_timeout = 60
         self.max_suggestions = 8
+        self.exclude_by_meta = []
 
         # Interface options and tools
         self.interface_languages = ['en', 'ru']

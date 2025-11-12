@@ -94,6 +94,8 @@ List of parameters
 
 - ``error_reports_enabled`` (Boolean) -- whether the user can send reports about mistakes in search hits. If enabled, each search hit will contain a button that toggles a modal form for writing the report. All reports are stored in ``search/error_reports.txt``. Defaults to ``False``.
 
+- ``exclude_by_meta`` (list of dictionaries) -- list of dictionaries, each of which contains a rule that determines which JSON documents should not be indexed (left out of the corpus) based on their metadata values. A document is skipped if it conforms to at least one rule. A document conforms to the rule if its metadata contains all the key-value pairs present in the rule, while possibly containing other keys. Defaults to an empty list.
+
 - ``exclude_from_dict`` (dictionary) -- if ``generate_dictionary`` is set to ``true``, this dictionary specifies which words should not be taken into account when generating a dictionary. For example, you may want to omit words annotated as hesitation or code switching. Keys are analysis fields (with the ``gr.`` prefix for grammatical categories, e.g. ``gr.pos``). Values are regexes. Words that have at liest one analysis field at least one value of which matches the corresponding regex will be excluded from the dictionary.
 
 - ``fulltext_search_enabled`` (Boolean) -- boolean value that determines whether a text box for full-text search should be displayed. Defaults to ``true``.

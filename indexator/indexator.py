@@ -1111,8 +1111,24 @@ class Indexator:
                 # Only take a random sample of the source files (for test purposes)
                 if random.random() > self.settings['sample_size']:
                     continue
+            meta = self.iterSent.get_metadata(fname)
+            if self.exclude_text(meta):
+                print('Document excluded by meta:', fname)
+                continue
             self.index_sentences(fname)
             yield self.index_doc(fname)
+
+    def exclude_text(self, meta):
+        """
+        Check if the file should be excluded from output based on the
+        metadata rules specified in "exclude_by_meta" in corpus.json.
+        """
+        if 'exclude_by_meta' not in self.settings:
+            return False
+        for rule in self.settings['exclude_by_meta']:
+            if all(k in meta and meta[k] == rule[k] for k in rule):
+                return True
+        return False
 
     def analyze_dir(self):
         """
