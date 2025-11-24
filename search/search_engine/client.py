@@ -131,6 +131,7 @@ class SearchClient:
         used to count the number of occurrences in a particular
         subcorpus.
         """
+        # print(esQuery)
         if self.settings.query_timeout > 0:
             hits = self.es.search(index=self.name + '.words',
                                   body=esQuery, request_timeout=self.settings.query_timeout)
@@ -169,6 +170,8 @@ class SearchClient:
         else:
             hits = self.es.search(index=indexName,
                                   body=esQuery)
+        if type(hits) is not dict:
+            hits = hits.body    # ES >= 8
         # print(json.dumps(hits, ensure_ascii=False, indent=1))
         return hits
 

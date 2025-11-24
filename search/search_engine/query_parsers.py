@@ -47,7 +47,8 @@ class InterfaceQueryParser:
                                and f not in settings.sentence_meta]
         kwMetaFields = [f + '_kw' for f in self.docMetaFields
                         if not f.startswith('year')
-                        and f not in self.settings.integer_meta_fields]
+                        and f not in self.settings.integer_meta_fields
+                        and f not in self.settings.non_kw_meta_fields]
         self.docMetaFields += kwMetaFields
         self.rxWordIndexQueryFields = re.compile('^(?:sent_meta_.+|' + '|'.join(
             re.escape(awf) + '.*' for awf in settings.accidental_word_fields) + ')$')
@@ -1056,7 +1057,8 @@ class InterfaceQueryParser:
                 and int(htmlQuery['sentence_index1']) != 0):
             searchIndex = 'sentences'
         elif any(k.startswith('sent_meta_')
-                 and len(htmlQuery[k]) > 0 and htmlQuery[k] not in ('*', '.*')
+                 and (type(htmlQuery[k]) == int
+                      or (len(htmlQuery[k]) > 0 and htmlQuery[k] not in ('*', '.*')))
                  for k in htmlQuery):
             searchIndex = 'sentences'
         elif any(self.rxWordIndexQueryFields.search(k) is not None
@@ -1086,7 +1088,9 @@ class InterfaceQueryParser:
                     # Rewrite a document-level constraint as a sentence-level constraint
                     # on the first query word.
                     # If the value is not numerical, search in the XXX_kw field.
-                    if not (k.startswith('year') or k in self.settings.integer_meta_fields):
+                    if not (k.startswith('year')
+                            or k in self.settings.integer_meta_fields
+                            or k in self.settings.non_kw_meta_fields):
                         k += '_kw1'
                     else:
                         k += '1'

@@ -376,6 +376,7 @@ def get_word_buckets(searchType, metaField, nWords, htmlQuery,
     bLocalized = False
     bSentenceLevel = (metaField in settings.sentence_meta or metaField in settings.doc_to_sentence_meta)
     if bSentenceLevel:
+        searchIndex = 'sentences'
         queryFieldName = 'sent_meta_' + metaField
         if not (metaField.startswith('year') or metaField in settings.integer_meta_fields):
             queryFieldName += '_kw'

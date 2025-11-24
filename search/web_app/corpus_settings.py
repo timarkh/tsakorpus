@@ -79,6 +79,7 @@ class CorpusSettings:
         self.line_plot_meta = ['year']    # metadata fields whose statistics can be displayed on a line plot
         self.multiple_choice_fields = {}
         self.integer_meta_fields = []
+        self.non_kw_meta_fields = []
         self.word_table_fields = []
         self.lemma_table_fields = []
         self.default_values = {}
@@ -168,6 +169,7 @@ class CorpusSettings:
             'input_methods',
             'line_plot_meta',
             'integer_meta_fields',
+            'non_kw_meta_fields',
             'word_table_fields',
             'lemma_table_fields',
             'accidental_word_fields',
