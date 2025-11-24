@@ -558,6 +558,19 @@ def count_occurrences(query, distances=None, partition=0):
         return int(math.floor(hits['aggregations']['agg_nwords']['sum']))
     return 0
 
+def subcorpus_size(query):
+    """
+    Calculate the size of a subcorpus defined by document- and sentence-level metadata,
+    without taking into account any word-level parts of the query.
+    """
+    query = {
+        re.sub('[0-9]+$', '1', k): v for k, v in query.items() if ((k.startswith('sent_meta_')
+                                                                    or k in settings.viewable_meta
+                                                                    or k in ('sent_ids', 'doc_ids', 'lang1'))
+                                                                   and len(v) > 0 and v not in ('*', '.*'))
+    }
+    query['n_words'] = 1
+    return count_occurrences(query)
 
 def extrapolate_word_count(nWords, partition):
     return math.floor(nWords / settings.partition_sizes_words[partition - 1] * settings.corpus_size_total)
@@ -594,12 +607,17 @@ def find_sentences_json(page=0):
 
     nWords = 1
     negWords = []
+    showOccurrences = True
     if 'n_words' in query:
         nWords = int(query['n_words'])
         if nWords > 0:
             for iQueryWord in range(1, nWords + 1):
                 if 'negq' + str(iQueryWord) in query and query['negq' + str(iQueryWord)] == 'on':
                     negWords.append(iQueryWord)
+            if nWords > 1:
+                showOccurrences = False
+    if 'txt' in query and len(query['txt']) > 0:
+        showOccurrences = False
 
     docIDs = None           # IDs of subcorpus docs that should be taken into
                             # account when searching (i.e., those that are not
@@ -697,6 +715,7 @@ def find_sentences_json(page=0):
         # but we want it to be truly random at the step where the number of occurrences
         # is calculated.
     hits = sc.get_sentences(esQuery, partition=partition)
+    hits['subcorpus_size'] = subcorpus_size(query)
     if nWords > 1 and 'hits' in hits and 'hits' in hits['hits']:
         for hit in hits['hits']['hits']:
             sentView.filter_multi_word_highlight(hit, nWords=nWords, negWords=negWords)
@@ -723,6 +742,7 @@ def find_sentences_json(page=0):
             hit['toggled_on'] = sc.qp.wr.check_sentence(hit, wordConstraints, nWords=nWords)
     if subcorpusDocIDs is not None and len(subcorpusDocIDs) > 0:
         hits['subcorpus_enabled'] = True
+    hits['show_occurrences'] = showOccurrences
     return hits
 
 

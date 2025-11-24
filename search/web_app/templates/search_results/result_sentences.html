@@ -1,6 +1,10 @@
 ﻿<div id="results_info" class="row_section_fixed">
-	<p>{{ ngettext('Search result:', 'Search result:', data.n_occurrences) }}
-	{{ data.n_occurrences }} {{ ngettext('occurrence', 'occurrences', data.n_occurrences) }},
+	<p>{% if data.show_occurrences %}
+	{{ ngettext('Search result:', 'Search result:', data.n_occurrences) }}
+	{{ data.n_occurrences }} {{ ngettext('occurrence', 'occurrences', data.n_occurrences) }}{% if data.ipm %} (<span id="ipm_count" data-subcorpus-size="{{ data.subcorpus_size }}">{{ data.ipm }} {{_('ipm')}}</span>){% endif %},
+	{% else %}
+	{{ ngettext('Search result:', 'Search result:', data.n_sentences) }}
+	{% endif %}
 	{{ data.n_sentences }} {{ ngettext('sentence found in approximately', 'sentences found in approximately', data.n_sentences) }}
 	{{ data.n_docs }} {{ ngettext('in_document', 'in_documents', data.n_docs) }}.</p>
 

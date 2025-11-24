@@ -353,6 +353,11 @@
 	min-height: 100px;
 }
 
+#ipm_count {
+	text-decoration: dotted underline;
+	cursor: pointer;
+}
+
 .p_highlighted {
 	background-color: #f8ffc4;
 }

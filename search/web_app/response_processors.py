@@ -1556,6 +1556,9 @@ class SentenceViewer:
             'n_occurrences': 0,
             'n_sentences': 0,
             'n_docs': 0,
+            'subcorpus_size': 0,
+            'ipm': 0,
+            'show_occurrences': True,
             'page': 1,
             'message': 'Nothing found.',
             'contexts': [],
@@ -1581,6 +1584,12 @@ class SentenceViewer:
             if result['n_docs'] > 0 and 'agg_nwords' in response['aggregations']:
                 result['n_occurrences'] = int(math.floor(response['aggregations']['agg_nwords']['sum']))
                 result['n_sentences'] = int(math.floor(response['aggregations']['agg_nwords']['count']))
+        if 'subcorpus_size' in response:
+            result['subcorpus_size'] = response['subcorpus_size']
+        result['ipm'] = math.ceil(result['n_occurrences'] * 1000000 / max(1, result['subcorpus_size']))
+        if not response['show_occurrences'] and result['n_occurrences'] > 1:
+            result['show_occurrences'] = False
+
         for iHit in range(len(response['hits']['hits'])):
             langID, lang = self.get_lang_from_hit(response['hits']['hits'][iHit])
             langView = lang

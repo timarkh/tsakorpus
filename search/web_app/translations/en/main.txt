@@ -776,3 +776,14 @@ msgstr "no context"
 msgid "Show links to the local copy of the corpus"
 msgstr "Show links to the local copy of the corpus"
 
+msgid "ipm"
+msgstr "ipm"
+
+msgid "What is IPM?"
+msgstr "What is IPM?"
+
+msgid "IPM_explanation"
+msgstr "IPM stands for &ldquo;items per million&rdquo;, i.e., the number of words that you can expect to match your query in a corpus of one million words. This is known as <em>relative frequency</em>. Relative frequencies are usually preferable to absolute frequencies in papers because they facilitate comparison between subcorpora, different corpora, and languages. After all, ten occurrences in a thousand-word corpus is very different from ten occurrences in a billion-word corpus. IPM makes sense for one-word queries. Here, the IPM value is calculated by dividing the number of words found by the total size of the (sub)corpus you are searching in, multiplied by one million. The subcorpus is defined as all sentences that conform to your metadata criteria. If you did not select a subcorpus or fill any sentence-level metadata boxes, the relative frequency for the entire corpus is calculated."
+
+msgid "Current subcorpus size: "
+msgstr "Current (sub)corpus size: "

@@ -26,6 +26,21 @@
 	</div>
 </div>
 
+<div class="modal fade" id="ipm_explanation_dialogue" tabindex="-1" role="dialog" aria-labelledby="ipm_explanation_dialogue_header" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="ipm_explanation_dialogue_header">{{ _('What is IPM?') }}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+			</div>
+			<div class="modal-body" id="ipm_explanation_dialogue_body">
+			<p>{{ _('IPM_explanation') | safe }}</p>
+			<p>{{ _('Current subcorpus size: ') }} <span id="ipm_explanation_subcorpus_size"></span></p>
+			</div>
+		</div>
+	</div>
+</div>
+
 {% endif %}
 
 <div class="modal fade modal-dialog-scrollable" id="help_dialogue" tabindex="-1" role="dialog" aria-labelledby="help_dialogue_header" aria-hidden="true">

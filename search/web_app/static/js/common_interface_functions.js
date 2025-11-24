@@ -94,6 +94,11 @@ function show_citation(e) {
 	$('#citation_dialogue').modal('show');
 }
 
+function show_ipm_explanation(e) {
+	$('#ipm_explanation_subcorpus_size').html($(e.currentTarget).attr('data-subcorpus-size'));
+	$('#ipm_explanation_dialogue').modal('show');
+}
+
 function show_error_report_form(e) {
 	let n_sent = $(e.currentTarget).attr('data-nsent');
 	$('.error_report_input').val('');

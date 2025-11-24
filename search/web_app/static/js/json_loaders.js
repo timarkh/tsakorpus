@@ -360,6 +360,7 @@ function assign_input_events() {
 	$('.toggle_lang').unbind('click');
 	$(".tier_select").unbind('change');
 	$(".search_from_ana").unbind('click');
+	$("#ipm_count").unbind('click');
 	$(".word_plus").click(add_word_inputs);
 	$(".word_minus").click(del_word_inputs);
 	$(".word_expand").click(expand_word_input);
@@ -388,6 +389,7 @@ function assign_input_events() {
 	$('.toggle_lang').click(toggle_lang);
 	$(".tier_select").change(change_tier);
 	$(".search_from_ana").click(search_word_from_ana);
+	$("#ipm_count").click(show_ipm_explanation);
 	assign_tooltips();
 	initialize_keyboards();
 	assign_autocomplete();
