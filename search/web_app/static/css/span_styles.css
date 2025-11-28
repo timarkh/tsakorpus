@@ -69,3 +69,8 @@ in different styles) */
 .style_txt_h3 {
 	font-size: 110%;
 }
+
+.style_speaker_mark {
+	font-size: 70%;
+	color: #777777;
+}

@@ -64,7 +64,8 @@ class DocxExampleProcessor:
             p = wordDoc.add_paragraph('')
             DocxExampleProcessor.p_no_margins(wordDoc, p)
             for iSent in range(len(sentences)):
-                text = sentences[iSent]['text']
+                s = sentences[iSent]
+                text = s['text']
                 if self.rxLeadingNewline.search(text) is not None:
                     if iSent > 0:
                         # Start new paragraph
@@ -72,6 +73,15 @@ class DocxExampleProcessor:
                         DocxExampleProcessor.p_no_margins(wordDoc, p)
                 elif iSent > 0:
                     text = ' ' + text.lstrip()
+                # Add speaker mark, if needed and if there is none yet
+                if iSent == 0 and 'meta' in s and 'speaker' in s['meta'] and len(s['meta']['speaker']) > 0:
+                    if ('style_spans' not in s or len(s['style_spans']) <= 0
+                            or all('span_class' not in ss or ss['span_class'] != 'speaker_mark'
+                                   for ss in s['style_spans'])):
+                        if text.startswith(' '):
+                            text = ' [' + s['meta']['speaker'].strip() + ']' + text[1:]
+                        else:
+                            text = '[' + s['meta']['speaker'].strip() + '] ' + text
                 self.add_pure_text(p, text, translit)
                 if self.rxTrailingNewline.search(text) is not None:
                     if iSent < len(sentences) - 1:

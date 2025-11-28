@@ -179,7 +179,7 @@ class Splitter:
 
     def add_speaker_marks(self, sentences):
         """
-        Add the name/code of the speaker in the beginning of every
+        Add the name/code of the speaker at the beginning of every
         sentence that starts the turn.
         """
         if 'insert_speaker_marks' in self.settings and not self.settings['insert_speaker_marks']:
@@ -227,6 +227,13 @@ class Splitter:
                     for ss in sentences[i]['style_spans']:
                         ss['off_start'] += addOffset
                         ss['off_end'] += addOffset
+                if 'style_spans' not in sentences[i]:
+                    sentences[i]['style_spans'] = []
+                sentences[i]['style_spans'].append({
+                    'off_start': sentences[i]['words'][0]['off_start'],
+                    'off_end': sentences[i]['words'][0]['off_end'],
+                    'span_class': 'speaker_mark'
+                })
             prevSpeaker = sentences[i]['meta']['speaker']
             if 'last' in sentences[i] and sentences[i]['last']:
                 prevSpeaker = ''
