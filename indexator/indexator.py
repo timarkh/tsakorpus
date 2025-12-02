@@ -1,6 +1,7 @@
 import copy
 import html
 import shutil
+import base64
 
 import elasticsearch
 ESVersion = elasticsearch.__version__[0]   # Should be 7 or 9 (or use 8 at your own risk, I didn't test it)
@@ -867,26 +868,35 @@ class Indexator:
         self.wfs = None
         self.lemmata = None
 
-    def iterate_lex_profiles(self, langID, lexProfileCategs, lexFreqs):
-        for lexTuple in lexFreqs:
-            lemma, grdic, additionalFields = lexTuple
+    def iterate_lex_profiles(self, langID, lexProfileCategs, lexFreqs, lID2lex):
+        for lID in lexFreqs:
+            lemma, grdic, additionalFields = lID2lex[lID]
             if len(lemma) <= 0:
                 continue
             lex = {
                 'lemma': lemma,
+                'l_id': lID,
                 'lang': langID,
                 'grdic': grdic,
-                'freq': lexFreqs[lexTuple]
+                'freq': lexFreqs[lID],
+                'payload': ''
             }
             additionalFieldsJson = json.loads(additionalFields)
             for field, value in additionalFieldsJson.items():
                 lex['_add_' + field] = value
+            curProfile = {}
             for c in lexProfileCategs:
                 for v in lexProfileCategs[c]:
                     try:
-                        lex[c + '__' + v] = lexProfileCategs[c][v][lexTuple]
+                        cvFreq = lexProfileCategs[c][v][lID]
                     except KeyError:
-                        pass
+                        continue
+                    if cvFreq > 0:
+                        if c not in curProfile:
+                            curProfile[c] = {}
+                        curProfile[c][v] = cvFreq
+            curProfileStr = base64.b64encode(json.dumps(curProfile, ensure_ascii=False, indent=-1, sort_keys=True).encode('utf-8'))
+            lex['payload'] = curProfileStr
             print(lex)
             curAction = {
                 '_index': self.name + '.lex_profiles',
@@ -894,13 +904,13 @@ class Indexator:
             }
             yield curAction
 
-    def index_lex_profiles(self, langID, lexProfileCategs, lexFreqs):
+    def index_lex_profiles(self, langID, lexProfileCategs, lexFreqs, lID2lex):
         if len(lexProfileCategs) <= 0:
             return
-        bulk(self.es, self.iterate_lex_profiles(langID, lexProfileCategs, lexFreqs),
+        bulk(self.es, self.iterate_lex_profiles(langID, lexProfileCategs, lexFreqs, lID2lex),
              chunk_size=1000, request_timeout=120)
 
-    def write_dictionary(self, lang, lexFreqs):
+    def write_dictionary(self, lang, lexFreqs, lID2lex):
         """
         Write an HTML dictionary based on the frequency data gathered at a previous step.
         """
@@ -913,8 +923,9 @@ class Indexator:
                        '({{ _(\'langname_' + lang + '\') }})</h1>\n')
             prevLetter = ''
             sortingFunction = self.make_sorting_function(lang)
-            for lemma, grdic, additionalFields in sorted(lexFreqs,
-                                                         key=lambda x: (sortingFunction(x[0].lower()), -lexFreqs[x])):
+            for lID in sorted(lexFreqs, key=lambda x: (sortingFunction(x[0].lower()),
+                                                       -lexFreqs[x])):
+                lemma, grdic, additionalFields = lID2lex[lID]
                 if len(lemma) <= 0:
                     continue
                 additionalFieldsJson = json.loads(additionalFields)
@@ -954,6 +965,7 @@ class Indexator:
             iWord = 0
             print('Generating dictionary for ' + lang + '...')
             lexFreqs = {}            # lemma ID -> its frequency
+            lID2lex = {}             # lemma ID -> its features as JSON
             lexProfileCategs = {}    # {category -> {value -> {lemma ID -> frequency}}}
             if lang in self.settings['lang_props'] and 'lex_profile_categories' in self.settings['lang_props'][lang]:
                 for c in self.settings['lang_props'][lang]['lex_profile_categories']:
@@ -980,33 +992,39 @@ class Indexator:
                         break
                 if excludeWord:
                     continue
+                try:
+                    lID = self.word2lemma[langID][wID]
+                except KeyError:
+                    lID = 'l0'
                 lemma = self.get_lemma(wJson, lower_lemma=False)
                 grdic, additionalFields = self.get_grdic(wJson, self.languages[langID])
                 wordFreq = self.wordFreqs[langID][wID]
-                lexTuple = (lemma, grdic, json.dumps(additionalFields, indent=0, ensure_ascii=False, sort_keys=True))
+                lexTuple = (lemma, grdic,
+                            json.dumps(additionalFields, indent=0, ensure_ascii=False, sort_keys=True))
+                lID2lex[lID] = lexTuple
                 # Lexeme frequency
-                if lexTuple not in lexFreqs:
-                    lexFreqs[lexTuple] = wordFreq
+                if lID not in lexFreqs:
+                    lexFreqs[lID] = wordFreq
                 else:
-                    lexFreqs[lexTuple] += wordFreq
+                    lexFreqs[lID] += wordFreq
                 # Grammar for the lexical profile
-                for c in lexProfileCategs:
-                    profileGramm = self.get_gramm(wJson, self.languages[langID], c)
-                    if profileGramm in lexProfileCategs[c]:
-                        v = profileGramm
-                    else:
-                        v = '_other'
-                    try:
-                        lexProfileCategs[c][v][lexTuple] += wordFreq
-                    except KeyError:
-                        lexProfileCategs[c][v][lexTuple] = wordFreq
+                if lID != 'l0':
+                    for c in lexProfileCategs:
+                        profileGramm = self.get_gramm(wJson, self.languages[langID], c)
+                        if profileGramm in lexProfileCategs[c]:
+                            v = profileGramm
+                        else:
+                            v = '_other'
+                        try:
+                            lexProfileCategs[c][v][lID] += wordFreq
+                        except KeyError:
+                            lexProfileCategs[c][v][lID] = wordFreq
 
             if len(lexFreqs) <= 0:
                 continue
 
-            self.write_dictionary(lang, lexFreqs)
-            self.index_lex_profiles(langID, lexProfileCategs, lexFreqs)
-
+            self.write_dictionary(lang, lexFreqs, lID2lex)
+            self.index_lex_profiles(langID, lexProfileCategs, lexFreqs, lID2lex)
 
     def index_words(self):
         """

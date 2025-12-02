@@ -227,7 +227,10 @@ class PrepareData:
                 },
                 'analyzer': 'wf_analyzer'
             },
-            'freq': {'type': 'keyword'}
+            'l_id': {'type': 'keyword'},
+            'grdic': {'type': 'keyword'},
+            'freq': {'type': 'keyword'},
+            'payload': {'type': 'binary'}
         }
         mapping = {
             'mappings': {
