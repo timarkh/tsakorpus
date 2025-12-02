@@ -212,11 +212,38 @@ class PrepareData:
         }
         return mapping
 
+    def generate_lex_profiles_mapping(self):
+        """
+        Return Elasticsearch mapping for the type "lex_profile".
+        """
+        m = {
+            'lang': {'type': 'byte'},
+            'lemma': {
+                'type': 'text',
+                'fielddata': True,
+                'index_prefixes': {
+                    'min_chars': 3,
+                    'max_chars': 10
+                },
+                'analyzer': 'wf_analyzer'
+            },
+            'freq': {'type': 'keyword'}
+        }
+        mapping = {
+            'mappings': {
+                'properties': m
+            },
+            'settings': {
+                'analysis': self.wfAnalyzer
+            }
+        }
+        return mapping
+
     def generate_docs_mapping(self):
         """
         Return Elasticsearch mapping for the type "doc".
         Each element of docs index contains metadata about
-        about a single document.
+        a single document.
         """
         m = {
             'n_words': {'type': 'integer'},

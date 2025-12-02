@@ -304,7 +304,8 @@ class Indexator:
         if not self.overwrite:
             if (self.es_ic.exists(index=self.name + '.docs')
                     or self.es_ic.exists(index=self.name + '.words')
-                    or self.es_ic.exists(index=self.name + '.sentences')):
+                    or self.es_ic.exists(index=self.name + '.sentences')
+                    or self.es_ic.exists(index=self.name + '.lex_profiles')):
                 print('It seems that a corpus named "' + self.name + '" already exists. '
                       + 'Do you want to overwrite it? [y/n]')
                 reply = input()
@@ -315,6 +316,8 @@ class Indexator:
             self.es_ic.delete(index=self.name + '.docs')
         if self.es_ic.exists(index=self.name + '.words'):
             self.es_ic.delete(index=self.name + '.words')
+        if self.es_ic.exists(index=self.name + '.lex_profiles'):
+            self.es_ic.delete(index=self.name + '.lex_profiles')
         if self.es_ic.exists(index=self.name + '.sentences*'):
             if self.es_ic.exists(index=self.name + '.sentences'):
                 self.es_ic.delete(index=self.name + '.sentences')
@@ -338,6 +341,7 @@ class Indexator:
         """
         self.sentWordMapping = self.pd.generate_words_mapping(wordFreqs=False)
         self.wordMapping = self.pd.generate_words_mapping(wordFreqs=True)
+        self.lexProfileMapping = self.pd.generate_lex_profiles_mapping()
         self.docMapping = self.pd.generate_docs_mapping()
         self.sentMapping = self.pd.generate_sentences_mapping(self.sentWordMapping, self.docMapping,
                                                               corpusSizeInBytes=self.corpusSizeInBytes)
@@ -348,6 +352,9 @@ class Indexator:
         self.es_ic.create(index=self.name + '.words',
                           mappings=self.wordMapping['mappings'],
                           settings=self.wordMapping['settings'])
+        self.es_ic.create(index=self.name + '.lex_profiles',
+                          mappings=self.lexProfileMapping['mappings'],
+                          settings=self.lexProfileMapping['settings'])
         if 'partitions' in self.settings and self.settings['partitions'] > 1:
             for i in range(int(self.settings['partitions'])):
                 self.es_ic.create(index=self.name + '.sentences.' + str(i),
@@ -661,6 +668,42 @@ class Indexator:
             additionalValues[field] = ' | '.join(av for av in additionalValues[field] if len(av) > 0)
         return grdic, additionalValues
 
+    def get_gramm(self, word, lang, schema):
+        """
+        Join grammar tag strings in the JSON representation of a word with
+        an analysis. Only take category or categories listed in the schema.
+        The schema string contains either a name of a single category or a list
+        of categories separated by a comma. Return the values as a string.
+        """
+        if 'ana' not in word:
+            return ''
+        categs = schema.strip(' ,').split(',')
+        curGramm = set()
+        for ana in word['ana']:
+            grTags = {
+                c: '' for c in categs
+            }
+            for field in sorted(ana):
+                if not field.startswith('gr.'):
+                    continue
+                fieldShort = field[3:]
+                if fieldShort not in categs:
+                    continue
+                value = ana[field]
+                if type(value) is list:
+                    value = '/'.join(value)
+                grTags[fieldShort] = value
+            curGrammStr = ''
+            for c in categs:
+                if len(grTags[c]) > 0:
+                    if len(curGrammStr) > 0:
+                        curGrammStr += ','
+                    curGrammStr += grTags[c]
+            if len(curGrammStr) > 0:
+                curGramm.add(curGrammStr)
+        gramm = ' | '.join(g for g in sorted(curGramm))
+        return gramm
+
     def iterate_lemmata(self, langID, lemmataSorted):
         """
         Iterate over all lemmata for one language collected at the
@@ -824,58 +867,58 @@ class Indexator:
         self.wfs = None
         self.lemmata = None
 
-    def generate_dictionary(self):
-        """
-        For each language, print out an HTML dictionary containing all lexemes of the corpus.
-        """
-        for langID in range(len(self.languages)):
-            iWord = 0
-            print('Generating dictionary for ' + self.languages[langID] + '...')
-            lexFreqs = {}       # lemma ID -> its frequency
-            wFreqsSorted = [v for v in sorted(self.wordFreqs[langID].values(), reverse=True)]
-            freqToRank, quantiles = self.get_freq_ranks(wFreqsSorted)
-            # for wID in self.wordFreqs[langID]:
-            for w, wID in self.tmpWordIDs[langID].items():
-                wID = 'w' + str(wID)
-                if iWord % 1000 == 0:
-                    print('processing word', iWord, 'for the dictionary')
-                iWord += 1
-                wJson = json.loads(w)
-                if 'ana' not in wJson or len(wJson['ana']) <= 0:
-                    continue
-                excludeWord = False
-                for ana in wJson['ana']:
-                    if any(k in ana and ((type(ana[k]) == str and v.search(ana[k]) is not None)
-                                           or (type(ana[k]) == list and any(vp.search(ana[k]) is not None for vp in v)))
-                           for k, v in self.excludeFromDict.items()):
-                        excludeWord = True
-                        break
-                if excludeWord:
-                    continue
-                lemma = self.get_lemma(wJson, lower_lemma=False)
-                grdic, additionalFields = self.get_grdic(wJson, self.languages[langID])
-                wordFreq = self.wordFreqs[langID][wID]
-                lexTuple = (lemma, grdic, json.dumps(additionalFields, indent=0, ensure_ascii=False, sort_keys=True))
-                if lexTuple not in lexFreqs:
-                    lexFreqs[lexTuple] = wordFreq
-                else:
-                    lexFreqs[lexTuple] += wordFreq
-            if len(lexFreqs) <= 0:
+    def iterate_lex_profiles(self, langID, lexProfileCategs, lexFreqs):
+        for lexTuple in lexFreqs:
+            lemma, grdic, additionalFields = lexTuple
+            if len(lemma) <= 0:
                 continue
+            lex = {
+                'lemma': lemma,
+                'lang': langID,
+                'grdic': grdic,
+                'freq': lexFreqs[lexTuple]
+            }
+            additionalFieldsJson = json.loads(additionalFields)
+            for field, value in additionalFieldsJson.items():
+                lex['_add_' + field] = value
+            for c in lexProfileCategs:
+                for v in lexProfileCategs[c]:
+                    try:
+                        lex[c + '__' + v] = lexProfileCategs[c][v][lexTuple]
+                    except KeyError:
+                        pass
+            print(lex)
+            curAction = {
+                '_index': self.name + '.lex_profiles',
+                '_source': lex
+            }
+            yield curAction
 
-            if not os.path.exists('../search/web_app/templates/dictionaries'):
-                os.makedirs('../search/web_app/templates/dictionaries')
-            fOut = open(os.path.join('../search/web_app/templates/dictionaries', 'dictionary_' + self.settings['corpus_name']
-                                     + '_' + self.languages[langID] + '.html'), 'w', encoding='utf-8')
+    def index_lex_profiles(self, langID, lexProfileCategs, lexFreqs):
+        if len(lexProfileCategs) <= 0:
+            return
+        bulk(self.es, self.iterate_lex_profiles(langID, lexProfileCategs, lexFreqs),
+             chunk_size=1000, request_timeout=120)
+
+    def write_dictionary(self, lang, lexFreqs):
+        """
+        Write an HTML dictionary based on the frequency data gathered at a previous step.
+        """
+        if not os.path.exists('../search/web_app/templates/dictionaries'):
+            os.makedirs('../search/web_app/templates/dictionaries')
+        with open(os.path.join('../search/web_app/templates/dictionaries',
+                               'dictionary_' + self.settings['corpus_name'] + '_' + lang + '.html'),
+                  'w', encoding='utf-8') as fOut:
             fOut.write('<h1 class="dictionary_header"> {{ _(\'Dictionary_header\') }} '
-                       '({{ _(\'langname_' + self.languages[langID] + '\') }})</h1>\n')
+                       '({{ _(\'langname_' + lang + '\') }})</h1>\n')
             prevLetter = ''
-            sortingFunction = self.make_sorting_function(self.settings['languages'][langID])
-            for lemma, grdic, additionalFields in sorted(lexFreqs, key=lambda x: (sortingFunction(x[0].lower()), -lexFreqs[x])):
+            sortingFunction = self.make_sorting_function(lang)
+            for lemma, grdic, additionalFields in sorted(lexFreqs,
+                                                         key=lambda x: (sortingFunction(x[0].lower()), -lexFreqs[x])):
                 if len(lemma) <= 0:
                     continue
                 additionalFieldsJson = json.loads(additionalFields)
-                mChar = self.character_regex(self.languages[langID]).search(lemma.lower())
+                mChar = self.character_regex(lang).search(lemma.lower())
                 if mChar is None:
                     curLetter = '*'
                 else:
@@ -901,7 +944,69 @@ class Indexator:
                 fOut.write('<td>' + str(lexFreqs[(lemma, grdic, additionalFields)]) + '</td></tr>\n')
             if prevLetter != '':
                 fOut.write('</tbody>\n</table>\n')
-            fOut.close()
+
+    def generate_dictionary(self):
+        """
+        For each language, save an HTML dictionary containing all lexemes of the corpus.
+        """
+        for langID in range(len(self.languages)):
+            lang = self.languages[langID]
+            iWord = 0
+            print('Generating dictionary for ' + lang + '...')
+            lexFreqs = {}            # lemma ID -> its frequency
+            lexProfileCategs = {}    # {category -> {value -> {lemma ID -> frequency}}}
+            if lang in self.settings['lang_props'] and 'lex_profile_categories' in self.settings['lang_props'][lang]:
+                for c in self.settings['lang_props'][lang]['lex_profile_categories']:
+                    lexProfileCategs[c] = {'_other': {}}
+                    for v in self.settings['lang_props'][lang]['lex_profile_categories'][c]:
+                        lexProfileCategs[c][v] = {}     # lemma ID -> frequency
+            wFreqsSorted = [v for v in sorted(self.wordFreqs[langID].values(), reverse=True)]
+            freqToRank, quantiles = self.get_freq_ranks(wFreqsSorted)
+            # for wID in self.wordFreqs[langID]:
+            for w, wID in self.tmpWordIDs[langID].items():
+                wID = 'w' + str(wID)
+                if iWord % 1000 == 0:
+                    print('processing word', iWord, 'for the dictionary')
+                iWord += 1
+                wJson = json.loads(w)
+                if 'ana' not in wJson or len(wJson['ana']) <= 0:
+                    continue
+                excludeWord = False
+                for ana in wJson['ana']:
+                    if any(k in ana and ((type(ana[k]) == str and v.search(ana[k]) is not None)
+                                           or (type(ana[k]) == list and any(vp.search(ana[k]) is not None for vp in v)))
+                           for k, v in self.excludeFromDict.items()):
+                        excludeWord = True
+                        break
+                if excludeWord:
+                    continue
+                lemma = self.get_lemma(wJson, lower_lemma=False)
+                grdic, additionalFields = self.get_grdic(wJson, self.languages[langID])
+                wordFreq = self.wordFreqs[langID][wID]
+                lexTuple = (lemma, grdic, json.dumps(additionalFields, indent=0, ensure_ascii=False, sort_keys=True))
+                # Lexeme frequency
+                if lexTuple not in lexFreqs:
+                    lexFreqs[lexTuple] = wordFreq
+                else:
+                    lexFreqs[lexTuple] += wordFreq
+                # Grammar for the lexical profile
+                for c in lexProfileCategs:
+                    profileGramm = self.get_gramm(wJson, self.languages[langID], c)
+                    if profileGramm in lexProfileCategs[c]:
+                        v = profileGramm
+                    else:
+                        v = '_other'
+                    try:
+                        lexProfileCategs[c][v][lexTuple] += wordFreq
+                    except KeyError:
+                        lexProfileCategs[c][v][lexTuple] = wordFreq
+
+            if len(lexFreqs) <= 0:
+                continue
+
+            self.write_dictionary(lang, lexFreqs)
+            self.index_lex_profiles(langID, lexProfileCategs, lexFreqs)
+
 
     def index_words(self):
         """
