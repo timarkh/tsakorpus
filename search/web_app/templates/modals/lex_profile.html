@@ -1,0 +1,32 @@
+<h3><em>{{ lex.wf }}</em>{% if lex.grdic %} ({{ lex.grdic }}){% endif %}</h3>
+<table class="table">
+	<thead>
+		<th></th>
+		<th>{% if lex.subcorpora|length > 0 %}{{ _('Corpus') }}{% endif %}</th>
+		{% for subcorpus in lex.subcorpora %}
+		<th><div class="circle subcorpus_{{ subcorpus }}" data-tooltip="tooltip" data-placement="bottom" title="" data-bs-original-title="Subcorpus: metavalue_{{ subcorpus }}"></div></th>
+		{% endfor %}
+	</thead>
+	<tbody>
+		<tr>
+			<td>{{ _('Frequency') }}</td>
+			<td>{{ lex.freq }}</td>
+			{% for subcorpus in lex.subcorpora %}
+			<td>{{ lex.subcorpora[subcorpus].freq }}</td>
+			{% endfor %}
+		</tr>
+		{% for c in categories %}
+		{% if c in lex.lex_profile['_all'] %}
+		<tr>
+			<td>{{ c }}</td>
+			<td><div class="lex_profile_plot" id="lex_profile_plot_all_{{ c }}">[{% for v in categories[c] %}["{{ v }}", {% if v in lex.lex_profile['_all'][c] %}{{ lex.lex_profile['_all'][c][v] }} {% else %} 0 {% endif %}]{% if not loop.last %},{% endif %} {% endfor %}]</div></td>
+			{% for subcorpus in lex.subcorpora %}
+			<td><div class="lex_profile_plot" id="lex_profile_plot_{{ subcorpus }}_{{ c }}">[{% for v in categories[c] %}["{{ v }}", {% if v in lex.lex_profile[subcorpus][c] %}{{ lex.lex_profile[subcorpus][c][v] }} {% else %} 0 {% endif %}]{% if not loop.last %},{% endif %} {% endfor %}]</div></td>
+			{% endfor %}
+		</tr>
+		{% endif %}
+		{% endfor %}
+	</tbody>
+</table>
+
+<script type='text/javascript' src='static/js/lex_profiles.js'></script>

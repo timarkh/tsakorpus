@@ -3,8 +3,8 @@ High-level functions that handle user queries by transforming
 them into series of ES queries using the query parser and
 processing the hits using response_processors.
 """
-
-
+import base64
+import json
 import copy
 import math
 import re
@@ -892,6 +892,25 @@ def find_words_json(searchType='word', page=0):
     set_session_data('progress', 100)
     return hitsProcessed
 
+def get_lexeme_by_id(lID):
+    """
+    Return the data for one lexeme for the lexical profile modal.
+    """
+    hits = sc.get_word_by_id(lID)
+    if (len(hits) <= 0 or 'hits' not in hits
+            or 'hits' not in hits['hits']
+            or 'total' not in hits['hits']
+            or hits['hits']['total']['value'] <= 0):
+        return {'lemma': '(not found)', 'grdic': '', 'freq': 0}
+    lex = hits['hits']['hits'][0]['_source']
+    if 'lex_profile' in lex:
+        lex['lex_profile'] = json.loads(base64.b64decode(lex['lex_profile'].encode('utf-8')))
+    lex['subcorpora'] = {}
+    for subcorpus in settings.subcorpora:
+        lex['subcorpora'][subcorpus] = {}
+        if 'freq_' + subcorpus in lex:
+            lex['subcorpora'][subcorpus]['freq'] = lex['freq_' + subcorpus]
+    return lex
 
 def find_sent_context(curSentData, n):
     """

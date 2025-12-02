@@ -582,15 +582,32 @@ function gramm_gloss_selector_loaded(result) {
 	$("#gramm_selector_ok").click(gram_selector_ok);
 }
 
-function assign_dictionary_events(){
+function assign_dictionary_events() {
 	$(".dictionary_lemma").unbind("click");
 	$(".dictionary_lemma").click(input_lemma);
+	$(".lex_profile_link").unbind("click");
+	$(".lex_profile_link").click(show_lex_profile);
 }
 
 function input_lemma(e) {
 	$('#wf1').val("");
 	$('#lex1').val($(e.target).html());
 	$('#gr1').val($(e.target).next().html().replace(" ", ""));
+}
+
+function show_lex_profile(e) {
+	e.preventDefault();
+	$.ajax({
+		url: $(e.target).attr("href"),
+		type: "GET",
+		success: function(result) {
+			$('#lex_profile_body').html(result);
+			$('#lex_profile').modal('show');
+		},
+		error: function(errorThrown) {
+			alert( JSON.stringify(errorThrown) );
+		}
+	});
 }
 
 function gram_selector_ok(e) {

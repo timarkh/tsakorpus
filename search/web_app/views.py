@@ -860,6 +860,18 @@ def get_gloss_selector(lang=''):
     glossSelection = settings.lang_props[lang]['gloss_selection']
     return render_template('modals/select_gloss.html', glosses=glossSelection)
 
+@app.route('/get_lex_profile/<lang>/<lID>')
+def get_lex_profile(lang='', lID='l0'):
+    """
+    Return HTML of the grammatical tags selection dialogue for the given language.
+    """
+    if lang not in settings.lang_props or 'lex_profile_categories' not in settings.lang_props[lang]:
+        return ''
+    lex = get_lexeme_by_id(lID)
+    categories = copy.deepcopy(settings.lang_props[lang]['lex_profile_categories'])
+    for c in categories:
+        categories[c].append('_other')
+    return render_template('modals/lex_profile.html', lex=lex, categories=categories)
 
 @app.route('/get_glossed_sentence/<int:n>')
 def get_glossed_sentence(n):

@@ -242,6 +242,17 @@
 	color: #cf7a13!important;
 }
 
+
+.lex_profile_link {
+    font-size: 18px;
+	margin: auto;
+	color: #8f4a00!important;
+}
+
+.lex_profile_link:hover {
+	color: #cf7a13!important;
+}
+
 .bi-arrows-fullscreen {
 	width: 22px;
 	font-size: 22px;
@@ -1015,6 +1026,10 @@ hr.separator {
 
 .modal {
 	z-index: 9999999;  /* Dirty trick for dealing with wide third-party headers */
+}
+
+#lex_profile {
+	z-index: 10000000;  /* This one can appear on top of other modals */
 }
 
 .modal-dialog {

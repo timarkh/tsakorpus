@@ -696,7 +696,8 @@ class Indexator:
                 curGramm.add(grTags)
         grdic = ' | '.join(grdic for grdic in sorted(curGramm))
         for field in additionalValues:
-            additionalValues[field] = ' | '.join(av for av in additionalValues[field] if len(av) > 0)
+            additionalValues[field] = ' | '.join(av for av in sorted(additionalValues[field])
+                                                 if len(av) > 0)
         return grdic, additionalValues
 
     def get_gramm(self, word, lang, schema):
@@ -1022,7 +1023,7 @@ class Indexator:
                 fOut.write('<td>' + str(lexFreqs[lID]) + '</td>')
                 if includeLexProfile:
                     fOut.write('<td><a class="bi bi-activity lex_profile_link"'
-                               ' href="lex_profile/' + lang + '/' + lID + '"'
+                               ' href="get_lex_profile/' + lang + '/' + lID + '"'
                                ' target="_blank" title="Lexical profile"> </a></td>')
                 fOut.write('</tr>\n')
             if prevLetter != '':
