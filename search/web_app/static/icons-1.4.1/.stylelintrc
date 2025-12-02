@@ -1,8 +1,0 @@
-{
-  "extends": [
-    "stylelint-config-twbs-bootstrap/scss"
-  ],
-  "rules": {
-    "scss/selector-no-union-class-name": true
-  }
-}
