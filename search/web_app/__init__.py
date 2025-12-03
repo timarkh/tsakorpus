@@ -6,6 +6,8 @@ import os
 import re
 import random
 
+rxJinjaBadPercent = re.compile('(?<!%)%(?!%)')
+
 
 def load_csv_translations(fname, pfx=''):
     """
@@ -21,6 +23,9 @@ def load_csv_translations(fname, pfx=''):
             key, value = line.split('\t')
             key = pfx + key
             translations[key] = value
+            keyPercnt = rxJinjaBadPercent.sub('&percnt;', key)
+            if keyPercnt != key:
+                translations[keyPercnt] = value
     return translations
 
 
@@ -80,8 +85,8 @@ def generate_po(lang):
                                     dictMessages['tooltip_' + item['value']] = item['value']
 
             for k in sorted(dictMessages):
-                fOut.write('msgid "' + k.replace('\n', '\\n').replace('"', '&quot;').replace('%', '%%') + '"\n')
-                fOut.write('msgstr "' + dictMessages[k].replace('\n', '\\n').replace('"', '&quot;').replace('%', '%%') + '"\n\n')
+                fOut.write('msgid "' + k.replace('\n', '\\n').replace('"', '&quot;').replace('%', '&percnt;') + '"\n')
+                fOut.write('msgstr "' + dictMessages[k].replace('\n', '\\n').replace('"', '&quot;').replace('%', '&percnt;') + '"\n\n')
         except:
             print('Something went wrong when generating interface translations.')
 

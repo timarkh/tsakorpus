@@ -13,7 +13,7 @@ import shutil
 import uuid
 import xlsxwriter
 from werkzeug.utils import secure_filename
-from . import app, settings, sc, sentView, MAX_PAGE_SIZE, docxex
+from . import app, settings, sc, sentView, MAX_PAGE_SIZE, docxex, rxJinjaBadPercent
 from .session_management import get_locale, get_session_data, change_display_options, set_session_data
 from .auxiliary_functions import process_request_cookies, jsonp, gzipped, nocache, lang_sorting_key, copy_request_args,\
     distance_constraints_too_complex, remove_sensitive_data, log_query
@@ -835,7 +835,12 @@ def get_gramm_selector(lang=''):
     """
     if lang not in settings.lang_props or 'gramm_selection' not in settings.lang_props[lang]:
         return ''
-    grammSelection = settings.lang_props[lang]['gramm_selection']
+    grammSelection = copy.deepcopy(settings.lang_props[lang]['gramm_selection'])
+    for iCol in range(len(grammSelection['columns'])):
+        for iTag in range(len(grammSelection['columns'][iCol])):
+            if 'value' in grammSelection['columns'][iCol][iTag]:
+                grammSelection['columns'][iCol][iTag]['value'] = rxJinjaBadPercent.sub('&percnt;',
+                                                                                       grammSelection['columns'][iCol][iTag]['value'])
     return render_template('modals/select_gramm.html', tag_table=grammSelection)
 
 
