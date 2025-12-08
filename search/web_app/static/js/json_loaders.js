@@ -587,6 +587,8 @@ function assign_dictionary_events() {
 	$(".dictionary_lemma").click(input_lemma);
 	$(".lex_profile_link").unbind("click");
 	$(".lex_profile_link").click(show_lex_profile);
+	$(".lex_profile_l").unbind("click");
+	$(".lex_profile_l").click(show_lex_profile);
 }
 
 function input_lemma(e) {
@@ -597,8 +599,12 @@ function input_lemma(e) {
 
 function show_lex_profile(e) {
 	e.preventDefault();
+	let url = $(e.target).attr("href");
+	if (typeof url === 'undefined' || url === false) {
+		url = $(e.target).attr("data-href");
+	}
 	$.ajax({
-		url: $(e.target).attr("href"),
+		url: url,
 		type: "GET",
 		success: function(result) {
 			$('#lex_profile_body').html(result);

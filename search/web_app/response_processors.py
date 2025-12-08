@@ -1084,7 +1084,8 @@ class SentenceViewer:
                                    nSents=nSents,
                                    nDocs=nDocs,
                                    wID=wID,
-                                   wfSearch=wSource['wf'])
+                                   wfSearch=wSource['wf'],
+                                   lang=lang)
         return render_template('search_results/lemma_table_row.html',
                                ana_popup=html.escape(self.build_ana_popup(wSource, lang, translit=translit)),
                                wf=wf,
@@ -1100,7 +1101,8 @@ class SentenceViewer:
                                nDocs=nDocs,
                                nForms=nForms,
                                lID=wID,
-                               wfSearch=wSource['wf'])
+                               wfSearch=wSource['wf'],
+                               lang=lang)
 
     def process_word_buckets(self, w, nDocuments, nForms, freq, lang, searchType='word', translit=None):
         """

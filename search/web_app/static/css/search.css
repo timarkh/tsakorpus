@@ -627,11 +627,11 @@ label {
 	height: 100%;
 }
 
-.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .search_from_ana, .stat_w, .search_l, .stat_l, #show_help, #cite_corpus {
+.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .search_from_ana, .stat_w, .search_l, .stat_l, .lex_profile_l, #show_help, #cite_corpus {
 	cursor: pointer;
 }
 
-.search_w, .stat_w, .search_l, .stat_l {
+.search_w, .stat_w, .search_l, .stat_l, .lex_profile_l {
 	padding-left: 10px;
 	padding-right: 5px;
 }
@@ -1030,6 +1030,10 @@ hr.separator {
 
 #lex_profile {
 	z-index: 10000000;  /* This one can appear on top of other modals */
+}
+
+.tooltip {
+	z-index: 11000000;
 }
 
 .modal-dialog {
@@ -1446,6 +1450,35 @@ hr.separator {
   font: 11px sans-serif;
   color: #333;
 }
+
+.lex_profile_plot .axis text {
+	font-size: 3em;
+	color: #555555;
+}
+
+.lex_profile_th_categ {
+	width: 12vw;
+}
+
+.lex_profile_th_corpus {
+	width: 30vw;
+	min-width: 350px;
+}
+
+.lex_profile_th_subcorpus {
+	width: 20vw;
+	min-width: 300px;
+}
+
+#lex_profile_table {
+	overflow-y: scroll;
+}
+
+.lex_profile_lex_field {
+	color: #656565;
+	font-size: 0.9em;
+}
+
 /*
 .x.axis text {
   transform: rotate(90deg);

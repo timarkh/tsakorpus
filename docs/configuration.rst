@@ -140,6 +140,20 @@ List of parameters
 
     - ``lexical_fields`` (list of strings) -- names of non-grammatical analysis fields that should appear in analysis popups between the lines with dictionary categories and (inflectional) grammatical categories. Defaults to empty list. All fields that do not belong to this list are displayed below the grammatical line.
 
+    - ``lexical_profiles`` (dictionary) -- templates for lexical profiles. (NB: This is a feature introduced in late 2025; the format will probably change during the next year.) *Lexical profiles* are pre-calculated statistics for lexemes, which serve as the basis for bar charts callable from Lemma search and the dictionary. Right now, you can include distributions of forms over values of a single grammatical category or a combination of categories. Keys are names of categories (as in :doc:`categories.json </categories>`), values are lists of their values. For example:
+
+  .. code-block::
+  
+    "lex_profile_categories":
+    {
+          "case": ["nom", "acc", "dat", "gen", "ins", "loc"],
+          "number": ["sg", "pl"],
+          "tense": ["prs", "pst", "pst2", "fut"],
+          "mood,aspect": ["indic,pfv", "indic,ipfv", "imp,pfv", "imp,ipfv"]
+    }
+
+  This will enable bar charts for for categories/combinations. It is not obligatory to list all possible values. Values other than those listed here, as well as empty values, will be added to the last bar called ``_other``. If ``subcorpora`` are specified, the values will be calculated not only for the whole corpus, but also for the subcorpora.
+    
     - ``lexicographic_order`` (list of strings) -- list of characters ordered alphabetically for sorting words and lemmata. If absent, standard Unicode ordering is applied. "Characters" are actually arbitrary strings and may include e.g. digraphs.
 
     - ``other_fields_order`` (list of strings) -- list of names of non-grammatical analysis fields which defines in which order their values should be displayed in word analyses. If the field is missing, the fields are sorted alphabetically. If present, this field must contain all field names that exist in the corpus.

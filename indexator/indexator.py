@@ -1024,7 +1024,7 @@ class Indexator:
                 if includeLexProfile:
                     fOut.write('<td><a class="bi bi-activity lex_profile_link"'
                                ' href="get_lex_profile/' + lang + '/' + lID + '"'
-                               ' target="_blank" title="Lexical profile"> </a></td>')
+                               ' target="_blank" title="{{ _(\'Lexical profile\') }}"> </a></td>')
                 fOut.write('</tr>\n')
             if prevLetter != '':
                 fOut.write('</tbody>\n</table>\n')

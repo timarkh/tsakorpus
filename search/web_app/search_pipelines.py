@@ -772,6 +772,10 @@ def find_words_json(searchType='word', page=0):
         docIDs = query['doc_ids']
     subcorpus = (docIDs is not None)
 
+    lang = ''
+    if 'lang1' in query and query['lang1'] in settings.languages:
+        lang = query['lang1']
+
     searchIndex = 'words'
     sortOrder = get_session_data('sort')
     wordConstraints = None
@@ -889,6 +893,7 @@ def find_words_json(searchType='word', page=0):
 
     hitsProcessed['media'] = settings.media
     hitsProcessed['images'] = settings.images
+    hitsProcessed['lang'] = lang
     set_session_data('progress', 100)
     return hitsProcessed
 

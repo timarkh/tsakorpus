@@ -22,6 +22,7 @@ function print_html(results) {
 	$('#video_prompt').show();
 	toggle_interlinear();
 	assign_input_events();
+	assign_dictionary_events();
 }
 
 function update_wordlist(results) {
@@ -31,6 +32,7 @@ function update_wordlist(results) {
 	$('#l_id1').val('');
 	$("#td_load_more_words").replaceWith(results);
 	toggle_interlinear();
+	assign_dictionary_events();
 }
 
 function show_player() {

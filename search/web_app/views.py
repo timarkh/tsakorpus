@@ -874,9 +874,13 @@ def get_lex_profile(lang='', lID='l0'):
         return ''
     lex = get_lexeme_by_id(lID)
     categories = copy.deepcopy(settings.lang_props[lang]['lex_profile_categories'])
+    lexFields = []
+    if 'lexical_fields' in settings.lang_props[lang]:
+        lexFields = copy.deepcopy(settings.lang_props[lang]['lexical_fields'])
     for c in categories:
         categories[c].append('_other')
-    return render_template('modals/lex_profile.html', lex=lex, categories=categories)
+    return render_template('modals/lex_profile.html',
+                           lex=lex, categories=categories, lex_fields=lexFields)
 
 @app.route('/get_glossed_sentence/<int:n>')
 def get_glossed_sentence(n):

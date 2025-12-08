@@ -736,6 +736,12 @@ msgstr "chercher"
 msgid "word_th_word stats"
 msgstr "statistiques"
 
+msgid "word_th_lex_profile"
+msgstr "profil du lexème"
+
+msgid "Lexical profile"
+msgstr "Profil du lexème"
+
 #: templates/search_results/sentence_header.html:20
 msgid "Full text (opens in a new tab)"
 msgstr "Texte intégral (s'ouvre dans un nouvel onglet)"

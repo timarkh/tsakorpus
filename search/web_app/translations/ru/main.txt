@@ -745,6 +745,12 @@ msgstr "искать"
 msgid "word_th_word stats"
 msgstr "статистика"
 
+msgid "word_th_lex_profile"
+msgstr "профиль лексемы"
+
+msgid "Lexical profile"
+msgstr "Профиль лексемы"
+
 #: templates/search_results/sentence_header.html:20
 msgid "Full text (opens in a new tab)"
 msgstr "Полный текст (откроется в новой вкладке)"
