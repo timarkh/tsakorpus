@@ -534,7 +534,7 @@ class SentenceViewer:
                             fname = fname[:-4]
                         if not fname.lower().endswith('.exb'):
                             fname += '.exb'
-                        fname = re.sub('^tsakorpus_|_inel$', '', self.settings.corpus_name) + '/' + fname
+                        fname = re.sub('^tsakorpus_(?:current_)?|_inel$', '', self.settings.corpus_name) + '/' + fname
                         if 'meta' in sentSource and 'exb_anchor' in sentSource['meta']:
                             exbAnchor = '___' + sentSource['meta']['exb_anchor']
                         externalLink = 'exmaralda:' + fname + exbAnchor
