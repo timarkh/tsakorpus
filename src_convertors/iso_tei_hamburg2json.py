@@ -419,6 +419,9 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         text = re.sub(' +\\([0-9]{1,4}(\\.[0-9]{1,4})?\\) *$', '', text)
         if self.curMeta is None:
             return text + ' (INEL)'
+        elif 'citation' in self.curMeta and self.rxEmptyValueComa.search(self.curMeta['citation']) is None:
+            text += ' (INEL / ' + self.curMeta['citation'] + ')'
+            text = text.strip()
         elif 'published_in' in self.curMeta and self.rxEmptyValueComa.search(self.curMeta['published_in']) is None:
             text += ' (INEL / ' + self.curMeta['published_in'] + ')'
             text = text.strip()
