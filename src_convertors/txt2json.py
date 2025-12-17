@@ -318,7 +318,7 @@ class Txt2JSON:
         only the filename field.
         """
         fname2check = fname
-        curMeta = {'filename': fname}
+        curMeta = {'filename': fname.replace('\\', '/')}
         if not self.corpusSettings['meta_files_dir']:
             fname2check = self.rxStripDir.sub('', fname2check)
         elif fname2check.startswith(os.path.join(self.corpusSettings['corpus_dir'], self.srcExt)):
