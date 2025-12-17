@@ -738,7 +738,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         print(fnameSrc)
         self.curMeta = self.get_meta(fnameSrc)
         if self.curMeta is None or len(self.curMeta) == 1:
-            self.curMeta = {'filename': fnameSrc, 'title': fnameSrc, 'author': '',
+            self.curMeta = {'filename': fnameSrc.replace('\\', '/'), 'title': fnameSrc, 'author': '',
                             'year_from': '1900', 'year_to': str(datetime.datetime.now().year)}
 
         textJSON = {'meta': self.curMeta, 'sentences': []}

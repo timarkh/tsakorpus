@@ -19,9 +19,9 @@ One way of configuring the parameters is manually editing ``/conf/corpus.json``.
 
 .. _JSONLint: https://jsonlint.com/
 
-However, a more human-friendly way of configuring your corpus is doing that through a simple web interface. To do so, launch ``/search/tsakorpus.wsgi`` as a Python file on your local machine. You do not have to have Elasticsearch running. This will start a local web-server. Open your browser and type ``http://127.0.0.1:7342/config``. You will see a configuration page. Note that it is only accessible from your local machine.
+A more human-friendly way of configuring your corpus is doing that through a simple web interface. To do so, launch ``/search/tsakorpus.wsgi`` as a Python file on your local machine. You do not have to have Elasticsearch running. This will start a local web-server. Open your browser and type ``http://127.0.0.1:7342/config``. You will see a configuration page. Note that it is only accessible from your local machine.
 
-This page contains (almost) all possible parameters separated into rubrics. Fill in the boxes with the values you need and click "Save" in the bottom slide. You can save the page many times. After you click the button, a new ``corpus.json`` file will appear in ``/USER_CONFIG`` (*not* in ``/conf``). When you are ready, move it to ``/conf``. Filling all relevant boxes (especially those related to tag selection tables) can take a lot of time; please be patient.
+This page contains most (but probably not all) possible parameters separated into rubrics. Fill in the boxes with the values you need and click "Save" in the bottom slide. You can save the page many times. After you click the button, a new ``corpus.json`` file will appear in ``/USER_CONFIG`` (*not* in ``/conf``). When you are ready, move it to ``/conf``. Filling all relevant boxes (especially those related to tag selection tables) can take a lot of time; please be patient.
 
 Apart from ``corpus.json``, it will generate :doc:`translation files </interface_languages>` in ``/USER_CONFIG/translations``. Edit them and replace files in ``/search/web_app/translations/`` with them in your :doc:`fork </forks>`.
 
@@ -39,6 +39,8 @@ List of parameters
 - ``ambiguous_analyses`` (Boolean) -- whether there are tokens in the corpus which have multiple (ambiguous) analyses. In this case, the user can select if they want to search only among unambiguously analyzed words.
 
 - ``author_metafield`` (string) -- name of the second-important metadata field whose value will be displayed next to the title in headers of hit results. Defaults to ``author``.
+
+- ``bibref`` (dictionary) -- dictionary where keys are short IDs of bibliographic references (something like _citation-keys_ in BibTeX) and values contain full descriptions of those references. Each value is a dictionary. Right now, the only possible key there is ``default``, and the value is a string with a full reference. (Other keys will be probably added in the future.) The idea is that the user sees a bubble with a full reference when the mouse pointer hovers over a token that has a ``bib_ref`` key with an ID of a bibliographic reference as a value. The full reference also appears at the end of a downloaded ``docx`` file with glossed examples if any of them contains such a token. First of all, such tokens may appear in reference or comment tiers, e.g., indicating which publication the text comes from. For example, a reference tier may contain a token like ``{"wf": "Kálmán (1976b: 120)", "wtype": "word", "bib_ref": "Kalman1976b"}``, and ``bibref`` may look like ``{"Kalman1976b": {"default": "Kálmán, Béla. 1976. Chrestomathia Vogulica. Budapest: Tankönyvkiadó."}}``.
 
 - ``case_sensitive_meta_fields`` (list of strings) -- names of the document-level metadata fields that should be treated as case-sensitive when searching (e.g. when selecting a subcorpus). Defaults to an empty list.
 

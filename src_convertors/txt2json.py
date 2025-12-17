@@ -268,6 +268,7 @@ class Txt2JSON:
                         continue
                     self.add_coma_key_to_meta(curMetaDict, descrKey, fname)
             if len(fname) > 0:
+                fname = fname.replace('\\', '/')
                 if 'title' not in curMetaDict:
                     if len(title) > 0:
                         curMetaDict['title'] = title
