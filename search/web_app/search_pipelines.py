@@ -823,7 +823,7 @@ def find_words_json(searchType='word', page=0):
                           distances=queryWordConstraints,
                           includeNextWordField=constraintsTooComplex,
                           after_key=cur_search_context().after_key)
-    # print(query)
+    # print(searchIndex, query)
 
     maxRunTime = time.time() + settings.query_timeout
     hitsProcessed = {}

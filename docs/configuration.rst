@@ -36,6 +36,8 @@ List of parameters
 
 - ``all_language_search_enabled`` (Boolean) -- whether the user may make language-inspecific queries. Relevant only in a corpus with multiple languages.
 
+- ``ambiguous_lemma_multiple_count`` (Boolean) -- this parameter makes sense only if ambiguous analyses are allowed. If ``true``, count the word towards the frequency of each lemma it has. For example, if a token _sense_ has two analyses, *sense (N)* and *sense (V)*, then increase the frequency of both lemmas by 1. This will lead to overestimated frequencies of lemmas that have homonyms. If ``false``, create a composite lemma for words with multiple analyses, e.g. *sense (N | V)* for ambiguous words, but also *sense (N)* and *sense (V)* for unambiguous ones. This yields precise frequencies, but generates ugly composite lemmas.
+
 - ``ambiguous_analyses`` (Boolean) -- whether there are tokens in the corpus which have multiple (ambiguous) analyses. In this case, the user can select if they want to search only among unambiguously analyzed words.
 
 - ``author_metafield`` (string) -- name of the second-important metadata field whose value will be displayed next to the title in headers of hit results. Defaults to ``author``.

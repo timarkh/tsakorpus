@@ -45,6 +45,7 @@ class CorpusSettings:
         self.search_meta = {'columns': [], 'stat_options': []}
         self.ambiguous_analyses = True
         self.keep_lemma_order = False
+        self.ambiguous_lemma_multiple_count = False
         self.bibref = {}
 
         # Indexation and search options

@@ -1237,46 +1237,54 @@ class SentenceViewer:
                 hitsProcessed['total_freq'] += 1
                 word['_source']['lang'] = lang
                 if searchType == 'word':
-                    wID = word['_source']['w_id']
+                    wIDs = word['_source']['w_id']
                     wf = word['_source']['wf'].lower()
                 elif searchType == 'lemma':
-                    wID = word['_source']['l_id']
-                    wf = self.get_lemma(word['_source'])
+                    wIDs = word['_source']['l_id']
                 else:
-                    wID = 'w0'
+                    wIDs = ['w0']
                     wf = ''
-                try:
-                    hitsProcessed['word_ids'][wID]['n_occurrences'] += 1
-                    hitsProcessed['word_ids'][wID]['sents'].add(hit['_id'])
-                    hitsProcessed['word_ids'][wID]['docs'].add(hit['_source']['doc_id'])
+                if type(wIDs) is str:
+                    wIDs = [wIDs]
+                for wID in wIDs:
                     if searchType == 'lemma':
-                        hitsProcessed['word_ids'][wID]['forms'].add(word['_source']['w_id'])
-                except KeyError:
-                    hitsProcessed['n_occurrences'] += 1
-                    hitsProcessed['word_ids'][wID] = {
-                        'n_occurrences': 1,
-                        'sents': {hit['_id']},
-                        'docs': {hit['_source']['doc_id']},
-                        'wf': wf
-                    }
-                    if searchType == 'lemma':
-                        hitsProcessed['word_ids'][wID]['forms'] = {word['_source']['w_id']}
-                    elif searchType == 'word':
-                        hitsProcessed['word_ids'][wID]['lemma'] = self.get_lemma(word['_source'])
+                        wf = self.get_lemma(word['_source'], wID)
+                    try:
+                        hitsProcessed['word_ids'][wID]['n_occurrences'] += 1
+                        hitsProcessed['word_ids'][wID]['sents'].add(hit['_id'])
+                        hitsProcessed['word_ids'][wID]['docs'].add(hit['_source']['doc_id'])
+                        if searchType == 'lemma':
+                            hitsProcessed['word_ids'][wID]['forms'].add(word['_source']['w_id'])
+                    except KeyError:
+                        hitsProcessed['n_occurrences'] += 1
+                        hitsProcessed['word_ids'][wID] = {
+                            'n_occurrences': 1,
+                            'sents': {hit['_id']},
+                            'docs': {hit['_source']['doc_id']},
+                            'wf': wf
+                        }
+                        if searchType == 'lemma':
+                            hitsProcessed['word_ids'][wID]['forms'] = {word['_source']['w_id']}
+                        elif searchType == 'word':
+                            hitsProcessed['word_ids'][wID]['lemma'] = self.get_lemma(word['_source'], wID)
         if bRelevantWordExists:
             hitsProcessed['n_sentences'] += 1
             hitsProcessed['doc_ids'].add(hit['_source']['doc_id'])
 
-    def get_lemma(self, word):
+    def get_lemma(self, word, lID=''):
         """
         Join all lemmata in the JSON representation of a word with
         an analysis and return them as a string.
+        If lID is specified, only take the lemma which corresponds to it.
         """
         if 'ana' not in word:
             return ''
+        checkLID = (self.settings.ambiguous_lemma_multiple_count and len(lID) > 0)
         if not self.settings.keep_lemma_order:
             curLemmata = set()
             for ana in word['ana']:
+                if (checkLID and ('l_id' not in ana or ana['l_id'] != lID)):
+                    continue
                 if 'lex' in ana:
                     if type(ana['lex']) == list:
                         for l in ana['lex']:
@@ -1286,6 +1294,8 @@ class SentenceViewer:
             return '/'.join(l for l in sorted(curLemmata))
         curLemmata = []
         for ana in word['ana']:
+            if (checkLID and ('l_id' not in ana or ana['l_id'] != lID)):
+                continue
             if 'lex' in ana:
                 if type(ana['lex']) == list:
                     for l in ana['lex']:
