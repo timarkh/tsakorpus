@@ -241,8 +241,11 @@ class SentenceViewer:
         grValues = []     # inflectional categories
         grdicValues = []  # dictionary categories such as nominal gender
         for field in sorted(ana):
-            if field not in ['lex', 'gr.pos'] and field not in self.invisibleAnaFields:
-                value = ana[field]
+            if field not in ['lex', 'gr.pos'] and field not in self.invisibleAnaFields and not field.endswith('_display'):
+                if field + '_display' in ana:
+                    value = ana[field + '_display']
+                else:
+                    value = ana[field]
                 if type(value) == list:
                     value = ', '.join(value)
                 if field.startswith('gr.'):

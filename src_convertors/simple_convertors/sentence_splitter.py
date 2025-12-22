@@ -333,6 +333,7 @@ class Splitter:
                             newValues = ''
                         elif len(newValues) == 1:
                             newValues = newValues[0]
+                        ana[field + '_display'] = ana[field]
                         ana[field] = newValues
 
     def resegment_sentences(self, sentences):
