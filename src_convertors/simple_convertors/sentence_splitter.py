@@ -312,7 +312,7 @@ class Splitter:
                 if words[i]['wtype'] != 'word' or 'ana' not in words[i]:
                     continue
                 for ana in words[i]['ana']:
-                    for field in ana:
+                    for field in [_ for _ in ana.keys()]:
                         if field not in tokenizers:
                             continue
                         tokenizer = tokenizers[field]
