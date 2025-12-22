@@ -28,7 +28,7 @@ class SentenceViewer:
     rxTabs = re.compile('^\t*$')
     rxKW = re.compile('_kw$')
     rxStartSpacesNewlines = re.compile('^[\r\n\t ]+', flags=re.DOTALL)
-    invisibleAnaFields = {'gloss_index'}
+    invisibleAnaFields = {'gloss_index', 'l_id', 'w_id'}
 
     def __init__(self, settings, search_client, fullText=False):
         """
@@ -1355,6 +1355,8 @@ class SentenceViewer:
             curValues = set()
             for k, v in word.items():
                 if k == field:
+                    if k + '_display' in word:
+                        v = word[k + '_display']
                     if type(v) == list:
                         for value in v:
                             curValues.add(value)
@@ -1364,6 +1366,8 @@ class SentenceViewer:
                 for ana in word['ana']:
                     for k, v in ana.items():
                         if k == field:
+                            if k + '_display' in ana:
+                                v = ana[k + '_display']
                             if type(v) == list:
                                 for value in v:
                                     curValues.add(value)
@@ -1384,6 +1388,8 @@ class SentenceViewer:
             curValues = set()
             for k, v in lemma.items():
                 if k == field:
+                    if k + '_display' in lemma:
+                        v = lemma[k + '_display']
                     if type(v) == list:
                         for value in v:
                             curValues.add(value)

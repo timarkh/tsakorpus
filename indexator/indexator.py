@@ -421,7 +421,9 @@ class Indexator:
         wClean = {'lang': langID}
         lClean = [{'lang': langID, 'wf': ''}]
         for field in w:
-            if field in self.goodWordFields or field in self.additionalWordFields:
+            if ((field in self.goodWordFields or field in self.additionalWordFields)
+                    or (field.endswith('_display')
+                        and (field[:-8] in self.goodWordFields or field[:-8] in self.additionalWordFields))):
                 wClean[field] = w[field]
                 if field == 'wf':
                     if self.lowerWf:
@@ -442,7 +444,9 @@ class Indexator:
                         lClean[-1]['wf'] = lClean[-1]['wf'].lower()
                 self.lemmata.add(lClean[-1]['wf'])
                 cleanAna = {k: copy.deepcopy(v) for k, v in ana.items()
-                            if k in self.goodWordFields or k in self.additionalWordFields}
+                            if ((k in self.goodWordFields or k in self.additionalWordFields)
+                                or (k.endswith('_display')
+                                    and (k[:-8] in self.goodWordFields or k[:-8] in self.additionalWordFields)))}
                 wCleanTmp['ana'] = [cleanAna]
                 wClean['ana'].append(cleanAna)
                 grdic, additionalFields = self.get_grdic(wCleanTmp, lang)
