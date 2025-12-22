@@ -322,11 +322,11 @@ class Splitter:
                         newValues = []
                         for v in values:
                             if 'tokens' in tokenizer:
-                                for t in tokenizers['tokens'].findall(v):
+                                for t in tokenizer['tokens'].findall(v):
                                     if t not in newValues:
                                         newValues.append(t)
                                     if 'subtokens' in tokenizer:
-                                        for subt in tokenizers['subtokens'].findall(t):
+                                        for subt in tokenizer['subtokens'].findall(t):
                                             if subt not in newValues:
                                                 newValues.append(subt)
                         if len(newValues) <= 0:
