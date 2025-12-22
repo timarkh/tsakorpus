@@ -134,8 +134,8 @@ These parameters are taken into account in scenarios where Tsakorpus performs to
 
 - ``add_contextual_flags`` (Boolean, optional) -- whether punctuation-related ``flags`` field should be added automatically to each word. There is a pre-defined set of punctuation-related flags, e.g. ``comma``, ``quest_mark`` or ``quote`` (see ``src_convertors/simple_convertors/sentence_splitter.py`` for details). For example, if a word is preceded by a comma and followed by a question mark, it will get ``a:comma`` and ``b:quest_mark`` strings in the ``flags`` field. This way, the users can take punctuation into account when searching. This option only works in some of the convertors for now. 
 
-Morphological analysis
-~~~~~~~~~~~~~~~~~~~~~~
+Morphological analysis and other word-level annotation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 These parameters are relevant in the scenarios where you have no POS tagging / morphological annotation in the texts yet, but would like to add some at the conversion stage. The only way of doing so right now is providing Tskorpus convertors with a pre-analyzed word list (or several lists, if you have multiple languages). Analyses from that list will be inserted into the JSON files. You have to put analyzed word list(s) to ``src_convertors/copus``. If some of the words have multiple ambiguous analyses and you would like to disambiguate them using CG3_, you can also put a CG3 rule list to the same folder. Note that you have to install CG3 to use it (``apt-get install cg3`` on Linux; download it and put the path to the binary to the ``PATH`` variable on Windows).
 
@@ -145,11 +145,17 @@ These parameters are relevant in the scenarios where you have no POS tagging / m
 
 - ``parsed_wordlist_format`` (string, optional) -- the format of the annotated word list. Currently, only the ``xml_rnc`` option is available, which means a list of XML-represented words in the format used in Russian National Corpus. See the description of this format :doc:`here </parsed_wordlist_format>`.
 
-- ``gramtags_exclude`` (list of strings, optional) --  grammatical tags that should be excluded from the analyses. Defaults to empty list.
+- ``gramtags_exclude`` (list of strings, optional) -- grammatical tags that should be excluded from the analyses. Defaults to empty list.
 
 - ``cg_disambiguate`` (Boolean, optional) -- whether your corpus has to be disambiguated with the Constraint Grammar rules after the annotation. Defaults to ``false``.
 
 - ``cg_filename`` (dictionary, optional) -- names of the CG3 rule files (if you want to disambiguate your corpus). The files should be located in ``src_convertors/corpus/``. The value of this field is a dictionary where the keys are the names of the languages and the values are the names of the corresponding files. You are not required to list all the languages you have.
+
+If you have word-level annotation fields other than those for lemma or grammatical categories described in :doc:`categories.json </categories>`, you may want to treat some of them as keywords. Keyword search is much faster than full-text search but it does not allow for automatic tokenization or wildcards / regexes. Which fields will be indexed as keywords can be specified by the ``kw_word_fields`` parameter in :doc:`conf/corpus.json </configuration>`. If you want to tokenize your keyword values, you have to do it before indexing by replacing a string value with a list of strings, each of which corresponds to one token. This can be done by the source convertors:
+
+- ``kw_word_field_tokenize`` (dictionary, optional) -- set of rules that describe how string values of additional word-level fields have to be tokenized. The keys are names of such fields, each value is a dictionary that can contain optional keys ``tokens`` and ``subtokens``. The value of ``tokens`` is a regex that will find all tokens. The value of ``subtokens`` is a regex that, additionally, will find some parts within tokens and save them as separate searchable tokens as well.
+
+E.g., imagine your word-level annotation field ``SyF`` contains values like ``0.3.h:S cop`` and you want to be able to find such words by typing ``cop``, ``0.3.h:S``, ``0.3.h`` or ``S`` in the query interface. Then you have to have a key ``SyF`` whose value is ``{"tokens": "[^ ]+", "subtokens": "[^:]+"}``. This way, the string value ``0.3.h:S cop`` will be replaced by ``["0.3.h:S", "0.3.h", "S", "cop"]`` by the source convertor.
 
 Media
 ~~~~~

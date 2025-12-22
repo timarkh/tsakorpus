@@ -769,6 +769,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         if 'add_contextual_flags' in self.corpusSettings and self.corpusSettings['add_contextual_flags']:
             self.tp.splitter.add_contextual_flags(textJSON['sentences'])
         self.tp.splitter.add_speaker_marks(textJSON['sentences'])
+        self.tp.splitter.prepare_kw_word_fields(textJSON['sentences'])
         self.write_output(fnameTarget, textJSON)
         for s in textJSON['sentences']:
             for word in s['words']:

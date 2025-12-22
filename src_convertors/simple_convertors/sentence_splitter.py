@@ -287,6 +287,54 @@ class Splitter:
         for s in sentences:
             self.add_contextual_flags_sentence(s)
 
+    def prepare_kw_word_fields(self, sentences):
+        """
+        For string word field values that have to be stored as keywords,
+        perform tokenization per rules set in conversion_settings.json.
+        If multiple tokens emerge, store them as a list.
+        """
+        tokenizers = {}
+        if 'kw_word_field_tokenize' in self.settings:
+            tokenizers = self.settings['kw_word_field_tokenize']
+        else:
+            return
+        if len(tokenizers) <= 0:
+            return
+        for field in tokenizers:
+            if 'tokens' in tokenizers[field]:
+                tokenizers[field]['tokens'] = re.compile(tokenizers[field]['tokens'])
+            if 'subtokens' in tokenizers[field]:
+                tokenizers[field]['subtokens'] = re.compile(tokenizers[field]['subtokens'])
+
+        for s in sentences:
+            words = s['words']
+            for i in range(len(words)):
+                if words[i]['wtype'] != 'word' or 'ana' not in words[i]:
+                    continue
+                for ana in words[i]['ana']:
+                    for field in ana:
+                        if field not in tokenizers:
+                            continue
+                        tokenizer = tokenizers[field]
+                        values = ana[field]
+                        if type(values) is str:
+                            values = [values]
+                        newValues = []
+                        for v in values:
+                            if 'tokens' in tokenizer:
+                                for t in tokenizers['tokens'].findall(v):
+                                    if t not in newValues:
+                                        newValues.append(t)
+                                    if 'subtokens' in tokenizer:
+                                        for subt in tokenizers['subtokens'].findall(t):
+                                            if subt not in newValues:
+                                                newValues.append(subt)
+                        if len(newValues) <= 0:
+                            newValues = ''
+                        elif len(newValues) == 1:
+                            newValues = newValues[0]
+                        ana[field] = newValues
+
     def resegment_sentences(self, sentences):
         """
         Join adjacent sentences that look like parts of the same

@@ -366,6 +366,7 @@ class Txt2JSON:
         fSrc.close()
 
         textJSON['sentences'], nTokens, nWords, nAnalyze = self.tp.process_string(text)
+        self.tp.splitter.prepare_kw_word_fields(textJSON['sentences'])
         self.write_output(fnameTarget, textJSON)
         return nTokens, nWords, nAnalyze
 
