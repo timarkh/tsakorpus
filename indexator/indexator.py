@@ -145,6 +145,9 @@ class Indexator:
         self.lowerWf = False
         if 'wf_lowercase' not in self.settings or self.settings['wf_lowercase']:
             self.lowerWf = True
+        self.lowerLemma = False
+        if 'lemma_lowercase' in self.settings and self.settings['lemma_lowercase']:
+            self.lowerLemma = True
         self.iterSent = None
         if self.input_format in ['json', 'json-gzip']:
             self.iterSent = JSONDocReader(format=self.input_format,
@@ -440,7 +443,7 @@ class Indexator:
                 lClean.append({'lang': langID, 'wf': ''})
                 if 'lex' in ana:
                     lClean[-1]['wf'] = ana['lex']
-                    if self.lowerWf:
+                    if self.lowerLemma:
                         lClean[-1]['wf'] = lClean[-1]['wf'].lower()
                 self.lemmata.add(lClean[-1]['wf'])
                 cleanAna = {k: copy.deepcopy(v) for k, v in ana.items()
@@ -453,7 +456,7 @@ class Indexator:
                 lClean[-1]['grdic'] = grdic
                 lClean[-1].update(additionalFields)
         else:
-            lClean[0]['wf'] = self.get_lemma(w, lower_lemma=self.lowerWf)
+            lClean[0]['wf'] = self.get_lemma(w, lower_lemma=self.lowerLemma)
             self.lemmata.add(lClean[0]['wf'])
             for ana in w['ana']:
                 cleanAna = {}
@@ -680,9 +683,9 @@ class Indexator:
                                      if freq >= quantiles[q])) + '%'
         return ''
 
-    def get_lemma(self, word, lower_lemma=True):
+    def get_lemma(self, word, lower_lemma=False):
         """
-        Join all lemmata in the JSON representation of a word with
+        Join all lemmas in the JSON representation of a word with
         an analysis and return them as a string.
         """
         if 'ana' not in word:
@@ -946,7 +949,7 @@ class Indexator:
                 wfOrder = wfsSorted[wJson['wf']]
             lOrder = len(lemmataSorted) + 1
             if 'ana' in wJson:
-                curLemma = self.get_lemma(wJson, lower_lemma=self.lowerWf)
+                curLemma = self.get_lemma(wJson, lower_lemma=self.lowerLemma)
                 if type(curLemma) is str:
                     lOrder = lemmataSorted[curLemma]
                 elif len(curLemma) <= 0:
@@ -1152,7 +1155,7 @@ class Indexator:
                 excludeWord = False
                 for ana in wJson['ana']:
                     if any(k in ana and ((type(ana[k]) == str and v.search(ana[k]) is not None)
-                                           or (type(ana[k]) == list and any(vp.search(ana[k]) is not None for vp in v)))
+                                           or (type(ana[k]) == list and any(v.search(anaVPart) is not None for anaVPart in ana[k])))
                            for k, v in self.excludeFromDict.items()):
                         excludeWord = True
                         break
