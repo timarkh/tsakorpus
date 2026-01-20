@@ -4,6 +4,7 @@
 {% elif data.wf_display %}
 <span class="popup_wf">{{ data.wf_display|safe }}</span>
 {% endif %}
+{% if data.wf_link|length > 0 %}<a href="{{ data.wf_link|safe }}" target="_blank"><span class="ana_external_link bi bi-sign-turn-slight-right" data-tooltip="tooltip" data-placement="top" title="{{ _('Find in an external dictionary') }}"></span></a> {% endif %}
 {% for ana in data.analyses %}
 <div class="popup_ana{% if ana.match %} popup_match{% endif %}">{% if data.analyses|length > 1 %}{{ loop.index }}. {% endif %}{{ ana.ana_div | safe }}</div>
 {% endfor %}

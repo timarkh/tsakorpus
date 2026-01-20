@@ -9,10 +9,11 @@ import jinja2
 from flask import render_template
 try:
     from .transliteration import *
+    from .additional_functions import dictionary_link_wf, dictionary_link_lemma
 except ImportError:
     # This happens when response_processors.py is imported
     # from outside this package, but we do not need the
-    # transliterations in that case
+    # transliterations or additional functions in that case
     pass
 
 
@@ -222,7 +223,7 @@ class SentenceViewer:
                                           grAnaPart=grAnaPart,
                                           noSearchButton=True).strip()
 
-    def build_ana_div(self, ana, lang, translit=None):
+    def build_ana_div(self, ana, lang, translit=None, lemmaLink=''):
         """
         Build the contents of a div with one particular analysis.
         """
@@ -233,7 +234,15 @@ class SentenceViewer:
             return (len(self.settings.lang_props[lang]['other_fields_order']),
                     x['key'])
 
-        ana4template = {'lex': '', 'pos': '', 'grdic': '', 'lex_fields': [], 'gr': '', 'other_fields': []}
+        ana4template = {
+            'lex': '',
+            'pos': '',
+            'grdic': '',
+            'lex_fields': [],
+            'gr': '',
+            'other_fields': [],
+            'lemma_link': lemmaLink
+        }
         if 'lex' in ana:
             ana4template['lex'] = self.transliterate_baseline(ana['lex'], lang=lang, translit=translit)
         if 'gr.pos' in ana:
@@ -281,7 +290,9 @@ class SentenceViewer:
                                           ana=ana4template,
                                           noSearchButton=True).strip()
 
-    def build_ana_popup(self, word, lang, matchingAnalyses=None, translit=None):
+    def build_ana_popup(self, word, lang,
+                        matchingAnalyses=None, sentMeta=None,
+                        translit=None):
         """
         Build a string for a popup with the word and its analyses. 
         """
@@ -292,11 +303,19 @@ class SentenceViewer:
             data4template['wf_display'] = self.transliterate_baseline(word['wf_display'], lang=lang, translit=translit)
         elif 'wf' in word:
             data4template['wf'] = html.escape(self.transliterate_baseline(word['wf'], lang=lang, translit=translit))
+            wordAna = None
+            if 'ana' in word:
+                wordAna = word['ana']
+            data4template['wf_link'] = dictionary_link_wf(lang, word['wf'], wordAna, sentMeta)
         if 'ana' in word:
             simplifiedAnas, simpleMatchingAnalyses = self.simplify_ana(word['ana'], matchingAnalyses)
             for iAna in range(len(simplifiedAnas)):
-                ana4template = {'match': iAna in simpleMatchingAnalyses,
-                                'ana_div': self.build_ana_div(simplifiedAnas[iAna], lang, translit=translit)}
+                lemmaLink = dictionary_link_lemma(lang, word['wf'], simplifiedAnas[iAna], sentMeta)
+                ana4template = {
+                    'match': iAna in simpleMatchingAnalyses,
+                    'ana_div': self.build_ana_div(simplifiedAnas[iAna], lang,
+                                                  translit=translit, lemmaLink=lemmaLink)
+                }
                 data4template['analyses'].append(ana4template)
         try:
             return render_template('search_results/analyses_popup.html', data=data4template)
@@ -307,7 +326,9 @@ class SentenceViewer:
                                           data=data4template,
                                           noSearchButton=True)
 
-    def prepare_analyses(self, words, indexes, lang, matchWordOffsets=None, translit=None):
+    def prepare_analyses(self, words, indexes, lang,
+                         matchWordOffsets=None, sentMeta=None,
+                         translit=None):
         """
         Generate viewable analyses for the words with given indexes.
         """
@@ -325,7 +346,9 @@ class SentenceViewer:
             matchingAnalyses = []
             if matchWordOffsets is not None and iStr in matchWordOffsets:
                 matchingAnalyses = [offAna[1] for offAna in matchWordOffsets[iStr]]
-            result += self.build_ana_popup(word, lang, matchingAnalyses=matchingAnalyses, translit=translit)
+            result += self.build_ana_popup(word, lang,
+                                           matchingAnalyses=matchingAnalyses, sentMeta=sentMeta,
+                                           translit=translit)
         # result = result.replace('"', "&quot;").replace('<', '&lt;').replace('>', '&gt;')
         return result
 
@@ -368,6 +391,7 @@ class SentenceViewer:
         if 'word' in curClass:
             dataAna = self.prepare_analyses(sentSrc['words'], curWords,
                                             lang, matchWordOffsets,
+                                            sentMeta=sentSrc['meta'],
                                             translit=translit)
             dataBibref, dataBibrefTooltips = self.prepare_bib_ref(sentSrc['words'], curWords)
         else:

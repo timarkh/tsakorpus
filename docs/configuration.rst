@@ -293,6 +293,7 @@ Further configuration
    
    interface_languages
    transliteration
+   external_links
    input_methods
    keyboards
    styles

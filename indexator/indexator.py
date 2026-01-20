@@ -350,7 +350,7 @@ class Indexator:
                 self.es_ic.delete(index=self.name + '.sentences')
             nPartitions = 100
             if 'partitions' in self.settings and int(self.settings['partitions']) > 1:
-                nPartitions = int(self.settings['partitions'])
+                nPartitions = max(100, int(self.settings['partitions']))
             for i in range(nPartitions):
                 if self.es_ic.exists(index=self.name + '.sentences.' + str(i)):
                     self.es_ic.delete(index=self.name + '.sentences.' + str(i))

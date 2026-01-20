@@ -13,6 +13,7 @@
 {% elif ana.pos|length > 0 %}
 </span>
 {% endif %} 
+{% if ana.lemma_link|length > 0 %}<a href="{{ ana.lemma_link|safe }}" target="_blank"><span class="ana_external_link bi bi-sign-turn-slight-right" data-tooltip="tooltip" data-placement="top" title="{{ _('Find in an external dictionary') }}"></span></a> {% endif %}
 </div>
 {% endif %} 
 {% for item in ana.lex_fields %}
