@@ -339,7 +339,8 @@ class Eaf2JSON(Txt2JSON):
                                 elif type(totalAna[k]) == list and ana[k] not in totalAna[k]:
                                     totalAna[k].append(ana[k])
                         else:
-                            if len(totalAna[k]) > 0 and k not in ['parts', 'gloss']:
+                            if (len(totalAna[k]) > 0 and (k != 'parts' or ('hyphens_in_gloss' in self.corpusSettings
+                                    and self.corpusSettings['hyphens_in_gloss'] and k != 'gloss'))):
                                 totalAna[k] += '-'
                             if k not in ana:
                                 totalAna[k] += '∅'

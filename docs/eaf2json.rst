@@ -59,7 +59,9 @@ Annotations that belong to these tiers are processed in a special way, e.g. gram
 
 - ``tier_languages`` is a dictionary where keys are the names of the tier types (listed in ``main_tiers`` and ``analysis_tiers``) and the values are the names of their languages.
 
-- ``one_morph_per_cell`` (Boolean, optional; only if you have glossing) -- whether the annotation tiers contain one cell per morpheme/gloss (``true``) or the whole morpheme segmentation / glossing is written inside one cell with hyphens as separators (``false``). For example, if the morpheme segmentation of the German word *ge-schloss-en* is kept in three different cells (*ge-*, *schloss* and *-en*), this value should be set to true. Defaults to ``false``.
+- ``one_morph_per_cell`` (Boolean, optional; only if you have glossing) -- whether the annotation tiers contain one cell per morpheme/gloss (``true``) or the whole morpheme segmentation / glossing is written inside one cell with hyphens as separators (``false``). For example, if the morpheme segmentation of the German word *ge-schloss-en* is kept in three different cells (*ge-*, *schloss* and *-en*), this value should be set to ``true``. Defaults to ``false``.
+
+- ``hyphens_in_gloss`` (Boolean, optional; only if ``one_morph_per_cell`` is ``true``) -- whether each gloss contains the hyphens needed to attach it to the neighboring glosses. Defaults to ``false``. Different FLEX versions apparently behave differently when it comes to this parameter in ELAN export.
 
 - ``privacy_tier`` (string) -- type or ID (no regexes) of a time-aligned "privacy tier". The sound in the segments of this tier will be replaced with a beep when cutting the media files (regardless of the segment annotation). This can be used to hide sensitive data (e.g. personal data) from a recording without damaging the original file. Note that video is left as is, only the sound is changed.
 
