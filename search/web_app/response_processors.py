@@ -306,11 +306,17 @@ class SentenceViewer:
             wordAna = None
             if 'ana' in word:
                 wordAna = word['ana']
-            data4template['wf_link'] = dictionary_link_wf(lang, word['wf'], wordAna, sentMeta)
+            try:
+                data4template['wf_link'] = dictionary_link_wf(lang, word['wf'], wordAna, sentMeta)
+            except NameError:
+                data4template['wf_link'] = ''
         if 'ana' in word:
             simplifiedAnas, simpleMatchingAnalyses = self.simplify_ana(word['ana'], matchingAnalyses)
             for iAna in range(len(simplifiedAnas)):
-                lemmaLink = dictionary_link_lemma(lang, word['wf'], simplifiedAnas[iAna], sentMeta)
+                try:
+                    lemmaLink = dictionary_link_lemma(lang, word['wf'], simplifiedAnas[iAna], sentMeta)
+                except NameError:
+                    lemmaLink = ''
                 ana4template = {
                     'match': iAna in simpleMatchingAnalyses,
                     'ana_div': self.build_ana_div(simplifiedAnas[iAna], lang,
