@@ -1211,7 +1211,8 @@ class SentenceViewer:
                                    nDocs=nDocs,
                                    nForms=nForms,
                                    lID=w['_id'],
-                                   wfSearch=wSource['wf'])
+                                   wfSearch=wSource['wf'],
+                                   lang=lang)
 
     def filter_multi_word_highlight_iter(self, hit, nWords=1, negWords=None, keepOnlyFirst=False):
         """
