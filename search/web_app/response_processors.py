@@ -1119,6 +1119,8 @@ class SentenceViewer:
                                    wID=wID,
                                    wfSearch=wSource['wf'],
                                    lang=lang)
+        if lang in self.settings.lang_props and 'paradigm_templates' in self.settings.lang_props[lang]:
+            bShowParadigms = True
         return render_template('search_results/lemma_table_row.html',
                                ana_popup=html.escape(self.build_ana_popup(wSource, lang, translit=translit)),
                                wf=wf,
@@ -1135,7 +1137,8 @@ class SentenceViewer:
                                nForms=nForms,
                                lID=wID,
                                wfSearch=wSource['wf'],
-                               lang=lang)
+                               lang=lang,
+                               show_paradigms=bShowParadigms)
 
     def process_word_buckets(self, w, nDocuments, nForms, freq, lang, searchType='word', translit=None):
         """

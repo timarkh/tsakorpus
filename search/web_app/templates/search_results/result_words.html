@@ -56,8 +56,12 @@
 			<th><i class="bi bi-search" data-tooltip="tooltip" data-placement="top" title="{{ _('word_th_search in corpus') }}"></i></th>
 			<th><i class="bi bi-bar-chart-line-fill" data-tooltip="tooltip" data-placement="top" title="{{ _('word_th_word stats') }}"></i></th>
 			{% if search_type == "lemma" %}
-			<th><i class="bi bi-activity" data-tooltip="tooltip" data-placement="top" title="{{ _('word_th_lex_profile') }}"></i></th></thead>
+			<th><i class="bi bi-activity" data-tooltip="tooltip" data-placement="top" title="{{ _('word_th_lex_profile') }}"></i></th>
+				{% if show_paradigms %}
+				<th><i class="bi bi-table" data-tooltip="tooltip" data-placement="top" title="{{ _('word_th_paradigm') }}"></i></th>
+				{% endif %}
 			{% endif %}
+			</thead>
 			<tbody>
 {% endif %}
 

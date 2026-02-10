@@ -466,6 +466,9 @@ def search_word(searchType='word', page=-1):
     bShowNextButton = True
     if 'words' not in hitsProcessed or len(hitsProcessed['words']) != get_session_data('page_size'):
         bShowNextButton = False
+    bShowParadigms = False
+    if hitsProcessed['lang'] in settings.lang_props and 'paradigm_templates' in settings.lang_props[hitsProcessed['lang']]:
+        bShowParadigms = True
     return render_template('search_results/result_words.html',
                            data=hitsProcessed,
                            word_table_fields=settings.word_table_fields,
@@ -474,7 +477,8 @@ def search_word(searchType='word', page=-1):
                            display_freq_rank=settings.display_freq_rank,
                            search_type=searchType,
                            page=get_session_data('page'),
-                           show_next=bShowNextButton)
+                           show_next=bShowNextButton,
+                           show_paradigms=bShowParadigms)
 
 
 @app.route('/invert_subcorpus')
@@ -865,10 +869,11 @@ def get_gloss_selector(lang=''):
     glossSelection = settings.lang_props[lang]['gloss_selection']
     return render_template('modals/select_gloss.html', glosses=glossSelection)
 
+
 @app.route('/get_lex_profile/<lang>/<lID>')
 def get_lex_profile(lang='', lID='l0'):
     """
-    Return HTML of the grammatical tags selection dialogue for the given language.
+    Return HTML of the lexical profile dialogue for the given lemma.
     """
     if lang not in settings.lang_props or 'lex_profile_categories' not in settings.lang_props[lang]:
         return ''
@@ -881,6 +886,24 @@ def get_lex_profile(lang='', lID='l0'):
         categories[c].append('_other')
     return render_template('modals/lex_profile.html',
                            lex=lex, categories=categories, lex_fields=lexFields)
+
+
+@app.route('/get_paradigm/<lang>/<lID>')
+def get_paradigm(lang='', lID='l0'):
+    """
+    Return HTML of the paradigm modal for the given lemma.
+    """
+    if lang not in settings.lang_props or 'paradigm_templates' not in settings.lang_props[lang]:
+        return ''
+    paradigm, pt = get_paradigm_by_id(lID, lang, settings.lang_props[lang]['paradigm_templates'])
+    lexFields = []
+    if 'lexical_fields' in settings.lang_props[lang]:
+        lexFields = copy.deepcopy(settings.lang_props[lang]['lexical_fields'])
+    return render_template('modals/paradigm.html',
+                           paradigm=paradigm,
+                           template=pt,
+                           lexFields=lexFields)
+
 
 @app.route('/get_glossed_sentence/<int:n>')
 def get_glossed_sentence(n):

@@ -917,6 +917,92 @@ def get_lexeme_by_id(lID):
             lex['subcorpora'][subcorpus]['freq'] = lex['freq_' + subcorpus]
     return lex
 
+def get_paradigm_cell(lID, lang, gramm):
+    query = {
+        'n_words': 1,
+        'lang1': lang,
+        'l_id1': lID,
+        'gr1': gramm
+    }
+    ESQuery = sc.qp.html2es(query,
+                            searchOutput='words',
+                            groupBy='word',
+                            sortOrder='freq',
+                            query_size=100)
+    hits = sc.get_words(ESQuery)
+    if ('hits' not in hits
+            or 'total' not in hits['hits']
+            or hits['hits']['total']['value'] <= 0):
+        return []
+    forms = []
+    wfs = set()
+    for iHit in range(len(hits['hits']['hits'])):
+        forms.append({
+            'wf': hits['hits']['hits'][iHit]['_source']['wf'],
+            'freq': hits['hits']['hits'][iHit]['_source']['freq']
+        })
+        if hits['hits']['hits'][iHit]['_source']['n_ana'] > 1:
+            forms[-1]['wf'] += '?'
+        wfs.add(forms[-1]['wf'])
+    forms = [{'wf': wf, 'freq': sum(wOrig['freq'] for wOrig in forms if wOrig['wf'] == wf)}
+             for wf in wfs]
+    forms.sort(key=lambda w: (-w['freq'], w['wf']))
+    return forms
+
+def get_paradigm_by_id(lID, lang, pt):
+    """
+    Return all paradigm forms for one lexeme, for the paradigm modal.
+    """
+    hits = sc.get_word_by_id(lID)
+    result = {'lemma': '(not found)', 'grdic': '', 'freq': 0, 'paradigm': []}
+    curPT = []
+    if (len(hits) <= 0 or 'hits' not in hits
+            or 'hits' not in hits['hits']
+            or 'total' not in hits['hits']
+            or hits['hits']['total']['value'] <= 0):
+        return result, []
+    lex = hits['hits']['hits'][0]['_source']
+    # print(lex)
+    result['lemma'] = lex['wf']
+    result['grdic'] = lex['grdic']
+    result['freq'] = lex['freq']
+    for k, v in pt.items():
+        if re.search(k, result['grdic']) is None:
+            continue
+        # v: a maximum of 3 layers of values or value combinations
+        if len(v) <= 0:
+            v = [[''], [''], ['']]
+        elif len(v) == 1:
+            v = [[''], v[0], ['']]
+        elif len(v) == 2:
+            v = [[''], v[0], v[1]]
+        elif len(v) > 3:
+            v = v[-3:]
+        curPT = v
+        for iTable in range(len(v[0])):
+            result['paradigm'].append([])
+            for iRow in range(len(v[1])):
+                result['paradigm'][iTable].append([])
+                for iCol in range(len(v[2])):
+                    result['paradigm'][iTable][iRow].append('')
+                    queryGram = ''
+                    if len(v[0][iTable]) > 0:
+                        queryGram += '(' + v[0][iTable] + ')'
+                    if len(v[1][iRow]) > 0:
+                        if len(queryGram) > 0:
+                            queryGram += ','
+                        queryGram += '(' + v[1][iRow] + ')'
+                    if len(v[2][iCol]) > 0:
+                        if len(queryGram) > 0:
+                            queryGram += ','
+                        queryGram += '(' + v[2][iCol] + ')'
+                    vars = get_paradigm_cell(lID, lang, queryGram)
+                    result['paradigm'][iTable][iRow][iCol] = ' / '.join(v['wf'] + ' (' + str(v['freq']) + ')'
+                                                                        for v in vars)
+        break
+    # print(result)
+    return result, curPT
+
 def find_sent_context(curSentData, n):
     """
     Find sentences adjacent to the one described by curSentData (which
