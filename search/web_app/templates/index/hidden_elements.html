@@ -45,7 +45,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="lex_profile_header">Lexical profile</h5>
+				<h5 class="modal-title" id="lex_profile_header">{{ _('Lexical profile') }}</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
 			</div>
 			<div class="modal-body" id="lex_profile_body">
@@ -53,6 +53,23 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default btn-success" aria-label="OK" id="lex_profile_ok">OK</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade modal-dialog-scrollable" id="paradigm" tabindex="-1" role="dialog" aria-labelledby="paradigm_header" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="paradigm_header">{{ _('Paradigm') }}</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+			</div>
+			<div class="modal-body" id="paradigm_body">
+				<p>Paradigm body</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default btn-success" aria-label="OK" id="paradigm_ok">OK</button>
 			</div>
 		</div>
 	</div>

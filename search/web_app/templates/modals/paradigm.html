@@ -11,7 +11,7 @@
 <div id="paradigm_body">
 {% for iTable in range(template[0] | length) %}
 {% if template[0][iTable]|length > 0 %}<h3>{{ template[0][iTable] }}</h3>{% endif %}
-<table class="table">
+<table class="table paradigm_table">
 	<thead>
 		<th></th>
 		{% for iCol in range(template[2] | length) %}

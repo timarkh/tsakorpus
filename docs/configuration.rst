@@ -162,6 +162,22 @@ List of parameters
 
     - ``other_fields_order`` (list of strings) -- list of names of non-grammatical analysis fields which defines in which order their values should be displayed in word analyses. If the field is missing, the fields are sorted alphabetically. If present, this field must contain all field names that exist in the corpus.
 
+    - ``paradigm_templates`` (dictionary) -- templates for paradigms. (NB: This is a feature introduced in early 2026; the format might change during the next year.) If present for a given language, then the dictionary and the lemma search table will contain links that show the tabular paradigm of the respective lexeme (only forms found in the corpus). Paradigms should look differently for different word classes, which is why multiple layouts can be described for different (sub)classes. Keys are regexes that match tags for dictionary categories (such as part of speech or animacy, see ``dictionary_categories`` above.) Values are lists that describe the layout of the paradigm tables for this particular subclass. Each list contains up to three lists with strings. The entire paradigm will not fit into one table if there are more than two parameters (inflectional categories), so the first list (if any) contains values or value combinations for each of which a separate table must be created. The second list contains values for the rows of each table, and the third list, for the columns. For example:
+
+  .. code-block::
+  
+    "paradigm_templates":
+    {
+      "^(N|PRO)\\b":
+      [
+        ["sg", "du", "pl"],
+        ["nom", "acc", "gen", "dat", "loc"],
+        ["~(1sg|2sg|3sg|1pl|2pl|3pl)", "1sg", "2sg", "3sg", "1pl", "2pl", "3pl"]
+      ]
+    }
+  
+  This template will be applied to words whose dictionary categories start with ``N`` or ``PRO``. It will include 3 tables: one for singular forms, one for dual, and one for plural. Inside each table, there will be rows corresponding to 6 case values and 7 columns corresponding to 7 possession values (including a negative search for non-possessive forms).
+  
 - ``languages`` (list of strings) -- names of the languages used in the corpus. The order of the languages determines how they are encoded in the index (the code of the language is its index in this list) and, in the case of parallel corpora, in which order they are displayed within one parallel context.
 
 - ``lemma_lowercase`` (Boolean) -- whether all lemmas should be stored in lowercase. Defaults to ``false``. It is used in indexation only. If set to false, the lemma search will be case sensitive.

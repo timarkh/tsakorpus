@@ -356,6 +356,8 @@ function assign_input_events() {
 	$('#query_load_ok').unbind('click');
 	$('#display_settings_ok').unbind('click');
 	$("#error_report_ok").unbind('click');
+	$('#lex_profile_ok').unbind('click');
+	$('#paradigm_ok').unbind('click');
 	$('.toggle_glossed_layer').unbind('click');
 	$('.toggle_lang').unbind('click');
 	$(".tier_select").unbind('change');
@@ -385,6 +387,8 @@ function assign_input_events() {
 	$('#query_load_ok').click(load_query);
 	$('#display_settings_ok').click(hide_settings);
 	$("#error_report_ok").click(send_error_report);
+	$('#lex_profile_ok').click(lex_profile_ok);
+	$('#paradigm_ok').click(paradigm_ok);
 	$('.toggle_glossed_layer').click(toggle_glossed_layer);
 	$('.toggle_lang').click(toggle_lang);
 	$(".tier_select").change(change_tier);
@@ -628,8 +632,8 @@ function show_paradigm(e) {
 		url: url,
 		type: "GET",
 		success: function(result) {
-			$('#lex_profile_body').html(result);
-			$('#lex_profile').modal('show');
+			$('#paradigm_body').html(result);
+			$('#paradigm').modal('show');
 		},
 		error: function(errorThrown) {
 			alert( JSON.stringify(errorThrown) );
@@ -641,6 +645,16 @@ function gram_selector_ok(e) {
 	var field = '#' + $('#gram_selector').attr('data-field');
 	$(field).val($('#gramm_gloss_query_viewer').text());
 	$('#gram_selector').modal('toggle');
+}
+
+function lex_profile_ok(e) {
+	$('#lex_profile_body').html("");
+	$('#lex_profile').modal("hide");
+}
+
+function paradigm_ok(e) {
+	$('#paradigm_body').html("");
+	$('#paradigm').modal("hide");
 }
 
 function change_locale(e) {

@@ -627,11 +627,11 @@ label {
 	height: 100%;
 }
 
-.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .search_from_ana, .ana_external_link, .stat_w, .search_l, .stat_l, .lex_profile_l, #show_help, #cite_corpus {
+.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .search_from_ana, .ana_external_link, .stat_w, .search_l, .stat_l, .lex_profile_l, .paradigm_l, #show_help, #cite_corpus {
 	cursor: pointer;
 }
 
-.search_w, .stat_w, .search_l, .stat_l, .lex_profile_l {
+.search_w, .stat_w, .search_l, .stat_l, .lex_profile_l, .paradigm_l {
 	padding-left: 10px;
 	padding-right: 5px;
 }
@@ -1211,6 +1211,42 @@ hr.separator {
 #dictionary_dialogue_body {
 	overflow-y: scroll;
 	max-height: 80rem;
+}
+
+.paradigm_table {
+	border: solid 1px gray;
+	border-radius: 4px;
+	margin: auto;
+	margin-left: 15px;
+	margin-bottom: 15px;
+	border-spacing: 0;
+	border-collapse: separate;
+}
+
+.paradigm_table td:nth-child(odd) {
+	background-color: rgba(135, 153, 246, 0.2);
+}
+
+.paradigm_table tr:nth-child(even) {
+	background-color: rgba(135, 153, 246, 0.2);
+}
+
+.paradigm_table td {
+	border: 1px dotted gray;
+}
+
+.paradigm_table th {
+	padding: 5px;
+	color: #f7fdff;
+	min-width: 35px;
+	background-color: #3d3b7d;
+	border: 1px dotted white;
+	border-bottom: none;
+	text-align: center;
+}
+
+.paradigm_table thead th {
+	border-top: none!important;
 }
 
 .tabs-left {

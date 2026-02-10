@@ -1119,6 +1119,7 @@ class SentenceViewer:
                                    wID=wID,
                                    wfSearch=wSource['wf'],
                                    lang=lang)
+        bShowParadigms = False
         if lang in self.settings.lang_props and 'paradigm_templates' in self.settings.lang_props[lang]:
             bShowParadigms = True
         return render_template('search_results/lemma_table_row.html',
