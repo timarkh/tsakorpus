@@ -1196,6 +1196,9 @@ class SentenceViewer:
             gr = ''
             if 'grdic' in wSource:
                 gr = wSource['grdic']  # lexeme-level grammatical tags as a string
+            bShowParadigms = False
+            if lang in self.settings.lang_props and 'paradigm_templates' in self.settings.lang_props[lang]:
+                bShowParadigms = True
             return render_template('search_results/lemma_table_row.html',
                                    wf='',
                                    wfDisplay='',
@@ -1212,7 +1215,8 @@ class SentenceViewer:
                                    nForms=nForms,
                                    lID=w['_id'],
                                    wfSearch=wSource['wf'],
-                                   lang=lang)
+                                   lang=lang,
+                                   show_paradigms=bShowParadigms)
 
     def filter_multi_word_highlight_iter(self, hit, nWords=1, negWords=None, keepOnlyFirst=False):
         """
