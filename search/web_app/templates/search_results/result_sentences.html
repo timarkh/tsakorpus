@@ -39,8 +39,10 @@
 		<span class="sentence" id='res{{ loop.index - 1 }}'>
 		{% for lang in data.languages %}
 			{% if lang in c.languages %}
-			<span class="sent_lang sent_lang_{{ lang }}" id='res{{ context_loop.index - 1 }}_{{ lang }}' {% if c.languages[lang].img %}data-img="{{ c.languages[lang].img }}"{% endif %}{% if c.languages[lang].rtl %} dir="rtl"{% endif %}>
+			<span class="sent_lang sent_lang_{{ lang }}" id='res{{ context_loop.index - 1 }}_{{ lang }}' {% if c.languages[lang].rtl %} dir="rtl"{% endif %}>
+			{% if c.languages[lang].img %}<span class="dummy-sent-img" data-img="{{ c.languages[lang].img }}" />{% endif %}
 			{{ c.languages[lang].text | safe }}
+			{% if c.languages[lang].img %}<span class="dummy-sent-img" data-img="" />{% endif %}
 			</span>
 			{% if not loop.last %}{% endif %}
 			{% endif %}

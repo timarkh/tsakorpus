@@ -322,11 +322,8 @@ function assign_src_alignment() {
 
 function show_sentence_img(e) {
 	var e_obj = $(e.currentTarget);
-	while (!e_obj.hasClass('sent_lang')) {
-		e_obj = e_obj.parent();
-	}
-	var imgSrc = $(e_obj).attr('data-img');
-	if (typeof imgSrc !== typeof undefined && imgSrc !== false) {
+	var imgSrc = $(e_obj).prev(".dummy-sent-img").attr('data-img');
+	if (typeof imgSrc !== typeof undefined && imgSrc !== false && imgSrc.length > 0) {
 		$('#image_div').html('<img id="image_src" src="img/' + imgSrc + '">');
 		$('#img_fullres').attr('src', 'img/' + imgSrc);
 		show_img();
