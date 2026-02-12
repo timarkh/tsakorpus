@@ -65,7 +65,7 @@ function assign_word_events() {
 	$(".stat_l").unbind('click');
 	$(".page_link").unbind('click');
 	$(".cx_toggle_chk").unbind('change');
-	$(".sent_lang").unbind('change');
+	$(".sent_lang").unbind('click');
 	$("#td_load_more_words").unbind('click');
 	$('span.word').click(highlight_cur_word);
 	//$('span.style_span').click(highlight_cur_word);
@@ -79,7 +79,6 @@ function assign_word_events() {
 	$('.stat_l').click(show_lemma_stats);
 	$(".page_link").click(page_click);
 	$(".cx_toggle_chk").change(context_toggle);
-	$('.sent_lang').click(show_sentence_img);
 	$("#td_load_more_words").click(load_more_words);
 	assign_para_highlight();
 	assign_src_alignment();
@@ -318,19 +317,6 @@ function assign_src_alignment() {
 		var targetClasses = $(e.target).attr('class').split(' ');
 		targetClasses.forEach(src_align_span);
 	});
-}
-
-function show_sentence_img(e) {
-	var e_obj = $(e.currentTarget);
-	var imgSrc = $(e_obj).prev(".dummy-sent-img").attr('data-img');
-	if (typeof imgSrc !== typeof undefined && imgSrc !== false && imgSrc.length > 0) {
-		$('#image_div').html('<img id="image_src" src="img/' + imgSrc + '">');
-		$('#img_fullres').attr('src', 'img/' + imgSrc);
-		show_img();
-	}
-	else {
-		hide_img();
-	}
 }
 
 function show_word_stats(e) {

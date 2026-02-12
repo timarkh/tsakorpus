@@ -147,6 +147,20 @@ function highlight_cur_word(e) {
 	targetClasses = e_obj.attr('class').split(' ');
 	$('.w_highlighted').removeClass('w_highlighted');
 	targetClasses.forEach(highlight_word_spans);
+	show_sentence_img(e);
+}
+
+function show_sentence_img(e) {
+	var e_obj = $(e.currentTarget);
+	var imgSrc = $(e_obj).prev(".dummy-sent-img").attr('data-img');
+	if (typeof imgSrc !== typeof undefined && imgSrc !== false && imgSrc.length > 0) {
+		$('#image_div').html('<img id="image_src" src="img/' + imgSrc + '">');
+		$('#img_fullres').attr('src', 'img/' + imgSrc);
+		show_img();
+	}
+	else {
+		hide_img();
+	}
 }
 
 function assign_para_highlight() {
