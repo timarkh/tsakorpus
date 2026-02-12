@@ -4,6 +4,7 @@ Contains Flask view functions associated with certain URLs.
 
 
 from flask import request, render_template, jsonify, send_from_directory
+from urllib.parse import unquote
 import json
 import copy
 import re
@@ -577,7 +578,7 @@ def send_image(path):
     """
     Return the requested image file.
     """
-    return send_from_directory(os.path.join('../img', settings.corpus_name), path)
+    return send_from_directory(os.path.join('../img', settings.corpus_name), unquote(path))
 
 
 @app.route('/docs/<doc_fname>')
