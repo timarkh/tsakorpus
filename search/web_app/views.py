@@ -419,7 +419,6 @@ def search_sent(page=-1):
 
     if request.args and 'response_format' in request.args and request.args['response_format'] == 'json':
         return jsonify(hitsProcessed)
-
     return render_template('search_results/result_sentences.html',
                            data=hitsProcessed,
                            max_page_number=maxPageNumber,

@@ -79,7 +79,7 @@ var srcAlignments = {{ data.src_alignment | safe }};
 	</script>
 	{% endif %}
 	<script type='text/javascript'>searchType = 'sentences';</script>
-	{% if expanded_contexts|length > 5 %}
+	{% if expanded_contexts|length > 0 %}
 	<script type='text/javascript'>
 		var expanded_contexts = {{ expanded_contexts|safe }};
 		expanded_contexts.forEach(show_expanded_context);
