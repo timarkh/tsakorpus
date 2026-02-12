@@ -152,7 +152,7 @@ function highlight_cur_word(e) {
 
 function show_sentence_img(e) {
 	var e_obj = $(e.currentTarget);
-	var imgSrc = $(e_obj).prev(".dummy-sent-img").attr('data-img');
+	var imgSrc = e_obj.prevAll(".dummy-sent-img").first().attr('data-img');
 	if (typeof imgSrc !== typeof undefined && imgSrc !== false && imgSrc.length > 0) {
 		$('#image_div').html('<img id="image_src" src="img/' + imgSrc + '">');
 		$('#img_fullres').attr('src', 'img/' + imgSrc);
