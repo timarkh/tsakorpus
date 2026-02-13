@@ -467,7 +467,8 @@ def search_word(searchType='word', page=-1):
     if 'words' not in hitsProcessed or len(hitsProcessed['words']) != get_session_data('page_size'):
         bShowNextButton = False
     bShowParadigms = False
-    if hitsProcessed['lang'] in settings.lang_props and 'paradigm_templates' in settings.lang_props[hitsProcessed['lang']]:
+    if (hitsProcessed['lang'] in settings.lang_props
+            and 'paradigm_templates' in settings.lang_props[hitsProcessed['lang']]):
         bShowParadigms = True
     return render_template('search_results/result_words.html',
                            data=hitsProcessed,
@@ -895,13 +896,12 @@ def get_paradigm(lang='', lID='l0'):
     """
     if lang not in settings.lang_props or 'paradigm_templates' not in settings.lang_props[lang]:
         return ''
-    paradigm, pt = get_paradigm_by_id(lID, lang, settings.lang_props[lang]['paradigm_templates'])
+    paradigmData = get_paradigm_by_id(lID, lang, settings.lang_props[lang]['paradigm_templates'])
     lexFields = []
     if 'lexical_fields' in settings.lang_props[lang]:
         lexFields = copy.deepcopy(settings.lang_props[lang]['lexical_fields'])
     return render_template('modals/paradigm.html',
-                           paradigm=paradigm,
-                           template=pt,
+                           data=paradigmData,
                            lexFields=lexFields)
 
 

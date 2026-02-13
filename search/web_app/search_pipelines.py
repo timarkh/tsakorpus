@@ -949,12 +949,17 @@ def get_paradigm_cell(lID, lang, gramm):
     forms.sort(key=lambda w: (-w['freq'], w['wf']))
     return forms
 
-def get_paradigm_by_id(lID, lang, pt):
+def get_paradigm_by_id(lID, lang, pts):
     """
     Return all paradigm forms for one lexeme, for the paradigm modal.
     """
     hits = sc.get_word_by_id(lID)
-    result = {'lemma': '(not found)', 'grdic': '', 'freq': 0, 'paradigm': []}
+    result = {
+        'lemma': '(not found)',
+        'grdic': '',
+        'freq': 0,
+        'paradigm': []
+    }
     curPT = []
     if (len(hits) <= 0 or 'hits' not in hits
             or 'hits' not in hits['hits']
@@ -966,42 +971,44 @@ def get_paradigm_by_id(lID, lang, pt):
     result['lemma'] = lex['wf']
     result['grdic'] = lex['grdic']
     result['freq'] = lex['freq']
-    for k, v in pt.items():
-        if re.search(k, result['grdic']) is None:
+    for pt in pts:
+        if pt['regex_grdic'].search(result['grdic']) is None:
             continue
         # v: a maximum of 3 layers of values or value combinations
-        if len(v) <= 0:
-            v = [[''], [''], ['']]
-        elif len(v) == 1:
-            v = [[''], v[0], ['']]
-        elif len(v) == 2:
-            v = [[''], v[0], v[1]]
-        elif len(v) > 3:
-            v = v[-3:]
-        curPT = v
-        for iTable in range(len(v[0])):
-            result['paradigm'].append([])
-            for iRow in range(len(v[1])):
-                result['paradigm'][iTable].append([])
-                for iCol in range(len(v[2])):
-                    result['paradigm'][iTable][iRow].append('')
-                    queryGram = ''
-                    if len(v[0][iTable]) > 0:
-                        queryGram += '(' + v[0][iTable] + ')'
-                    if len(v[1][iRow]) > 0:
-                        if len(queryGram) > 0:
-                            queryGram += ','
-                        queryGram += '(' + v[1][iRow] + ')'
-                    if len(v[2][iCol]) > 0:
-                        if len(queryGram) > 0:
-                            queryGram += ','
-                        queryGram += '(' + v[2][iCol] + ')'
-                    vars = get_paradigm_cell(lID, lang, queryGram)
-                    result['paradigm'][iTable][iRow][iCol] = ' / '.join(v['wf'] + ' (' + str(v['freq']) + ')'
-                                                                        for v in vars)
+        for table in pt['tables']:
+            for iGramm in range(len(table['gramm'])):
+                result['paradigm'].append(
+                    {
+                        'title': table['title'][iGramm],
+                        'rows': [],
+                        'columns': [],
+                        'cells': []
+                    }
+                )
+                for col in table['columns']:
+                    result['paradigm'][-1]['columns'].append(col['title'])
+                for row in table['rows']:
+                    result['paradigm'][-1]['rows'].append(row['title'])
+                    result['paradigm'][-1]['cells'].append([])
+                    for col in table['columns']:
+                        result['paradigm'][-1]['cells'][-1].append('')
+                        queryGram = ''
+                        if len(table['gramm'][iGramm]) > 0:
+                            queryGram += '(' + table['gramm'][iGramm] + ')'
+                        if len(row['gramm']) > 0:
+                            if len(queryGram) > 0:
+                                queryGram += ','
+                            queryGram += '(' + row['gramm'] + ')'
+                        if len(col['gramm']) > 0:
+                            if len(queryGram) > 0:
+                                queryGram += ','
+                            queryGram += '(' + col['gramm'] + ')'
+                        vars = get_paradigm_cell(lID, lang, queryGram)
+                        result['paradigm'][-1]['cells'][-1][-1] = ' / '.join(v['wf'] + ' (' + str(v['freq']) + ')'
+                                                                             for v in vars)
         break
     # print(result)
-    return result, curPT
+    return result
 
 def find_sent_context(curSentData, n):
     """

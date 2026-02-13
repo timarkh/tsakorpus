@@ -1,29 +1,29 @@
 <h3>
-	<em>{{ paradigm.lemma }}</em>
-	{% if paradigm.grdic %} ({{ paradigm.grdic }}){% endif %} &nbsp;
+	<em>{{ data.lemma }}</em>
+	{% if data.grdic %} ({{ data.grdic }}){% endif %} &nbsp;
 	{% for field in lex_fields %}
-		{% if field in paradigm %}
-			<span class="lex_profile_lex_field">{{ paradigm[field] }}</span>
+		{% if field in data %}
+			<span class="lex_profile_lex_field">{{ data[field] }}</span>
 			{% if not loop.last %} <span class="lex_profile_lex_field">•</span> {% endif %}
 		{% endif %}
 	{% endfor %}
 </h3>
 <div id="paradigm_body">
-{% for iTable in range(template[0] | length) %}
-{% if template[0][iTable]|length > 0 %}<h3>{{ template[0][iTable] }}</h3>{% endif %}
+{% for table in data.paradigm %}
+{% if table.title|length > 0 %}<h3>{{ table.title }}</h3>{% endif %}
 <table class="table paradigm_table">
 	<thead>
 		<th></th>
-		{% for iCol in range(template[2] | length) %}
-		<th>{{ template[2][iCol] }}</th>
+		{% for col in table.columns %}
+		<th>{{ col }}</th>
 		{% endfor %}
 	</thead>
 	<tbody>
-		{% for iRow in range(template[1] | length) %}
+		{% for iRow in range(table.rows | length) %}
 		<tr>
-			<th>{{ template[1][iRow] }}</th>
-			{% for iCol in range(template[2] | length) %}
-			<td>{{ paradigm.paradigm[iTable][iRow][iCol] | safe }}</td>
+			<th>{{ table.rows[iRow] }}</th>
+			{% for iCol in range(table.columns | length) %}
+			<td>{{ table.cells[iRow][iCol] | safe }}</td>
 			{% endfor %}
 		</tr>
 		{% endfor %}

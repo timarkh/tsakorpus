@@ -1040,8 +1040,16 @@ hr.separator {
 	z-index: 11000000;
 }
 
-.modal-dialog {
-	max-width: 60vw;
+@media (min-width: 576px) {
+	.modal-dialog {
+		max-width: 80vw;
+	}
+}
+
+@media (min-width: 1400px) {
+  .modal-dialog {
+  	max-width: 1122px;
+  }
 }
 
 .modal-content {
@@ -1214,13 +1222,13 @@ hr.separator {
 }
 
 .paradigm_table {
+	display: contents;
 	border: solid 1px gray;
 	border-radius: 4px;
 	margin: auto;
 	margin-left: 15px;
 	margin-bottom: 15px;
 	border-spacing: 0;
-	border-collapse: separate;
 }
 
 .paradigm_table td:nth-child(odd) {

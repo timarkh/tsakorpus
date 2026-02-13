@@ -162,21 +162,84 @@ List of parameters
 
     - ``other_fields_order`` (list of strings) -- list of names of non-grammatical analysis fields which defines in which order their values should be displayed in word analyses. If the field is missing, the fields are sorted alphabetically. If present, this field must contain all field names that exist in the corpus.
 
-    - ``paradigm_templates`` (dictionary) -- templates for paradigms. (NB: This is a feature introduced in early 2026; the format might change during the next year.) If present for a given language, then the dictionary and the lemma search table will contain links that show the tabular paradigm of the respective lexeme (only forms found in the corpus). Paradigms should look differently for different word classes, which is why multiple layouts can be described for different (sub)classes. Keys are regexes that match tags for dictionary categories (such as part of speech or animacy, see ``dictionary_categories`` above.) Values are lists that describe the layout of the paradigm tables for this particular subclass. Each list contains up to three lists with strings. The entire paradigm will not fit into one table if there are more than two parameters (inflectional categories), so the first list (if any) contains values or value combinations for each of which a separate table must be created. The second list contains values for the rows of each table, and the third list, for the columns. For example:
+    - ``paradigm_templates`` (list of dictionaries) -- templates for paradigms. If present for a given language, then the dictionary and the lemma search table will contain links that show the tabular paradigm of the respective lexeme (only forms found in the corpus). Paradigms can have a complex structure and should look differently for different word classes, which is why multiple layouts can be described for different (sub)classes. Each list element describes the paradigm structure for one word class. Its keys are ``regex_grdic`` and ``tables``. Each paradigm structure is applied to those lexemes whose comma-separated dictionary categories (such as part of speech or animacy, see ``dictionary_categories`` above) match the regex. The structure is defined in ``tables`` (list of dictionaries). The entire paradigm will not fit into one table if there are more than two parameters (inflectional categories), which is why you may need multiple tables for one lexeme. Each item in ``tables`` describes the layout of one paradigm table. Its keys are ``gramm``, ``title``, ``rows`` and ``columns``. The values for ``gramm`` and ``title`` are either strings or lists of strings. ``gramm`` contains inflectional tags (or Boolean expressions with combinations of tags) that should be fixed for this particular table. ``title`` contains the header for the table, if different from ``gramm``. If the same table structure has to be applied to many tags or tag combinations (e.g., first for ``sg``, then for ``pl``), these maybe listed in a list. The values of ``rows`` and ``columns`` are lists of dictionaries. They may be empty for one-dimensional tables. Each dictionary describes one row or column and contains keys ``gramm`` and ``title``. Here is an example:
 
   .. code-block::
   
-    "paradigm_templates":
-    {
-      "^(N|PRO)\\b":
-      [
-        ["sg", "du", "pl"],
-        ["nom", "acc", "gen", "dat", "loc"],
-        ["~(1sg|2sg|3sg|1pl|2pl|3pl)", "1sg", "2sg", "3sg", "1pl", "2pl", "3pl"]
-      ]
-    }
+    "paradigm_templates": [
+      {
+        "regex_grdic": "^N\\b",
+        "tables": [
+          {
+            "gramm": ["sg", "pl"],
+            "title": ["sg", "pl"],
+            "rows": [
+              {
+                "gramm": "nom",
+                "title": "nom"
+              },
+              {
+                "gramm": "acc",
+                "title": "acc"
+              },
+              {
+                "gramm": "gen",
+                "title": "gen"
+              }
+            ],
+            "columns": [
+              {
+                "gramm": "~(1sg|2sg|1pl|2pl|3sg|3pl)",
+                "title": "nonposs"
+              },
+              {
+                "gramm": "1sg",
+                "title": "1sg"
+              },
+              {
+                "gramm": "2sg",
+                "title": "2sg"
+              },
+              {
+                "gramm": "3sg",
+                "title": "3sg"
+              },
+              {
+                "gramm": "1pl",
+                "title": "1pl"
+              },
+              {
+                "gramm": "2pl",
+                "title": "2pl"
+              },
+              {
+                "gramm": "3pl",
+                "title": "3pl"
+              }
+            ]
+          },
+          {
+            "gramm": "attr_o,~(sg|pl)",
+            "title": "attr_o"
+          },
+          {
+            "gramm": "attr_em,~sg",
+            "title": "attr_em",
+            "rows": [
+              {
+                "gramm": "~pl",
+                "title": "sg"
+              },
+              {
+                "gramm": "pl"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   
-  This template will be applied to words whose dictionary categories start with ``N`` or ``PRO``. It will include 3 tables: one for singular forms, one for dual, and one for plural. Inside each table, there will be rows corresponding to 6 case values and 7 columns corresponding to 7 possession values (including a negative search for non-possessive forms).
+  This template will be applied to words whose dictionary categories start with ``N``. It will include 4 tables: one for singular forms (``sg``), one for plural (``pl``) and two for productive attributives tagged as ``attr_o`` and ``attr_em``. Inside first two tables, there will be rows corresponding to 3 case values and 7 columns corresponding to 7 possession values (including a negative search for non-possessive forms). The third table will contain just one cell, and the last one, two cells (two rows, one column).
   
 - ``languages`` (list of strings) -- names of the languages used in the corpus. The order of the languages determines how they are encoded in the index (the code of the language is its index in this list) and, in the case of parallel corpora, in which order they are displayed within one parallel context.
 
