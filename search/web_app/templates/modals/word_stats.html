@@ -24,6 +24,7 @@
 							<option value="context">{{ _('search the whole query') }}</option>
 							<option value="compare" selected>{{ _('compare words in the query') }}</option>
 						</select>
+						<a class="download_plot_png bi bi-filetype-png disabled_search_input" data-tooltip="tooltip" data-placement="top" title="{{ _('Download this plot in PNG') }}"> </a>
 						<div id="word_stats_max_bars" class="alert alert-warning" role="alert" style="display:none;">
 							<span class="bi bi-exclamation-triangle-fill" aria-hidden="true"></span>&nbsp; {{ _('A maximum of 25 metadata values can be displayed, sorted by the number of words in the relevant texts.') }}
 						</div>
@@ -78,6 +79,7 @@
 							<option value="1">{{ _('1%%') }}</option>
 							<option value="0.1">{{ _('0.1%%') }}</option>
 						</select>
+						<a class="download_plot_png bi bi-filetype-png disabled_search_input" data-tooltip="tooltip" data-placement="top" title="{{ _('Download this plot in PNG') }}"> </a>
 						<div id="word_freq_rank_stats_plot">{{ _('(please wait for the plot to load)') }}</div>
 					</div>
 				</div>
@@ -88,4 +90,5 @@
 		</div>
 	</div>
 </div>
+<img id="png_img"><canvas id="png_canvas"></canvas>
 <script type='text/javascript' src='static/js/word_stats.js'></script>

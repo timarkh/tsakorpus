@@ -627,13 +627,20 @@ label {
 	height: 100%;
 }
 
-.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .search_from_ana, .ana_external_link, .stat_w, .search_l, .stat_l, .lex_profile_l, .paradigm_l, #show_help, #cite_corpus {
+.word_plus, .word_minus, .add_rel, .neg_query, .word_expand, .search_w, .search_from_ana, .ana_external_link, .stat_w, .search_l, .stat_l, .lex_profile_l, .paradigm_l, #show_help, #cite_corpus, .download_plot_png {
 	cursor: pointer;
 }
 
 .search_w, .stat_w, .search_l, .stat_l, .lex_profile_l, .paradigm_l {
 	padding-left: 10px;
 	padding-right: 5px;
+}
+
+.download_plot_png {
+	padding-left: 17px;
+	padding-right: 5px;
+	font-size: 1.5em;
+	vertical-align: bottom;
 }
 
 .search_from_ana {
@@ -1724,6 +1731,10 @@ svg circle {
 
 #word_stats_max_bars {
     margin: 0.5rem;
+}
+
+#png_img, #png_canvas {
+	display: none;
 }
 
 .th_query_word {

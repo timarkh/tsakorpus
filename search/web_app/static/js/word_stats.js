@@ -10,6 +10,9 @@ var chart = null;
 var svg = null;
 var bar = null;
 var data = null;
+var canvas = $("#png_canvas")[0];
+var img = $("#png_img")[0];
+
 
 function vw(v) {
     var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -27,6 +30,7 @@ $(function() {
 		$('#button_close_word_stats').unbind('click');
 		$('#load_word_meta_stats').unbind('click');
 		$('#load_word_freq_stats').unbind('click');
+		$('.download_plot_png').unbind('click');
 		$('#select_meta_word_stat').change(load_word_stats);
 		$('#select_meta_query_type').change(load_word_stats);
 		$('#select_freq_stat_type').change(load_freq_stats);
@@ -36,6 +40,7 @@ $(function() {
 		$('#button_close_word_stats').click(close_word_stats);
 		$('#load_word_meta_stats').click(load_word_stats);
 		$('#load_word_freq_stats').click(load_freq_stats);
+		$('.download_plot_png').click(download_plot_png);
 	}
 
 	function assign_word_stats_table_events() {
@@ -59,6 +64,7 @@ $(function() {
 
 	function close_word_stats() {
 		$('#word_stats').modal('toggle');
+		$(".download_plot_png").addClass("disabled_search_input");
 		$('#w_id1').val('');
 	}
 	
@@ -66,6 +72,7 @@ $(function() {
 		$('#word_stats_plot').html('<svg></svg>');
 		$('#word_freq_rank_stats_plot').html('<svg></svg>');
 		$('#word_stats_nothing_found').hide();
+		$(".download_plot_png").addClass("disabled_search_input");
 		$('#word_stats_wait').show();
 	}
 
@@ -529,7 +536,7 @@ $(function() {
 		fill_table(results);
 		svg = d3.create("svg");
       	plotObj.append(svg);
-      	plotObj.find('svg').addClass('word_meta_plot').attr("viewBox", "0 0 600 350");
+      	plotObj.find('svg').addClass('word_meta_plot').attr("viewBox", "0 0 600 350").attr("xmlns", "http://www.w3.org/2000/svg");
 		if (metaField.startsWith('year') || intMetaFields.includes(metaField)) {
 			show_line_plot(results, maxHeight, 1, ' ipm');
 		}
@@ -537,6 +544,7 @@ $(function() {
 		{
 			show_bar_chart(results, maxHeight);
 		}
+		$(".download_plot_png").removeClass("disabled_search_input");
 	}
 	
 	function display_word_freq_stats_plot(results) {
@@ -568,8 +576,62 @@ $(function() {
 		}
 		svg = d3.create("svg");
       	plotObj.append(svg);
-      	plotObj.find('svg').addClass('word_meta_plot').attr("viewBox", "0 0 600 350");
+      	plotObj.find('svg').addClass('word_meta_plot').attr("viewBox", "0 0 600 350").attr("xmlns", "http://www.w3.org/2000/svg");
 		show_line_plot(results, maxHeight, 100, '%');
+		$(".download_plot_png").removeClass("disabled_search_input");
+	}
+
+	function explicate_styles(s) {
+		s = s.replace(/class *= *"bar bar_w1"/g, 'style="fill: #932d01; opacity: 0.7"');
+		s = s.replace(/class *= *"bar bar_w2"/g, 'style="fill: #380584; opacity: 0.7"');
+		s = s.replace(/class *= *"bar bar_w3"/g, 'style="fill: #074d70; opacity: 0.7"');
+		s = s.replace(/class *= *"bar bar_w4"/g, 'style="fill: #335b17; opacity: 0.7"');
+		s = s.replace(/class *= *"bar bar_w5"/g, 'style="fill: #969218; opacity: 0.7"');
+		s = s.replace(/class *= *"bar bar_w6"/g, 'style="fill: #8e0f79; opacity: 0.7"');
+		s = s.replace(/class *= *"bar bar_w7"/g, 'style="fill: #bc2326; opacity: 0.7"');
+		s = s.replace(/class *= *"bar bar_w8"/g, 'style="fill: #40b78f; opacity: 0.7"');
+		s = s.replace(/class *= *"plot_line_w1 plot_line"/g, 'style="fill: none; stroke: #932d01"');
+		s = s.replace(/class *= *"plot_line_w2 plot_line"/g, 'style="fill: none; stroke: #380584"');
+		s = s.replace(/class *= *"plot_line_w3 plot_line"/g, 'style="fill: none; stroke: #074d70"');
+		s = s.replace(/class *= *"plot_line_w4 plot_line"/g, 'style="fill: none; stroke: #335b17"');
+		s = s.replace(/class *= *"plot_line_w5 plot_line"/g, 'style="fill: none; stroke: #969218"');
+		s = s.replace(/class *= *"plot_line_w6 plot_line"/g, 'style="fill: none; stroke: #8e0f79"');
+		s = s.replace(/class *= *"plot_line_w7 plot_line"/g, 'style="fill: none; stroke: #bc2326"');
+		s = s.replace(/class *= *"plot_line_w8 plot_line"/g, 'style="fill: none; stroke: #40b78f"');
+		s = s.replace(/class *= *"plot_circle plot_circle_w1"/g, 'style="fill: white; stroke: #932d01"');
+		s = s.replace(/class *= *"plot_circle plot_circle_w2"/g, 'style="fill: white; stroke: #380584"');
+		s = s.replace(/class *= *"plot_circle plot_circle_w3"/g, 'style="fill: white; stroke: #074d70"');
+		s = s.replace(/class *= *"plot_circle plot_circle_w4"/g, 'style="fill: white; stroke: #335b17"');
+		s = s.replace(/class *= *"plot_circle plot_circle_w5"/g, 'style="fill: white; stroke: #969218"');
+		s = s.replace(/class *= *"plot_circle plot_circle_w6"/g, 'style="fill: white; stroke: #8e0f79"');
+		s = s.replace(/class *= *"plot_circle plot_circle_w7"/g, 'style="fill: white; stroke: #bc2326"');
+		s = s.replace(/class *= *"plot_circle plot_circle_w8"/g, 'style="fill: white; stroke: #40b78f"');
+		s = s.replace(/<line stroke *= *"currentColor" *([xy]2) *=/g, 
+				      '<line style="stroke: lightgrey; stroke-opacity: 0.6; shape-rendering: crispEdges;" stroke="currentColor" $1=');
+		return s;
+	}
+
+	function download_plot_png(e) {
+		var svgEl = $(".word_meta_plot")[0];
+		var svgHtml = explicate_styles(svgEl.outerHTML);
+		var base64doc = btoa(unescape(encodeURIComponent(svgHtml)));
+		var w = 6000;
+		var h = 4000;
+		
+		// img.src = "data:image/svg+xml;utf8," + svgEl.outerHTML;
+		img.src = "data:image/svg+xml;base64," + base64doc;
+		img.onload = function () {
+			canvas.setAttribute("width", w);
+    		canvas.setAttribute("height", h);
+			var context = canvas.getContext("2d");
+			context.drawImage(img, 0, 0, w, h);
+			var dataURL = canvas.toDataURL("image/png");
+			var a = document.createElement("a");
+			var event = new MouseEvent("click");
+			a.download = "plot.png";
+			a.href = dataURL;
+			a.dispatchEvent(event);
+        }  
 	}
 
 	assign_word_stats_events();

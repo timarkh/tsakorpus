@@ -581,6 +581,9 @@ msgstr "1%%"
 msgid "0.1%%"
 msgstr "0.1%%"
 
+msgid "Download this plot in PNG"
+msgstr "Télécharger ce graphique au format PNG"
+
 #: templates/search_results/lemma_table_row.html:16
 #: templates/search_results/word_table_row.html:20
 msgid "Search in corpus"
