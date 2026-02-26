@@ -154,10 +154,11 @@ def get_buckets_for_doc_metafield(fieldName, langID=-1, docIDs=None, maxBuckets=
         buckets.sort(key=lambda b: (-b['n_words'], -b['n_docs'], b['name']))
     else:
         buckets.sort(key=lambda b: b['name'])
-    if len(buckets) > 25 and not (fieldName.startswith('year') or fieldName in settings.integer_meta_fields):
-        bucketsFirst = buckets[:25]
+    if (len(buckets) > settings.max_stats_values
+            and not (fieldName.startswith('year') or fieldName in settings.integer_meta_fields)):
+        bucketsFirst = buckets[:settings.max_stats_values]
         lastBucket = {'name': '>>', 'n_docs': 0, 'n_words': 0}
-        for i in range(25, len(buckets)):
+        for i in range(settings.max_stats_values, len(buckets)):
             lastBucket['n_docs'] += buckets[i]['n_docs']
             lastBucket['n_words'] += buckets[i]['n_words']
         bucketsFirst.append(lastBucket)
@@ -354,10 +355,11 @@ def get_buckets_for_sent_metafield(fieldName, langID=-1, docIDs=None, maxBuckets
         buckets.sort(key=lambda b: (-b['n_words'], -b['n_sents'], b['name']))
     else:
         buckets.sort(key=lambda b: b['name'])
-    if len(buckets) > 25 and not (fieldName.startswith('year') or fieldName in settings.integer_meta_fields):
-        bucketsFirst = buckets[:25]
+    if (len(buckets) > settings.max_stats_values
+            and not (fieldName.startswith('year') or fieldName in settings.integer_meta_fields)):
+        bucketsFirst = buckets[:settings.max_stats_values]
         lastBucket = {'name': '>>', 'n_sents': 0, 'n_words': 0}
-        for i in range(25, len(buckets)):
+        for i in range(settings.max_stats_values, len(buckets)):
             lastBucket['n_sents'] += buckets[i]['n_sents']
             lastBucket['n_words'] += buckets[i]['n_words']
         bucketsFirst.append(lastBucket)

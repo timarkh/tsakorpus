@@ -105,6 +105,7 @@ def search_page():
                            default_view=settings.default_view,
                            max_request_time=settings.query_timeout + 1,
                            max_page_size=MAX_PAGE_SIZE,
+                           max_stats_values=settings.max_stats_values,
                            max_context_expand=settings.max_context_expand,
                            default_context_size=settings.default_context_size,
                            inel_exmaralda_links=settings.inel_exmaralda_links,
@@ -312,6 +313,9 @@ def get_word_freq_stats(searchType='word'):
                 bucket['n_words'] = prevFreq / freq_by_rank[langID][freqRank]
             buckets.append(bucket)
         results.append(buckets)
+    for iWord in range(len(results)):
+        for iValue in range(len(results[iWord])):
+            results[iWord][iValue]['n_value'] = iValue
     return jsonify(results)
 
 
@@ -376,6 +380,9 @@ def get_word_stats(searchType, metaField):
     results = get_word_buckets(searchType, metaField, nWords, htmlQuery,
                                queryWordConstraints, langID, searchIndex,
                                curLocale=get_locale())
+    for iWord in range(len(results)):
+        for iValue in range(len(results[iWord])):
+            results[iWord][iValue]['n_value'] = iValue
     return jsonify(results)
 
 

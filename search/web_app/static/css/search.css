@@ -1729,11 +1729,11 @@ svg circle {
     display: none;
 }
 
-#word_stats_max_bars {
+#word_stats_max_bars, #word_stats_max_results {
     margin: 0.5rem;
 }
 
-#png_img, #png_canvas {
+#png_img, #png_canvas, #dummy_download_link {
 	display: none;
 }
 

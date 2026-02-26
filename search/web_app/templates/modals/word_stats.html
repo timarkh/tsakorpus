@@ -25,19 +25,26 @@
 							<option value="compare" selected>{{ _('compare words in the query') }}</option>
 						</select>
 						<a class="download_plot_png bi bi-filetype-png disabled_search_input" data-tooltip="tooltip" data-placement="top" title="{{ _('Download this plot in PNG') }}"> </a>
-						<div id="word_stats_max_bars" class="alert alert-warning" role="alert" style="display:none;">
+						<div id="word_stats_max_results" class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none;">
+							<span class="bi bi-exclamation-triangle-fill" aria-hidden="true"></span>&nbsp; {{ _('Maximal number of values to be displayed: ') }}<span id="max_stats_values"></span>
+							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Close') }}"></button>
+						</div>
+						<div id="word_stats_max_bars" class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none;">
 							<span class="bi bi-exclamation-triangle-fill" aria-hidden="true"></span>&nbsp; {{ _('A maximum of 25 metadata values can be displayed, sorted by the number of words in the relevant texts.') }}
+							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Close') }}"></button>
 						</div>
 						<div id="word_stats_plot"></div>
 						<table id="word_stats_table" class="table table-hover">
 							<thead>
 								<tr id="word_stats_table_header_top">
 									<th></th>
+									<th></th>
 									<th colspan="2">{{ _('Query word ') }} 1</th>
 								</tr>
 								<tr id="word_stats_table_header_bottom">
 								</tr>
 								<tr id="header_template_start" class="hidden">
+									<th></th>
 									<th>{{ _('value') }}</th>
 								</tr>
 								<tr id="header_template_end" class="hidden">
@@ -90,5 +97,5 @@
 		</div>
 	</div>
 </div>
-<img id="png_img"><canvas id="png_canvas"></canvas>
+<img id="png_img"><canvas id="png_canvas"></canvas><a id="dummy_download_link"></a>
 <script type='text/javascript' src='static/js/word_stats.js'></script>
