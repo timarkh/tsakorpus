@@ -437,7 +437,10 @@ msgstr "Paramètre : "
 #: templates/modals/subcorpus_selection.html:71
 #: templates/modals/word_stats.html:28
 msgid "A maximum of 25 metadata values can be displayed, sorted by the number of words in the relevant texts."
-msgstr "Un maximum de 25 valeurs peuvent être affichées, triées en fonction du nombre de mots dans les textes concernés."
+msgstr "Un maximum de 25 valeurs peuvent être affichées dans le graphique, triées en fonction du nombre de mots dans les textes concernés."
+
+msgid "Maximal number of values to be displayed: "
+msgstr "Nombre maximal de valeurs à afficher : "
 
 #: templates/modals/subcorpus_selection.html:73
 #: templates/modals/word_stats.html:81
