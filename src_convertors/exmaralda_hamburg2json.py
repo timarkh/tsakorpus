@@ -17,7 +17,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
     rxSplitGlosses = re.compile('-|\\.(?=\\[)')
     rxSpecialWords = re.compile('^ *\\(\\(.*?\\)\\) *$')
     rxWordPunc = re.compile('^( *)([^\\w]*)(.*?)([^\\w]*?)( *)$')
-    rxMCPOS = re.compile('^([^%#>:\\[\\]() ]+)(?:\\([^%#>:\\[\\] ]*\\))?(?:\\.\\[[^\\[\\]]*\\])?(?:=.*)?$')
+    rxMCPOS = re.compile('^([^%#>:\\[\\]()= ]+)(?:\\([^%#>:\\[\\] ]*\\))?(?:\\.\\[[^\\[\\]]*\\])?(?:=.*)?$')
     txTierXpath = '/basic-transcription/basic-body/tier[@category=\'tx\']'
     mediaExtensions = {'.wav', '.mp3', '.mp4', '.avi'}
 
