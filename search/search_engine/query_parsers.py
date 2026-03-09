@@ -814,12 +814,15 @@ class InterfaceQueryParser:
                     k = 'meta.' + k[10:]
                     if k.endswith('_kw'):
                         boolQuery = self.make_bool_query(v, k, lang=lang, keyword_query=True)
-                    elif (k.endswith('__to')
-                          and k[5:len(k)-4] in self.settings.integer_meta_fields) or k == 'meta.year__to':
+                    elif (k.endswith('__to') and k[5:len(k)-4] in self.settings.integer_meta_fields):
                         boolQuery = self.make_range_query([None, v], k[:-4])
+                    elif k == 'meta.year_to':
+                        boolQuery = self.make_range_query([None, v], k)
                     elif (k.endswith('__from')
-                          and k[5:len(k)-6] in self.settings.integer_meta_fields) or k == 'meta.year__from':
+                          and k[5:len(k)-6] in self.settings.integer_meta_fields):
                         boolQuery = self.make_range_query([v, None], k[:-6])
+                    elif k == 'meta.year_from':
+                        boolQuery = self.make_range_query([v, None], k)
                     else:
                         boolQuery = self.make_bool_query(v, k, lang=lang)
                     if 'match_none' not in boolQuery:
@@ -1112,7 +1115,7 @@ class InterfaceQueryParser:
                 distances=None, includeNextWordField=False,
                 after_key=None, highlight=True):
         """
-        Make and return a ES query out of the HTML form data.
+        Make and return an ES query out of the HTML form data.
         """
         query_from, langID, lang, searchIndex =\
             self.check_html_parameters(htmlQuery, page, query_size, searchOutput)
