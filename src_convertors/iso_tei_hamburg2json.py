@@ -21,7 +21,7 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
     rxFloat = re.compile('^[0-9]+(?:\\.[0-9]+)?$')
     rxTrailingZeroes = re.compile('^0+(?=[1-9])|\\.0+$')
     rxNonDigit = re.compile('[^0-9]+')
-    rxMCPOS = re.compile('^([^%#>:\\[\\]() ]+)(?:\\([^%#>:\\[\\] ]*\\))?(?:\\.\\[[^\\[\\]]*\\])?$')
+    rxMCPOS = re.compile('^([^%#>:\\[\\]() ]+)(?:\\([^%#>:\\[\\] ]*\\))?(?:\\.\\[[^\\[\\]]*\\])?(?:=.*)?$')
     rxTokenID = re.compile('^(TIE[0-9]+\\.e[0-9]+\\.(w|pc|inc|[0-9]))|'
                            '^(w|pc|inc)')
     rxWordID = re.compile('^(TIE[0-9]+\\.e[0-9]+\\.w)|'
