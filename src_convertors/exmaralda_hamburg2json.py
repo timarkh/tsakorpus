@@ -17,6 +17,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
     rxSplitGlosses = re.compile('-|\\.(?=\\[)')
     rxSpecialWords = re.compile('^ *\\(\\(.*?\\)\\) *$')
     rxWordPunc = re.compile('^( *)([^\\w]*)(.*?)([^\\w]*?)( *)$')
+    rxMCPOS = re.compile('^([^%#>:\\[\\]() ]+)(?:\\([^%#>:\\[\\] ]*\\))?(?:\\.\\[[^\\[\\]]*\\])?$')
     txTierXpath = '/basic-transcription/basic-body/tier[@category=\'tx\']'
     mediaExtensions = {'.wav', '.mp3', '.mp4', '.avi'}
 
@@ -86,6 +87,21 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                 tliTuples.add(tliTuple)
         return tliTuples
 
+    def add_pos_ana(self, ana, pos, field='gr.pos'):
+        """
+        Add the part of speech tag to single JSON analysis, taking into
+        account the correspondences between source file tags and the target
+        corpus tags. Change the analysis, do not return anything.
+        """
+        if pos in self.tp.parser.posRules:
+            pos = self.tp.parser.posRules[pos]
+        if field not in ana:
+            ana[field] = pos
+        elif type(ana[field]) == str and ana[field] != pos:
+            ana[field] = [ana[field], pos]
+        elif pos not in ana[field]:
+            ana[field].append(pos)
+
     def collect_annotation(self, srcTree):
         """
         Return a dictionary that contains all word-level annotation events,
@@ -132,11 +148,9 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         the event is used as the value.
         """
         for tierName in curWordAnno:
-            if tierName in ['tx', 'mb', 'mp', 'gr', 'ge']:
+            if tierName in ['tx', 'mb', 'mp', 'gr', 'ge', 'gg', 'ps', 'SpeakerContribution_Event']:
                 continue
-            if tierName == 'ps':
-                ana['gr.pos'] = curWordAnno[tierName]
-            else:
+            elif len(curWordAnno[tierName]) > 0:
                 ana[tierName] = curWordAnno[tierName]
 
     def get_words(self, srcTree, speaker=''):
@@ -175,8 +189,13 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                 if 'ge' in curWordAnno:
                     ana['gloss'] = curWordAnno['ge']
                     self.glosses |= set(g for g in self.rxSplitGlosses.split(ana['gloss']) if g.upper() == g)
-                    # print(ana['gloss'], self.rxSplitGlosses.split(ana['gloss']))
                 if 'mp' in curWordAnno:
+                    # mp contains normalized versions of morphemes. If this tier exists,
+                    # take normalized stem from it and make it a lemma.
+                    # Write glosses (gloss_index) based on the mb tier, if it exists, but also
+                    # store the "deep form" from mp in ana['parts_deep'] and add this data
+                    # to ana['gloss_index'] as well, prefixing each deep morpheme representation
+                    # with '_'.
                     ana['parts'] = curWordAnno['mp']  # Will be overwritten by mb, if any
                     ana['parts_deep'] = curWordAnno['mp']
                     self.tp.parser.process_gloss_in_ana(ana)
@@ -186,7 +205,6 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                         if len(stems) > 0 and type(stems[0]) == list:
                             stems = stems[0]
                         ana['lex'] = ' '.join(s[1] for s in stems)
-
                 if 'mb' in curWordAnno:
                     ana['parts'] = curWordAnno['mb']
                 if 'gr' in curWordAnno:
@@ -195,7 +213,21 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                 if 'gg' in curWordAnno:
                     ana['gloss_de'] = curWordAnno['gg']
                     self.tp.parser.process_gloss_in_ana(ana, 'de')
-                self.tp.parser.process_gloss_in_ana(ana)
+                if 'mc' in curWordAnno:
+                    pos = set()
+                    for mcPart in curWordAnno['mc'].split('-'):
+                        m = self.rxMCPOS.search(mcPart)
+                        if m is not None:
+                            if ('bad_pos_mc' not in self.corpusSettings
+                                    or m.group(1) not in self.corpusSettings['bad_pos_mc']):
+                                pos.add(m.group(1))
+                    if len(pos) == 1:
+                        self.add_pos_ana(ana, [p for p in pos][0])
+                if 'ps' in curWordAnno:
+                    if 'gr.pos' not in ana:
+                        self.add_pos_ana(ana, curWordAnno['ps'])
+                    self.add_pos_ana(ana, curWordAnno['ps'], field='ps')
+                self.tp.parser.process_gloss_in_ana(ana)  # "Surface" representations (mb)
                 if 'gloss_index' in ana:
                     stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index'],
                                                                      self.corpusSettings['languages'][0])
