@@ -4,6 +4,7 @@ Contains Flask view functions associated with certain URLs.
 
 
 from flask import request, render_template, jsonify, send_from_directory
+from jinja2.exceptions import TemplateNotFound
 from urllib.parse import unquote
 import json
 import copy
@@ -25,6 +26,34 @@ from .search_pipelines import *
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/favicons'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+
+@app.route('/start')
+def landing():
+    ready4work = settings.ready_for_work
+    if settings.ready_for_work:
+        ready4work = sc.is_alive()
+    locales = settings.interface_languages
+    if type(locales) == list:
+        locales = {x: x for x in locales}
+    try:
+        return render_template('landing/index_' + get_locale() + '.html',
+                               ready_for_work=ready4work,
+                               locale=get_locale(),
+                               corpus_name=settings.corpus_name,
+                               documentation_url=settings.documentation_url,
+                               locales=locales,
+                               corpus_size=settings.corpus_size,
+                               corpus_size_total=settings.corpus_size_total)
+    except TemplateNotFound:
+        return render_template('landing/index.html',
+                               ready_for_work=ready4work,
+                               locale=get_locale(),
+                               corpus_name=settings.corpus_name,
+                               documentation_url=settings.documentation_url,
+                               locales=locales,
+                               corpus_size=settings.corpus_size,
+                               corpus_size_total=settings.corpus_size_total)
 
 
 @app.route('/search')
