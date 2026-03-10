@@ -43,8 +43,8 @@ def landing():
                                corpus_name=settings.corpus_name,
                                documentation_url=settings.documentation_url,
                                locales=locales,
-                               corpus_size=settings.corpus_size,
-                               corpus_size_total=settings.corpus_size_total)
+                               corpus_size=round(settings.corpus_size),
+                               corpus_size_total=round(settings.corpus_size_total))
     except TemplateNotFound:
         return render_template('landing/index.html',
                                ready_for_work=ready4work,
@@ -52,8 +52,8 @@ def landing():
                                corpus_name=settings.corpus_name,
                                documentation_url=settings.documentation_url,
                                locales=locales,
-                               corpus_size=settings.corpus_size,
-                               corpus_size_total=settings.corpus_size_total)
+                               corpus_size=round(settings.corpus_size),
+                               corpus_size_total=round(settings.corpus_size_total))
 
 
 @app.route('/search')
