@@ -68,10 +68,8 @@
   [
     "trans_ru"
   ],
-  "default_values": {"sent_meta_speaker_type": "native"},
-  "sentence_meta_values": {
-    "speaker_type": ["native", "linguist"]
-  },
+
+
   "keyboards": {
     "evenki": "evenki",
     "russian": "russian"
