@@ -58,7 +58,7 @@ class MediaCutter:
         filenameNumber = math.floor(frameNumber // 3)
         m = re.search('^(.*)\\.([^.]+)$', fname)
         if m is None:
-            fname = fname + '-' + str(filenameOffset) + '-' + str(filenameNumber)
+            fname = fname + '-' + str(filenameOffset) + '-' + str(filenameNumber) + '.mp4'
         else:
             fname = m.group(1) + '-' + str(filenameOffset) + '-' + \
                     str(filenameNumber) + '.mp4'    # + m.group(2)

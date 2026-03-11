@@ -180,6 +180,7 @@ Commonly used convertors
 
 - :doc:`Plain text convertor </txt2json>`: ``txt2json.py``.
 - :doc:`ELAN media-aligned files convertor </eaf2json>`: ``eaf2json.py``.
+- :doc:`Praat TextGrid media-aligned files convertor </textgrid2json>`: ``textgrid2json.py``.
 - :doc:`Fieldworks FLEX glossed texts convertor </xml_flex2json>`: ``xml_flex2json.py``.
 - :doc:`Convertor of morphologically annotated XML (possibly parallel) </xml_rnc2json>` in one of the formats used by Russian National Corpus: ``xml_rnc2json.py``.
 
