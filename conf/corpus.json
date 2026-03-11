@@ -1,10 +1,11 @@
 {
-  "corpus_name": "beserman_eaf",
-  "citation": "Beserman corpus.",
+  "elastic_pwd": "password",
+  "corpus_name": "evenki",
+  "citation": "Evenki corpus TODO.",
   "input_format": "json",
-  "debug": false,
-  "media": true,
-  "video": true,
+  "debug": true,
+  "media": false,
+  "video": false,
   "media_length": 60,
   "max_context_expand": 10,
   "max_distance_filter": 200000,
@@ -72,22 +73,18 @@
     "speaker_type": ["native", "linguist"]
   },
   "keyboards": {
-    "beserman": "beserman",
+    "evenki": "evenki",
     "russian": "russian"
   },
   "generate_dictionary": true,
   "fulltext_view_enabled": true,
   "use_nonpersistent_fulltext_id": true,
-  "languages": ["beserman", "russian"],
-  "transliterations": ["original", "cyrillic", "UPA"],
+  "languages": ["evenki", "russian"],
+  "transliterations": ["cyrillic"],
   "input_methods": ["normal"],
   "interface_languages": [
     "en",
-    "ru",
-    "fr",
-	"zh",
-	"sq",
-	"hy"
+    "ru"
   ],
   "all_language_search_enabled": false,
   "gloss_search_enabled": true,
@@ -95,7 +92,7 @@
   "doc_to_sentence_meta": ["genre", "year"],
   "lang_props":
   {
-    "beserman":
+    "evenki":
     {
       "gramm_shortcuts": {
         "NV": "(N|V)",

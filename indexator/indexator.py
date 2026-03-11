@@ -133,7 +133,9 @@ class Indexator:
         with open(os.path.join(self.SETTINGS_DIR, 'corpus.json'),
                   'r', encoding='utf-8') as fSettings:
             self.settings = json.load(fSettings)
+        print(1)
         if not self.check_elastic_version():
+            print(2)
             return
         self.j2h = JSON2HTML(settings=self.settings)
         self.name = self.settings['corpus_name']
@@ -292,6 +294,7 @@ class Indexator:
         and if version-specific settings (if any) are provided.
         Return False if something is wrong, True otherwise.
         """
+        print(ESVersion)
         if ESVersion == 8:
             print('Warning: this Tsakorpus version has not been tested with Elasticsearch 8.x.')
         elif ESVersion not in (7, 9):
@@ -1455,10 +1458,12 @@ class Indexator:
         Collect all filenames for subsequent indexing and calculate
         their total size. Store them as object properties.
         """
+        print('corpdir', self.corpus_dir)
         self.filenames = []
         self.corpusSizeInBytes = 0
         for root, dirs, files in os.walk(self.corpus_dir):
             for fname in files:
+                print(fname)
                 if (not ((self.settings['input_format'] == 'json'
                           and fname.lower().endswith('.json'))
                          or (self.settings['input_format'] == 'json-gzip'
@@ -1550,4 +1555,5 @@ if __name__ == '__main__':
     if args.y is not None:
         overwrite = True
     x = Indexator(overwrite)
+    print(3)
     x.load_corpus()
