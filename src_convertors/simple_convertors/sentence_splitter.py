@@ -230,8 +230,8 @@ class Splitter:
                 if 'style_spans' not in sentences[i]:
                     sentences[i]['style_spans'] = []
                 sentences[i]['style_spans'].append({
-                    'off_start': sentences[i]['words'][0]['off_start'],
-                    'off_end': sentences[i]['words'][0]['off_end'],
+                    'off_start': sentences[i]['words'][1]['off_start'],
+                    'off_end': sentences[i]['words'][1]['off_end'],
                     'span_class': 'speaker_mark'
                 })
             prevSpeaker = sentences[i]['meta']['speaker']
