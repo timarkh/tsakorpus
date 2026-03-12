@@ -150,7 +150,7 @@ class Eaf2JSON(Txt2JSON):
                     curSent['meta'][k] = v
 
             # Tokenize the sentence
-            curSent['words'] = self.tp.tokenizer.tokenize(txt)
+            curSent['words'] = self.tp.tokenizer.tokenize(curSent['text'])
             self.tp.cleaner.clean_tokens(curSent['words'])
             self.tp.splitter.add_next_word_id_sentence(curSent)
             self.tp.parser.analyze_sentence(curSent, lang=lang)

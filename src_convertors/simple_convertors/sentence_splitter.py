@@ -76,6 +76,18 @@ class Splitter:
 
         # Now, shift all character offsets in source alignment etc.
         for segType in ['src_alignment', 'para_alignment', 'style_spans']:
+            if segType in sentenceL:
+                leftmostSeg = None
+                leftmostSegOffEnd = -1
+                for seg in sentenceL[segType]:
+                    for key in ['off_end', 'off_end_sent']:
+                        if key in seg and seg[key] > leftmostSegOffEnd:
+                            leftmostSegOffEnd = seg[key]
+                            leftmostSeg = seg
+                if leftmostSeg is not None:
+                    for key in ['off_end', 'off_end_sent']:
+                        if key in leftmostSeg:
+                            leftmostSeg[key] += nSpacesBetween  # Add the spaces to the left segments
             if segType in sentenceR:
                 if segType not in sentenceL:
                     sentenceL[segType] = []
