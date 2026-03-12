@@ -92,7 +92,7 @@ class Eaf2JSON(Txt2JSON):
                                'off_start_sent': 0,
                                'off_end_sent': len(sent['text']),
                                'mtype': 'audio',
-                               'src_id': ts1 + '_' + ts2,
+                               'src_id': str(round(float(ts1) * 1000)) + '_' + str(round(float(ts2) * 1000)),
                                'src': srcFile})
         # for alignment in sentAlignments:
         #     self.fragmentize_src_alignment(alignment)
