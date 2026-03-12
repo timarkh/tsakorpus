@@ -139,7 +139,7 @@ class Eaf2JSON(Txt2JSON):
             if self.rxEmpty.search(txt) is not None:
                 continue
             curSent = {
-                'text': txt.strip(),
+                'text': self.tp.cleaner.clean_text(txt.strip()),
                 'words': None,
                 'lang': langID,
                 'meta': {'speaker': tierID}
@@ -151,6 +151,7 @@ class Eaf2JSON(Txt2JSON):
 
             # Tokenize the sentence
             curSent['words'] = self.tp.tokenizer.tokenize(txt)
+            self.tp.cleaner.clean_tokens(curSent['words'])
             self.tp.splitter.add_next_word_id_sentence(curSent)
             self.tp.parser.analyze_sentence(curSent, lang=lang)
             self.add_src_alignment(curSent, xmin, xmax, srcFile)

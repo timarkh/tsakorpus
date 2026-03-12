@@ -59,7 +59,7 @@ class TextCleaner:
         text = self.convert_html(text)
         text = self.clean_spaces(text)
         text = self.separate_words(text, lang)
-        if self.settings['convert_quotes']:
+        if 'convert_quotes' in self.settings and self.settings['convert_quotes']:
             text = self.convert_quotes(text, lang)
         text = self.clean_other(text, lang)
         return text
