@@ -155,13 +155,14 @@ class TextCleaner:
 
     def clean_tokens(self, tokens, lang=''):
         """
-        Clean token['wf'] for each token in the list.
+        Clean token['wf'] for each token in the list. Change the list,
+        do not return anything.
         """
         if len(lang) <= 0:
             lang = self.settings['languages'][0]
-        for token in tokens:
-            if 'wf' in token and token['wtype'] == 'word':
-                token['wf'] = self.clean_token(token['wf'])
+        for i in range(len(tokens)):
+            if 'wf' in tokens[i] and tokens[i]['wtype'] == 'word':
+                tokens[i]['wf'] = self.clean_token(tokens[i]['wf'])
 
     def clean_token_rnc(self, text):
         """
