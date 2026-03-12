@@ -50,16 +50,18 @@ class TextCleaner:
     def __init__(self, settings):
         self.settings = copy.deepcopy(settings)
 
-    def clean_text(self, text):
+    def clean_text(self, text, lang=''):
         """
         Main method that calls separate step-by-step procedures.
         """
+        if len(lang) <= 0:
+            lang = self.settings['languages'][0]
         text = self.convert_html(text)
         text = self.clean_spaces(text)
-        text = self.separate_words(text)
+        text = self.separate_words(text, lang)
         if self.settings['convert_quotes']:
-            text = self.convert_quotes(text)
-        text = self.clean_other(text)
+            text = self.convert_quotes(text, lang)
+        text = self.clean_other(text, lang)
         return text
 
     def convert_html(self, text):
@@ -72,34 +74,45 @@ class TextCleaner:
         text = self.rxSpaces2.sub('\n ', text)  # normalize new lines
         return text
 
-    def separate_words(self, text):
+    def separate_words(self, text, lang=''):
         # punctuation inside a word
+        if len(lang) <= 0:
+            lang = self.settings['languages'][0]
         text = self.rxPuncWords.sub('\\1 \\2', text)  # adds a space between punctuation and next letter
         return text
 
-    def convert_quotes(self, text):
+    def convert_quotes(self, text, lang=''):
+        if len(lang) <= 0:
+            lang = self.settings['languages'][0]
         text = self.rxQuotesL.sub('\\1«\\2', text)
         text = self.rxQuotesR.sub('\\1»\\2', text)
         text = self.rxNonstandardQuotesL.sub(self.settings['left_quot_mark'], text)
         text = self.rxNonstandardQuotesR.sub(self.settings['right_quot_mark'], text)
         return text
 
-    def clean_other(self, text):
-        if self.settings['languages'][0] == 'udmurt':
-            text = text.replace('ü', 'ӥ')
-        if self.settings['languages'][0] in ['ukrainian', 'kazakh', 'komi']:
+    def clean_other(self, text, lang=''):
+        if len(lang) <= 0:
+            lang = self.settings['languages'][0]
+        if lang == 'udmurt':
+            text = self.rxDiacriticsUdm.sub(lambda m: self.dictDiacriticsUdm[m.group(1)], text)
+            text = self.rxUdmU2I.sub('ӥ', text)
+            text = self.rxUdmO2O.sub('ӧ', text)
+            text = self.rxUdmX2Ch.sub('ӵ', text)
+            text = self.rxUdmDzh.sub('ӝ', text)
+            text = self.rxUdmZj.sub('ӟ', text)
+        if lang in ['ukrainian', 'kazakh', 'komi']:
             text = self.rxCyrISmall.sub('і', text)
             text = self.rxCyrIBig.sub('І', text)
-        if self.settings['languages'][0] in ['kazakh', 'tatar', 'bashkir', 'kalmyk']:
+        if lang in ['kazakh', 'tatar', 'bashkir', 'kalmyk']:
             text = self.rxCyrHSmall.sub('һ', text)
             text = self.rxCyrHBig.sub('Һ', text)
-        if self.settings['languages'][0] in ['kazakh', 'tatar', 'bashkir']:
+        if lang in ['kazakh', 'tatar', 'bashkir']:
             text = self.rxCyrSchwaSmall.sub('ә', text)
             text = self.rxCyrSchwaBig.sub('Ә', text)
-        if self.settings['languages'][0] in ['ossetic', 'iron', 'digor']:
+        if lang in ['ossetic', 'iron', 'digor']:
             text = self.rxCyrAeSmall.sub('ӕ', text)
             text = self.rxCyrAeBig.sub('Ӕ', text)
-        if self.settings['languages'][0] in ['armenian']:
+        if lang in ['armenian']:
             text = self.rxArmPeriod.sub('։', text)
         text = text.replace('…', '...')
         text = text.replace('\\r\\n', '\n')
@@ -107,7 +120,9 @@ class TextCleaner:
         text = text.replace('\\', '/')
         return text
 
-    def clean_social_networks(self, text):
+    def clean_social_networks(self, text, lang=''):
+        if len(lang) <= 0:
+            lang = self.settings['languages'][0]
         text = re.sub('(?<=\\w)ааа+', 'а', text)
         text = re.sub('(?<=\\w)ооо+', 'о', text)
         text = re.sub('(?<=\\w)еее+', 'е', text)
@@ -115,7 +130,7 @@ class TextCleaner:
         text = re.sub('(?<=\\w)иии+', 'у', text)
         text = re.sub('(?<=\\w)ыы+', 'ы', text)
         text = re.sub('(?<=\\w)ээ+', 'э', text)
-        if self.settings['languages'][0] == 'udmurt':
+        if lang == 'udmurt':
             text = self.rxDiacriticsUdm.sub(lambda m: self.dictDiacriticsUdm[m.group(1)], text)
             text = self.rxUdmU2I.sub('ӥ', text)
             text = self.rxUdmO2O.sub('ӧ', text)
@@ -126,21 +141,24 @@ class TextCleaner:
             text = re.sub('(?<=\\w)ӥӥ+', 'ӥ', text)
         return text
 
-    def clean_token(self, text):
+    def clean_token(self, text, lang=''):
         """
         Clean a token for search purposes (the baseline will
         still have the original, uncleaned version).
         """
+        if len(lang) <= 0:
+            lang = self.settings['languages'][0]
         wordClean = text
-        if self.settings['languages'][0] in ['armenian']:
-            wordClean = self.rxArmOldCond.sub('կ', text)
+        if lang in ['armenian']:
             wordClean = self.rxArmIntraWordPunc.sub('', wordClean)
         return wordClean
 
-    def clean_tokens(self, tokens):
+    def clean_tokens(self, tokens, lang=''):
         """
         Clean token['wf'] for each token in the list.
         """
+        if len(lang) <= 0:
+            lang = self.settings['languages'][0]
         for token in tokens:
             if 'wf' in token and token['wtype'] == 'word':
                 token['wf'] = self.clean_token(token['wf'])
