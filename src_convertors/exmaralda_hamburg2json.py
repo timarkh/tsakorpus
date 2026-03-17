@@ -341,12 +341,24 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         text = re.sub(' +\\([0-9]{1,4}(\\.[0-9]{1,4})?\\) *$', '', text)
         if self.curMeta is None:
             return text + ' (INEL)'
-        if 'published_in' in self.curMeta and self.rxEmptyValueComa.search(self.curMeta['published_in']) is None:
+        elif 'citation' in self.curMeta and self.rxEmptyValueComa.search(self.curMeta['citation']) is None:
+            text += ' (INEL / ' + self.curMeta['citation'] + ')'
+            text = text.strip()
+        elif ('archive_written' in self.curMeta
+              and self.rxEmptyValueComa.search(self.curMeta['archive_written']) is None
+              and ('published_in' not in self.curMeta
+                   or self.rxEmptyValueComa.search(self.curMeta['published_in']) is not None
+                   or self.curMeta['published_in'].lower() in ('not published', 'unpublished'))):
+            text += ' (INEL / ' + re.sub('^\\((.+)\\)$', '\\1', self.curMeta['archive_written']) + ')'
+            text = text.strip()
+        elif 'published_in' in self.curMeta and self.rxEmptyValueComa.search(self.curMeta['published_in']) is None:
             text += ' (INEL / ' + self.curMeta['published_in'] + ')'
             text = text.strip()
             # Do not forget to add "INEL" and all bibliographic references to
             # the special tokens list in conversion_settings.json!
             # They should be assigned a "bib_ref" field.
+        else:
+            text += ' (INEL)'
         return text
 
     def get_parallel_sentences(self, srcTree, sentBoundaries, srcFile):
