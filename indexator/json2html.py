@@ -16,6 +16,7 @@ class JSON2HTML:
     HTML files, provided that the corpus settings allow full-text view.
     """
     SETTINGS_DIR = '../conf'
+    rxEmptyTier = re.compile('^[ \t\r\n.*—-]*$', flags=re.DOTALL)
 
     def __init__(self, settings):
         self.settings = CorpusSettings()
@@ -115,7 +116,7 @@ class JSON2HTML:
         # Remove empty tiers
         for iTier in range(len(htmlByTier) - 1, -1, -1):
             if (len(htmlByTier[iTier]) <= 0
-                    or all(len(sent['html'].strip()) <= 0
+                    or all(self.rxEmptyTier.search(sent['html']) is not None
                            for sent in htmlByTier[iTier])):
                 del htmlByTier[iTier]
                 del paraIDsByTier[iTier]

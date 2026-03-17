@@ -116,6 +116,7 @@ def search_page():
                            hidden_tiers=get_session_data('hidden_tiers'),
                            share_query_url=str(settings.share_query_url).lower(),
                            error_reports_enabled=settings.error_reports_enabled,
+                           error_reports_name_obligatory=settings.error_reports_name_obligatory,
                            docx_enabled=settings.docx_enabled,
                            docx_tabular=settings.docx_tabular,
                            docx_glossed=settings.docx_glossed,
@@ -460,6 +461,7 @@ def search_sent(page=-1):
                            data=hitsProcessed,
                            max_page_number=maxPageNumber,
                            error_reports_enabled=settings.error_reports_enabled,
+                           error_reports_name_obligatory=settings.error_reports_name_obligatory,
                            docx_enabled=settings.docx_enabled,
                            expanded_contexts=contexts)
 

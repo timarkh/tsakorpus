@@ -691,6 +691,9 @@ async function search_if_query() {
 }
 
 function send_error_report() {
+	if ($("#error_report_reference").prop('required') && !$("#error_report_reference").val()) {
+		return;
+	}
 	$.ajax({
 		url: "report_error",
 		data: $("#error_report_form").serialize(),

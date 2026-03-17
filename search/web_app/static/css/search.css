@@ -554,6 +554,10 @@ label {
 	border: solid 1px #707070;
 }
 
+.error_report_input:not(:valid) {
+    background-color: #ffffc9;
+}
+
 .disabled_search_input {
 	color: #AAAAAA;
 }

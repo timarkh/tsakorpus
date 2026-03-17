@@ -97,6 +97,7 @@ class CorpusSettings:
         self.documentation_url = None
         self.share_query_url = False
         self.error_reports_enabled = False
+        self.error_reports_name_obligatory = False
         self.inel_exmaralda_links = False
         self.default_context_size = 0
         self.show_info_alert = False
@@ -142,7 +143,7 @@ class CorpusSettings:
         # Server configuration
         self.session_cookie_domain = None
         self.query_log = True
-        self.try_restart_elastic = True     # Try restarting elasticsearch.service if it is down
+        self.try_restart_elastic = False     # Try restarting elasticsearch.service if it is down
 
         # Statistics calculated at runtime
         self.corpus_size = 0             # corpus size in words, only counting primary language(s)

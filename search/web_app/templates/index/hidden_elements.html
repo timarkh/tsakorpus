@@ -187,10 +187,10 @@
 				</div>
 				<div class="row justify-content-start">
 					<div class="col-4 col-sm-3">
-						<label for="error_report_reference" id="_label_error_report_reference" class="search_label">{{ _('Your contact details (optional):') }}</label>
+						<label for="error_report_reference" id="_label_error_report_reference" class="search_label">{% if error_reports_name_obligatory %}{{ _('Your contact details:') }}{% else %}{{ _('Your contact details (optional):') }}{% endif %}</label>
 					</div>
 					<div class="col-8">
-						<input type="text" class="error_report_input" name="error_report_reference" id="error_report_reference">
+						<input type="text" class="error_report_input" name="error_report_reference" id="error_report_reference"{% if error_reports_name_obligatory %} required{% endif %}>
 					</div>
 				</div>
 			</form>
