@@ -1,32 +1,33 @@
-# Tsakorpus 3.0
+# Tsakorpus Evenki 3.0
+Этот репозиторий содержит инструменты для конвертации и индексации данных эвенкийского корпуса в систему **Tsakorpus**, а также для запуска самого корпуса.
 
-If you want to use Tsakorpus, download the most recent version from this repository.
+## Обзор
+**Tsakorpus** — это поисковая платформа для лингвистических корпусов, использующая движок **Elasticsearch** для хранения и обработки запросов. Система состоит из трех основных частей:
 
-## Overview
+1. Конвертеры исходных данных: превращают тексты из различных форматов (ELAN, TXT, JSON и др.) в унифицированные JSON-документы формата Tsakorpus.
+2. Индексатор: загружает эти документы в базу данных, рассчитывая частотные характеристики слов.
+3. Веб-интерфейс: написан на Python (фреймворк Flask). Он позволяет пользователям строить сложные запросы через графический интерфейс и просматривать результаты.
 
-Tsakorpus is a linguistic corpus search platform which uses elasticsearch for storing and querying data. It consists of a set of source convertors, an indexator and a web interface with a search engine. The source convertors transform a corpus in one of the several supported formats into a set of JSON documents in tsakorpus format. The indexator puts these documents into the database together with the frequency data for words that it calculates on the fly. The web interface, written in python+flask, allows the user to make complex queries using GUI and view the search results. The search queries are sent to the back-end as GET queries and transformed to JSON elasticsearch queries on the server. The search results are partly transformed to HTML on the server, sent back to the front-end as JSON through Ajax requests and displayed on the results page by a set of JavaScript/jQuery functions.
+Интерфейс легко переключается между языками благодаря библиотеке Flask-Babel.
 
-Tsakorpus supports corpora with morphological annotation, special gloss search, multi-word search, subcorpus selection, automatic transliteration, word distribution charts, parallel corpora, and media-aligned corpora. Multiple interface languages are supported with Flask-Babel.
+## Документация
+Вся документация по **Tsakorpus** находится [здесь](https://tsakorpus.readthedocs.io/en/latest/). [Здесь](https://tsakorpus.readthedocs.io/en/latest/overview.html) подробная инструкция по запуску.
 
-## Documentation
+## Требования
 
-All documentation is available [here](https://tsakorpus.readthedocs.io/en/latest/). If you are not sure if Tsakorpus is what you need, read the [FAQ](https://tsakorpus.readthedocs.io/en/latest/faq.html). If you want to set up a corpus, start [here](https://tsakorpus.readthedocs.io/en/latest/overview.html).
+Tsakorpus работает на Windows and Ubuntu. Для запуска нужны следующие зависимости:
 
-Feel free to ask questions or discuss Tsakorpus [on the Discussions page](https://github.com/timarkh/tsakorpus/discussions/) or post [issues](https://github.com/timarkh/tsakorpus/issues).
+* Elasticsearch 9.x или 7.x (возможно, работает и на 8.x)
+* Python >= 3.12
+* Библиотеки Python: elasticsearch, flask, lxml, ijson, Flask-Babel, xlsxwriter, sqlitedict, pympler (you can use requirements.txt)
+* Для конвертации мультимедийных корпусов (с привязкой к аудио или видео) необходим ffmpeg.
+* Для стабильной работы рекомендуется запускать Tsakorpus через Apache2 с модулем wsgi или через nginx
 
-## Requirements
+**Внимание!** Номер Python-модуля elasticsearch должен совпадать с версией вашего сервера Elasticsearch. Если вы устанавливаете зависимости через `requirements.txt`, по умолчанию установится последняя версия 9.x. Если вы используете другую версию Elasticsearch (например, 7.x), отредактируйте список зависимостей вручную.
 
-Tsakorpus was tested on Windows and Ubuntu. Its dependencies are the following:
+*Пример:* для Elasticsearch 7.x укажите в терминале или в файле: `elasticsearch>=7.0.0,<8.0.0`.
 
-* elasticsearch 9.x or 7.x (probably also works on 8.x)
-* python >= 3.12
-* python modules: elasticsearch, flask, lxml, ijson, Flask-Babel, xlsxwriter, sqlitedict, pympler (you can use requirements.txt)
-* for converting media-aligned corpora: ffmpeg
-* it is recommended to deploy tsakorpus through apache2 with wsgi or nginx
-
-**Caution**: the major version number of the ``elasticsearch`` Python module must be equal to the major version number of your Elasticsearch! If you use ``requirements.txt``, the latest ``9.x`` version will be installed. If you use another Elasticsearch version, edit the requirements manually (e.g., ``elasticsearch>=7.0.0,<8.0.0`` for Elasticsearch 7.x).
-
-The following resources are used by tsakorpus, but do not need to be installed:
+Ресурсы, которые используются, но их не нужно устанавливать:
 
 * [jQuery](https://jquery.com/) library
 * [jQuery-Autocomplete](https://github.com/devbridge/jQuery-Autocomplete)
@@ -36,6 +37,32 @@ The following resources are used by tsakorpus, but do not need to be installed:
 * [D3.js](https://d3js.org/) visualization library
 * [KioskBoard](https://github.com/furcan/KioskBoard) virtual keyboard
 
-## License
+## Установка
+Для локального запуска корпуса нужно сделать следующие действия:
 
-The software is distributed under MIT license (see LICENSE).
+### Подготовка окружения
+1. Запустить Docker
+2. Перейти в корень проекта
+3. Выполнить в терминале команды:
+``` bash
+docker run -d --name tsakorpus-es -p 9200:9200 -e "discovery.type=single-node" -e "xpack.security.enabled=false" elasticsearch:7.17.10
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+### Загрузка данных
+Перед этим убедитесь, что у вас есть доступ к нужному датасету на Hugging Face
+``` bash
+cd data_raw
+python get_data.py
+cd ../src_convertors
+python hf2json.py
+cd ../indexator
+python indexator.py
+```
+### Запуск сервера
+```bash
+cd ../search
+python tsakorpus.wsgi
+```
+Далее откройте в браузере ссылку `http://127.0.0.1:7342/search`. По этому адресу откроется корпус.
