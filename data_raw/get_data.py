@@ -2,7 +2,6 @@ import os
 import json
 from datasets import load_dataset
 
-os.makedirs("data_raw", exist_ok=True)
 print("Downloading from Hugging Face...")
 dataset = load_dataset("siberian-lang-lab/evenki-rus-parallel-corpora")
 

@@ -6,7 +6,7 @@ import time
 sys.path.append(os.path.join(os.path.dirname(__file__), 'simple_convertors'))
 from simple_convertors.text_processor import TextProcessor
 
-class HFEvenki2JSON:
+class HF2JSON:
     def __init__(self):
         conv_settings_dir = os.path.join(os.path.dirname(__file__), 'conf_conversion')
         root_conf_dir = os.path.join(os.path.dirname(__file__), '..', 'conf')
@@ -21,7 +21,7 @@ class HFEvenki2JSON:
                                 categories=self.categories)
         
         self.src_file = os.path.join('..', 'data_raw', 'evenki_data.json')
-        self.target_dir = os.path.join('..', 'corpus', self.corpusSettings['corpus_name'])
+        self.target_dir = os.path.join('..', 'corpus', 'evenki', self.corpusSettings['corpus_name'])
 
     def convert(self):
         tStart = time.time()
@@ -38,13 +38,19 @@ class HFEvenki2JSON:
         with open(self.src_file, 'r', encoding='utf-8') as f:
             for line in f:
                 item = json.loads(line)
-                
-                processed_sents, _, _, _ = self.tp.process_string(item["evn"])
-                
-                for s in processed_sents:
+                processed_evn_sents, _, _, _ = self.tp.process_string(item["evn"])
+                processed_rus_sents, _, _, _ = self.tp.process_string(item["ru"])
+        
+                for s in processed_evn_sents:
+                    s['lang'] = 0
                     s['para'] = [{'lang': 'rus', 'text': item['ru']}]
-                    if 'meta' not in s:
-                        s['meta'] = {}
+                    if 'meta' not in s: s['meta'] = {}
+                    s['meta']['source'] = item.get('source', '')
+                    all_sentences.append(s)
+
+                for s in processed_rus_sents:
+                    s['lang'] = 1  # Указываем, что это русский поиск
+                    if 'meta' not in s: s['meta'] = {}
                     s['meta']['source'] = item.get('source', '')
                     all_sentences.append(s)
 
@@ -61,5 +67,5 @@ class HFEvenki2JSON:
         print(f"Result saved to: {output_fname}")
 
 if __name__ == '__main__':
-    converter = HFEvenki2JSON()
+    converter = HF2JSON()
     converter.convert()
