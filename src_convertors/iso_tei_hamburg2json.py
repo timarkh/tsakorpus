@@ -422,6 +422,13 @@ class ISO_TEI_Hamburg2JSON(Txt2JSON):
         elif 'citation' in self.curMeta and self.rxEmptyValueComa.search(self.curMeta['citation']) is None:
             text += ' (INEL / ' + self.curMeta['citation'] + ')'
             text = text.strip()
+        elif ('archive_written' in self.curMeta
+              and self.rxEmptyValueComa.search(self.curMeta['archive_written']) is None
+              and ('published_in' not in self.curMeta
+                   or self.rxEmptyValueComa.search(self.curMeta['published_in']) is not None
+                   or self.curMeta['published_in'].lower() in ('not published', 'unpublished'))):
+            text += ' (INEL / ' + re.sub('^\\((.+)\\)$', '\\1', self.curMeta['archive_written']) + ')'
+            text = text.strip()
         elif 'published_in' in self.curMeta and self.rxEmptyValueComa.search(self.curMeta['published_in']) is None:
             text += ' (INEL / ' + self.curMeta['published_in'] + ')'
             text = text.strip()

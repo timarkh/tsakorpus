@@ -62,8 +62,9 @@ class InterfaceQueryParser:
     def find_operator(strQuery, start=0, end=-1, glossField=False):
         if end == -1:
             end = len(strQuery) - 1
+        bStartsWithNeg = False
         if strQuery[start] == '~':
-            return start, '~'
+            bStartsWithNeg = True
         parenthBalance = 0
         inCurlyBrackets = False
         for i in range(start, end):
@@ -81,6 +82,8 @@ class InterfaceQueryParser:
                 parenthBalance -= 1
             elif parenthBalance == 0 and strQuery[i] in ',&|':
                 return i, strQuery[i]
+        if bStartsWithNeg:
+            return start, '~'
         return -1, ''
 
     def make_gloss_query_src_part(self, text, lang):
