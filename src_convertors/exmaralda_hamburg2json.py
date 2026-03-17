@@ -38,7 +38,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         for tli in srcTree.xpath('/basic-transcription/basic-body/common-timeline')[0]:
             timeValue = ''
             if 'time' in tli.attrib:
-                timeValue = tli.attrib['time']
+                timeValue = tli.attrib['time'].replace(',', '.')
             tlis[tli.attrib['id']] = {'n': iTli, 'time': timeValue}
             iTli += 1
         return tlis
@@ -292,11 +292,11 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
             if len(self.tlis[word['tli_start']]['time']) > 0:
                 for wa in wordAlignments:
                     if len(wa['off_end_src']) <= 0:
-                        wa['off_end_src'] = self.tlis[word['tli_start']]['time']
+                        wa['off_end_src'] = self.tlis[word['tli_start']]['time'].replace(',', '.')
                         wa['src_id'] += word['tli_start']
-                wordAlignments.append({'off_start_src': self.tlis[word['tli_start']]['time'],
+                wordAlignments.append({'off_start_src': self.tlis[word['tli_start']]['time'].replace(',', '.'),
                                        'off_end_src': '',
-                                       'true_off_start_src': float(self.tlis[word['tli_start']]['time']),
+                                       'true_off_start_src': float(self.tlis[word['tli_start']]['time'].replace(',', '.')),
                                        'off_start_sent': word['off_start'],
                                        'off_end_sent': word['off_end'],
                                        'mtype': 'audio',
@@ -305,13 +305,13 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
             if len(self.tlis[word['tli_end']]['time']) > 0:
                 for wa in wordAlignments:
                     if len(wa['off_end_src']) <= 0:
-                        wa['off_end_src'] = self.tlis[word['tli_end']]['time']
+                        wa['off_end_src'] = self.tlis[word['tli_end']]['time'].replace(',', '.')
                         wa['off_end_sent'] = word['off_end']
                         wa['src_id'] += word['tli_end']
         for wa in wordAlignments:
             if len(wa['off_end_src']) <= 0:
                 if len(self.tlis[sentBoundaries[1]]['time']) > 0:
-                    wa['off_end_src'] = self.tlis[sentBoundaries[1]]['time']
+                    wa['off_end_src'] = self.tlis[sentBoundaries[1]]['time'].replace(',', '.')
                     wa['src_id'] += sentBoundaries[1]
                 else:
                     wa['off_end_src'] = wa['off_start_src']
@@ -320,9 +320,9 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         # if len(wordAlignments) <= 0 and len(self.tlis[sentBoundaries[0]]['time']) > 0:
         if len(self.tlis[sentBoundaries[0]]['time']) > 0:
             wordAlignments = []     # for the time being
-            wordAlignments.append({'off_start_src': self.tlis[sentBoundaries[0]]['time'],
-                                   'true_off_start_src': float(self.tlis[sentBoundaries[0]]['time']),
-                                   'off_end_src': self.tlis[sentBoundaries[1]]['time'],
+            wordAlignments.append({'off_start_src': self.tlis[sentBoundaries[0]]['time'].replace(',', '.'),
+                                   'true_off_start_src': float(self.tlis[sentBoundaries[0]]['time'].replace(',', '.')),
+                                   'off_end_src': self.tlis[sentBoundaries[1]]['time'].replace(',', '.'),
                                    'off_start_sent': 0,
                                    'off_end_sent': len(sent['text']),
                                    'mtype': 'audio',
