@@ -28,6 +28,7 @@ def favicon():
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
+@app.route('/')
 @app.route('/start')
 def landing():
     ready4work = settings.ready_for_work
