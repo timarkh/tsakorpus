@@ -190,6 +190,18 @@ msgstr "<abbr title="shënimet sqaruese">Glosat</abbr>:"
 msgid "Language/tier:"
 msgstr "Gjuhë/shtresë:"
 
+msgid "Languages / tiers:"
+msgstr "Gjuhët / shtresët:"
+
+msgid "Add. word-level annotation"
+msgstr "Fushat në nivel fjalësh"
+
+msgid "Sentence-level annotation"
+msgstr "Fushat në nivel fjale"
+
+msgid "Only annotated in some texts"
+msgstr "Etiketuar vetëm në disa tekste"
+
 #: templates/index/query_area.html:36
 #: templates/modals/subcorpus_selection.html:58
 msgid "langname_all"

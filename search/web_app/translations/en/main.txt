@@ -193,6 +193,15 @@ msgstr "Language/tier:"
 msgid "Languages / tiers:"
 msgstr "Languages / tiers:"
 
+msgid "Add. word-level annotation"
+msgstr "Add. word-level annotation"
+
+msgid "Sentence-level annotation"
+msgstr "Sentence-level annotation"
+
+msgid "Only annotated in some texts"
+msgstr "Only annotated in some texts"
+
 #: templates/index/query_area.html:36
 #: templates/modals/subcorpus_selection.html:58
 msgid "langname_all"

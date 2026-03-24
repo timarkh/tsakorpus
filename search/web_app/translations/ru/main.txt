@@ -193,6 +193,15 @@ msgstr "Язык/слой:"
 msgid "Languages / tiers:"
 msgstr "Языки / слои:"
 
+msgid "Add. word-level annotation"
+msgstr "Доп. разметка слов"
+
+msgid "Sentence-level annotation"
+msgstr "Разметка предложений"
+
+msgid "Only annotated in some texts"
+msgstr "Размечено не во всех текстах"
+
 #: templates/index/query_area.html:36
 #: templates/modals/subcorpus_selection.html:58
 msgid "langname_all"

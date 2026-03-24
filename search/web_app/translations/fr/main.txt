@@ -191,7 +191,16 @@ msgid "Language/tier:"
 msgstr "Langue/couche :"
 
 msgid "Languages / tiers:"
-msgstr "Languages / couches:"
+msgstr "Langues / couches :"
+
+msgid "Add. word-level annotation"
+msgstr "Annotation suppl. / mots"
+
+msgid "Sentence-level annotation"
+msgstr "Annotation / phrase"
+
+msgid "Only annotated in some texts"
+msgstr "N'apparaît que dans certains textes"
 
 #: templates/index/query_area.html:36
 #: templates/modals/subcorpus_selection.html:58

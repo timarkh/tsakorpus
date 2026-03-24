@@ -597,6 +597,7 @@ def get_word_fields():
     """
     return render_template('index/common_additional_search_fields.html',
                            word_fields=settings.word_fields,
+                           partial_word_fields=settings.partial_word_fields,
                            sentence_meta=settings.sentence_meta,
                            multiple_choice_fields=settings.multiple_choice_fields,
                            int_meta_fields=settings.integer_meta_fields,

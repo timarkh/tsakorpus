@@ -42,6 +42,7 @@ class CorpusSettings:
         self.viewable_meta = []
         self.subcorpora = {}
         self.word_fields = []
+        self.partial_word_fields = []
         self.search_meta = {'columns': [], 'stat_options': []}
         self.ambiguous_analyses = True
         self.keep_lemma_order = False
@@ -167,6 +168,7 @@ class CorpusSettings:
             'localized_meta_values',
             'case_sensitive_meta_fields',
             'word_fields',
+            'partial_word_fields',
             'interface_languages',
             'transliterations',
             'input_methods',

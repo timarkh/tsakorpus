@@ -1,31 +1,12 @@
-{% if word_fields %}
+{% if word_fields and word_fields|length > 0 %}
+<p class="query_fields_group_header">{{ _('Add. word-level annotation') }}</p>
 	{% for field in word_fields %}
 	{% if field == "_" %}
 <hr class="separator">
 	{% else %}
-		<label for="{{ field }}1" id="_label_{{ field }}1" class="search_label">{{ _('wordfield_' + field) | capitalize }}:</label>
+		<label for="{{ field }}1" id="_label_{{ field }}1" class="search_label">{{ _('wordfield_' + field) | capitalize }}{% if field in partial_word_fields %}<span class="bi bi-patch-exclamation partial_annotation_icon" data-tooltip="tooltip" data-placement="top" title="{{ _('Only annotated in some texts') }}"></span>{% endif %}:</label>
 		<input type="text" class="search_input" name="{{ field }}1" id="{{ field }}1">{% if multiple_choice_fields and field in multiple_choice_fields %}<span class="gram_selector_link bi bi-table" data-field="{{ field }}" data-nword="1"></span>{% endif %}<br>
 	{% endif %}
-	{% endfor %}
-{% endif %}
-{% if sentence_meta and sentence_meta|length > 0 %}
-<hr class="separator">
-	{% for field in sentence_meta %}
-		{% if int_meta_fields and field in int_meta_fields %}
-		<label>{{ _('metafield_' + field) | capitalize }}:</label>
-		<input type="number" class="search_input_num" name="sent_meta_{{ field }}__from1" id="sent_meta_{{ field }}__from1">&ndash;<input type="number" class="search_input_num" name="sent_meta_{{ field }}__to1" id="sent_meta_{{ field }}__to1"><br>
-		{% elif sentence_meta_values and field in sentence_meta_values %}
-		<label for="sent_meta_{{ field }}1">{{ _('metafield_' + field) | capitalize }}:</label>
-		<select class="search_input" name="sent_meta_{{ field }}1" id="sent_meta_{{ field }}1"><br>
-			<option value="" {% if "sent_meta_" + field not in default_values %} selected {% endif %}></option>
-			{% for v in sentence_meta_values[field] %}
-			<option value="{{ v }}" {% if "sent_meta_" + field in default_values and default_values["sent_meta_" + field] == v %} selected {% endif %}>{{ _('metavalue_' + v) }}</option>
-			{% endfor %}
-		</select><br>
-		{% else %}
-		<label for="sent_meta_{{ field }}1">{{ _('metafield_' + field) | capitalize }}:</label>
-		<input type="text" class="search_input" name="sent_meta_{{ field }}1" id="sent_meta_{{ field }}1" {% if "sent_meta_" + field in default_values %} value='{{ default_values["sent_meta_" + field] }}' {% endif %}>{% if multiple_choice_fields and "sent_meta_" + field in multiple_choice_fields %}<span class="gram_selector_link bi bi-table" data-field="sent_meta_{{ field }}" data-nword="1"></span>{% endif %}<br>
-		{% endif %}
 	{% endfor %}
 {% endif %}
 <label for="n_ana1">{{ _('Analyses: ') }}</label>
@@ -40,5 +21,25 @@
 	{% endif %}
 	<option value="none">{{ _('only without analysis') }}</option>
 </select><br>
-<label for="sentence_index1">{{ _('Position in sentence: ') }}</label>
-<input type="number" name="sentence_index1" id="sentence_index1" value="" placeholder="1" class="search_input distance_input"><br>
+<label for="sentence_index1">{{ _('Position in sentence: ') }}</label><input type="number" name="sentence_index1" id="sentence_index1" value="" placeholder="1" class="search_input distance_input"><br>
+{% if sentence_meta and sentence_meta|length > 0 %}
+<hr class="separator">
+<p class="query_fields_group_header">{{ _('Sentence-level annotation') }}</p>
+	{% for field in sentence_meta %}
+		{% if int_meta_fields and field in int_meta_fields %}
+		<label>{{ _('metafield_' + field) | capitalize }}{% if "sent_meta_" + field in partial_word_fields %}<span class="bi bi-patch-exclamation partial_annotation_icon" data-tooltip="tooltip" data-placement="top" title="{{ _('Only annotated in some texts') }}"></span>{% endif %}:</label>
+		<input type="number" class="search_input_num" name="sent_meta_{{ field }}__from1" id="sent_meta_{{ field }}__from1">&ndash;<input type="number" class="search_input_num" name="sent_meta_{{ field }}__to1" id="sent_meta_{{ field }}__to1"><br>
+		{% elif sentence_meta_values and field in sentence_meta_values %}
+		<label for="sent_meta_{{ field }}1">{{ _('metafield_' + field) | capitalize }}{% if "sent_meta_" + field in partial_word_fields %}<span class="bi bi-patch-exclamation partial_annotation_icon" data-tooltip="tooltip" data-placement="top" title="{{ _('Only annotated in some texts') }}"></span>{% endif %}:</label>
+		<select class="search_input" name="sent_meta_{{ field }}1" id="sent_meta_{{ field }}1"><br>
+			<option value="" {% if "sent_meta_" + field not in default_values %} selected {% endif %}></option>
+			{% for v in sentence_meta_values[field] %}
+			<option value="{{ v }}" {% if "sent_meta_" + field in default_values and default_values["sent_meta_" + field] == v %} selected {% endif %}>{{ _('metavalue_' + v) }}</option>
+			{% endfor %}
+		</select><br>
+		{% else %}
+		<label for="sent_meta_{{ field }}1">{{ _('metafield_' + field) | capitalize }}{% if "sent_meta_" + field in partial_word_fields %}<span class="bi bi-patch-exclamation partial_annotation_icon" data-tooltip="tooltip" data-placement="top" title="{{ _('Only annotated in some texts') }}"></span>{% endif %}:</label>
+		<input type="text" class="search_input" name="sent_meta_{{ field }}1" id="sent_meta_{{ field }}1" {% if "sent_meta_" + field in default_values %} value='{{ default_values["sent_meta_" + field] }}' {% endif %}>{% if multiple_choice_fields and "sent_meta_" + field in multiple_choice_fields %}<span class="gram_selector_link bi bi-table" data-field="sent_meta_{{ field }}" data-nword="1"></span>{% endif %}<br>
+		{% endif %}
+	{% endfor %}
+{% endif %}
