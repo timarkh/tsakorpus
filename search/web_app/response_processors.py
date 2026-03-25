@@ -394,10 +394,13 @@ class SentenceViewer:
             curClass += ' src '
         curClass = curClass.lstrip()
 
-        if 'word' in curClass:
+        if 'word' in curClass and 'words' in sentSrc:
+            sentMeta = {}
+            if 'meta' in sentSrc:
+                sentMeta = sentSrc['meta']
             dataAna = self.prepare_analyses(sentSrc['words'], curWords,
                                             lang, matchWordOffsets,
-                                            sentMeta=sentSrc['meta'],
+                                            sentMeta=sentMeta,
                                             translit=translit)
             dataBibref, dataBibrefTooltips = self.prepare_bib_ref(sentSrc['words'], curWords)
         else:
