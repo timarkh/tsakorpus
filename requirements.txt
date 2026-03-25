@@ -9,3 +9,4 @@ XlsxWriter
 sqlitedict
 pympler
 python-docx
+datasets

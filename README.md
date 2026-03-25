@@ -50,6 +50,13 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
+Для Windows:
+``` bash
+docker run -d --name tsakorpus-es -p 9200:9200 -e "discovery.type=single-node" -e "xpack.security.enabled=false" elasticsearch:9.3.0
+python -m venv .venv
+.venv\Scripts\activate.bat
+pip install -r requirements.txt
+```
 ### Загрузка данных
 Перед этим убедитесь, что у вас есть доступ к нужному датасету на Hugging Face
 ``` bash
