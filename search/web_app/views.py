@@ -883,9 +883,10 @@ def get_gramm_selector(lang=''):
     grammSelection = copy.deepcopy(settings.lang_props[lang]['gramm_selection'])
     for iCol in range(len(grammSelection['columns'])):
         for iTag in range(len(grammSelection['columns'][iCol])):
-            if 'value' in grammSelection['columns'][iCol][iTag]:
-                grammSelection['columns'][iCol][iTag]['value'] = rxJinjaBadPercent.sub('&percnt;',
-                                                                                       grammSelection['columns'][iCol][iTag]['value'])
+            for f in ('value', 'tooltip'):
+                if f in grammSelection['columns'][iCol][iTag]:
+                    grammSelection['columns'][iCol][iTag][f] =\
+                        rxJinjaBadPercent.sub('&percnt;', grammSelection['columns'][iCol][iTag][f])
     return render_template('modals/select_gramm.html', tag_table=grammSelection)
 
 
@@ -908,6 +909,12 @@ def get_gloss_selector(lang=''):
     if lang not in settings.lang_props or 'gloss_selection' not in settings.lang_props[lang]:
         return ''
     glossSelection = settings.lang_props[lang]['gloss_selection']
+    for iCol in range(len(glossSelection['columns'])):
+        for iTag in range(len(glossSelection['columns'][iCol])):
+            for f in ('value', 'tooltip'):
+                if f in glossSelection['columns'][iCol][iTag]:
+                    glossSelection['columns'][iCol][iTag][f] =\
+                        rxJinjaBadPercent.sub('&percnt;', glossSelection['columns'][iCol][iTag][f])
     return render_template('modals/select_gloss.html', glosses=glossSelection)
 
 
