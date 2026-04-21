@@ -987,6 +987,13 @@ hr.separator {
 	text-align: center;
 }
 
+.subcorpus_nested_option {
+    margin-left: 24px;
+    text-align: start;
+    padding-left: 12px;
+    background-color: #ffffffc7;
+}
+
 .subcorpus_option_enabled {
 	background-color: #fff9b2;
 }

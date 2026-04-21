@@ -19,20 +19,20 @@
 							{% for option in col %}
 								{% if option.type == "input_text" %}
 									<div class="autocomplete_input_div">
-									<input type="text" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input subcorpus_autocomplete" form="search_main" placeholder="{{ _('metafield_' + option.name) }}" title="{{ _('metafield_' + option.name) }}">
+									<input type="text" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input subcorpus_autocomplete{% if option.class %} {{ option.class }}{% endif %}" form="search_main" placeholder="{{ _('metafield_' + option.name) }}" title="{{ _('metafield_' + option.name) }}">
 									</div>
 								{% elif option.type == "input_number" %}
-									<input type="number" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) }}" title="{{ _('metafield_' + option.name) }}">
+									<input type="number" name="{{ option.name|safe }}" id="{{ option.name|safe }}" class="search_input subcorpus_input{% if option.class %} {{ option.class }}{% endif %}" form="search_main" placeholder="{{ _('metafield_' + option.name) }}" title="{{ _('metafield_' + option.name) }}">
 								{% elif option.type == "input_range" %}
 									<input type="number" name="{{ option.name|safe }}__from" id="{{ option.name|safe }}__from" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) }}" title="{{ _('metafield_' + option.name) }}: {{ _('lower bound') }}">&ndash;
 									<input type="number" name="{{ option.name|safe }}__to" id="{{ option.name|safe }}__to" class="search_input subcorpus_input" form="search_main" placeholder="{{ _('metafield_' + option.name) }}" title="{{ _('metafield_' + option.name) }}: {{ _('upper bound') }}">
 								{% elif option.type == "option" %}
-									<div class="switchable_subcorpus_option" data-name="{{ option.name|safe }}" data-value="{{ option.value|safe }}">{{ _(option.text)|safe }}
+									<div class="switchable_subcorpus_option{% if option.class %} {{ option.class }}{% endif %}" data-name="{{ option.name|safe }}" data-value="{{ option.value|safe }}">{{ _(option.text)|safe }}
 									</div>
 								{% elif option.type == "separator" %}
-									<hr class="separator subcorpus_separator">
+									<hr class="separator subcorpus_separator{% if option.class %} {{ option.class }}{% endif %}">
 								{% elif option.type == "header" %}
-									<div class="subcorpus_header">{{ _(option.text)|safe }}</div>
+									<div class="subcorpus_header{% if option.class %} {{ option.class }}{% endif %}">{{ _(option.text)|safe }}</div>
 								{% endif %}
 							{% endfor %}
 							</div>
