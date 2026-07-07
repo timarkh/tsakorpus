@@ -148,7 +148,7 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
         the event is used as the value.
         """
         for tierName in curWordAnno:
-            if tierName in ['tx', 'mb', 'mp', 'gr', 'ge', 'gg', 'ps', 'SpeakerContribution_Event']:
+            if tierName in ['tx', 'mb', 'mp', 'gr', 'ge', 'gg', 'ps', 'wge', 'wgr', 'wgg', 'SpeakerContribution_Event']:
                 continue
             elif len(curWordAnno[tierName]) > 0:
                 ana[tierName] = curWordAnno[tierName]
@@ -236,7 +236,10 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                     if 'lex' not in ana:
                         ana['lex'] = ' '.join(s[1] for s in stems)
                     ana['gloss_index'] = self.rxBracketGloss.sub('', newIndexGloss)
-                    ana['trans_en'] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
+                    if 'wge' in curWordAnno:
+                        ana['trans_en'] = curWordAnno['wge']
+                    else:
+                        ana['trans_en'] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
                     self.add_ana_fields(ana, curWordAnno)
                     useGlossList = False
                     if 'glosses' in self.corpusSettings:
@@ -247,7 +250,12 @@ class Exmaralda_Hamburg2JSON(Txt2JSON):
                     if 'gloss_index_' + glossLang in ana:
                         stems, newIndexGloss = self.tp.parser.find_stems(ana['gloss_index_' + glossLang],
                                                                          self.corpusSettings['languages'][0])
-                        ana['trans_' + glossLang] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
+                        if 'wgr' in curWordAnno and glossLang == 'ru':
+                            ana['trans_ru'] = curWordAnno['wgr']
+                        elif 'wgg' in curWordAnno and glossLang == 'de':
+                            ana['trans_de'] = curWordAnno['wgg']
+                        else:
+                            ana['trans_' + glossLang] = self.rxBracketGloss.sub('', ' '.join(s[0] for s in stems))
                         del ana['gloss_index_' + glossLang]
                         del ana['gloss_' + glossLang]
                         if 'glosses_covert_' + glossLang in ana:
