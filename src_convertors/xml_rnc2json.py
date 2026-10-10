@@ -82,7 +82,7 @@ class Xml_Rnc2JSON(Txt2JSON):
                     continue
                 if 'clean_words_rnc' in self.corpusSettings and self.corpusSettings['clean_words_rnc']:
                     word = self.tp.cleaner.clean_text(word, lang)
-                    wordClean, word = self.tp.cleaner.clean_token_rnc(word)
+                    wordClean, word = self.tp.cleaner.clean_token_rnc(word, lang)
                 else:
                     wordClean = word
                 tokenJSON['ana'] = self.tp.parser.transform_ana_rnc(mAna.group(1), lang=lang)

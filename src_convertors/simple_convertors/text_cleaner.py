@@ -181,16 +181,20 @@ class TextCleaner:
             if 'wf' in tokens[i] and tokens[i]['wtype'] == 'word':
                 tokens[i]['wf'] = self.clean_token(tokens[i]['wf'])
 
-    def clean_token_rnc(self, text):
+    def clean_token_rnc(self, text, lang=''):
         """
         Clean a token from things specific to the Russian National Corpus,
         such as stress marks.
         Return two versions of the token: one for the search, the other
         for the baseline.
         """
+        if len(lang) <= 0:
+            lang = self.settings['languages'][0]
+
         wordClean = self.rxRNCStress.sub('\\1', text)
         wordClean = self.rxModifierStress.sub('\\1', wordClean)
         wordText = self.rxRNCStress.sub('\\1́', text)
+        
         if lang.startswith(('hill_mari', 'meadow_mari', 'erzya', 'moksha', 'udmurt')):
             wordClean = self.rxCyrI10Small.sub('и', wordClean)
             wordClean = self.rxCyrI10Big.sub('И', wordClean)
