@@ -41,7 +41,7 @@ class TextCleaner:
     rxUdmZj = re.compile('(?<=[а-яА-ЯӜӞӴӝӟӵ])њ|њ(?=[а-яА-ЯӜӞӴӝӟӵ])')
 
     rxCyrI10Small = re.compile('[іїѷ]')
-    rxCyrI10Small = re.compile('[ІЇѶ]')
+    rxCyrI10Big = re.compile('[ІЇѶ]')
     rxYer = re.compile('[ъЪ]\\b')
     rxAllStressMarks = re.compile('[́̀]')
     rxYatSmall = re.compile('ѣ')
@@ -194,7 +194,7 @@ class TextCleaner:
         wordClean = self.rxRNCStress.sub('\\1', text)
         wordClean = self.rxModifierStress.sub('\\1', wordClean)
         wordText = self.rxRNCStress.sub('\\1́', text)
-        
+
         if lang.startswith(('hill_mari', 'meadow_mari', 'erzya', 'moksha', 'udmurt')):
             wordClean = self.rxCyrI10Small.sub('и', wordClean)
             wordClean = self.rxCyrI10Big.sub('И', wordClean)
