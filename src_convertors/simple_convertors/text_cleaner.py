@@ -40,6 +40,15 @@ class TextCleaner:
     rxUdmDzh = re.compile('(?<=[а-яА-ЯӜӞӴӝӟӵ])љ|љ(?=[а-яА-ЯӜӞӴӝӟӵ])')
     rxUdmZj = re.compile('(?<=[а-яА-ЯӜӞӴӝӟӵ])њ|њ(?=[а-яА-ЯӜӞӴӝӟӵ])')
 
+    rxCyrI10Small = re.compile('[іїѷ]')
+    rxCyrI10Small = re.compile('[ІЇѶ]')
+    rxYer = re.compile('[ъЪ]\\b')
+    rxAllStressMarks = re.compile('[́̀]')
+    rxYatSmall = re.compile('ѣ')
+    rxYatBig = re.compile('Ѣ')
+    rxThetaSmall = re.compile('ѳ')
+    rxThetaBig = re.compile('Ѳ')
+
     rxArmPeriod = re.compile('(?<![a-zA-Z ]):')
     rxArmIntraWordPunc = re.compile('[՞՜՛]')
     rxArmOldCond = re.compile('^կը +')
@@ -151,6 +160,14 @@ class TextCleaner:
         wordClean = text
         if lang in ['armenian']:
             wordClean = self.rxArmIntraWordPunc.sub('', wordClean)
+        if lang.startswith(('hill_mari', 'meadow_mari', 'erzya', 'moksha', 'udmurt')):
+            wordClean = self.rxCyrI10Small.sub('и', wordClean)
+            wordClean = self.rxCyrI10Big.sub('И', wordClean)
+            wordClean = self.rxYer.sub('', wordClean)
+            wordClean = self.rxYatSmall.sub('е', wordClean)
+            wordClean = self.rxYatBig.sub('Е', wordClean)
+            wordClean = self.rxThetaSmall.sub('ф', wordClean)
+            wordClean = self.rxThetaBig.sub('Ф', wordClean)
         return wordClean
 
     def clean_tokens(self, tokens, lang=''):
@@ -174,4 +191,12 @@ class TextCleaner:
         wordClean = self.rxRNCStress.sub('\\1', text)
         wordClean = self.rxModifierStress.sub('\\1', wordClean)
         wordText = self.rxRNCStress.sub('\\1́', text)
+        if lang.startswith(('hill_mari', 'meadow_mari', 'erzya', 'moksha', 'udmurt')):
+            wordClean = self.rxCyrI10Small.sub('и', wordClean)
+            wordClean = self.rxCyrI10Big.sub('И', wordClean)
+            wordClean = self.rxYer.sub('', wordClean)
+            wordClean = self.rxYatSmall.sub('е', wordClean)
+            wordClean = self.rxYatBig.sub('Е', wordClean)
+            wordClean = self.rxThetaSmall.sub('ф', wordClean)
+            wordClean = self.rxThetaBig.sub('Ф', wordClean)
         return wordClean, wordText

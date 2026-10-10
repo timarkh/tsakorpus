@@ -81,7 +81,7 @@ class Xml_Rnc2JSON(Txt2JSON):
                 if len(word) <= 0:
                     continue
                 if 'clean_words_rnc' in self.corpusSettings and self.corpusSettings['clean_words_rnc']:
-                    word = self.tp.cleaner.clean_text(word)
+                    word = self.tp.cleaner.clean_text(word, lang)
                     wordClean, word = self.tp.cleaner.clean_token_rnc(word)
                 else:
                     wordClean = word
@@ -124,7 +124,7 @@ class Xml_Rnc2JSON(Txt2JSON):
         seParts = self.rxSeParts.split(se)
         for part in seParts:
             if not bProcessXML:
-                part = self.tp.cleaner.clean_text(part)
+                part = self.tp.cleaner.clean_text(part, lang)
                 words = self.tp.tokenizer.tokenize(part)
                 curSent = {'words': words, 'text': part}
                 if 'corpus_type' in self.corpusSettings and self.corpusSettings['corpus_type'] == 'parallel':
