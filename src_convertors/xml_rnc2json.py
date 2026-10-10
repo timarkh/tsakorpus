@@ -126,6 +126,11 @@ class Xml_Rnc2JSON(Txt2JSON):
             if not bProcessXML:
                 part = self.tp.cleaner.clean_text(part, lang)
                 words = self.tp.tokenizer.tokenize(part)
+                if 'clean_words_rnc' in self.corpusSettings and self.corpusSettings['clean_words_rnc']:
+                    for i in range(len(words)):
+                        wf = self.tp.cleaner.clean_text(words[i]['wf'], lang)
+                        wfClean, wf = self.tp.cleaner.clean_token_rnc(wf, lang)
+                        words[i]['wf'] = wfClean
                 curSent = {'words': words, 'text': part}
                 if 'corpus_type' in self.corpusSettings and self.corpusSettings['corpus_type'] == 'parallel':
                     paraAlignment = {'off_start': 0, 'off_end': len(part), 'para_id': self.pID}
