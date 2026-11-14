@@ -86,6 +86,8 @@ class SentenceViewer:
         """
         differingField = ''
         for key in ana1:
+            if key in ('l_id', 'w_id'):
+                continue
             if key not in ana2:
                 return None
             if key in ('gloss', 'gloss_index'):
@@ -150,7 +152,8 @@ class SentenceViewer:
                     continue
                 if j in matchingAnalyses and i not in matchingAnalyses:
                     continue
-                if len(analyses[i]) != len(analyses[j]):
+                if (sum(1 for ak in analyses[i] if ak not in ('l_id', 'w_id'))
+                        != sum(1 for ak in analyses[j] if ak not in ('l_id', 'w_id'))):
                     continue
                 differingField = self.differing_ana_field(analyses[i], analyses[j])
                 if (differingField is not None
